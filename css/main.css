@@ -1,0 +1,100 @@
+.page {
+	text-align: center;	
+}
+
+p {
+	text-align: justify;
+}
+
+/*code {
+	background-color: rgba( 0, 0, 0, .3 );
+    border-radius: 3px;
+    padding: 2px 5px;
+}*/
+
+ul:not(.list-of-pages),
+ol {
+	max-width: max-content;
+	margin: 0 auto;
+	text-align: left;
+}
+
+.block-of-material > table {
+    text-align: justify;
+    margin: 0 auto;
+    border-collapse: collapse;
+}
+
+.block-of-material > table th,
+.block-of-material > table td {
+	border: 1px solid black;
+}
+
+th {
+	background: lightgrey;
+}
+
+a[href*="http"]:not(.tools-bar a) {
+	background-position: center right;
+    background-repeat: no-repeat;
+    background-image: url('https://en.wikipedia.org/w/skins/Vector/images/external-link-ltr-icon.png?325de');
+    padding-right: 13px;
+}
+
+.page-headings-container {
+	display: none;
+	position: fixed;
+	background: bisque;
+	padding: 5px;
+	z-index: 1;
+}
+
+.tools-bar {
+	position: fixed;
+	top: 5px;
+	right: 5px;
+	border: 1px solid black;
+	z-index: 1;
+}
+
+.tools-bar a {
+	display: block;
+	text-decoration: none;
+	opacity: .7;
+}
+
+.tools-bar a:hover {
+	opacity: 1;
+}
+
+.page img {
+	width: 100%;
+	border: 2px solid black;
+	cursor: pointer;
+}
+
+@media (min-width: 1000px) {
+	p {
+		text-align: center;
+	}
+
+	.page img {
+		width: 50%;
+	}
+}
+
+.navigation-panel {
+	text-align: left;
+}
+
+/*For code hosted on GitHub*/
+@media (min-width: 1000px) {
+	.gist {
+		max-width: 50%;
+		margin: 0 auto;
+	}
+}
+
+.gist-meta {
+	display: none;
+}

@@ -1,0 +1,98 @@
+<!doctype html>
+<html class="no-js" lang="en">
+
+<head>
+  <!-- Global site tag (gtag.js) - Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=UA-134228602-1"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'UA-134228602-1');
+  </script>
+
+  <meta charset="utf-8">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  <title>Writing Unit Tests on Swift for Verifying Asynchronous Tasks</title>
+  <meta name="description" content="Today I want to quickly tell you how to test asynchronous code. 
+ Imagine the situation that you need to download data from the Internet and check whe...">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+  <link rel="stylesheet" href="../../css/main.css">
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+  <script>window.jQuery || document.write('<script src="../../js/vendors/jquery-3.3.1.min.js"><\/script>')</script>
+</head>
+
+<body>
+  <!--[if lte IE 9]>
+    <p class="browserupgrade">You are using an <strong>outdated</strong> browser. Please <a href="https://browsehappy.com/">upgrade your browser</a> to improve your experience and security.</p>
+  <![endif]-->
+  <nav class="page-headings-container js-page-headings-container"></nav>
+  <div class="tools-bar js-tools-bar">
+    <!-- <a href="https://quick-geek.github.io/search.html" title="Search">🔎</a> -->
+    <a class="js-list-of-headings-button" data-state="closed" href="#" title="Headings">📜</a>
+    <a class="js-go-to-top-button" href="#" title="Go to Top">⬆️</a>
+    <a class="js-go-to-bottom-button" href="#" title="Go to Bottom">⬇️</a>
+  </div>
+  <section class="page js-page"><h1>Writing Unit Tests on Swift for Verifying Asynchronous Tasks</h1><div class="post__text post__text-html js-mediator-article">  Today I want to quickly tell you how to test asynchronous code. <br>  Imagine the situation that you need to download data from the Internet and check whether everything is working fine, or some other task that is being performed asynchronously.  And how to test it?  What if you try just like regular synchronous code ?! <br><pre><code class="swift hljs"><span class="hljs-function"><span class="hljs-keyword"><span class="hljs-function"><span class="hljs-keyword">func</span></span></span><span class="hljs-function"> </span><span class="hljs-title"><span class="hljs-function"><span class="hljs-title">testAscynFunction</span></span></span><span class="hljs-params"><span class="hljs-function"><span class="hljs-params">()</span></span></span></span> { someAsyncFunction() } <span class="hljs-function"><span class="hljs-keyword"><span class="hljs-function"><span class="hljs-keyword">func</span></span></span><span class="hljs-function"> </span><span class="hljs-title"><span class="hljs-function"><span class="hljs-title">someAsyncFunction</span></span></span><span class="hljs-params"><span class="hljs-function"><span class="hljs-params">()</span></span></span></span> { <span class="hljs-keyword"><span class="hljs-keyword">let</span></span> bg = <span class="hljs-type"><span class="hljs-type">DispatchQueue</span></span>.global(qos: .background) bg.asyncAfter(deadline: .now() + <span class="hljs-number"><span class="hljs-number">5</span></span>) { <span class="hljs-type"><span class="hljs-type">XCTAssert</span></span>(<span class="hljs-literal"><span class="hljs-literal">false</span></span>, <span class="hljs-string"><span class="hljs-string">"Something went wrong"</span></span>) } }</code> </pre> <br><br>  Such a test will return us a positive result, since the method will not wait for all our asynchronous tasks. <br><br>  To solve this problem in tests there is one wonderful thing: <a name="habracut"></a>  XCTestExpectation <br>  XCTestExpectation sets how many times the asynchronous method should be executed and only after all these executions the test will end and tell if there were any errors.  Here is an example: <br><br><pre> <code class="swift hljs"><span class="hljs-class"><span class="hljs-keyword"><span class="hljs-class"><span class="hljs-keyword">class</span></span></span><span class="hljs-class"> </span><span class="hljs-title"><span class="hljs-class"><span class="hljs-title">TestAsyncTests</span></span></span><span class="hljs-class">: </span><span class="hljs-title"><span class="hljs-class"><span class="hljs-title">XCTestCase</span></span></span><span class="hljs-class"> </span></span>{ <span class="hljs-comment"><span class="hljs-comment">// 1) объявляем expectation var expectation: XCTestExpectation! func testWithExpectationExample() { //2) Инициализируем его expectation = expectation(description: "Testing Async") //3) задаем то количество раз, сколько должен исполниться метод expectation.fulfill() expectation.expectedFulfillmentCount = 5 for index in 0...5 { someAsyncFunctionWithExpectation(at: index) } //5) Ожидаем пока исполнится нужное количество expectation.fulfill() // в противном же случае по истечении 60 сек метод сам выдаст ошибку, так как не дождался waitForExpectations(timeout: 60) { (error) in if let error = error { XCTFail("WaitForExpectationsWithTimeout errored: \(error)") } } } func someAsyncFunctionWithExpectation(at index: Int) { let bg = DispatchQueue.global(qos: .background) bg.asyncAfter(deadline: .now() + 5) { [weak self ] in XCTAssert(false, "Something went wrong at index \(index)") //4) Именно его исполнение и подсчитывает expectation.expectedFulfillmentCount self?.expectation.fulfill() } } }</span></span></code> </pre><br><br>  I hope someone will be useful this note. </div><p>Source: <a href="https://habr.com/ru/post/439772/">https://habr.com/ru/post/439772/</a></p>
+<section class="navigation-panel">
+<h4>More articles:</h4>
+<nav><ul class="list-of-pages">
+<li><a href="../439746/index.html">Promises in JavaScript</a></li>
+<li><a href="../439748/index.html">The digest of interesting materials for the mobile developer # 285 (February 4 - 10)</a></li>
+<li><a href="../439750/index.html">Learn product management - where?</a></li>
+<li><a href="../439752/index.html">Multicore MRI Method</a></li>
+<li><a href="../439754/index.html">Google is going to be engaged in the development of smart watches</a></li>
+<li><a href="../439756/index.html">Why do I need a thermo-acoustic generator?</a></li>
+<li><a href="../439760/index.html">Engineers "twisted" the light in the fiber - a new technology will speed up the transfer of data a hundred times</a></li>
+<li><a href="../439764/index.html">Corporate fruit</a></li>
+<li><a href="../439772/index.html">Writing Unit Tests on Swift for Verifying Asynchronous Tasks</a></li>
+<li><a href="../439778/index.html">The digest of fresh materials from the world of the frontend for the last week No. 351 (February 4 - 10, 2019)</a></li>
+<li><a href="../439780/index.html">PHP Digest number 149 (January 28 - February 11, 2019)</a></li>
+<li><a href="../439782/index.html">Headless CMS - the future of content management</a></li>
+</ul></nav>
+</section>
+<script src="../../js/main.js"></script>
+
+<!-- Yandex.Metrika counter -->
+<script type="text/javascript" >
+  (function (d, w, c) {
+      (w[c] = w[c] || []).push(function() {
+          try {
+              w.yaCounter52319614 = new Ya.Metrika({
+                  id:52319614,
+                  clickmap:true,
+                  trackLinks:true,
+                  accurateTrackBounce:true,
+                  webvisor:true
+              });
+          } catch(e) { }
+      });
+
+      var n = d.getElementsByTagName("script")[0],
+          s = d.createElement("script"),
+          f = function () { n.parentNode.insertBefore(s, n); };
+      s.type = "text/javascript";
+      s.async = true;
+      s.src = "https://mc.yandex.ru/metrika/watch.js";
+
+      if (w.opera == "[object Opera]") {
+          d.addEventListener("DOMContentLoaded", f, false);
+      } else { f(); }
+  })(document, window, "yandex_metrika_callbacks");
+</script>
+<noscript><div><img src="https://mc.yandex.ru/watch/52319614" style="position:absolute; left:-9999px;" alt="" /></div></noscript>
+
+<!-- Google Analytics -->
+  <script>
+    window.ga = function () { ga.q.push(arguments) }; ga.q = []; ga.l = +new Date;
+    ga('create', 'UA-134228602-1', 'auto'); ga('send', 'pageview')
+  </script>
+  <script src="https://www.google-analytics.com/analytics.js" async defer></script>
+
+</section>
+</body>
+
+</html>
