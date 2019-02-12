@@ -1,0 +1,1 @@
+Remote control application release: Aspia 1.1.0

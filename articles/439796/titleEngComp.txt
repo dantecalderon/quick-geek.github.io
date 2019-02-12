@@ -1,0 +1,1 @@
+Spring Boot 2: what is not written in release notes

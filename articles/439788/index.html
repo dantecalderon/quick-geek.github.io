@@ -1,0 +1,134 @@
+<!doctype html>
+<html class="no-js" lang="en">
+
+<head>
+  <!-- Global site tag (gtag.js) - Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=UA-134228602-1"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'UA-134228602-1');
+  </script>
+
+  <meta charset="utf-8">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  <title>Regular oddities in the GOST Grasshopper and Stribog algorithms</title>
+  <meta name="description" content="Hi% username%! 
+
+ Cryptographic algorithms in Russia do not pass through open contests, they simply let us down from above. And sooner or later it wil...">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+  <link rel="stylesheet" href="../../css/main.css">
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+  <script>window.jQuery || document.write('<script src="../../js/vendors/jquery-3.3.1.min.js"><\/script>')</script>
+</head>
+
+<body>
+  <!--[if lte IE 9]>
+    <p class="browserupgrade">You are using an <strong>outdated</strong> browser. Please <a href="https://browsehappy.com/">upgrade your browser</a> to improve your experience and security.</p>
+  <![endif]-->
+  <nav class="page-headings-container js-page-headings-container"></nav>
+  <div class="tools-bar js-tools-bar">
+    <!-- <a href="https://quick-geek.github.io/search.html" title="Search">🔎</a> -->
+    <a class="js-list-of-headings-button" data-state="closed" href="#" title="Headings">📜</a>
+    <a class="js-go-to-top-button" href="#" title="Go to Top">⬆️</a>
+    <a class="js-go-to-bottom-button" href="#" title="Go to Bottom">⬇️</a>
+  </div>
+  <section class="page js-page"><h1>Regular oddities in the GOST Grasshopper and Stribog algorithms</h1><div class="post__text post__text-html js-mediator-article">  Hi% username%! <br><br>  Cryptographic algorithms in Russia do not pass through open contests, they simply let us down from above.  And sooner or later it will strongly buzz us.  This article is about the latest study of our guests. <br><br><div style="text-align:center;"><img src="https://habrastorage.org/webt/e_/xx/fs/e_xxfsqqbqv_wa9dwa6j1orx2jw.jpeg"></div><a name="habracut"></a><br>  In 2016, researchers <a href="https://eprint.iacr.org/2016/071">showed</a> that the permutation table in the Russian hashing and encryption algorithms Grasshopper and Stribog has a structure that is very far from random.  This is after a <a href="https://eprint.iacr.org/2014/675">trivial error</a> was found in Stribog, reducing its resistance from <sup>2,512</sup> to <sup>2,266</sup> . <br><br>  On January 29, 2019, a <a href="https://eprint.iacr.org/2019/092">new study</a> “Partitions in the S-Box of Streebog and Kuznyechik” was published, which explicitly hints at the theoretical possibility of a <b>backdoor</b> in these algorithms. <br><br>  So, S-Box - or replacement table, is a key security element in many symmetric encryption and hashing algorithms.  An example of such a table is shown in the figure. <br><br><img src="https://habrastorage.org/webt/kx/kq/c-/kxkqc-v73ri8dpl3uxuvppj_tbw.jpeg"><br><br>  In general, this table maps one bit sequence to another.  But by what principle - always a big question. <br><br>  State structures are often limited to their publication without any rational explanation.  In the case of DES, the NSA suggested changing the S-Box before the algorithm became standard.  Only many years later it turned out that this change actually increased the resistance of DES to differential cryptanalysis. <br><br>  In the case of new guests, not everything is so rosy.  The authors declared that the replacement table was randomly selected.  Here is a slide from the presentation of the algorithm, which states that the authors chose a table at random.  So that it does not have an explicit structure that would help produce effective cryptanalysis.  (Red is what you chose) <br><br><img src="https://habrastorage.org/webt/uq/pt/p6/uqptp6rznt9jhljduf1eebeutj8.jpeg"><br><br>  Here is the table <br><br><img src="https://habrastorage.org/webt/cd/mw/fo/cdmwfooay7jk6yyryjj9hxlss1q.jpeg"><br><br>  But, first, as it turned out, it was not generated randomly, but with the help of a clever algorithm, which was <a href="https://eprint.iacr.org/2015/812">picked up</a> in 2015m. <br><br><img src="https://habrastorage.org/webt/p5/7o/o-/p57oo-tb9lzqgjs7z_hg32wnfxa.jpeg"><br><br>  Secondly, the authors did not leave attempts to find out the reason for this approach to the design of the S-Box and came up with very interesting results. <br><br>  It turned out that the algorithms that form the replacement table are more than one.  Different groups of researchers described completely different algorithms that have almost nothing in common, but come to the same table. <br><br>  This led the authors of the original research to dig deeper into the structure of these algorithms and to find common elements that they succeeded in. <br><br><h3>  Tklog </h3><br>  TKlog is a permutation construction, which the authors of the cryptanalysis named after the Russian office of TK-26, where the Grasshopper and Stribog were created.  Her description is far beyond the scope of this article, anyone can refer to the <a href="https://eprint.iacr.org/2019/092.pdf">original</a> .  In a nutshell, its key feature is the use of discrete logarithm, just like in asymmetric cryptography. <br><br>  What is important is the fact that both versions of the replacement function from GOST-based algorithms are a special case of the TKlog construction.  Like another replacement function from the <b>Belarusian</b> BelT <b>algorithm</b> .  Functions are different, but they boil down to one. <br><br><div class="spoiler">  <b class="spoiler_title">Hidden text</b> <div class="spoiler_text"><img src="https://habrastorage.org/webt/ns/uf/f5/nsuff5obmq-gql6xjd5lwzgnlvq.jpeg"><br></div></div><br><br>  The fact that there are very few different variants of the TKlog conversion speaks about the deliberate use of this particular, non-randomized structure instead of the random one shown on the slide. <br><br><h3>  Splitting into related classes </h3><br>  A key property of the TKlog transform is that it works with the so-called cosets.  And compares one to another. <br><br>  The problem is that these adjacent classes are multiplicative, as in all ordinary algorithms.  And there are additive. <br><br>  So, the only known case where additive adjacent classes were used in the function of replacing block ciphers is a <i>special creation of a backdoor</i> .  Information about this is in the <a href="https://eprint.iacr.org/2016/493">work of</a> 2016. <br><br>  Such backdoors are called NOBUS, abbr.  from “NObody But US”, these are vulnerabilities that only the authors of the algorithms can exploit. <br><br><h3>  Instead of conclusion </h3><br>  The authors of cryptanalysis did not present new attacks on the existing GOST algorithms, but asked a fair question of the expediency of this whole circus with a supposedly random permutation table. <br><br>  The NSA recently tried to push its lightweight symmetric algorithms Simon and Speck into standards.  And the very fact of the existence of replacement tables with a design, the description of which was not provided, was enough to be banished from everywhere with pissing rags. <br><br>  We have no such opportunity. <br><br>  PS Do not forget that Stribog was used to generate the parameters of the new GOST-based elliptic curves.  With it, hashed the mystical constant W. </div><p>Source: <a href="https://habr.com/ru/post/439788/">https://habr.com/ru/post/439788/</a></p>
+<section class="navigation-panel">
+<h4>More articles:</h4>
+<nav><ul class="list-of-pages">
+<li><a href="../439746/index.html">Understand the promises in javascript</a></li>
+<li><a href="../439748/index.html">The digest of interesting materials for the mobile developer # 285 (February 4 - 10)</a></li>
+<li><a href="../439750/index.html">Learn product management - where?</a></li>
+<li><a href="../439752/index.html">Multicore MRI Method</a></li>
+<li><a href="../439754/index.html">Google is going to be engaged in the development of smart watches</a></li>
+<li><a href="../439756/index.html">Why do I need a thermo-acoustic generator?</a></li>
+<li><a href="../439760/index.html">Engineers "twisted" the light in the fiber - a new technology will speed up the transfer of data a hundred times</a></li>
+<li><a href="../439764/index.html">Corporate fruit</a></li>
+<li><a href="../439772/index.html">Writing Unit Tests on Swift for Verifying Asynchronous Tasks</a></li>
+<li><a href="../439778/index.html">The digest of fresh materials from the world of the frontend for the last week No. 351 (February 4 - 10, 2019)</a></li>
+<li><a href="../439780/index.html">PHP Digest number 149 (January 28 - February 11, 2019)</a></li>
+<li><a href="../439782/index.html">Headless CMS - the future of content management</a></li>
+<li><a href="../439784/index.html">Methane engine "Raptor" broke the record RD-180</a></li>
+<li><a href="../439788/index.html">Regular oddities in the GOST Grasshopper and Stribog algorithms</a></li>
+<li><a href="../439790/index.html">Test JaCarta WebClient or store tokens in a safe</a></li>
+<li><a href="../439792/index.html">NASA is looking for partners in the American industry to create a partially reusable manned lender</a></li>
+<li><a href="../439794/index.html">Back pain - understanding from the perspective of modern medicine</a></li>
+<li><a href="../439796/index.html">Spring Boot 2: what is not written in release notes</a></li>
+<li><a href="../439800/index.html">RISEX and Julia. 5 stages of love customer and designer</a></li>
+<li><a href="../439806/index.html">Valid SSL domain names for local Docker containers</a></li>
+<li><a href="../439808/index.html">The biggest telescopes. From a notebook and eyes to 340 megapixel cameras and data centers. Part 1</a></li>
+<li><a href="../439810/index.html">Get acquainted with the Moleculer microservice framework</a></li>
+<li><a href="../439816/index.html">Practical blockchain in business</a></li>
+<li><a href="../439818/index.html">Features of approaches to design in the real manufacturing sector</a></li>
+<li><a href="../439820/index.html">We are trying to write a project alone. Introduction</a></li>
+<li><a href="../439822/index.html">Creating an alternative display for the Ensoniq EPS16 + and ASR10 synthesizer / sampler</a></li>
+<li><a href="../439824/index.html">When will the JavaScript frameworks disappear?</a></li>
+<li><a href="../439826/index.html">Disable analog. What will happen to the TV?</a></li>
+<li><a href="../439828/index.html">The network appeared "analog" Findface</a></li>
+<li><a href="../439840/index.html">Conference DUMP-2019: we invite you to speak in the sections Design, Management and Testing</a></li>
+<li><a href="../439852/index.html">Remote control application release: Aspia 1.1.0</a></li>
+<li><a href="../439858/index.html">Prometheus + Grafana + Node Exporter + Docker in Azure with notifications in Telegram</a></li>
+<li><a href="../439862/index.html">Digital events in Moscow from February 11 to 17</a></li>
+<li><a href="../439866/index.html">Principles of design reference books in 1C Enterprise Management 2 (ERP 2.4.6)</a></li>
+<li><a href="../439868/index.html">Life without Facebook: less radical views, good mood, more time for loved ones. Now proven by science</a></li>
+<li><a href="../439878/index.html">Creation of architecture for a new high-load startup in 2019</a></li>
+<li><a href="../439880/index.html">Security Week 07: Local IoT Device Vulnerabilities</a></li>
+<li><a href="../439886/index.html">How I trained the neural network to implement the position estimation function on the Russian AI Cup CodeBall 2018</a></li>
+<li><a href="../439894/index.html">How easy it is to monitor the site</a></li>
+<li><a href="../439900/index.html">Julia and the method of coordinate descent</a></li>
+<li><a href="../439902/index.html">Explaining the physical essence of the Wing Lift phenomenon without using the Bernouli equation. Part 2</a></li>
+<li><a href="../439906/index.html">Critical vulnerability in Zemana products and not only</a></li>
+<li><a href="../439908/index.html">Kohl, piss off ... Coax</a></li>
+<li><a href="../439912/index.html">Unsolved mystery of view</a></li>
+<li><a href="../439916/index.html">Unpacking: Dridex bootloader</a></li>
+<li><a href="../439922/index.html">Taxation of IP in Kazakhstan how to be a freelancer?</a></li>
+<li><a href="../439924/index.html">The volume of parcels from foreign online stores grew by 25%</a></li>
+</ul></nav>
+</section>
+<script src="../../js/main.js"></script>
+
+<!-- Yandex.Metrika counter -->
+<script type="text/javascript" >
+  (function (d, w, c) {
+      (w[c] = w[c] || []).push(function() {
+          try {
+              w.yaCounter52319614 = new Ya.Metrika({
+                  id:52319614,
+                  clickmap:true,
+                  trackLinks:true,
+                  accurateTrackBounce:true,
+                  webvisor:true
+              });
+          } catch(e) { }
+      });
+
+      var n = d.getElementsByTagName("script")[0],
+          s = d.createElement("script"),
+          f = function () { n.parentNode.insertBefore(s, n); };
+      s.type = "text/javascript";
+      s.async = true;
+      s.src = "https://mc.yandex.ru/metrika/watch.js";
+
+      if (w.opera == "[object Opera]") {
+          d.addEventListener("DOMContentLoaded", f, false);
+      } else { f(); }
+  })(document, window, "yandex_metrika_callbacks");
+</script>
+<noscript><div><img src="https://mc.yandex.ru/watch/52319614" style="position:absolute; left:-9999px;" alt="" /></div></noscript>
+
+<!-- Google Analytics -->
+  <script>
+    window.ga = function () { ga.q.push(arguments) }; ga.q = []; ga.l = +new Date;
+    ga('create', 'UA-134228602-1', 'auto'); ga('send', 'pageview')
+  </script>
+  <script src="https://www.google-analytics.com/analytics.js" async defer></script>
+
+</section>
+</body>
+
+</html>

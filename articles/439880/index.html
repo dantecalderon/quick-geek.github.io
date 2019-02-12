@@ -1,0 +1,132 @@
+<!doctype html>
+<html class="no-js" lang="en">
+
+<head>
+  <!-- Global site tag (gtag.js) - Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=UA-134228602-1"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'UA-134228602-1');
+  </script>
+
+  <meta charset="utf-8">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  <title>Security Week 07: Local IoT Device Vulnerabilities</title>
+  <meta name="description" content="In the traditional rubric of “what else is wrong with IoT,” last week a scientific study of specialists from American University of Michigan and the B...">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+  <link rel="stylesheet" href="../../css/main.css">
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+  <script>window.jQuery || document.write('<script src="../../js/vendors/jquery-3.3.1.min.js"><\/script>')</script>
+</head>
+
+<body>
+  <!--[if lte IE 9]>
+    <p class="browserupgrade">You are using an <strong>outdated</strong> browser. Please <a href="https://browsehappy.com/">upgrade your browser</a> to improve your experience and security.</p>
+  <![endif]-->
+  <nav class="page-headings-container js-page-headings-container"></nav>
+  <div class="tools-bar js-tools-bar">
+    <!-- <a href="https://quick-geek.github.io/search.html" title="Search">🔎</a> -->
+    <a class="js-list-of-headings-button" data-state="closed" href="#" title="Headings">📜</a>
+    <a class="js-go-to-top-button" href="#" title="Go to Top">⬆️</a>
+    <a class="js-go-to-bottom-button" href="#" title="Go to Bottom">⬇️</a>
+  </div>
+  <section class="page js-page"><h1>Security Week 07: Local IoT Device Vulnerabilities</h1><div class="post__text post__text-html js-mediator-article">  In the traditional rubric of “what else is wrong with IoT,” last week a scientific study of specialists from American University of Michigan and the Brazilian Federal University of Pernambuco was added.  As part of the study, 96 IoT devices for smart homes from the list of best-selling sites on the Amazon site were studied.  Scientists have analyzed applications for managing these devices from a smartphone, both manually and using automated tools for analyzing network communications.  First of all, we looked for vulnerabilities that allow us to seize control of IoT devices due to an inadequately secure connection. <br><br><div style="text-align:center;"><img src="https://habrastorage.org/webt/bd/c7/vl/bdc7vlrtd7db62wjgt4t8kbr8vw.jpeg"></div><br><br>  For 96 different devices, we managed to assemble 32 unique control applications.  Of these, half either do not encrypt traffic when working with IoT, or use fixed encryption keys.  Accordingly, not only the owner can control the devices, but anyone else, with one reservation - if there is access to the local network.  The study in PDF is <a href="https://arxiv.org/pdf/1901.10062.pdf">here</a> , a summary in Russian is in <a href="https://threatpost.ru/vulnerabilities-in-android-apps-for-iot/30957/">this news</a> .  We will focus on the most interesting details of the work. <br><a name="habracut"></a><br>  Unlike a generic safety study, usually focused on the specific vulnerability of a particular device, the Brazilian and American scientific work offers a comprehensive approach.  It can theoretically be used to assess the security of any IoT devices capable of connecting to the Internet and / or local network.  The approach turned out to be the following: we will limit ourselves to the study of control applications and how they interact with the devices of the smart home.  Gaps in the devices themselves are not taken into account - it is assumed that if the client part is vulnerable, then you can not dig, and so everything is bad enough. <br><br><div style="text-align:center;"><img src="https://habrastorage.org/webt/la/52/7e/la527etydrfeie14_rsaohv_mmm.png"></div><br><br>  The operation scheme of a typical device, such as a video surveillance camera, involves interaction with a smartphone through a controller — either directly via a local network or through a cloud system on the manufacturer’s side.  To begin with, the researchers purchased the five most popular smart home devices and studied them manually.  Problems were immediately detected - for example, with such a remotely controlled TP-Link socket: <br><br><div style="text-align:center;"><img src="https://habrastorage.org/webt/ez/9o/no/ez9onoi_if6cq_pdlz97lbiikcg.png"></div><br><br>  The initial setup of the device through the application on the smartphone is completely unencrypted.  In normal operation, data encryption is provided, but the encryption key is the same for all devices in the series.  To confirm the practical consequences of this approach, the researchers posted a <a href="https://figshare.com/s/d5bc439a7527df358f5f">video</a> confirming the possibility of intercepting control over the device.  The study of the five devices allowed us to formulate questions, the answers to which were later found using (mostly) an automated analysis system: <br><br><ul><li>  Is the "default" encryption key specified in the firmware used? </li><li>  Is the direct connection between the device and the smartphone over a local network used? </li><li>  Is the application and device broadcasting messages over the network? </li><li>  Is a known vulnerable communication protocol used? </li></ul><br>  The answers for the four selected applications are the following: <br><br><div style="text-align:center;"><img src="https://habrastorage.org/webt/jg/rg/zz/jgrgzzbajp9mmkg4gfv15eiizhu.png"></div><br><br>  Kasa Smart is an application for TP-Link devices, such as the smart socket above.  <a href="https://www.lifx.com/">LIFX</a> is a manufacturer of remote controlled light bulbs.  WeMo is being developed by Belkin, and e-Control by <a href="http://www.ibroadlink.com/app/">BroadLink</a> , in both cases it is about controlling lighting and electrical appliances, televisions and household appliances via infrared, as well as security systems.  In the case of WeMo, the researchers found the lack of encryption and any authorization when communicating with devices on the local network.  Intercepting network packets, scientists were able to create a script that manages Belkin smart devices without the knowledge of the owner. <br><br><div style="text-align:center;"><img src="https://habrastorage.org/webt/to/4a/7w/to4a7wcls4o7dvq-3p5hrx623r8.png"></div><br><br>  General research results: 16 applications either do not use encryption, or they are encrypted using a fixed key.  18 applications communicate with devices over a local network, 14 communicate only through the manufacturer's server.  6 applications use vulnerable communication protocols.  The Register has <a href="https://www.theregister.co.uk/2019/02/04/iot_apps_encryption/">requested</a> comments from the companies mentioned in the study.  The commentary of the manufacturer of smart bulbs LIFX boils down to the fact that the company is looking for a balance between security and convenience, and this is, in general, a key problem for IoT devices. <br><br>  Communication directly between devices (or a controller) and a smartphone over a local area network protects the user from a sudden bankruptcy of the manufacturer or the termination of support for outdated devices.  If your IoT is tied to a cloud in such a situation, you are alone with a non-working piece of hardware.  But the manufacturers' argument that there is no need to protect communications in the local network is also controversial.  The local network can be hacked, it is also possible to compromise a device that has access to it.  Multiple vulnerabilities of routers, the settings in which can be changed by opening the correct link in the browser, confirm this. <br><br>  The study provides examples of "correct" devices in which interaction with the control application occurs only through the cloud system, with the necessary level of encryption of the transmitted data.  These are products of Nest and EZVIZ.  It also implements a relatively safe way to initialize the device.  In the first case, this is a random authorization code displayed on the device screen.  In the second case, a unique authorization string is applied to the device in the form of a QR code that needs to be scanned. <br><br>  The priorities set by the researchers in this work can be challenged, as well as ideas about the correct approach to protecting communications of smart home systems.  At a minimum, the study confirms once again that it is not worth consciously lowering the protection of communication channels even in a local network.  The consequences can be serious, especially if unsafe methods are using smart alarms or an internet-connected door lock. <br><br>  <i>Disclaimer: The opinions expressed in this digest may not always coincide with the official position of Kaspersky Lab.</i>  <i>Dear editors generally recommend to treat any opinions with healthy skepticism.</i> </div><p>Source: <a href="https://habr.com/ru/post/439880/">https://habr.com/ru/post/439880/</a></p>
+<section class="navigation-panel">
+<h4>More articles:</h4>
+<nav><ul class="list-of-pages">
+<li><a href="../439746/index.html">Understand the promises in javascript</a></li>
+<li><a href="../439748/index.html">The digest of interesting materials for the mobile developer # 285 (February 4 - 10)</a></li>
+<li><a href="../439750/index.html">Learn product management - where?</a></li>
+<li><a href="../439752/index.html">Multicore MRI Method</a></li>
+<li><a href="../439754/index.html">Google is going to be engaged in the development of smart watches</a></li>
+<li><a href="../439756/index.html">Why do I need a thermo-acoustic generator?</a></li>
+<li><a href="../439760/index.html">Engineers "twisted" the light in the fiber - a new technology will speed up the transfer of data a hundred times</a></li>
+<li><a href="../439764/index.html">Corporate fruit</a></li>
+<li><a href="../439772/index.html">Writing Unit Tests on Swift for Verifying Asynchronous Tasks</a></li>
+<li><a href="../439778/index.html">The digest of fresh materials from the world of the frontend for the last week No. 351 (February 4 - 10, 2019)</a></li>
+<li><a href="../439780/index.html">PHP Digest number 149 (January 28 - February 11, 2019)</a></li>
+<li><a href="../439782/index.html">Headless CMS - the future of content management</a></li>
+<li><a href="../439784/index.html">Methane engine "Raptor" broke the record RD-180</a></li>
+<li><a href="../439788/index.html">Regular oddities in the GOST Grasshopper and Stribog algorithms</a></li>
+<li><a href="../439790/index.html">Test JaCarta WebClient or store tokens in a safe</a></li>
+<li><a href="../439792/index.html">NASA is looking for partners in the American industry to create a partially reusable manned lender</a></li>
+<li><a href="../439794/index.html">Back pain - understanding from the perspective of modern medicine</a></li>
+<li><a href="../439796/index.html">Spring Boot 2: what is not written in release notes</a></li>
+<li><a href="../439800/index.html">RISEX and Julia. 5 stages of love customer and designer</a></li>
+<li><a href="../439806/index.html">Valid SSL domain names for local Docker containers</a></li>
+<li><a href="../439808/index.html">The biggest telescopes. From a notebook and eyes to 340 megapixel cameras and data centers. Part 1</a></li>
+<li><a href="../439810/index.html">Get acquainted with the Moleculer microservice framework</a></li>
+<li><a href="../439816/index.html">Practical blockchain in business</a></li>
+<li><a href="../439818/index.html">Features of approaches to design in the real manufacturing sector</a></li>
+<li><a href="../439820/index.html">We are trying to write a project alone. Introduction</a></li>
+<li><a href="../439822/index.html">Creating an alternative display for the Ensoniq EPS16 + and ASR10 synthesizer / sampler</a></li>
+<li><a href="../439824/index.html">When will the JavaScript frameworks disappear?</a></li>
+<li><a href="../439826/index.html">Disable analog. What will happen to the TV?</a></li>
+<li><a href="../439828/index.html">The network appeared "analog" Findface</a></li>
+<li><a href="../439840/index.html">Conference DUMP-2019: we invite you to speak in the sections Design, Management and Testing</a></li>
+<li><a href="../439852/index.html">Remote control application release: Aspia 1.1.0</a></li>
+<li><a href="../439858/index.html">Prometheus + Grafana + Node Exporter + Docker in Azure with notifications in Telegram</a></li>
+<li><a href="../439862/index.html">Digital events in Moscow from February 11 to 17</a></li>
+<li><a href="../439866/index.html">Principles of design reference books in 1C Enterprise Management 2 (ERP 2.4.6)</a></li>
+<li><a href="../439868/index.html">Life without Facebook: less radical views, good mood, more time for loved ones. Now proven by science</a></li>
+<li><a href="../439878/index.html">Creation of architecture for a new high-load startup in 2019</a></li>
+<li><a href="../439880/index.html">Security Week 07: Local IoT Device Vulnerabilities</a></li>
+<li><a href="../439886/index.html">How I trained the neural network to implement the position estimation function on the Russian AI Cup CodeBall 2018</a></li>
+<li><a href="../439894/index.html">How easy it is to monitor the site</a></li>
+<li><a href="../439900/index.html">Julia and the method of coordinate descent</a></li>
+<li><a href="../439902/index.html">Explaining the physical essence of the Wing Lift phenomenon without using the Bernouli equation. Part 2</a></li>
+<li><a href="../439906/index.html">Critical vulnerability in Zemana products and not only</a></li>
+<li><a href="../439908/index.html">Kohl, piss off ... Coax</a></li>
+<li><a href="../439912/index.html">Unsolved mystery of view</a></li>
+<li><a href="../439916/index.html">Unpacking: Dridex bootloader</a></li>
+<li><a href="../439922/index.html">Taxation of IP in Kazakhstan how to be a freelancer?</a></li>
+<li><a href="../439924/index.html">The volume of parcels from foreign online stores grew by 25%</a></li>
+</ul></nav>
+</section>
+<script src="../../js/main.js"></script>
+
+<!-- Yandex.Metrika counter -->
+<script type="text/javascript" >
+  (function (d, w, c) {
+      (w[c] = w[c] || []).push(function() {
+          try {
+              w.yaCounter52319614 = new Ya.Metrika({
+                  id:52319614,
+                  clickmap:true,
+                  trackLinks:true,
+                  accurateTrackBounce:true,
+                  webvisor:true
+              });
+          } catch(e) { }
+      });
+
+      var n = d.getElementsByTagName("script")[0],
+          s = d.createElement("script"),
+          f = function () { n.parentNode.insertBefore(s, n); };
+      s.type = "text/javascript";
+      s.async = true;
+      s.src = "https://mc.yandex.ru/metrika/watch.js";
+
+      if (w.opera == "[object Opera]") {
+          d.addEventListener("DOMContentLoaded", f, false);
+      } else { f(); }
+  })(document, window, "yandex_metrika_callbacks");
+</script>
+<noscript><div><img src="https://mc.yandex.ru/watch/52319614" style="position:absolute; left:-9999px;" alt="" /></div></noscript>
+
+<!-- Google Analytics -->
+  <script>
+    window.ga = function () { ga.q.push(arguments) }; ga.q = []; ga.l = +new Date;
+    ga('create', 'UA-134228602-1', 'auto'); ga('send', 'pageview')
+  </script>
+  <script src="https://www.google-analytics.com/analytics.js" async defer></script>
+
+</section>
+</body>
+
+</html>

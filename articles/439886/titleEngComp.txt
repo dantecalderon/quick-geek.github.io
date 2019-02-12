@@ -1,0 +1,1 @@
+How I trained the neural network to implement the position estimation function on the Russian AI Cup CodeBall 2018

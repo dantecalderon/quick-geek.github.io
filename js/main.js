@@ -47,6 +47,9 @@ $(function() {
 		}
 	});
 
+  //Hide - it is not fixed yet
+  $(pageHeadingsButton).hide();
+
 
 	//Go to Top button Logic
 	$('.js-go-to-top-button').on('click', function(e) {

@@ -1,0 +1,134 @@
+<!doctype html>
+<html class="no-js" lang="en">
+
+<head>
+  <!-- Global site tag (gtag.js) - Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=UA-134228602-1"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'UA-134228602-1');
+  </script>
+
+  <meta charset="utf-8">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  <title>Creating an alternative display for the Ensoniq EPS16 + and ASR10 synthesizer / sampler</title>
+  <meta name="description" content="Hi, Habr! 
+
+ Here I will talk about one (unfortunately still unfinished) project to create an alternative to the standard display Ensoniq EPS16 + and ...">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+  <link rel="stylesheet" href="../../css/main.css">
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+  <script>window.jQuery || document.write('<script src="../../js/vendors/jquery-3.3.1.min.js"><\/script>')</script>
+</head>
+
+<body>
+  <!--[if lte IE 9]>
+    <p class="browserupgrade">You are using an <strong>outdated</strong> browser. Please <a href="https://browsehappy.com/">upgrade your browser</a> to improve your experience and security.</p>
+  <![endif]-->
+  <nav class="page-headings-container js-page-headings-container"></nav>
+  <div class="tools-bar js-tools-bar">
+    <!-- <a href="https://quick-geek.github.io/search.html" title="Search">🔎</a> -->
+    <a class="js-list-of-headings-button" data-state="closed" href="#" title="Headings">📜</a>
+    <a class="js-go-to-top-button" href="#" title="Go to Top">⬆️</a>
+    <a class="js-go-to-bottom-button" href="#" title="Go to Bottom">⬇️</a>
+  </div>
+  <section class="page js-page"><h1>Creating an alternative display for the Ensoniq EPS16 + and ASR10 synthesizer / sampler</h1><div class="post__text post__text-html js-mediator-article">  Hi, Habr! <br><br>  Here I will talk about one (unfortunately still unfinished) project to create an alternative to the standard display Ensoniq EPS16 + and ASR10. <a name="habracut"></a><br><br>  A little background: Actually the reason for the emergence of such a project is simple: the lack of spare parts for these old people.  Ansonik used its custom VFD displays in them, and since the company's history actually ended in the late 90s, there is no way to acquire such a new display.  In addition, the situation is aggravated by the fact that the company itself was extremely closed and there were no manuals with basic diagrams for models newer than 90th, repairs were assumed to be modular, the faulty module in an authorized SC was removed, sent to the factory, and from there came a new / refurbished one.  This is a big difference from other manufacturers, for all the other iron synthesizers / samplers that I had - there is an opportunity to find a concept. <br><br>  In general, for the start, I had my ASR-10 as a reference and I also bought inexpensively through the free classifieds website the EPS16 + rack version with a broken screen, and I began to revive it. <br><br><img src="https://habrastorage.org/webt/mu/dd/bb/muddbb6tsfuswyxnhccm8f7-tbo.jpeg"><br><br>  All that was known from the scrappy service manual is that the sampler motherboard transmits through a serial port to the keyboard board, which in turn, through a certain synchronous channel, transmits information to the display. <br><br>  Through trial and error, I found the pins on which the levels changed at the time of data transfer to the display.  Having produced the simplest logic analyzer from Arduina, I calculated that the transmission speed is approximately equal to 60kbit / s. <br><br><img src="https://habrastorage.org/webt/-l/vo/xy/-lvoxy2pkjummg0a05ru-exluom.png"><br><br>  I went along a simple path and connected a USB-Serial with ttl outputs and of course, with the old memory I set the nearest 56k, the modem speed familiar from ancient Internet times.  But the data was broken and unreadable.  Through trial and error, as well as some logical reflection (namely, multiplying the midi 31250 speed by two), the desired speed of the serial port was calculated.  But here the usual USB-Serial did not fit - in its drivers there is no possibility to choose the desired speed. <br><br>  Arduin came to the rescue again.  At its base, I made an adapter from a hardware 62500 to a software 9600, adding the already mentioned USB-Serial to the Arduin, calculating in passing that Ansonik uses a 7n1 package.  And now the data sniffer is ready. <br><br>  Then there was the matter of technology, having experience with ASR-10 on another arduin with a 240x64 display connected and the U8glib library quickly sketched the arrangement of symbols on the display, <br><br><img src="https://habrastorage.org/webt/no/oa/hf/nooahf3majvsvggtqjrcz9f23cs.jpeg"><br><br>  he cleared the commands, but at one moment everything got up, when he rested against an incomprehensible glitch with the disappearance of characters.  For two weeks he struggled with his understanding, until it came to the conclusion that in the standard Arduin's buffer, the entire team could not fit in some cases, which had to be patched by HardwareSerial.h, after which everything worked more or less (which took even ten more nights). <br><br><iframe width="560" height="315" src="https://www.youtube.com/embed/kBWTg9r5KoA" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen=""></iframe><br>  After that, I connected the arduin with the display and the sniffer to the ASR-10, drove a few scripts and clarified all the commands for full compatibility.  In fact, the software part was ready, it remained to finish the hardware to something more or less decent. <br>  But then fate made a sharp turn and I changed my main job to a banking organization, with all the ensuing consequences in the form of dresscode, tight schedules, and most importantly, cool information security.  In general, it was no longer possible to combine the main work with a pair of non-core ones and there was simply no time left for the project. <br><br>  For two years, I tried to somehow find time for it, but in the end I realized that nothing would work out and today I published the source code on <a href="https://github.com/balamutang/ensoniqdisplay">GitHub</a> , maybe they will be useful to someone in the future. </div><p>Source: <a href="https://habr.com/ru/post/439822/">https://habr.com/ru/post/439822/</a></p>
+<section class="navigation-panel">
+<h4>More articles:</h4>
+<nav><ul class="list-of-pages">
+<li><a href="../439746/index.html">Understand the promises in javascript</a></li>
+<li><a href="../439748/index.html">The digest of interesting materials for the mobile developer # 285 (February 4 - 10)</a></li>
+<li><a href="../439750/index.html">Learn product management - where?</a></li>
+<li><a href="../439752/index.html">Multicore MRI Method</a></li>
+<li><a href="../439754/index.html">Google is going to be engaged in the development of smart watches</a></li>
+<li><a href="../439756/index.html">Why do I need a thermo-acoustic generator?</a></li>
+<li><a href="../439760/index.html">Engineers "twisted" the light in the fiber - a new technology will speed up the transfer of data a hundred times</a></li>
+<li><a href="../439764/index.html">Corporate fruit</a></li>
+<li><a href="../439772/index.html">Writing Unit Tests on Swift for Verifying Asynchronous Tasks</a></li>
+<li><a href="../439778/index.html">The digest of fresh materials from the world of the frontend for the last week No. 351 (February 4 - 10, 2019)</a></li>
+<li><a href="../439780/index.html">PHP Digest number 149 (January 28 - February 11, 2019)</a></li>
+<li><a href="../439782/index.html">Headless CMS - the future of content management</a></li>
+<li><a href="../439784/index.html">Methane engine "Raptor" broke the record RD-180</a></li>
+<li><a href="../439788/index.html">Regular oddities in the GOST Grasshopper and Stribog algorithms</a></li>
+<li><a href="../439790/index.html">Test JaCarta WebClient or store tokens in a safe</a></li>
+<li><a href="../439792/index.html">NASA is looking for partners in the American industry to create a partially reusable manned lender</a></li>
+<li><a href="../439794/index.html">Back pain - understanding from the perspective of modern medicine</a></li>
+<li><a href="../439796/index.html">Spring Boot 2: what is not written in release notes</a></li>
+<li><a href="../439800/index.html">RISEX and Julia. 5 stages of love customer and designer</a></li>
+<li><a href="../439806/index.html">Valid SSL domain names for local Docker containers</a></li>
+<li><a href="../439808/index.html">The biggest telescopes. From a notebook and eyes to 340 megapixel cameras and data centers. Part 1</a></li>
+<li><a href="../439810/index.html">Get acquainted with the Moleculer microservice framework</a></li>
+<li><a href="../439816/index.html">Practical blockchain in business</a></li>
+<li><a href="../439818/index.html">Features of approaches to design in the real manufacturing sector</a></li>
+<li><a href="../439820/index.html">We are trying to write a project alone. Introduction</a></li>
+<li><a href="../439822/index.html">Creating an alternative display for the Ensoniq EPS16 + and ASR10 synthesizer / sampler</a></li>
+<li><a href="../439824/index.html">When will the JavaScript frameworks disappear?</a></li>
+<li><a href="../439826/index.html">Disable analog. What will happen to the TV?</a></li>
+<li><a href="../439828/index.html">The network appeared "analog" Findface</a></li>
+<li><a href="../439840/index.html">Conference DUMP-2019: we invite you to speak in the sections Design, Management and Testing</a></li>
+<li><a href="../439852/index.html">Remote control application release: Aspia 1.1.0</a></li>
+<li><a href="../439858/index.html">Prometheus + Grafana + Node Exporter + Docker in Azure with notifications in Telegram</a></li>
+<li><a href="../439862/index.html">Digital events in Moscow from February 11 to 17</a></li>
+<li><a href="../439866/index.html">Principles of design reference books in 1C Enterprise Management 2 (ERP 2.4.6)</a></li>
+<li><a href="../439868/index.html">Life without Facebook: less radical views, good mood, more time for loved ones. Now proven by science</a></li>
+<li><a href="../439878/index.html">Creation of architecture for a new high-load startup in 2019</a></li>
+<li><a href="../439880/index.html">Security Week 07: Local IoT Device Vulnerabilities</a></li>
+<li><a href="../439886/index.html">How I trained the neural network to implement the position estimation function on the Russian AI Cup CodeBall 2018</a></li>
+<li><a href="../439894/index.html">How easy it is to monitor the site</a></li>
+<li><a href="../439900/index.html">Julia and the method of coordinate descent</a></li>
+<li><a href="../439902/index.html">Explaining the physical essence of the Wing Lift phenomenon without using the Bernouli equation. Part 2</a></li>
+<li><a href="../439906/index.html">Critical vulnerability in Zemana products and not only</a></li>
+<li><a href="../439908/index.html">Kohl, piss off ... Coax</a></li>
+<li><a href="../439912/index.html">Unsolved mystery of view</a></li>
+<li><a href="../439916/index.html">Unpacking: Dridex bootloader</a></li>
+<li><a href="../439922/index.html">Taxation of IP in Kazakhstan how to be a freelancer?</a></li>
+<li><a href="../439924/index.html">The volume of parcels from foreign online stores grew by 25%</a></li>
+</ul></nav>
+</section>
+<script src="../../js/main.js"></script>
+
+<!-- Yandex.Metrika counter -->
+<script type="text/javascript" >
+  (function (d, w, c) {
+      (w[c] = w[c] || []).push(function() {
+          try {
+              w.yaCounter52319614 = new Ya.Metrika({
+                  id:52319614,
+                  clickmap:true,
+                  trackLinks:true,
+                  accurateTrackBounce:true,
+                  webvisor:true
+              });
+          } catch(e) { }
+      });
+
+      var n = d.getElementsByTagName("script")[0],
+          s = d.createElement("script"),
+          f = function () { n.parentNode.insertBefore(s, n); };
+      s.type = "text/javascript";
+      s.async = true;
+      s.src = "https://mc.yandex.ru/metrika/watch.js";
+
+      if (w.opera == "[object Opera]") {
+          d.addEventListener("DOMContentLoaded", f, false);
+      } else { f(); }
+  })(document, window, "yandex_metrika_callbacks");
+</script>
+<noscript><div><img src="https://mc.yandex.ru/watch/52319614" style="position:absolute; left:-9999px;" alt="" /></div></noscript>
+
+<!-- Google Analytics -->
+  <script>
+    window.ga = function () { ga.q.push(arguments) }; ga.q = []; ga.l = +new Date;
+    ga('create', 'UA-134228602-1', 'auto'); ga('send', 'pageview')
+  </script>
+  <script src="https://www.google-analytics.com/analytics.js" async defer></script>
+
+</section>
+</body>
+
+</html>

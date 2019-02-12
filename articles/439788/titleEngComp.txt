@@ -1,0 +1,1 @@
+Regular oddities in the GOST Grasshopper and Stribog algorithms

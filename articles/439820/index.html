@@ -1,0 +1,132 @@
+<!doctype html>
+<html class="no-js" lang="en">
+
+<head>
+  <!-- Global site tag (gtag.js) - Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=UA-134228602-1"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'UA-134228602-1');
+  </script>
+
+  <meta charset="utf-8">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  <title>We are trying to write a project alone. Introduction</title>
+  <meta name="description" content="After working for several years in backend development, which, in fact, is the conversion of SQL to JSON and vice versa, documentation, writing tests ...">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+  <link rel="stylesheet" href="../../css/main.css">
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+  <script>window.jQuery || document.write('<script src="../../js/vendors/jquery-3.3.1.min.js"><\/script>')</script>
+</head>
+
+<body>
+  <!--[if lte IE 9]>
+    <p class="browserupgrade">You are using an <strong>outdated</strong> browser. Please <a href="https://browsehappy.com/">upgrade your browser</a> to improve your experience and security.</p>
+  <![endif]-->
+  <nav class="page-headings-container js-page-headings-container"></nav>
+  <div class="tools-bar js-tools-bar">
+    <!-- <a href="https://quick-geek.github.io/search.html" title="Search">🔎</a> -->
+    <a class="js-list-of-headings-button" data-state="closed" href="#" title="Headings">📜</a>
+    <a class="js-go-to-top-button" href="#" title="Go to Top">⬆️</a>
+    <a class="js-go-to-bottom-button" href="#" title="Go to Bottom">⬇️</a>
+  </div>
+  <section class="page js-page"><h1>We are trying to write a project alone. Introduction</h1><div class="post__text post__text-html js-mediator-article">  After working for several years in backend development, which, in fact, is the conversion of SQL to JSON and vice versa, documentation, writing tests and other chores, I began to feel burnout (and this is about 20).  Fortunately, the situation was such that in the current work I had to tinker with the front-end, which delayed me and I started the next project on Angular 2. <br><br>  The tale did not last long, plunging into the world of the 2017-year development frontend, I wilted my head even more with all of these reactors, RN, vue, sass, webpack and other <a href="https://habr.com/ru/company/mailru/blog/340922/">redaks</a> .  After completing a few more projects with less and less motivation, although on interesting technologies (Node.JS, GraphQL, Docker) I realized that I can’t psychologically linger on the current place of work and changed it. <br><a name="habracut"></a><br>  Unfortunately (or fortunately), I didn’t grow together in a new place (even despite a good salary level and a team of professionals) and I didn’t linger for a long time.  After the dismissal he took a couple of months to rest, think. <br><br><h2>  Reflections </h2><br>  For some time I had the opportunity to live abroad, and there often used a popular service for “mitaps”, but it always seemed like “heavy”, I wanted something simpler - like Tinder, but for everyday activities.  So I began to slowly think about writing the project itself. <br><br>  There were the following conditions: <br><br><ul><li>  no sensitive data </li><li>  no work with payment systems </li><li>  minimum hosting costs </li><li>  that the project “self-cleaning” and live its life with minimal intervention from me </li></ul><br>  At first glance, my imaginary project was ideally suited for these restrictions.  No work with money was required, the data should have been at a minimum and a bonus - I was free to choose technologies.  Take it and do it. <br><br>  Being a realist (and on the spectrum an optimist-pessimist is more likely to be the second), I sensibly estimated (th) the chances of “projecting” the project financially and always considered start-ups as a kind of gambling.  God forbid one shoot out of a hundred, i.e.  will give its creator financial independence for N years. <br><br>  With the same success, you can put a two-month salary (it will take about so much time to write a simple MVP) to zero at the roulette table and with a 2.7% chance to forget about working for 6 years (at the same expenses).  In fact, I'm not sure that even a single startup of hundreds shoots, which makes roulette not such a bad alternative.  (this is of course a joke) <br><br>  On the other hand, even if the project does not take off, you can drank it apart, put it in open source, write a couple of articles on Habr, and the practical experience will not go anywhere - in the end, your hourly rate will increase and you will get more money than your colleagues sitting quietly in the office. <br><br>  Do not forget that the work on your project flies much nicer than the routine closure of tasks in JIRA or Redmine. <br><br><h2>  Go to the implementation </h2><br>  Well, finally, the most interesting.  A typical modern web project consists of the following parts: <br><br>  <b>Mobile</b> .  Here, for a solo developer, the choice is small, the immediate disappears immediately, there remain cross-platform solutions.  Having already had experience with RN, I made a choice on Flutter, it is still damp, but so far (and if) I will go to the product ... In general, the choice has been made, the technology is fresh, interesting. <br><br>  <b>Web</b> .  Then I decided to cut corners and provide a simple landing page with links to stor, where you can download applications. <br><br>  Container orchestration, cluster, fault tolerance, monitoring, logging.  No options <b>Kubernetes</b> (along with Prometheus, etc.). <br><br>  Docker Swarm is dead, and k8s has a huge community, easy-to-read source code, lots of tools.  Working with a cluster, at least for a small project, is a pleasure.  Not the last role was played by the report of D. Stolyarov on <a href="https://www.youtube.com/watch%3Fv%3DXZQ7-7vej6w">k8s</a> . <br><br>  <b>Back-end</b> .  The name for the experience of the spring, using it.  In addition, some separate high-performance services (such as chat), I want to write on Go.  All this will be tightly integrated with native components of k8s (LB, service discovery). <br><br>  Gitlab CI was chosen as the <b>CI / CD</b> tool - there is everything from tickets and milestones to integration with k8s and local docker repository.  This will be a key tool throughout the development. <br><br>  Despite the presence of only one person on the project, it is not excluded that, for example, a freelancer can connect, so an easy entry should be provided for the “beginner” <br><br>  Tasks are scattered on milestones, progress is updated, there is necessary information in the task.  All for an adult.  Yes, and very nice, you can see both WIP (work in progress) and completed tasks. <br><br><img src="https://habrastorage.org/webt/6l/3q/ec/6l3qecnakqtlqhyzcxbwvuepot4.png"><br><br><h2>  Future </h2><br>  This post, of course, is not the only and not the last.  The following entries will describe the difficulties that I have already encountered in the course of implementation - the material has accumulated for several posts - and with what else it will have to. <br><br>  It is worth adding that I deliberately do not give information either on the specifics of the application or on the business tasks that it solves.  The main purpose of the series of posts is to answer the question - is it possible to write a modern 3-tier application with a streamlined ci / cd by a single mediocre [backend] programmer. <br><br>  The closer the series comes to an end, the more specificity will be given on the application, and in the final post of the series (if there is enough “fuel” to finish everything) - links, screenshots and results. <br><br>  In the next posts - we will analyze the great and terrible Kubernetes, as well as partially Gitlab CI. </div><p>Source: <a href="https://habr.com/ru/post/439820/">https://habr.com/ru/post/439820/</a></p>
+<section class="navigation-panel">
+<h4>More articles:</h4>
+<nav><ul class="list-of-pages">
+<li><a href="../439746/index.html">Understand the promises in javascript</a></li>
+<li><a href="../439748/index.html">The digest of interesting materials for the mobile developer # 285 (February 4 - 10)</a></li>
+<li><a href="../439750/index.html">Learn product management - where?</a></li>
+<li><a href="../439752/index.html">Multicore MRI Method</a></li>
+<li><a href="../439754/index.html">Google is going to be engaged in the development of smart watches</a></li>
+<li><a href="../439756/index.html">Why do I need a thermo-acoustic generator?</a></li>
+<li><a href="../439760/index.html">Engineers "twisted" the light in the fiber - a new technology will speed up the transfer of data a hundred times</a></li>
+<li><a href="../439764/index.html">Corporate fruit</a></li>
+<li><a href="../439772/index.html">Writing Unit Tests on Swift for Verifying Asynchronous Tasks</a></li>
+<li><a href="../439778/index.html">The digest of fresh materials from the world of the frontend for the last week No. 351 (February 4 - 10, 2019)</a></li>
+<li><a href="../439780/index.html">PHP Digest number 149 (January 28 - February 11, 2019)</a></li>
+<li><a href="../439782/index.html">Headless CMS - the future of content management</a></li>
+<li><a href="../439784/index.html">Methane engine "Raptor" broke the record RD-180</a></li>
+<li><a href="../439788/index.html">Regular oddities in the GOST Grasshopper and Stribog algorithms</a></li>
+<li><a href="../439790/index.html">Test JaCarta WebClient or store tokens in a safe</a></li>
+<li><a href="../439792/index.html">NASA is looking for partners in the American industry to create a partially reusable manned lender</a></li>
+<li><a href="../439794/index.html">Back pain - understanding from the perspective of modern medicine</a></li>
+<li><a href="../439796/index.html">Spring Boot 2: what is not written in release notes</a></li>
+<li><a href="../439800/index.html">RISEX and Julia. 5 stages of love customer and designer</a></li>
+<li><a href="../439806/index.html">Valid SSL domain names for local Docker containers</a></li>
+<li><a href="../439808/index.html">The biggest telescopes. From a notebook and eyes to 340 megapixel cameras and data centers. Part 1</a></li>
+<li><a href="../439810/index.html">Get acquainted with the Moleculer microservice framework</a></li>
+<li><a href="../439816/index.html">Practical blockchain in business</a></li>
+<li><a href="../439818/index.html">Features of approaches to design in the real manufacturing sector</a></li>
+<li><a href="../439820/index.html">We are trying to write a project alone. Introduction</a></li>
+<li><a href="../439822/index.html">Creating an alternative display for the Ensoniq EPS16 + and ASR10 synthesizer / sampler</a></li>
+<li><a href="../439824/index.html">When will the JavaScript frameworks disappear?</a></li>
+<li><a href="../439826/index.html">Disable analog. What will happen to the TV?</a></li>
+<li><a href="../439828/index.html">The network appeared "analog" Findface</a></li>
+<li><a href="../439840/index.html">Conference DUMP-2019: we invite you to speak in the sections Design, Management and Testing</a></li>
+<li><a href="../439852/index.html">Remote control application release: Aspia 1.1.0</a></li>
+<li><a href="../439858/index.html">Prometheus + Grafana + Node Exporter + Docker in Azure with notifications in Telegram</a></li>
+<li><a href="../439862/index.html">Digital events in Moscow from February 11 to 17</a></li>
+<li><a href="../439866/index.html">Principles of design reference books in 1C Enterprise Management 2 (ERP 2.4.6)</a></li>
+<li><a href="../439868/index.html">Life without Facebook: less radical views, good mood, more time for loved ones. Now proven by science</a></li>
+<li><a href="../439878/index.html">Creation of architecture for a new high-load startup in 2019</a></li>
+<li><a href="../439880/index.html">Security Week 07: Local IoT Device Vulnerabilities</a></li>
+<li><a href="../439886/index.html">How I trained the neural network to implement the position estimation function on the Russian AI Cup CodeBall 2018</a></li>
+<li><a href="../439894/index.html">How easy it is to monitor the site</a></li>
+<li><a href="../439900/index.html">Julia and the method of coordinate descent</a></li>
+<li><a href="../439902/index.html">Explaining the physical essence of the Wing Lift phenomenon without using the Bernouli equation. Part 2</a></li>
+<li><a href="../439906/index.html">Critical vulnerability in Zemana products and not only</a></li>
+<li><a href="../439908/index.html">Kohl, piss off ... Coax</a></li>
+<li><a href="../439912/index.html">Unsolved mystery of view</a></li>
+<li><a href="../439916/index.html">Unpacking: Dridex bootloader</a></li>
+<li><a href="../439922/index.html">Taxation of IP in Kazakhstan how to be a freelancer?</a></li>
+<li><a href="../439924/index.html">The volume of parcels from foreign online stores grew by 25%</a></li>
+</ul></nav>
+</section>
+<script src="../../js/main.js"></script>
+
+<!-- Yandex.Metrika counter -->
+<script type="text/javascript" >
+  (function (d, w, c) {
+      (w[c] = w[c] || []).push(function() {
+          try {
+              w.yaCounter52319614 = new Ya.Metrika({
+                  id:52319614,
+                  clickmap:true,
+                  trackLinks:true,
+                  accurateTrackBounce:true,
+                  webvisor:true
+              });
+          } catch(e) { }
+      });
+
+      var n = d.getElementsByTagName("script")[0],
+          s = d.createElement("script"),
+          f = function () { n.parentNode.insertBefore(s, n); };
+      s.type = "text/javascript";
+      s.async = true;
+      s.src = "https://mc.yandex.ru/metrika/watch.js";
+
+      if (w.opera == "[object Opera]") {
+          d.addEventListener("DOMContentLoaded", f, false);
+      } else { f(); }
+  })(document, window, "yandex_metrika_callbacks");
+</script>
+<noscript><div><img src="https://mc.yandex.ru/watch/52319614" style="position:absolute; left:-9999px;" alt="" /></div></noscript>
+
+<!-- Google Analytics -->
+  <script>
+    window.ga = function () { ga.q.push(arguments) }; ga.q = []; ga.l = +new Date;
+    ga('create', 'UA-134228602-1', 'auto'); ga('send', 'pageview')
+  </script>
+  <script src="https://www.google-analytics.com/analytics.js" async defer></script>
+
+</section>
+</body>
+
+</html>

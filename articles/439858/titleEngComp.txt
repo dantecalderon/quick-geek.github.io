@@ -1,0 +1,1 @@
+Prometheus + Grafana + Node Exporter + Docker in Azure with notifications in Telegram

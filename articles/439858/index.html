@@ -1,0 +1,132 @@
+<!doctype html>
+<html class="no-js" lang="en">
+
+<head>
+  <!-- Global site tag (gtag.js) - Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=UA-134228602-1"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'UA-134228602-1');
+  </script>
+
+  <meta charset="utf-8">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  <title>Prometheus + Grafana + Node Exporter + Docker in Azure with notifications in Telegram</title>
+  <meta name="description" content="To begin with, we will prepare a virtual machine, for this we will write a small script that deploys and automates some routine operations, the script...">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+  <link rel="stylesheet" href="../../css/main.css">
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+  <script>window.jQuery || document.write('<script src="../../js/vendors/jquery-3.3.1.min.js"><\/script>')</script>
+</head>
+
+<body>
+  <!--[if lte IE 9]>
+    <p class="browserupgrade">You are using an <strong>outdated</strong> browser. Please <a href="https://browsehappy.com/">upgrade your browser</a> to improve your experience and security.</p>
+  <![endif]-->
+  <nav class="page-headings-container js-page-headings-container"></nav>
+  <div class="tools-bar js-tools-bar">
+    <!-- <a href="https://quick-geek.github.io/search.html" title="Search">🔎</a> -->
+    <a class="js-list-of-headings-button" data-state="closed" href="#" title="Headings">📜</a>
+    <a class="js-go-to-top-button" href="#" title="Go to Top">⬆️</a>
+    <a class="js-go-to-bottom-button" href="#" title="Go to Bottom">⬇️</a>
+  </div>
+  <section class="page js-page"><h1>Prometheus + Grafana + Node Exporter + Docker in Azure with notifications in Telegram</h1><div class="post__text post__text-html js-mediator-article"><p>  To begin with, we will prepare a virtual machine, for this we will write a small script that deploys and automates some routine operations, the script uses the Azure Cli: </p><br><div class="spoiler">  <b class="spoiler_title">project.sh</b> <div class="spoiler_text"><pre><code class="bash hljs"><span class="hljs-comment"><span class="hljs-comment">#!/bin/bash echo "AZURE VM Create" echo "Azure Account:" echo "Azure name:" read AZ_NAME read -sp "Azure password: " AZ_PASS &amp;&amp; echo &amp;&amp; az login -u $AZ_NAME -p $AZ_PASS echo "Name Group VM" read GROUP_NAME az group create --name $GROUP_NAME --location eastus echo "VM name" read VM echo "Admin user name" read ADMIN az vm create --resource-group $GROUP_NAME --name $VM --image UbuntuLTS --admin-username $ADMIN --generate-ssh-keys --custom-data cloud-init.txt az vm open-port --resource-group $GROUP_NAME --name $VM --port 8080 --priority 1001 az vm open-port --resource-group $GROUP_NAME --name $VM --port 8081 --priority 1002 az vm open-port --resource-group $GROUP_NAME --name $VM --port 9090 --priority 1003 az vm open-port --resource-group $GROUP_NAME --name $VM --port 9093 --priority 1004 az vm open-port --resource-group $GROUP_NAME --name $VM --port 9100 --priority 1005 az vm open-port --resource-group $GROUP_NAME --name $VM --port 3000 --priority 1006 RESULT=$(az vm show --resource-group $GROUP_NAME --name $VM -d --query [publicIps] --o tsv) echo $RESULT echo "Whait 5 min" sleep 300 ssh $ADMIN@$RESULT -y &lt;&lt; EOF sudo usermod -aG docker $ADMIN EOF sleep 10 echo "Connect to Azure..."</span></span></code> </pre> </div></div><br><p>  In the script, we use the <strong><em>cloud-init.txt file</em></strong> that will automatically install Docker and Docker-Compose on the virtual machine. </p><br><div class="spoiler">  <b class="spoiler_title">cloud-init.txt</b> <div class="spoiler_text"><pre> <code class="plaintext hljs">#cloud-config package_upgrade: true write_files: - path: /etc/systemd/system/docker.service.d/docker.conf content: | [Service] ExecStart= ExecStart=/usr/bin/dockerd - path: /etc/docker/daemon.json content: | { "hosts": ["fd://","tcp://127.0.0.1:2375"] } runcmd: - apt-get update &amp;&amp; apt-get install mc -y - curl -sSL https://get.docker.com/ | sh - curl -L "https://github.com/docker/compose/releases/download/1.23.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose - chmod +x /usr/local/bin/docker-compose</code> </pre> </div></div><a name="habracut"></a><br><p>  In the home directory, create a folder for the project and the file <strong><em>docker-compose.yaml</em></strong> </p><br><div class="spoiler">  <b class="spoiler_title">docker-compose.yaml</b> <div class="spoiler_text"><pre> <code class="xml hljs">version: '3.2' services: alertmanager-bot: image: metalmatze/alertmanager-bot:0.3.1 environment: - ALERTMANAGER_URL=http://<span class="hljs-tag"><span class="hljs-tag">&lt;</span><span class="hljs-name"><span class="hljs-tag"><span class="hljs-name">alertmngerURL</span></span></span><span class="hljs-tag">&gt;</span></span>:9093 #откуда бот получает алерт - LISTEN_ADDR=0.0.0.0:8080 - BOLT_PATH=/data/bot.db - STORE=bolt - TELEGRAM_ADMIN=<span class="hljs-tag"><span class="hljs-tag">&lt;</span><span class="hljs-name"><span class="hljs-tag"><span class="hljs-name">TelegramAdminID</span></span></span><span class="hljs-tag">&gt;</span></span> #ваш ID в телеграм - TELEGRAM_TOKEN=<span class="hljs-tag"><span class="hljs-tag">&lt;</span><span class="hljs-name"><span class="hljs-tag"><span class="hljs-name">TelegramBotToken</span></span></span><span class="hljs-tag">&gt;</span></span> # токен бота - TEMPLATE_PATHS=/templates/default.tmpl volumes: - /srv/monitoring/alertmanager-bot:/data ports: - 8080:8080 prometheus: image: prom/prometheus:latest volumes: - ./prometheus:/etc/prometheus/ command: - --config.file=/etc/prometheus/prometheus.yml ports: - 9090:9090 links: - cadvisor:cadvisor depends_on: - cadvisor restart: always node-exporter: image: prom/node-exporter volumes: - /proc:/host/proc:ro - /sys:/host/sys:ro - /:/rootfs:ro command: - --path.procfs=/host/proc - --path.sysfs=/host/sys - --collector.filesystem.ignored-mount-points - ^/(sys|proc|dev|host|etc|rootfs/var/lib/docker/containers|rootfs/var/lib/docker/overlay2|rootfs/run/docker/netns|rootfs/var/lib/docker/aufs)($$|/) ports: - 9100:9100 restart: always deploy: mode: global alertmanager: image: prom/alertmanager ports: - 9093:9093 volumes: - ./alertmanager/:/etc/alertmanager/ restart: always command: - --config.file=/etc/alertmanager/config.yml - --storage.path=/alertmanager cadvisor: image: google/cadvisor volumes: - /:/rootfs:ro - /var/run:/var/run:rw - /sys:/sys:ro - /var/lib/docker/:/var/lib/docker:ro ports: - 8081:8080 restart: always deploy: mode: global grafana: image: grafana/grafana depends_on: - prometheus ports: - 3000:3000 volumes: - ./grafana:/var/lib/grafana - ./grafana/provisioning/:/etc/grafana/provisioning/ restart: always</code> </pre> </div></div><br><p>  Do not forget that in yaml there should be no tabulation, only spaces, watch out for this carefully.  Let's look at the <strong><em>docker-compose.yaml file in</em></strong> more detail: </p><br><p>  <strong><em>image:</em></strong> - here, docker container images are shown that we will use </p><br><p>  Now let's start creating Telegram bot.  We will not dwell on this in detail, the Internet is full of descriptions, I will just say that the creation takes place through the <strong><em>@BotFather</em></strong> bot. </p><br><p>  We need a <strong>Token</strong> bot and your <strong>TelegramID</strong> to control the bot, you need to substitute this data into the file <strong><em>docker-compose.yaml</em></strong> </p><br><p>  Create files: <br>  <strong><em>prometheus.yml</em></strong> in the <strong><em>prometheus</em></strong> directory which describes the server for collecting metrics and sending alerts. </p><br><div class="spoiler">  <b class="spoiler_title">prometheus.yml</b> <div class="spoiler_text"><pre> <code class="plaintext hljs">scrape_configs: - job_name: node scrape_interval: 5s static_configs: - targets: ['ip_node_explorer:9100'] rule_files: - './con.yml' alerting: alertmanagers: - static_configs: - targets: ['ip_alertmanager:9093']</code> </pre> </div></div><br><p>  <strong><em>con.yml</em></strong> in the same directory for describing alerts.  This file describes one alert that checks if our Node Exporter is alive. </p><br><div class="spoiler">  <b class="spoiler_title">con.yml</b> <div class="spoiler_text"><pre> <code class="plaintext hljs">groups: - name: ExporterDown rules: - alert: NodeDown expr: up{} == 0 for: 1m labels: severity: Error annotations: summary: "Node Explorer instance ($instance) down" description: "NodeExporterDown"</code> </pre> </div></div><br><p>  <strong><em>config.yml</em></strong> in the <strong><em>alertmanager</em></strong> directory in which we add a connection to the Telegram bot </p><br><div class="spoiler">  <b class="spoiler_title">config.yml</b> <div class="spoiler_text"><pre> <code class="plaintext hljs">route: group_wait: 20s # Частота group_interval: 20s # уведомлений repeat_interval: 60s # в телеграм group_by: ['alertname', 'cluster', 'service'] receiver: alertmanager-bot receivers: - name: alertmanager-bot webhook_configs: - send_resolved: true url: 'http://ip_telegram_bot:8080'</code> </pre> </div></div><br><p>  Run our image and check the result: </p><br><pre> <code class="plaintext hljs">docker-compose up -d</code> </pre> <br><pre> <code class="plaintext hljs">docker-compose ps</code> </pre> <br><p>  You should have something like this: </p><br><p><img src="https://habrastorage.org/webt/4c/nl/fd/4cnlfdyexnjouvucu2gx0hbcaro.jpeg"></p><br><p>  As we can see the <strong><em>State</em></strong> of all containers <strong><em>Up</em></strong> , if for some reason one of the containers did not start, we can see the log with the command: </p><br><pre> <code class="plaintext hljs">docker logs &lt;имя контейнера&gt;</code> </pre> <br><p>  for example: </p><br><pre> <code class="plaintext hljs">docker logs docker logs project_alertmanager_1</code> </pre> <br><p>  will bring us this result: </p><br><p><img src="https://habrastorage.org/webt/gb/m_/be/gbm_be7y6qw5lyhbf55l3i6vxia.jpeg"></p><br><p>  Now create a <strong><em>test.sh</em></strong> script to check for notifications. </p><br><div class="spoiler">  <b class="spoiler_title">test.sh</b> <div class="spoiler_text"><pre> <code class="plaintext hljs">#!/bin/sh curl \ --request POST \ --data '{"receiver":"telegram","status":"firing","alerts":[{"status":"firing","labels":{"alertname":"Fire","severity":"critical"},"annotations":{"message":"Something is on fire"},"startsAt":"2018-11-04T22:43:58.283995108+01:00","endsAt":"2018-11-04T22:46:58.283995108+01:00","generatorURL":"http://localhost:9090/graph?g0.expr=vector%28666%29\u0026g0.tab=1"}],"groupLabels":{"alertname":"Fire"},"commonLabels":{"alertname":"Fire","severity":"critical"},"commonAnnotations":{"message":"Something is on fire"},"externalURL":"http://localhost:9093","version":"4","groupKey":"{}:{alertname=\"Fire\"}"}' \ localhost:8080</code> </pre> </div></div><br><p>  after the launch of which, the bot must send a test message. <br>  We can also check the operation of our alert, <strong><em>described</em></strong> in <strong><em>con.yml</em></strong> , for this we will stop the <strong><em>Node Exporter with the</em></strong> command </p><br><pre> <code class="plaintext hljs">docker stop &lt;имя контейнера node exporter&gt;</code> </pre> <br><p>  in two minutes, the bot will send you a notification that the server has crashed, run the <strong><em>Node Exporter</em></strong> command </p><br><pre> <code class="plaintext hljs">docker start &lt;имя контейнера node exporter&gt;</code> </pre> <br><p>  And after a certain time, the bot will respond that the server has started. </p><br><p>  That's all, in the following article I will teach you to connect additional metrics and create notifications in Prometheus. </p></div><p>Source: <a href="https://habr.com/ru/post/439858/">https://habr.com/ru/post/439858/</a></p>
+<section class="navigation-panel">
+<h4>More articles:</h4>
+<nav><ul class="list-of-pages">
+<li><a href="../439746/index.html">Understand the promises in javascript</a></li>
+<li><a href="../439748/index.html">The digest of interesting materials for the mobile developer # 285 (February 4 - 10)</a></li>
+<li><a href="../439750/index.html">Learn product management - where?</a></li>
+<li><a href="../439752/index.html">Multicore MRI Method</a></li>
+<li><a href="../439754/index.html">Google is going to be engaged in the development of smart watches</a></li>
+<li><a href="../439756/index.html">Why do I need a thermo-acoustic generator?</a></li>
+<li><a href="../439760/index.html">Engineers "twisted" the light in the fiber - a new technology will speed up the transfer of data a hundred times</a></li>
+<li><a href="../439764/index.html">Corporate fruit</a></li>
+<li><a href="../439772/index.html">Writing Unit Tests on Swift for Verifying Asynchronous Tasks</a></li>
+<li><a href="../439778/index.html">The digest of fresh materials from the world of the frontend for the last week No. 351 (February 4 - 10, 2019)</a></li>
+<li><a href="../439780/index.html">PHP Digest number 149 (January 28 - February 11, 2019)</a></li>
+<li><a href="../439782/index.html">Headless CMS - the future of content management</a></li>
+<li><a href="../439784/index.html">Methane engine "Raptor" broke the record RD-180</a></li>
+<li><a href="../439788/index.html">Regular oddities in the GOST Grasshopper and Stribog algorithms</a></li>
+<li><a href="../439790/index.html">Test JaCarta WebClient or store tokens in a safe</a></li>
+<li><a href="../439792/index.html">NASA is looking for partners in the American industry to create a partially reusable manned lender</a></li>
+<li><a href="../439794/index.html">Back pain - understanding from the perspective of modern medicine</a></li>
+<li><a href="../439796/index.html">Spring Boot 2: what is not written in release notes</a></li>
+<li><a href="../439800/index.html">RISEX and Julia. 5 stages of love customer and designer</a></li>
+<li><a href="../439806/index.html">Valid SSL domain names for local Docker containers</a></li>
+<li><a href="../439808/index.html">The biggest telescopes. From a notebook and eyes to 340 megapixel cameras and data centers. Part 1</a></li>
+<li><a href="../439810/index.html">Get acquainted with the Moleculer microservice framework</a></li>
+<li><a href="../439816/index.html">Practical blockchain in business</a></li>
+<li><a href="../439818/index.html">Features of approaches to design in the real manufacturing sector</a></li>
+<li><a href="../439820/index.html">We are trying to write a project alone. Introduction</a></li>
+<li><a href="../439822/index.html">Creating an alternative display for the Ensoniq EPS16 + and ASR10 synthesizer / sampler</a></li>
+<li><a href="../439824/index.html">When will the JavaScript frameworks disappear?</a></li>
+<li><a href="../439826/index.html">Disable analog. What will happen to the TV?</a></li>
+<li><a href="../439828/index.html">The network appeared "analog" Findface</a></li>
+<li><a href="../439840/index.html">Conference DUMP-2019: we invite you to speak in the sections Design, Management and Testing</a></li>
+<li><a href="../439852/index.html">Remote control application release: Aspia 1.1.0</a></li>
+<li><a href="../439858/index.html">Prometheus + Grafana + Node Exporter + Docker in Azure with notifications in Telegram</a></li>
+<li><a href="../439862/index.html">Digital events in Moscow from February 11 to 17</a></li>
+<li><a href="../439866/index.html">Principles of design reference books in 1C Enterprise Management 2 (ERP 2.4.6)</a></li>
+<li><a href="../439868/index.html">Life without Facebook: less radical views, good mood, more time for loved ones. Now proven by science</a></li>
+<li><a href="../439878/index.html">Creation of architecture for a new high-load startup in 2019</a></li>
+<li><a href="../439880/index.html">Security Week 07: Local IoT Device Vulnerabilities</a></li>
+<li><a href="../439886/index.html">How I trained the neural network to implement the position estimation function on the Russian AI Cup CodeBall 2018</a></li>
+<li><a href="../439894/index.html">How easy it is to monitor the site</a></li>
+<li><a href="../439900/index.html">Julia and the method of coordinate descent</a></li>
+<li><a href="../439902/index.html">Explaining the physical essence of the Wing Lift phenomenon without using the Bernouli equation. Part 2</a></li>
+<li><a href="../439906/index.html">Critical vulnerability in Zemana products and not only</a></li>
+<li><a href="../439908/index.html">Kohl, piss off ... Coax</a></li>
+<li><a href="../439912/index.html">Unsolved mystery of view</a></li>
+<li><a href="../439916/index.html">Unpacking: Dridex bootloader</a></li>
+<li><a href="../439922/index.html">Taxation of IP in Kazakhstan how to be a freelancer?</a></li>
+<li><a href="../439924/index.html">The volume of parcels from foreign online stores grew by 25%</a></li>
+</ul></nav>
+</section>
+<script src="../../js/main.js"></script>
+
+<!-- Yandex.Metrika counter -->
+<script type="text/javascript" >
+  (function (d, w, c) {
+      (w[c] = w[c] || []).push(function() {
+          try {
+              w.yaCounter52319614 = new Ya.Metrika({
+                  id:52319614,
+                  clickmap:true,
+                  trackLinks:true,
+                  accurateTrackBounce:true,
+                  webvisor:true
+              });
+          } catch(e) { }
+      });
+
+      var n = d.getElementsByTagName("script")[0],
+          s = d.createElement("script"),
+          f = function () { n.parentNode.insertBefore(s, n); };
+      s.type = "text/javascript";
+      s.async = true;
+      s.src = "https://mc.yandex.ru/metrika/watch.js";
+
+      if (w.opera == "[object Opera]") {
+          d.addEventListener("DOMContentLoaded", f, false);
+      } else { f(); }
+  })(document, window, "yandex_metrika_callbacks");
+</script>
+<noscript><div><img src="https://mc.yandex.ru/watch/52319614" style="position:absolute; left:-9999px;" alt="" /></div></noscript>
+
+<!-- Google Analytics -->
+  <script>
+    window.ga = function () { ga.q.push(arguments) }; ga.q = []; ga.l = +new Date;
+    ga('create', 'UA-134228602-1', 'auto'); ga('send', 'pageview')
+  </script>
+  <script src="https://www.google-analytics.com/analytics.js" async defer></script>
+
+</section>
+</body>
+
+</html>
