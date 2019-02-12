@@ -1,0 +1,412 @@
+<!doctype html>
+<html class="no-js" lang="en">
+
+<head>
+  <!-- Global site tag (gtag.js) - Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=UA-134228602-1"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'UA-134228602-1');
+  </script>
+
+  <meta charset="utf-8">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  <title>Julia. Report Generators and Documentation</title>
+  <meta name="description" content="One of the most pressing problems at all times is the problem of preparing reports. Since Julia is a language whose users are directly connected with ...">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+  <link rel="stylesheet" href="../../css/main.css">
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+  <script>window.jQuery || document.write('<script src="../../js/vendors/jquery-3.3.1.min.js"><\/script>')</script>
+</head>
+
+<body>
+  <!--[if lte IE 9]>
+    <p class="browserupgrade">You are using an <strong>outdated</strong> browser. Please <a href="https://browsehappy.com/">upgrade your browser</a> to improve your experience and security.</p>
+  <![endif]-->
+  <nav class="page-headings-container js-page-headings-container"></nav>
+  <div class="tools-bar js-tools-bar">
+    <!-- <a href="https://quick-geek.github.io/search.html" title="Search">🔎</a> -->
+    <a class="js-list-of-headings-button" data-state="closed" href="#" title="Headings">📜</a>
+    <a class="js-go-to-top-button" href="#" title="Go to Top">⬆️</a>
+    <a class="js-go-to-bottom-button" href="#" title="Go to Bottom">⬇️</a>
+  </div>
+  <section class="page js-page"><h1>Julia. Report Generators and Documentation</h1><div class="post__text post__text-html js-mediator-article"><p><img src="https://habrastorage.org/webt/1z/xx/oe/1zxxoem9yjn-i2g-r6mi7g-9aco.png"></p><br><p>  One of the most pressing problems at all times is the problem of preparing reports.  Since Julia is a language whose users are directly connected with the tasks of data analysis, the preparation of articles and beautiful presentations with the results of calculations and reports, this topic simply cannot be ignored. </p><br><p>  Initially, this article planned a set of recipes for generating reports, but next to the reports is the topic of documentation, with which report generators have many intersections.  Therefore, it includes tools by the criterion of the possibility of embedding an executable code on Julia into a template with some markup.  Finally, we note that the review includes report generators, both implemented on Julia itself, and tools written in other programming languages.  And, of course, some key points of the Julia language itself were not ignored, without which it may not be clear in what cases and what means should be used. </p><a name="habracut"></a><br><h2 id="jupyter-notebook">  Jupyter notebook </h2><br><p>  This tool, perhaps, should be attributed to the most popular among those who are engaged in data analysis.  Due to the ability to connect various computational cores, it is popular with researchers and mathematicians who are used to their specific programming languages, one of which is Julia.  The corresponding modules for the Julia language are implemented for Jupyter Notebook in full.  And that is why Notebook is mentioned here. <br>  The installation process of Jupyter Notebook is not complicated.  See <a href="">https://github.com/JuliaLang/IJulia.jl for the</a> order. If Jupyter Notebook is already installed, you just need to install the Ijulia package and register the corresponding computational kernel. </p><br><p>  Since the Jupyter Notebook product is sufficiently well known not to paint it in detail, we only mention a couple of points.  Notepad (we will use notepad terminology) in Jupyter Notebook consists of blocks, each of which can contain either code or markup in its various forms (for example, Markdown).  The result of processing is either visualization of the markup (text, formulas, etc.), or the result of the last operation.  If at the end of the line with the code is a semicolon, the result will not be displayed. </p><br><p>  Examples  Notepad before execution is shown in the following figure: </p><br><p><img src="https://habrastorage.org/webt/l_/2j/4g/l_2j4ggapx3gxwgz6mrqv46rfxw.png"></p><br><p>  The result of its execution is shown in the following figure. </p><br><p><img src="https://habrastorage.org/webt/zt/b0/lk/ztb0lku6kzxc7spuqbpnyn0xr0a.png"></p><br><p> Notepad contains graphics and some text.  Note that to output the matrix, it is possible to use the <code>DataFrame</code> type, for which the result is displayed in the form of an html-table with explicit borders and a scroller, if needed. </p><br><p>  Jupyter notebook can export the current notepad to a file in html format.  With installed conversion tools, it can convert to pdf. </p><br><p>  To build reports on a certain schedule, you can use the <code>nbconvert</code> module and the following command, which is called in the background on a schedule: <br> <code>jupyter nbconvert --to html --execute julia_filename.ipynb</code> </p> <br><p>  When performing lengthy calculations, it is advisable to add an option indicating the timeout - <code>--ExecutePreprocessor.timeout=180</code> </p><br><p>  An html report formed from this file will appear in the current directory.  The option <code>--execute</code> here means a forced start of the recalculation. </p><br><p>  For a complete set of options for the <code>nbconvert</code> module <code>nbconvert</code> see <br>  <a href="https://nbconvert.readthedocs.io/en/latest/usage.html">https://nbconvert.readthedocs.io/en/latest/usage.html</a> </p><br><p>  The result of the conversion to html is almost completely consistent with the previous figure, except that there is no menu bar and buttons. </p><br><h2 id="jupytext">  Jupytext </h2><br><p>  Quite an interesting utility that allows you to convert already created ipynb notes into Markdown text or Julia code. </p><br><p>  We can convert the previously considered example using the command <br> <code>jupytext --to julia julia_filename.ipynb</code> </p> <br><p>  As a result, we get the file <code>julia_filename.jl</code> with the code for Julia and a special markup in the form of comments. </p><br><pre> <code class="plaintext hljs"># --- # jupyter: # jupytext: # text_representation: # extension: .jl # format_name: light # format_version: '1.3' # jupytext_version: 0.8.6 # kernelspec: # display_name: Julia 1.0.3 # language: julia # name: julia-1.0 # --- # # Report example using Plots, DataFrames # ### Drawing # Good time to show some plot plot(rand(5,5), linewidth=2, title="My Plot", size = (500, 200)) # ## Some computational results rand(2, 3) DataFrame(rand(2, 3))</code> </pre> <br><p>  Note block delimiters are just a double line feed. </p><br><p>  We can do the inverse transform using the command: <br> <code>jupytext --to notebook julia_filename.jl</code> </p> <br><p>  As a result, an ipynb file will be generated, which, in turn, can be processed and converted into pdf or html. </p><br><p>  See <a href="https://github.com/mwouts/jupytext">https://github.com/mwouts/jupytext</a> for details. </p><br><p>  A common drawback of jupytext and jupyter notebook is that the “beautiful” report is limited by the capabilities of these tools. </p><br><h2 id="samostoyatelnaya-generaciya-html">  HTML self-generation </h2><br><p>  If for some reason we believe that Jupyter Notebook is too heavy a product, requiring the installation of numerous third-party packages that are not needed for Julia, or not flexible enough to build the required report form, then an alternative way is to generate the HTML page manually.  However, here you have to immerse yourself in the features of image formation. </p><br><p>  For Julia, using the <code>Base.write</code> function is the typical way to output something to the output stream, and <code>Base.show(io, mime, x)</code> for decorating.  Moreover, for various requested mime-output methods there can be various display options.  For example, a <code>DataFrame</code> displayed as text with a pseudo-table. </p><br><pre> <code class="plaintext hljs">julia&gt; show(stdout, MIME"text/plain"(), DataFrame(rand(3, 2))) 3×2 DataFrame │ Row │ x1 │ x2 │ │ │ Float64 │ Float64 │ ├─────┼──────────┼───────────┤ │ 1 │ 0.321698 │ 0.939474 │ │ 2 │ 0.933878 │ 0.0745969 │ │ 3 │ 0.497315 │ 0.0167594 │</code> </pre> <br><p>  If <code>mime</code> is specified as <code>text/html</code> , then the result is HTML markup. </p><br><pre> <code class="plaintext hljs">julia&gt; show(stdout, MIME"text/html"(), DataFrame(rand(3, 2))) &lt;table class="data-frame"&gt; &lt;thead&gt; &lt;tr&gt;&lt;th&gt;&lt;/th&gt;&lt;th&gt;x1&lt;/th&gt;&lt;th&gt;x2&lt;/th&gt;&lt;/tr&gt; &lt;tr&gt;&lt;th&gt;&lt;/th&gt;&lt;th&gt;Float64&lt;/th&gt;&lt;th&gt;Float64&lt;/th&gt;&lt;/tr&gt; &lt;/thead&gt; &lt;tbody&gt;&lt;p&gt;3 rows × 2 columns&lt;/p&gt; &lt;tr&gt;&lt;th&gt;1&lt;/th&gt;&lt;td&gt;0.640151&lt;/td&gt;&lt;td&gt;0.219299&lt;/td&gt;&lt;/tr&gt; &lt;tr&gt;&lt;th&gt;2&lt;/th&gt;&lt;td&gt;0.463402&lt;/td&gt;&lt;td&gt;0.764952&lt;/td&gt;&lt;/tr&gt; &lt;tr&gt;&lt;th&gt;3&lt;/th&gt;&lt;td&gt;0.806543&lt;/td&gt;&lt;td&gt;0.300902&lt;/td&gt;&lt;/tr&gt; &lt;/tbody&gt; &lt;/table&gt;</code> </pre> <br><p>  That is, using the methods of the <code>show</code> function defined for the corresponding data type (third argument) and the corresponding output format, you can ensure the formation of the file in any desired data format. </p><br><p>  The situation with images is more complicated.  If we need to create a single html file, the image must be embedded in the page code. </p><br><p>  Consider an example in which this is implemented.  Output to the file will be performed by the function <code>Base.write</code> , for which we define the appropriate methods.  So, the code: </p><br><pre> <code class="plaintext hljs">#!/usr/bin/env julia using Plots using Base64 using DataFrames # сформируем изображение и запомним его в переменной p = plot(rand(5,5), linewidth=2, title="My Plot", size = (500, 200)) # распечатаем тип, чтобы видеть, кто формирует изображение @show typeof(p) # =&gt; typeof(p) = Plots.Plot{Plots.GRBackend} # Определим три абстрактных типа, чтобы сделать 3 разных # метода функции преобразования изображений abstract type Png end abstract type Svg end abstract type Svg2 end # Функция Base.write используется для записи в поток # Определим свои методы этой функции с разными типами # Первый вариант — выводим растровое изображение, перекодировав # его в Base64-формат. # Используем HTML разметку img src="data:image/png;base64,..." function Base.write(file::IO, ::Type{Png}, p::Plots.Plot) local io = IOBuffer() local iob64_encode = Base64EncodePipe(io); show(iob64_encode, MIME"image/png"(), p) close(iob64_encode); write(file, string("&lt;img src=\"data:image/png;base64, ", String(take!(io)), "\" alt=\"fig.png\"/&gt;\n")) end # Два метода для вывода Svg function Base.write(file::IO, ::Type{Svg}, p::Plots.Plot) local io = IOBuffer() show(io, MIME"image/svg+xml"(), p) write(file, replace(String(take!(io)), r"&lt;\?xml.*\?&gt;" =&gt; "" )) end # выводим в поток XML-документ без изменений, содержащий SVG Base.write(file::IO, ::Type{Svg2}, p::Plots.Plot) = show(file, MIME"image/svg+xml"(), p) # Определим метод функции для DataFrame Base.write(file::IO, df::DataFrame) = show(file, MIME"text/html"(), df) # Пишем файл out.html простейший каркас HTML open("out.html", "w") do file write(file, """ &lt;!DOCTYPE html&gt; &lt;html&gt; &lt;head&gt;&lt;title&gt;Test report&lt;/title&gt;&lt;/head&gt; &lt;body&gt; &lt;h1&gt;Test html&lt;/h1&gt; """) write(file, Png, p) write(file, "&lt;br/&gt;") write(file, Svg, p) write(file, "&lt;br/&gt;") write(file, Svg2, p) write(file, DataFrame(rand(2, 3))) write(file, """ &lt;/body&gt; &lt;/html&gt; """) end</code> </pre> <br><p>  For image generation, the default engine is <code>Plots.GRBackend</code> , which can perform raster or vector image output.  Depending on what type is specified in the <code>mime</code> argument of the <code>show</code> function, the corresponding result is generated.  <code>MIME"image/png"()</code> generates an image in <code>png</code> format.  <code>MIME"image/svg+xml"()</code> generates an svg image.  However, in the second case, you should pay attention to the fact that a completely independent xml-document is being formed, which can be written as a separate file.  At the same time, our goal is to insert an image into an HTML page, which in HTML5 can be done by simply inserting SVG markup.  That is why the <code>Base.write(file::IO, ::Type{Svg}, p::Plots.Plot)</code> cuts the xml header, which, otherwise, will violate the structure of the HTML document.  Although most browsers can correctly display an image even in this case. </p><br><p>  Regarding the method for raster images <code>Base.write(file::IO, ::Type{Png}, p::Plots.Plot)</code> , the implementation feature here is that we can insert the binary data into the HTML only in Base64-format.  We do this with the <code>&lt;img src="data:image/png;base64,"/&gt;</code> construct.  And for transcoding use <code>Base64EncodePipe</code> . </p><br><p>  The <code>Base.write(file::IO, df::DataFrame)</code> method <code>Base.write(file::IO, df::DataFrame)</code> provides output in the html-table format of the <code>DataFrame</code> object. </p><br><p>  The final page looks like this: </p><br><p><img src="https://habrastorage.org/webt/m8/5o/qg/m85oqgvazdnduuxy-6mrneujw5c.png"></p><br><p>  In the image, all three pictures look about the same, but remember that one of them is incorrectly inserted from the HTML point of view (extra xml header).  One is raster, which means it cannot be increased without loss of detail.  And only one of them is inserted as a valid svg fragment inside the HTML markup.  And it can also be easily scaled without loss of detail. </p><br><p>  Naturally, the page was very simple.  But any visual improvements are possible with CSS. </p><br><p>  This way of generating reports is useful, for example, when the number of output tables is determined by real data, and not by a template.  For example, you need to group data by some field.  And for each group to form separate blocks.  Since the formation of the page results in the number of calls to <code>Base.write</code> , it is obvious that there is no problem to wrap the necessary block in a loop, make the output dependent on data, etc. </p><br><p>  Code example: </p><br><pre> <code class="plaintext hljs">using DataFrames # Химические элементы и их аггрегатное состояние ptable = DataFrame( Symbol = ["H", "He", "C", "O", "Fe" ], Room = [:Gas, :Gas, :Solid, :Gas, :Solid] ) res = groupby(ptable, [:Room]) # А теперь выведем группы раздельно open("out2.html", "w") do f for df in (groupby(ptable, [:Room])) write(f, "&lt;h2&gt;$(df[1, :Room])&lt;/h2&gt;\n") show(f, MIME"text/html"(), DataFrame(df)) write(f, "\n") end end</code> </pre> <br><p>  The result of this script is a fragment of the HTML page. </p><br><p><img src="https://habrastorage.org/webt/6m/-q/nh/6m-qnh-n8wa5v4rrdatbbpn1q-a.png"></p><br><p>  Please note that everything that does not require decorating / formatting is output directly via the <code>Base.write</code> function.  At the same time, everything that requires conversion is displayed via <code>Base.show</code> . </p><br><h2 id="weavejl">  Weave.jl </h2><br><p>  Weave is a science report generator that is implemented on Julia.  Uses ideas from Pweave, Knitr, rmarkdown, Sweave generators.  Its main task is to export the original markup in any of the proposed languages ​​(Noweb, Markdown, script format) to LaTex, Pandoc, Github markdown, MultiMarkdown, Asciidoc, reStructuredText markup.  And, even in iJulia Notebooks and back.  In part of the latter, it looks like Jupytext. </p><br><p>  That is, Weave is a tool that allows you to write templates that contain Julia-code in different markup languages, and on the output to have markup in another language (but already with the results of Julia-code execution).  And this is a very useful tool for researchers.  For example, you can prepare an article on Latex, which will have inserts on Julia with automatic calculation of the result and its substitution.  Weave will generate a file for the final article. </p><br><p>  There is support for the Atom editor with the appropriate plugin <a href="https://atom.io/packages/language-weave">https://atom.io/packages/language-weave</a> .  This allows you to develop and debug Julia-embedded scripts on the markup, and then generate the target file. </p><br><p>  The basic principle in Weave, as already mentioned, is the parsing of a template containing markup with text (formulas, etc.) and pasting the Julia code.  The result of the code can be displayed in the final report.  The output of text, code, output of results, the output of graphs - all this can be individually configured. </p><br><p>  To process the templates, you need to run an external script that will collect everything into a single document and convert it to the desired output format.  That is, templates are separate, handlers are separate. </p><br><p>  An example of such a processing script: </p><br><pre> <code class="plaintext hljs"># Обработать файлы и сгенерировать отчёты: # Markdown weave("w_example.jmd", doctype="pandoc" out_path=:pwd) # HTML weave("w_example.jmd", out_path=:pwd, doctype = "md2html") # pdf weave("w_example.jmd", out_path=:pwd, doctype = "md2pdf")</code> </pre> <br><p>  <code>jmd</code> in file names is Julia Markdown. </p><br><p>  Take the same example that we used in the previous tools.  However, we’ll insert a title with information about the author that Weave understands. </p><br><pre> <code class="markdown hljs">--- title : Intro to Weave.jl with Plots author : Anonymous date : 06th Feb 2019 --- # Intro ## Plot ` ``{julia;} using Plots, DataFrames plot(rand(5,5), linewidth=2, title="My Plot", size = (500, 200)) ` `` ## Some computational results ` ``julia rand(2, 3) ` `` ` ``julia DataFrame(rand(2, 3)) ` ``</code> </pre> <br><p>  This fragment, being converted to pdf, looks something like this: </p><br><p><img src="https://habrastorage.org/webt/ga/_t/fh/ga_tfhgqqkfbofctlq6coym6unw.png"></p><br><p>  Fonts and design are well recognizable for Latex users. </p><br><p>  For each piece of embedded code, you can determine how this code will be processed and what will be displayed in the end. </p><br><p>  For example: </p><br><ul><li>  echo = true - the code will be displayed </li><li>  eval = true - the result of the code execution will be displayed in the report </li><li>  label - add a label.  If Latex is used, it will be used as a fig: label </li><li>  fig_width, fig_height - image size </li><li>  and so forth </li></ul><br><p>  About noweb and script formats, and more about this tool, see <a href="http://weavejl.mpastell.com/stable/">http://weavejl.mpastell.com/stable/</a> </p><br><h2 id="literatejl">  Literate.jl </h2><br><p>  The authors of this package to the question why Literate, refer to the paradigm of the Literate Programming Donald Knutt.  The task of this tool is to generate documents based on the Julia code containing comments in the markdown format.  Unlike the previously reviewed Weave tool, it cannot do documents with the results of its execution.  However, the tool is lightweight and, above all, focused on documenting code.  For example, help in writing beautiful examples that can be placed on any markdown platform.  Often used in a chain of other documentation tools, for example with <code>Documenter.jl</code> . </p><br><p>  There are three possible output formats - markdown, notebook and script (pure Julia code).  In none of them the implementation of the embedded code will not be carried out. </p><br><p>  An example of a source file with Markdown comments (after the first # character): </p><br><pre> <code class="plaintext hljs">#!/usr/bin/env julia using Literate Literate.markdown(@__FILE__, pwd()) # documenter=true # # Intro # ## Plot using Plots, DataFrames plot(rand(5,5), linewidth=2, title="My Plot", size = (500, 200)) # ## Some computational results rand(2, 3) DataFrame(rand(2, 3))</code> </pre> <br><p>  The result of his work will be a Markdown document and directives for the <code>Documenter</code> , if their generation has not been explicitly disabled. </p><br><pre> <code class="markdown hljs"><span class="hljs-code"><span class="hljs-code">` `</span></span><span class="hljs-code"><span class="hljs-code">`@meta EditURL = "https://github.com/TRAVIS_REPO_SLUG/blob/master/" `</span></span> <span class="hljs-code"><span class="hljs-code">`` `</span></span> <span class="hljs-code"><span class="hljs-code">``@example literate_example #!/usr/bin/env julia using Literate Literate.markdown(@__FILE__, pwd(), documenter=true) `</span></span> <span class="hljs-code"><span class="hljs-code">`` # Intro ## Plot `</span></span> <span class="hljs-code"><span class="hljs-code">``@example literate_example using Plots, DataFrames plot(rand(5,5), linewidth=2, title="My Plot", size = (500, 200)) `</span></span> <span class="hljs-code"><span class="hljs-code">`` ## Some computational results `</span></span> <span class="hljs-code"><span class="hljs-code">``@example literate_example rand(2, 3) DataFrame(rand(2, 3)) `</span></span> `` <span class="hljs-emphasis"><span class="hljs-emphasis">*This page was generated using [Literate.jl](https://github.com/fredrikekre/Literate.jl).*</span></span></code> </pre> <br><p>  The code inserts inside the markdown here are intentionally set with a space between the first and subsequent apostrophes, so as not to deteriorate when the article is published. </p><br><p>  See <a href="https://fredrikekre.github.io/Literate.jl/stable/">https://fredrikekre.github.io/Literate.jl/stable/</a> for details. </p><br><h2 id="documenterjl">  Documenter.jl </h2><br><p>  Generator documentation.  Its main purpose is to form readable documentation packages written on Julia.  Documenter converts to html or pdf as examples with Markdown-markup and embedded Julia-code, and the source files of the modules, extracting Julia-docstrings (Julia's own comments). </p><br><p>  An example of a typical paperwork: </p><br><p><img src="https://habrastorage.org/webt/1b/wc/za/1bwczaoej_07sqjs1qfktzhnhr0.png"></p><br><p>  In this article we will not dwell on the principles of documentation, because, in an amicable way, this should be done in a separate article on the development of modules.  However, some moments of the Documenter, we consider here. </p><br><p>  First of all, you should pay attention to the fact that the screen is divided into two parts - the left side contains an interactive table of contents.  The right side is actually the text of the documentation. </p><br><p>  A typical directory structure with examples and documentation is as follows: </p><br><pre> <code class="plaintext hljs"> docs/ src/ make.jl src/ Example.jl ...</code> </pre> <br><p>  The <code>docs/src</code> directory is the markdown documentation.  And the examples are located somewhere in the <code>src</code> source directory. </p><br><p>  The key file for the Docuementer is <code>docs/make.jl</code>  The contents of this file for the documentation itself: </p><br><pre> <code class="plaintext hljs">using Documenter, DocumenterTools makedocs( modules = [Documenter, DocumenterTools], format = Documenter.HTML( # Use clean URLs, unless built as a "local" build prettyurls = !("local" in ARGS), canonical = "https://juliadocs.github.io/Documenter.jl/stable/", ), clean = false, assets = ["assets/favicon.ico"], sitename = "Documenter.jl", authors = "Michael Hatherly, Morten Piibeleht, and contributors.", analytics = "UA-89508993-1", linkcheck = !("skiplinks" in ARGS), pages = [ "Home" =&gt; "index.md", "Manual" =&gt; Any[ "Guide" =&gt; "man/guide.md", "man/examples.md", "man/syntax.md", "man/doctests.md", "man/latex.md", hide("man/hosting.md", [ "man/hosting/walkthrough.md" ]), "man/other-formats.md", ], "Library" =&gt; Any[ "Public" =&gt; "lib/public.md", hide("Internals" =&gt; "lib/internals.md", Any[ "lib/internals/anchors.md", "lib/internals/builder.md", "lib/internals/cross-references.md", "lib/internals/docchecks.md", "lib/internals/docsystem.md", "lib/internals/doctests.md", "lib/internals/documenter.md", "lib/internals/documentertools.md", "lib/internals/documents.md", "lib/internals/dom.md", "lib/internals/expanders.md", "lib/internals/mdflatten.md", "lib/internals/selectors.md", "lib/internals/textdiff.md", "lib/internals/utilities.md", "lib/internals/writers.md", ]) ], "contributing.md", ], ) deploydocs( repo = "github.com/JuliaDocs/Documenter.jl.git", target = "build", )</code> </pre> <br><p>  As you can see, the key methods here are <code>makedocs</code> and <code>deploydocs</code> , which determine the structure of future documentation and the place for its placement.  <code>makedocs</code> provides for the formation of markdown markup from all specified files, which includes both the implementation of embedded code and the extraction of docstrings comments. </p><br><p>  Documenter supports a number of directives to insert code.  Their format is `` ` <code>@something</code> </p><br><ul><li>  <code>@docs</code> , <code>@autodocs</code> - links to docstrings documentation extracted from Julia files. </li><li>  <code>@ref</code> , <code>@meta</code> , <code>@index</code> , <code>@contents</code> - links, indication of index pages, etc. </li><li>  <code>@example</code> , <code>@repl</code> , <code>@eval</code> are the modes for executing the embedded code on Julia. </li><li>  ... </li></ul><br><p>  The presence of <code>@example, @repl, @eval</code> , in fact, determined whether to include the Documenter in this review or not.  Moreover, the previously mentioned <code>Literate.jl</code> can automatically generate such markup, which was demonstrated earlier.  That is, there are no fundamental limitations to using the documentation generator as a report generator. </p><br><p>  For more information about Documenter.jl, see <a href="https://juliadocs.github.io/Documenter.jl/stable/">https://juliadocs.github.io/Documenter.jl/stable/</a> </p><br><h2 id="zaklyuchenie">  Conclusion </h2><br><p>  Despite the youth of the Julia language, already developed packages and tools for it, we can speak about full use in high-loaded services, and not just about the implementation of pilot projects.  As you can see, the ability to generate various documents and reports, including the results of code execution both in text and in graphical form, is already provided.  Moreover, depending on the complexity of the report, we can choose between the simplicity of creating a template and the flexibility of generating reports. </p><br><p>  The article does not consider the Flax generator from the Genie.jl package.  Genie.jl is an attempt to implement Julia on Rails, and Flax is a kind of analogue of eRubis with Julia code inserts.  However, Flax is not provided as a separate package, and Genie is not included in the main package repository, so it was not included in this review. </p><br><p>  I would like to separately mention the <a href="">Makie.jl</a> and <a href="https://juliagraphics.github.io/Luxor.jl/stable/examples/">Luxor.jl packages</a> , which provide the formation of complex vector visualizations.  The result of their work can also be used as part of the reports, but this should also be a separate article. </p><br><h2 id="ssylki">  Links </h2><br><ul><li>  <a href="">Jupyter Notebook / IJulia</a> </li><li>  <a href="https://github.com/mwouts/jupytext">Jupytext</a> </li><li>  <a href="http://weavejl.mpastell.com/stable/">Weave.jl</a> </li><li>  <a href="https://fredrikekre.github.io/Literate.jl/stable/">Literate.jl</a> </li><li>  <a href="https://juliadocs.github.io/Documenter.jl/stable/">Documenter.jl</a> </li></ul></div><p>Source: <a href="https://habr.com/ru/post/439442/">https://habr.com/ru/post/439442/</a></p>
+<section class="navigation-panel">
+<h4>More articles:</h4>
+<nav><ul class="list-of-pages">
+<li><a href="../438956/index.html">Magnetite in the teeth: sequencing of transcriptomes of the tissues of the radula of the shell of mollusc shell</a></li>
+<li><a href="../438958/index.html">ILV confirmed the existence of its "space station"</a></li>
+<li><a href="../438960/index.html">How I abandoned Ruby in favor of Python, working on a backend</a></li>
+<li><a href="../438962/index.html">For the most part, a positive outlook for the future of chips.</a></li>
+<li><a href="../438964/index.html">Who really stands behind popular free VPNs?</a></li>
+<li><a href="../438966/index.html">The history of wandering documentation Haproxy, or what you should pay attention to when it is configured</a></li>
+<li><a href="../438968/index.html">Marking shoes in Russia: The market is not ready, but will have to work</a></li>
+<li><a href="../438970/index.html">It is said that Haskell is a language for geniuses and academics. True?</a></li>
+<li><a href="../438972/index.html">The brain from the inside (Visualization of the passage of the pattern through the model of an artificial neural network)</a></li>
+<li><a href="../438974/index.html">Virtual reality helps to cope with mental disorders</a></li>
+<li><a href="../438976/index.html">The book "Spring. All design patterns »</a></li>
+<li><a href="../438980/index.html">Spring Boot 2: what's new?</a></li>
+<li><a href="../438982/index.html">Kubernetes tutorial, part 1: applications, microservices and containers</a></li>
+<li><a href="../438984/index.html">Kubernetes Handbook Part 2: Creating and Working With a Cluster</a></li>
+<li><a href="../438986/index.html">React Training Course Part 14: Workshop on Class Based Components, Component State</a></li>
+<li><a href="../438988/index.html">React Training Course, Part 15: Workshop on Working with Component State</a></li>
+<li><a href="../438992/index.html">Developer Diary or Bad Decisions</a></li>
+<li><a href="../438994/index.html">Intel Xeon W-3175X, hot drummer. Testing</a></li>
+<li><a href="../438996/index.html">Company network and MitM. Part 1</a></li>
+<li><a href="../438998/index.html">CGDevs Moscow Meetup # 2</a></li>
+<li><a href="../439000/index.html">Spatial manipulation in 2D using Signed Distance Fields</a></li>
+<li><a href="../439002/index.html">How to stop "writing TK" and start working?</a></li>
+<li><a href="../439006/index.html">How AI helps to master sign language</a></li>
+<li><a href="../439008/index.html">Mail.ru has released a new Atom browser with an emphasis on "security and privacy"</a></li>
+<li><a href="../439010/index.html">How is the consolidation of archives in DeviceLock DLP</a></li>
+<li><a href="../439012/index.html">Telephone directory of the organization - print version</a></li>
+<li><a href="../439016/index.html">Static Generic Tables</a></li>
+<li><a href="../439018/index.html">Setting up Sphinx search for an online store</a></li>
+<li><a href="../439020/index.html">Ticket to Ride. Europe - arithmetic, part two</a></li>
+<li><a href="../439022/index.html">CNC in the hobby workshop (part 3)</a></li>
+<li><a href="../439024/index.html">Results Slurm-3</a></li>
+<li><a href="../439028/index.html">How to improve network perimeter protection? Practical recommendations for Check Point and not only</a></li>
+<li><a href="../439030/index.html">A lot of managers</a></li>
+<li><a href="../439032/index.html">Amazon and Google are planning to enter the energy market</a></li>
+<li><a href="../439034/index.html">Group-IB Webinar: Red Team or Pentest 12.02.2019</a></li>
+<li><a href="../439036/index.html">The main thing is not to get into the mall under the reconciliation of hours</a></li>
+<li><a href="../439038/index.html">Making a neural network: how not to break the brain</a></li>
+<li><a href="../439040/index.html">To isolate the Runet need budget funds</a></li>
+<li><a href="../439042/index.html">Puma is looking for beta testers for self-tapping sneakers Fi</a></li>
+<li><a href="../439046/index.html">How to safely combine the network segments of the three major banks: share tricks</a></li>
+<li><a href="../439050/index.html">Training Cisco 200-125 CCNA v3.0. Cisco Certified Network Specialist (CCNA). Day 2. OSI and TCP-IP models</a></li>
+<li><a href="../439056/index.html">Cement Brand Integration</a></li>
+<li><a href="../439060/index.html">7 types of customers</a></li>
+<li><a href="../439062/index.html">Anisoprint Composer: 3D printing of high strength</a></li>
+<li><a href="../439064/index.html">Typical mesh error (Bootstrap Grid), or why the designer and layout designer do not understand each other</a></li>
+<li><a href="../439066/index.html">Operating system on Rust. Page memory: advanced level</a></li>
+<li><a href="../439068/index.html">Spam campaign “Love you” redirected to Japan</a></li>
+<li><a href="../439070/index.html">China refuses anti-corruption system Zero Trust AI because of its high efficiency</a></li>
+<li><a href="../439074/index.html">Password Checkup extension checks passwords with a base of 4 billion compromised accounts</a></li>
+<li><a href="../439076/index.html">In which applications to wait for an unknown malicious code?</a></li>
+<li><a href="../439078/index.html">Perm programmer arrested for creating a mobile application through which the pedophile acted</a></li>
+<li><a href="../439080/index.html">Unobvious RabbitMQ in Yii2 or why RabbitMQ writes to all queues at once</a></li>
+<li><a href="../439082/index.html">Walk through the plant of desires</a></li>
+<li><a href="../439086/index.html">Causes of ANR and how to avoid it</a></li>
+<li><a href="../439094/index.html">Scientists have found the oldest living vertebrate on Earth</a></li>
+<li><a href="../439096/index.html">Buildbot: a tale with examples of one more continuous integration system</a></li>
+<li><a href="../439098/index.html">Sasha Memus, Chatfuel: How to build a career in products after consulting, is it dangerous to meditate and how to change behavior</a></li>
+<li><a href="../439100/index.html">How to adapt UX / UI for permissions</a></li>
+<li><a href="../439102/index.html">Russians are 20% more likely to face insults on the Internet</a></li>
+<li><a href="../439104/index.html">Redux Simple as a rake</a></li>
+<li><a href="../439106/index.html">Programming in Russia will be introduced from primary school</a></li>
+<li><a href="../439108/index.html">Amateur radio measurements: when there is no frequency meter</a></li>
+<li><a href="../439112/index.html">Creator Kate Mobile arrested for using a pedophile for his service</a></li>
+<li><a href="../439118/index.html">New in browsers: Firefox 66 blocks video and sound by default, Chromium limits page budget</a></li>
+<li><a href="../439122/index.html">Simplicity and complexity of primitives or how to determine unnecessary preprocessing for a neural network</a></li>
+<li><a href="../439124/index.html">If software is created with public money, the code should be open.</a></li>
+<li><a href="../439126/index.html">Requests from users and product requirements</a></li>
+<li><a href="../439128/index.html">How to organize the work of QA. One practically applied method</a></li>
+<li><a href="../439130/index.html">13 trends in the cybersecurity and information security market 2019-2020</a></li>
+<li><a href="../439132/index.html">Unforgettable old age</a></li>
+<li><a href="../439134/index.html">Russian scientists are developing sitall (unbreakable glass) for LG smartphones</a></li>
+<li><a href="../439136/index.html">What is the difference between 4G and 5G?</a></li>
+<li><a href="../439138/index.html">Working with callbacks in React</a></li>
+<li><a href="../439140/index.html">Important message about invites in profile</a></li>
+<li><a href="../439142/index.html">Design maturity models</a></li>
+<li><a href="../439148/index.html">Working with nRF51822 using ST-Link and Clion + OpenOCD</a></li>
+<li><a href="../439150/index.html">Who should pay transaction costs</a></li>
+<li><a href="../439152/index.html">Salaries in IT in the second half of 2018: according to the “My Circle” salary calculator</a></li>
+<li><a href="../439154/index.html">How do freelancers live: book cover design, own production of backpacks and travel work</a></li>
+<li><a href="../439158/index.html">DataArt Launches Free CV Duck Resume Improvement Service</a></li>
+<li><a href="../439160/index.html">Algorithm state: what happens to indie developers on Steam?</a></li>
+<li><a href="../439162/index.html">How to debug front-end and backend: step-by-step instructions</a></li>
+<li><a href="../439166/index.html">mmWave on the road to commercialization in the form factor of a smartphone</a></li>
+<li><a href="../439170/index.html">Cellular operators will help banks verify the accuracy of customer data</a></li>
+<li><a href="../439172/index.html">Extending the assert () macro to implement minimal error handling</a></li>
+<li><a href="../439174/index.html">Safe Internet Day: what threats to pay attention to in 2019</a></li>
+<li><a href="../439182/index.html">How do we distribute orders between drivers in Yandex.Taxi</a></li>
+<li><a href="../439186/index.html">UX Editor: True Story, Rial Life</a></li>
+<li><a href="../439194/index.html">Controlling a character with SharedEvents</a></li>
+<li><a href="../439196/index.html">JPMorgan analysts: Apple should buy Blizzard, Netflix or Sonos to reassure investors</a></li>
+<li><a href="../439198/index.html">Generation of barrier islands</a></li>
+<li><a href="../439200/index.html">Composer for the smallest</a></li>
+<li><a href="../439202/index.html">Detection of web attacks using autoencoder Seq2Seq</a></li>
+<li><a href="../439204/index.html">Increasing the efficiency of photosynthesis by genetic modification of plants</a></li>
+<li><a href="../439210/index.html">Java after volcanic eruption</a></li>
+<li><a href="../439216/index.html">pudge embedded database in 500 lines on golang</a></li>
+<li><a href="../439218/index.html">VC bot on the knee, or how to please people February 14</a></li>
+<li><a href="../439222/index.html">What is API management?</a></li>
+<li><a href="../439224/index.html">Again about the Voronoi diagrams</a></li>
+<li><a href="../439232/index.html">JAMstack: How to create your blog using Gatsby + Contentful + Netlify</a></li>
+<li><a href="../439236/index.html">xenvman: Flexible environments for testing microservices (and not only)</a></li>
+<li><a href="../439238/index.html">Play Store now accepts progressive web applications (PWA)</a></li>
+<li><a href="../439240/index.html">Joomla Digest for January 2019</a></li>
+<li><a href="../439244/index.html">FAS strongly recommends to pre-install Russian software on smartphones and laptops sold in Russia</a></li>
+<li><a href="../439248/index.html">Alan Kay: “Could the ancient Romans build a computer?”</a></li>
+<li><a href="../439252/index.html">6 reasons to develop IT career in Armenia</a></li>
+<li><a href="../439254/index.html">Our all</a></li>
+<li><a href="../439260/index.html">The author of the book "The Witcher" will still receive compensation from CD Projekt Red</a></li>
+<li><a href="../439262/index.html">Deploy the code directly to the docker container. Or how not to prokrasinirovat after each commit</a></li>
+<li><a href="../439264/index.html">How to lead complex technical projects without hiring PMs: DataLine experience</a></li>
+<li><a href="../439266/index.html">The experience of creating an Android game alone from scratch and how it was captured on Google Play</a></li>
+<li><a href="../439268/index.html">How VR, AR and 3D printing work together: the VR Concept experience</a></li>
+<li><a href="../439270/index.html">An example of parsing C ++ code using libclang in Python</a></li>
+<li><a href="../439278/index.html">ACS my LCD - security on two bolts</a></li>
+<li><a href="../439280/index.html">Trautonium: the German wave in the history of synthesizers</a></li>
+<li><a href="../439282/index.html">Effects of filtering SVG. Part 1. SVG filters 101</a></li>
+<li><a href="../439288/index.html">SciPy Optimization</a></li>
+<li><a href="../439290/index.html">Accelerate compilation in Xcode to swift</a></li>
+<li><a href="../439292/index.html">Google has agreed to remove from the search banned sites in the Russian Federation</a></li>
+<li><a href="../439294/index.html">Translation review "If software is created with public money, the code must be open"</a></li>
+<li><a href="../439296/index.html">Soviet license plate and Kolmogorov complexity</a></li>
+<li><a href="../439298/index.html">What would the Internet system look like in the game EvE Online</a></li>
+<li><a href="../439300/index.html">Statistics for file types in the Wildfire cloud sandbox</a></li>
+<li><a href="../439302/index.html">Product Design Digest, January 2019</a></li>
+<li><a href="../439304/index.html">[Ekaterinburg, announcement] Mitap for Java-developers</a></li>
+<li><a href="../439308/index.html">Kill cancer: iridium, human serum albumin and some blue light</a></li>
+<li><a href="../439310/index.html">Why not take off the real estate portal. Part 2</a></li>
+<li><a href="../439312/index.html">Speed ​​up complex calculations with minimal RAM</a></li>
+<li><a href="../439314/index.html">Seven strange ways of dealing with recluse in remote work</a></li>
+<li><a href="../439316/index.html">“I stopped doing what I see no point in”: project managers about their work and training</a></li>
+<li><a href="../439318/index.html">Win procrastination gaming addiction</a></li>
+<li><a href="../439320/index.html">How to diversify programming lessons for children of different ages</a></li>
+<li><a href="../439322/index.html">OS Sailfish renamed OS "Aurora"</a></li>
+<li><a href="../439324/index.html">Using a binary tree in swift using enum using OCR as an example</a></li>
+<li><a href="../439326/index.html">Electric Ford F-150 EV - in the prototype and tested on the road</a></li>
+<li><a href="../439328/index.html">Okay, google! Are you good or evil?</a></li>
+<li><a href="../439332/index.html">How PageRank works: implementation in the R language through linear algebra and power-method</a></li>
+<li><a href="../439334/index.html">About 2 billion rubles allocated for the implementation of the draft law on sustainable runet</a></li>
+<li><a href="../439336/index.html">We are looking for a needle in a stack without using well-known algorithms.</a></li>
+<li><a href="../439338/index.html">Forget about privacy: you still have terrible targeting</a></li>
+<li><a href="../439340/index.html">GDPR backup — what a new tool will do</a></li>
+<li><a href="../439342/index.html">Winter DIYorDIE Meetup February 17</a></li>
+<li><a href="../439344/index.html">To be like a troll: how monopolists rule patents</a></li>
+<li><a href="../439346/index.html">Laravel + Docker: Our Successful Experience</a></li>
+<li><a href="../439348/index.html">Vision falls after laser vision correction - what to do? Or, doctor, make me an "enhancement"</a></li>
+<li><a href="../439350/index.html">Artificial intelligence as a machine of inventions</a></li>
+<li><a href="../439352/index.html">Making a bot prototype for fighting in Clash Royale</a></li>
+<li><a href="../439354/index.html">Rust news # 5 (January 2019)</a></li>
+<li><a href="../439356/index.html">Nontrivial metrics of the effectiveness of advertising campaigns</a></li>
+<li><a href="../439358/index.html">Excel metadata files</a></li>
+<li><a href="../439360/index.html">Training Cisco 200-125 CCNA v3.0. Cisco Certified Network Specialist (CCNA). Day 3. Subnets</a></li>
+<li><a href="../439362/index.html">How we teach Software Engineering at St. Petersburg HSE</a></li>
+<li><a href="../439364/index.html">Oculus Go glasses with “strawberry” content set up for sale</a></li>
+<li><a href="../439366/index.html">Automation of three nails</a></li>
+<li><a href="../439368/index.html">Animations in iOS applications born on the server</a></li>
+<li><a href="../439374/index.html">For those who want to play detective: find a bug in the function from Midnight Commander</a></li>
+<li><a href="../439376/index.html">"Interest club"</a></li>
+<li><a href="../439378/index.html">The Book of Genesis?). Reflections on the nature of mind. Part I</a></li>
+<li><a href="../439380/index.html">How I created an extension for Atom and VS Code: personal experience and source codes</a></li>
+<li><a href="../439382/index.html">Using Ansible, Terraform, Docker, Consul, Nomad in the Clouds (Alexey Vakhov, Uchi.ru)</a></li>
+<li><a href="../439390/index.html">The best innovations of social networks in 2018</a></li>
+<li><a href="../439392/index.html">The 2019 championship season is open! SNA Hackathon Launches ala ML Boot Camp 8</a></li>
+<li><a href="../439394/index.html">As a programmer dataseativistam wrote</a></li>
+<li><a href="../439396/index.html">UniFi Controller Password Reset</a></li>
+<li><a href="../439404/index.html">A brief history of electronic public procurement in Russia</a></li>
+<li><a href="../439408/index.html">Pseudo Lens Flare</a></li>
+<li><a href="../439410/index.html">Jeff Hawkins is finally ready to explain his brain research.</a></li>
+<li><a href="../439414/index.html">Client for "server push messages"</a></li>
+<li><a href="../439416/index.html">A-Frame Review</a></li>
+<li><a href="../439418/index.html">Pentaho Data Integration (PDI), Python and Deep Learning</a></li>
+<li><a href="../439420/index.html">Building the transport package without installing MODX</a></li>
+<li><a href="../439422/index.html">What does a programmer need to develop games and who really is a game developer on the part of a programmer</a></li>
+<li><a href="../439424/index.html">How I Fought Free Hosting and Composer</a></li>
+<li><a href="../439426/index.html">Situation: a new wave of attacks with the interception of DNS queries - we analyze the basic methods of protection</a></li>
+<li><a href="../439430/index.html">Believe me if you can. Water meters. part 1</a></li>
+<li><a href="../439432/index.html">How to become a Java developer in 1.5 years</a></li>
+<li><a href="../439434/index.html">NestJS - the very real nodejs backend</a></li>
+<li><a href="../439436/index.html">Cheaper price of small series of electronics in Russia. Case Internet radio WOLNA</a></li>
+<li><a href="../439440/index.html">Implementation of Zimbra Collaboration Open Source, authorization through AD and automatic creation of mailboxes</a></li>
+<li><a href="../439442/index.html">Julia. Report Generators and Documentation</a></li>
+<li><a href="../439446/index.html">What you need to know about JavaScript Engine Switcher 3.0</a></li>
+<li><a href="../439448/index.html">What virtualization questions do you expect from a graduate?</a></li>
+<li><a href="../439450/index.html">RS-485 on domestic microcontrollers from the company Milandr</a></li>
+<li><a href="../439454/index.html">Program as Art - a new software management paradigm</a></li>
+<li><a href="../439456/index.html">Hipster podcasts # 2</a></li>
+<li><a href="../439458/index.html">As we Republic website on Kubernetes translated</a></li>
+<li><a href="../439460/index.html">How marketers of Maxidom lose millions flirting in groz marketing: independent usability auditing</a></li>
+<li><a href="../439462/index.html">Civilization Springs, 5/5</a></li>
+<li><a href="../439464/index.html">VXinspect: part quality control in 10 minutes</a></li>
+<li><a href="../439466/index.html">NASA lunar orbital probe made the first pictures of the China Chang'e-4 station - two pixels of light</a></li>
+<li><a href="../439468/index.html">Where to lead the search for the perfect SCADA</a></li>
+<li><a href="../439470/index.html">Germany plans to abandon coal in the near future.</a></li>
+<li><a href="../439472/index.html">Automation of border control within the company</a></li>
+<li><a href="../439476/index.html">Cockney Slang: Modern History and Position</a></li>
+<li><a href="../439478/index.html">Entertaining C #. Five examples for a coffee break</a></li>
+<li><a href="../439480/index.html">Give way, or Why does your CRM (and CRM) slow down?</a></li>
+<li><a href="../439482/index.html">devleads - (not) financial motivation</a></li>
+<li><a href="../439484/index.html">Get the enum data in the Automapper projection</a></li>
+<li><a href="../439496/index.html">How is billing done there: when a customer and a developer speak different languages</a></li>
+<li><a href="../439498/index.html">What hardware to analyze a huge shaft of information?</a></li>
+<li><a href="../439500/index.html">Why are captcha so complicated</a></li>
+<li><a href="../439502/index.html">Undefined behavior and truth undefined</a></li>
+<li><a href="../439504/index.html">Does your Data Engineer team need it?</a></li>
+<li><a href="../439506/index.html">9 alternatives to a bad team (design pattern)</a></li>
+<li><a href="../439510/index.html">High-load distributed control system of a modern NPP</a></li>
+<li><a href="../439512/index.html">The era of dinosaurs or legally verified reinsurance?</a></li>
+<li><a href="../439516/index.html">00110001 00110100 00101110 00110000 00110010</a></li>
+<li><a href="../439524/index.html">Fortnite is the future, but for rather unexpected reasons.</a></li>
+<li><a href="../439526/index.html">Telecom operators will conduct a "field test" of the law on the stability of the Runet</a></li>
+<li><a href="../439532/index.html">What's new in javascript ES2019</a></li>
+<li><a href="../439534/index.html">Yield programming and the use of drones in oil production - 10 lectures from the conference GIS Tech Russia</a></li>
+<li><a href="../439538/index.html">Community programming</a></li>
+<li><a href="../439540/index.html">Etherblade.net - opensource project to create an ethernet traffic encapsulator on FPGA (part one)</a></li>
+<li><a href="../439542/index.html">Nintendo makes it clear that only piracy can save the history of video games</a></li>
+<li><a href="../439544/index.html">The colony. Chapter 24: Departure</a></li>
+<li><a href="../439556/index.html">TDMS Fairway. Methods PMBOK and Russian design organizations</a></li>
+<li><a href="../439558/index.html">New old phone. Reinvent the PSTN phone</a></li>
+<li><a href="../439560/index.html">The adapter for working with the blockchain Ethereum for the InterSystems IRIS data platform</a></li>
+<li><a href="../439562/index.html">Configure the Kubernetes HA cluster on bare metal with kubeadm. Part 1/3</a></li>
+<li><a href="../439564/index.html">Practical application of transformation of AST-trees on the example of Putout</a></li>
+<li><a href="../439566/index.html">Why SRE is important documentation. Part 3</a></li>
+<li><a href="../439568/index.html">QLC based SSD - hard drive killer? Not really</a></li>
+<li><a href="../439572/index.html">Automated design of electronic equipment</a></li>
+<li><a href="../439576/index.html">Extensive review of Python interviews. Hints and Tips</a></li>
+<li><a href="../439578/index.html">On the issue of transformations and other operations</a></li>
+<li><a href="../439584/index.html">Project Lenergy, how to rethink portable power sources</a></li>
+<li><a href="../439586/index.html">SPBm protocol as the basis of Extreme Automated Campus</a></li>
+<li><a href="../439588/index.html">ESET has discovered new versions of the DanaBot Trojan.</a></li>
+<li><a href="../439590/index.html">Quals: Saudi and Oman National Cyber ​​Security CTF 2019. WriteUp</a></li>
+<li><a href="../439592/index.html">Ethical Activity Automation</a></li>
+<li><a href="../439596/index.html">How I accelerated image processing on Android 15 times</a></li>
+<li><a href="../439598/index.html">Microsoft told about the cost of paid support for Windows 7</a></li>
+<li><a href="../439600/index.html">Finland summed up the preliminary results of the experiment with a guaranteed basic income</a></li>
+<li><a href="../439604/index.html">How does the barcode work?</a></li>
+<li><a href="../439606/index.html">Experimental production of electronics for the minimum price</a></li>
+<li><a href="../439608/index.html">Modern religion: what do people give to Google, Facebook, Amazon and Apple?</a></li>
+<li><a href="../439610/index.html">As in my Chevrolet Bolt electric car, under warranty, two battery modules were replaced, and the third was monitored</a></li>
+<li><a href="../439616/index.html">The digest of interesting IT projects on Kickstarter №7</a></li>
+<li><a href="../439618/index.html">PHP for beginners. File attachment</a></li>
+<li><a href="../439620/index.html">Understanding asynchronous JavaScript [Translated by Sukhjinder Arora]</a></li>
+<li><a href="../439624/index.html">Why keep data in orbit</a></li>
+<li><a href="../439626/index.html">Experience developing a free application for collectors OpenNumismat</a></li>
+<li><a href="../439628/index.html">Parallel data update in ASP.NET Web API</a></li>
+<li><a href="../439632/index.html">How to set up Continuous Deployment for your project: personal experience</a></li>
+<li><a href="../439636/index.html">The crisis of the concepts of improving road safety and a new concept of its solution</a></li>
+<li><a href="../439638/index.html">Getting FPGA to Python</a></li>
+<li><a href="../439640/index.html">Vinyl is back and it's different</a></li>
+<li><a href="../439642/index.html">Java pitfalls. Part 1</a></li>
+<li><a href="../439644/index.html">Anti-Aging: Senolithics and Stem Cell Therapy</a></li>
+<li><a href="../439646/index.html">Holding SoftBank sold a stake in Nvidia due to the fall in their prices, but still earned $ 3.3 billion</a></li>
+<li><a href="../439648/index.html">Internal and nested java classes. Part 1</a></li>
+<li><a href="../439652/index.html">How to transport your startup to the USA: 4 important steps</a></li>
+<li><a href="../439654/index.html">Full immersion: how do we cool ASIC chips in Bitfury</a></li>
+<li><a href="../439656/index.html">C # character calculator</a></li>
+<li><a href="../439676/index.html">Integration of React Native and C ++ for iOS and Android</a></li>
+<li><a href="../439680/index.html">About 50% of Russians are ready to sell their personal data</a></li>
+<li><a href="../439682/index.html">Training Cisco 200-125 CCNA v3.0. Cisco Certified Network Specialist (CCNA). Day 4. Gateway devices</a></li>
+<li><a href="../439686/index.html">Flickr introduces new rules regarding the number of photos and videos users.</a></li>
+<li><a href="../439688/index.html">Overview of AI & ML solutions in 2018 and forecasts for 2019: Part 1 - NLP, Computer Vision</a></li>
+<li><a href="../439690/index.html">Virtual machine performance comparison of 6 cloud platforms: Selectel, MCS, Ya.Oblako, Google Cloud, AWS and Azure</a></li>
+<li><a href="../439692/index.html">AT & T sued for changing the network icon from 4G to 5G E</a></li>
+<li><a href="../439694/index.html">Developed smart tissue that reacts to changes in body temperature</a></li>
+<li><a href="../439696/index.html">On the crest of a wave, or “I want to go to the mainstream” - is it worth it?</a></li>
+<li><a href="../439698/index.html">Introduction to programming: a simple 3D shooter from scratch over the weekend, part 1</a></li>
+<li><a href="../439700/index.html">Patent for a board game in Russia</a></li>
+<li><a href="../439704/index.html">From pool request to release. Report Yandex.Taxi</a></li>
+<li><a href="../439706/index.html">BLACK HAT conference. Survival lessons in a 300 Gbps DDOS attack. Part 1</a></li>
+<li><a href="../439710/index.html">Features of creating products for the US market</a></li>
+<li><a href="../439712/index.html">Government procurement: a balance between the Italian strike and the Russian criminal</a></li>
+<li><a href="../439716/index.html">Tails OS or how to protect yourself online</a></li>
+<li><a href="../439718/index.html">Developing Elixir / Phoenix Applications with Docker</a></li>
+<li><a href="../439720/index.html">Introduction to programming: a simple 3D shooter from scratch over the weekend, part 2</a></li>
+<li><a href="../439722/index.html">Effects of SVG filters. Part 2. Outline text with feMorphology</a></li>
+<li><a href="../439724/index.html">Overview of AI & ML solutions in 2018 and forecasts for 2019: Part 2 - Tools and Libraries, AutoML, RL, Ethics in AI</a></li>
+<li><a href="../439726/index.html">Lock-in: truth or fiction?</a></li>
+<li><a href="../439728/index.html">Setting up backup and recovery of Zimbra OSE entirely and in separate boxes without using Zextras</a></li>
+<li><a href="../439730/index.html">Organizing reducer through standard class</a></li>
+<li><a href="../439732/index.html">Lazarus - simple animation using the TImageFragment component</a></li>
+<li><a href="../439734/index.html">We deploy Kubernetes on the desktop in minutes with MicroK8s</a></li>
+<li><a href="../439736/index.html">IPSec VPN connection between MikroTik and Kerio Control</a></li>
+<li><a href="../439746/index.html">Understand the promises in javascript</a></li>
+<li><a href="../439748/index.html">The digest of interesting materials for the mobile developer # 285 (February 4 - 10)</a></li>
+<li><a href="../439750/index.html">Learn product management - where?</a></li>
+<li><a href="../439752/index.html">Multicore MRI Method</a></li>
+<li><a href="../439754/index.html">Google is going to be engaged in the development of smart watches</a></li>
+<li><a href="../439756/index.html">Why do I need a thermo-acoustic generator?</a></li>
+<li><a href="../439760/index.html">Engineers "twisted" the light in the fiber - a new technology will speed up the transfer of data a hundred times</a></li>
+<li><a href="../439764/index.html">Corporate fruit</a></li>
+<li><a href="../439772/index.html">Writing Unit Tests on Swift for Verifying Asynchronous Tasks</a></li>
+<li><a href="../439778/index.html">The digest of fresh materials from the world of the frontend for the last week No. 351 (February 4 - 10, 2019)</a></li>
+<li><a href="../439780/index.html">PHP Digest number 149 (January 28 - February 11, 2019)</a></li>
+<li><a href="../439782/index.html">Headless CMS - the future of content management</a></li>
+<li><a href="../439784/index.html">Methane engine "Raptor" broke the record RD-180</a></li>
+<li><a href="../439788/index.html">Regular oddities in the GOST Grasshopper and Stribog algorithms</a></li>
+<li><a href="../439790/index.html">Test JaCarta WebClient or store tokens in a safe</a></li>
+<li><a href="../439792/index.html">NASA is looking for partners in the American industry to create a partially reusable manned lender</a></li>
+<li><a href="../439794/index.html">Back pain - understanding from the perspective of modern medicine</a></li>
+<li><a href="../439796/index.html">Spring Boot 2: what is not written in release notes</a></li>
+<li><a href="../439800/index.html">RISEX and Julia. 5 stages of love customer and designer</a></li>
+<li><a href="../439806/index.html">Valid SSL domain names for local Docker containers</a></li>
+<li><a href="../439808/index.html">The biggest telescopes. From a notebook and eyes to 340 megapixel cameras and data centers. Part 1</a></li>
+<li><a href="../439810/index.html">Get acquainted with the Moleculer microservice framework</a></li>
+<li><a href="../439816/index.html">Practical blockchain in business</a></li>
+<li><a href="../439818/index.html">Features of approaches to design in the real manufacturing sector</a></li>
+<li><a href="../439820/index.html">We are trying to write a project alone. Introduction</a></li>
+<li><a href="../439822/index.html">Creating an alternative display for the Ensoniq EPS16 + and ASR10 synthesizer / sampler</a></li>
+<li><a href="../439824/index.html">When will the JavaScript frameworks disappear?</a></li>
+<li><a href="../439826/index.html">Disable analog. What will happen to the TV?</a></li>
+<li><a href="../439828/index.html">The network appeared "analog" Findface</a></li>
+<li><a href="../439840/index.html">Conference DUMP-2019: we invite you to speak in the sections Design, Management and Testing</a></li>
+<li><a href="../439852/index.html">Remote control application release: Aspia 1.1.0</a></li>
+<li><a href="../439858/index.html">Prometheus + Grafana + Node Exporter + Docker in Azure with notifications in Telegram</a></li>
+<li><a href="../439862/index.html">Digital events in Moscow from February 11 to 17</a></li>
+<li><a href="../439866/index.html">Principles of design reference books in 1C Enterprise Management 2 (ERP 2.4.6)</a></li>
+<li><a href="../439868/index.html">Life without Facebook: less radical views, good mood, more time for loved ones. Now proven by science</a></li>
+<li><a href="../439878/index.html">Creation of architecture for a new high-load startup in 2019</a></li>
+<li><a href="../439880/index.html">Security Week 07: Local IoT Device Vulnerabilities</a></li>
+<li><a href="../439886/index.html">How I trained the neural network to implement the position estimation function on the Russian AI Cup CodeBall 2018</a></li>
+<li><a href="../439894/index.html">How easy it is to monitor the site</a></li>
+<li><a href="../439900/index.html">Julia and the method of coordinate descent</a></li>
+<li><a href="../439902/index.html">Explaining the physical essence of the Wing Lift phenomenon without using the Bernouli equation. Part 2</a></li>
+<li><a href="../439906/index.html">Critical vulnerability in Zemana products and not only</a></li>
+<li><a href="../439908/index.html">Kohl, piss off ... Coax</a></li>
+<li><a href="../439912/index.html">Unsolved mystery of view</a></li>
+<li><a href="../439916/index.html">Unpacking: Dridex bootloader</a></li>
+<li><a href="../439922/index.html">Taxation of IP in Kazakhstan how to be a freelancer?</a></li>
+<li><a href="../439924/index.html">The volume of parcels from foreign online stores grew by 25%</a></li>
+</ul></nav>
+</section>
+<script src="../../js/main.js"></script>
+
+<!-- Yandex.Metrika counter -->
+<script type="text/javascript" >
+  (function (d, w, c) {
+      (w[c] = w[c] || []).push(function() {
+          try {
+              w.yaCounter52319614 = new Ya.Metrika({
+                  id:52319614,
+                  clickmap:true,
+                  trackLinks:true,
+                  accurateTrackBounce:true,
+                  webvisor:true
+              });
+          } catch(e) { }
+      });
+
+      var n = d.getElementsByTagName("script")[0],
+          s = d.createElement("script"),
+          f = function () { n.parentNode.insertBefore(s, n); };
+      s.type = "text/javascript";
+      s.async = true;
+      s.src = "https://mc.yandex.ru/metrika/watch.js";
+
+      if (w.opera == "[object Opera]") {
+          d.addEventListener("DOMContentLoaded", f, false);
+      } else { f(); }
+  })(document, window, "yandex_metrika_callbacks");
+</script>
+<noscript><div><img src="https://mc.yandex.ru/watch/52319614" style="position:absolute; left:-9999px;" alt="" /></div></noscript>
+
+<!-- Google Analytics -->
+  <script>
+    window.ga = function () { ga.q.push(arguments) }; ga.q = []; ga.l = +new Date;
+    ga('create', 'UA-134228602-1', 'auto'); ga('send', 'pageview')
+  </script>
+  <script src="https://www.google-analytics.com/analytics.js" async defer></script>
+
+</section>
+</body>
+
+</html>

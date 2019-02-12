@@ -1,0 +1,1 @@
+Simplicity and complexity of primitives or how to determine unnecessary preprocessing for a neural network

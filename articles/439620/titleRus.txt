@@ -1,0 +1,1 @@
+Разбираемся с асинхронностью в JavaScript [Перевод статьи Sukhjinder Arora]

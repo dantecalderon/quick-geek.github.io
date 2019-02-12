@@ -1,0 +1,1 @@
+Implementation of Zimbra Collaboration Open Source, authorization through AD and automatic creation of mailboxes

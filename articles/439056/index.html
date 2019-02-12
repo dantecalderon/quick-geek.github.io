@@ -1,0 +1,412 @@
+<!doctype html>
+<html class="no-js" lang="en">
+
+<head>
+  <!-- Global site tag (gtag.js) - Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=UA-134228602-1"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'UA-134228602-1');
+  </script>
+
+  <meta charset="utf-8">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  <title>Cement Brand Integration</title>
+  <meta name="description" content="Yesterday I raised the topic “Business, don't worry” about the real goals of IT projects. Not everyone believed that I was serious, but I was not joki...">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+  <link rel="stylesheet" href="../../css/main.css">
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+  <script>window.jQuery || document.write('<script src="../../js/vendors/jquery-3.3.1.min.js"><\/script>')</script>
+</head>
+
+<body>
+  <!--[if lte IE 9]>
+    <p class="browserupgrade">You are using an <strong>outdated</strong> browser. Please <a href="https://browsehappy.com/">upgrade your browser</a> to improve your experience and security.</p>
+  <![endif]-->
+  <nav class="page-headings-container js-page-headings-container"></nav>
+  <div class="tools-bar js-tools-bar">
+    <!-- <a href="https://quick-geek.github.io/search.html" title="Search">🔎</a> -->
+    <a class="js-list-of-headings-button" data-state="closed" href="#" title="Headings">📜</a>
+    <a class="js-go-to-top-button" href="#" title="Go to Top">⬆️</a>
+    <a class="js-go-to-bottom-button" href="#" title="Go to Bottom">⬇️</a>
+  </div>
+  <section class="page js-page"><h1>Cement Brand Integration</h1><div class="post__text post__text-html js-mediator-article">  Yesterday I raised the topic <a href="https://habr.com/ru/post/438896/">“Business, don't worry”</a> about the real goals of IT projects.  Not everyone believed that I was serious, but I was not joking. <br><br>  I am sure that we (who we are and how many of us are we?) Need cases to achieve real goals.  Plant, cement, squeeze and learn. <br><br>  Of course, there will be people who spit on me from the high bell tower of moral values, best practices, MBA, customer focus and the slogan “IT helps to solve business problems”.  It helps, of course.  Those that he creates.  This is also called "business."  It remains to learn how to do it systematically, predictably and reliably.  Like tobacco corporations. <br><br>  Today I present to your court one of the ways of cementing - integration. <a name="habracut"></a><br><br><h4>  Double eagle </h4><br>  A typical example is a company has an information system, for example, UPP or ERP on the 1C platform.  And the company decided to create a website.  Not just a business card site with contact information, but also an information system that is useful for business. <br><br>  Let the site be an online store, with a catalog of products, descriptions and images, balances, prices, orders, and payment.  A good, normal, self-service web app. <br><br>  So stop ... Product catalog?  Prices?  Leftovers?  Orders and payments?  Somewhere we have already seen it, just recently ... Well, this is all in 1C! <br><br>  There is metadata (the structure of reference books, documents, their details), and data (specific nomenclature, prices, balances, etc.), and algorithms (ordering, connection with payments, selection by balances, etc.). <br><br>  So, our 1C system already contains everything that is necessary for customer self-service?  Remove unnecessary (purchase prices, for example), delineate access rights (so that customers can see only their data), and voila - the application is ready!  Is not it so?  Where is the mistake? <br><br>  There is no error, everything is correct.  The information system 1C has everything you need.  There is no one - the ability to publish our application to the world, i.e.  the Internet so that customers can go in and make an order. <br><br>  Formally, the ability to publish, of course, is present - for a long time there is a web client in the 1C platform.  But no one will seriously consider the possibility of an online store in the 1C web client? <br><br>  But what if you change the appearance of the application in 1C web client?  Remove panels, shapes, color scheme change - in general, bring the appearance of the application to the usual "Internet".  Yes, and disable licensing, otherwise our site will never accommodate even a thousand users - we will break the keys.  Otherwise, everything is fine?  All the data in the application is already there, all the algorithms work - and, without re-programming, it will work as in the “office” 1C. <br><br>  It was not there.  The 1C information system runs on the 1C platform.  Platform 1C will not allow you to bring the interface to the "Internet" mind, will not allow to disable the license.  There are simply no such tools, settings and checkboxes. <br><br>  Well, no tools, okay.  There are programmers, they can correct the source code, without having at hand visual tools to configure the interface?  Let them create a modification of the 1C platform, especially for our company, removing the restrictions created “for all”.  Normal idea? <br><br>  The idea is beautiful, but again nothing will come of it.  Platform 1C can not be changed.  It is impossible to look <b>at the</b> 1C platform (it is possible to look <b>at the</b> platform, but not at the <b>c</b> ).  No one except hackers with a decompiler and employees of the 1C platform development department. <br><br>  Well, okay, you can survive it.  Surely the people responsible for the development of the platform understand what huge markets and opportunities they are missing, not allowing to make a web application from 1C?  After all, this is a huge reservoir of needs that arise in almost all companies!  Surely the work on the realization of such opportunities in the platform has long been seething!  So, it is urgent to find out from them, when at last it will be possible to feel all this! <br><br>  Hmm, and how to find out?  Who?  Our 1C programmers do not know, the partners (1C franchisees) do not know, there is no section on the 1C website with the planned improvements, they don’t say anything by phone ... Oh, there is a <a href="https://wonderland.v8.1c.ru/">looking-glass</a> !  But even there about the creation of a web application from 1C is not written ... Some technical terms, metadata, registers, extensions ... And, here, <a href="https://wonderland.v8.1c.ru/blog/podderzhka-korporativnogo-stilya/">something is written</a> !  It will be possible to change the style of the application to corporate!  Damn, this is just the colors will change and the screen saver at the start will be removed ... Ugh.  Dead end. <br><br>  What should we, the unfortunate company, do with our web application?  And the same as to all other companies - as the classic said, “In line, you sons of bitches, in line!”.  In turn, to site developers, web makers and sellers of "ready-made web platforms."  And the budget immediately lay a million, or even three.  And for the introduction of 1C have already given a million.  And every month we spend 100-200 thousand to support and develop it.  Damn, something is wrong in this world. <br><br>  What will web makers do?  Well, except that they will try to plant us on themselves. <br><br>  They will create another application, on another platform, using other technologies.  <b>They will create the same application again</b> .  The same reference book of the nomenclature, the same balances, prices, orders, algorithms for their processing, payment, demarcation of rights, authorization.  All the same, only on a different technology. <br><br>  And why web makers create the same application, but at a price several times more expensive than 1C programmers?  After all, the programmer 1C to create a directory of nomenclature "from scratch", with all the necessary fields, will go if not minutes, then the maximum is hours, and will it cost thousands of rubles?  Why does an Internet programmer take at <b>least</b> hours to do such a job? <br><br>  And for the same reason - platform restrictions, only this time not 1C, but the one on which the site is being made.  You did not think that this text is about what a bad platform 1C? <br><br>  In 1C, everything related to the work of directories has already been created in the platform.  The programmer simply uses ready-made constructions, and without programming, almost with one mouse, creates our reference book of nomenclature.  And in the platform of the site there are no reference books as entities.  Just as there are no documents, reports, registers, balances - everything we are used to when working with 1C.  And this is a limitation of the site creation platform. <br><br>  This is what web makers have to pay for creating a platform.  Or rather, for recreating, copying, playing.  What is important - <b>you have to pay every time, every customer</b> who ordered, in fact, a standard site.  Well, isn't it nonsense?  Anyway, buying a car, paying the plant for the purchase of machine tools.  Everytime. <br><br>  Logic dictates that web-makers, having once created such an application for, say, 3 million rubles of one client, use this template on the next project.  There, too, need the same directories, prices, balances, etc.?  Just take the finished frame, change the design, download the data and voila!  The normal approach? <br><br>  No, what's so normal about him?  In this case, the web maker sells the boxed solution.  What is its price?  Well, compare with the prices of boxes 1C, for example.  For 10 thousand to give?  Over 20?  Over 50?  Meaning?  If you can again take the same 3 million.  Including, without telling the client that the finished application framework will be used.  Just copy the budget, with the same effort, and roll out the CP. <br><br>  There, in the piggy bank of a booming Russian IT business, we are throwing the costs of <b>integrating</b> the 1C system and the site.  Here, at least, both camps will receive money - the integration algorithms must be implemented on both sides. <br><br>  So it turned out the price limit, which is measured at the start in millions of rubles.  Add the cost of maintenance, site hosting, salary, taxes, depreciation of internal IT professionals and their jobs, God forbid - refinement.  After adding the directory "Suppliers" on the site, too, will not take 20 thousand rubles? <br><br>  Intermediate solutions — platforms for websites containing a certain set of predefined types of data — also do not save, because  their customizability (possibility and complexity of changes) is even worse than that of the “bare” platforms.  Although, if you shrink upon requests, and order a “typical” site, you can save money.  There will be something similar to the 1C web client, which is also “typical”. <br><br>  But a holy place is never empty.  Or is it?  So you say a pattern phrase, and even thoughts do not arise to argue with it.  There are enthusiasts trying to bridge the gap.  Moreover, in both camps - and among 1snikov, and among web makers.  But so far, alas, at the level of “possible directions of development” and “technologies for simple applications, without frills”. <br><br>  <b>Integration has fastened two bricks, like cement.</b>  Now this whole construction is more expensive for the client - both literally and figuratively.  Especially if the integration is complicated, even if it is hand-footed. <br><br><h4>  Zmey Gorynych </h4><br>  Ok, there is nothing to do, we agreed on the double-headed eagle: the 1C information system and the site.  They gave the millions requested by web makers and 1Decnik for system creation and integration.  We will live and enjoy. <br><br>  Will we?  No, we will not.  We have business, processes, products, dynamics, development.  The accounting system and the site are no longer enough to meet the growing need for analysis, management and monitoring tools. <br><br>  For example, our business is growing, and management problems have become clearly manifested - there are many people, many departments, tasks are set orally or on traditional media (like paper memos), then they are lost somewhere, they are not executed, the effectiveness of management is very low.  It is very difficult to achieve the execution of instructions, especially “long” ones, the constant attention of the manager to all questions is needed. <br><br>  What to do?  Implement any task management system or project management system.  Fortunately, the choice is very large.  There are solutions from 1C, there are online services, there are old desktop systems.  What to take?  Remembering that we already have 1C and a site. <br><br>  Programs from 1C promise seamless integration with the main accounting system (whatever that means).  Probably, the necessary data will be moved in both directions: accounting - in tasks, and tasks - in accounting.  For example, it is possible to arrange the coordination of documents born in the accounting system, such as contracts, applications for spending money, etc. <br><br>  But here we already have a known problem - access via the Internet.  If access to the Internet is not so important for the accounting system, then it is one of the basic values ​​for managing tasks.  Managers and owners, especially geographically distributed business, can not be tied to the office in management.  It is no secret that many managers are involved in planning, monitoring projects and setting tasks during off-hours - in the evening, on weekends, at the airport, etc.  And task management is a system, first of all, for managers. <br><br>  The system on 1C will not give us acceptable access via the Internet, which means - we look further, towards online services.  Theoretically, you can, of course, order a refinement of our site from web-makers, increase its functionality to manage tasks, but we remember their requests to the budget.  We'll have to take the service, with a monthly fee for access.  The money is small there, so we are happy to pay the bill and begin to use it. <br><br>  And we understand that something is wrong again.  The formulation of tasks, if it is not done for fun, is based on reality - data, information, indicators, numbers.  Where is it all located?  In the accounting system.  Part of it is on the site (metrics of visitor behavior, for example).  How to work with tasks?  Well, how ... Three windows open, run between them, collect data, set tasks.  Yes, and only in the office - the accounting system through the Internet does not work. <br><br>  How long is the leader?  Not.  The most probable scenario that we often see in practice is that it simply will not use any systems of setting tasks, and it will begin to act using the old methods.  Will subordinate and downline managers use the service in this case?  Not.  They are not fools. <br><br>  Firstly, it is meaningless and inconvenient - part of the tasks lives in the system, part comes from the manager by mail, part - by service lines, part - verbally, part - in the minutes of meetings.  Secondly, subordinates, especially subordinate managers, consciously and subconsciously mimic, adapt to the style and patterns of the superior boss.  If he does not use the service, then it makes no sense to us, siry. <br><br>  But if the system does survive, remains in the enterprise, albeit with patchwork, then there will be no benefit from it - just because of patchwork.  Of course, the system will be just ballast, albeit inexpensive.  The double-headed eagle turns into a three-headed Serpent Gorynych. <br><br>  The value of the system grows stronger.  And at the expense of its parts, and - because integration.  A normal system for managing tasks and indicators, integrated with account, is much more valuable than a boxed one.  Of course, integration is not “everything connected, now customize data migration”.  Integration is the result of a project working with data and processes in the first place. <br><br><h4>  Hydra </h4><br>  New iteration of the company's development requires another tool - CRM.  Where without CRM in the modern world?  Still heard the mantra that "the introduction of a CRM-system automatically increases sales by 10%"? <br><br>  Now we have more choice.  Firstly, there are already three places where you can plug in the functionality of CRM.  There are solutions from 1C, both separate and embedded and embedded in the accounting system.  There is, as before, the opportunity to give several million web-makers for implementing CRM on our website.  It is possible to choose an online task management service in which the CRM functionality is embedded (or is connected on a different tariff plan).  And finally, you can buy a separate system or service. <br><br>  And again the same problem - data reuse.  It is obvious that the CRM-system will not be able to work normally without data from the accounting system - for example, the amounts of sales and profits.  Otherwise, a banal ABC analysis will become a problem.  So, we take the decision on 1C? <br><br>  So it again does not work via the Internet.  And what to do remote sales offices?  How to analyze sales outside the office?  How to be employees with smartphones?  What do field managers do? <br><br>  Let's say, okay, reconcile, they will work through the 1C web client and mobile application.  And how to get data from the site for analysis?  There can not do without web-makers - they must organize the transfer of data in 1C.  I think half a million can be met if the data on the site already exists. <br><br>  But the worst thing to come.  CRM - this is not only, and even not so much analysis, as a process, and accordingly - a task.  Managers working with clients must perform certain tasks in accordance with the change plan, sales scripts, marketing campaigns, etc.  And where is our task management system?  In a separate service.  All, again a dead end. <br><br>  We think how not to step back and not take the task management system on 1C.  Damn, so there is no access via the Internet.  Alone limitations around.  Maybe then take the same cloud CRM, which integrated task management tools?  And, no, then there will be no data from 1C, about sales ... Some Bermuda triangle of platforms, technologies, services and their endless restrictions. <br><br>  The data is in one place, the interface is in another, the control is in the third, the analytics is in the fourth.  Not the Serpent Gorynych, but the Hydra (the exact number of heads of the mythological hydra is not known). <br><br>  But, the main thing - everything is filled with cement.  No part of the system will move for many years. <br><br><h4>  Hercules </h4><br>  What remains?  Keep a zoo of programs and services, and customize the integration.  Integration is not just a connection, like a stretched cable.  This is, in fact, a separate program.  And there will be several such programs, because each system and service stores data in different types of databases, has different interaction interfaces and, what is there, a different ability to integrate.  There are still many applications in the world, integration with which is more expensive than the applications themselves. <br><br>  What is important is that there will be more integrations than the programs themselves.  The number of bonds is described by the formula n * (n - 1), where n is the number of elements, i.e.  our systems (assuming that integration is two-way).  For example, for three systems there will be 6 integrations, for four systems - 12 integrations, for five systems - 20 integrations. <br><br>  Each integration is the money for development, the money for maintenance, the money for refinement when changing in one of the elements. <br><br>  Let's not forget that the above four systems will not do business.  We also need a system for monitoring indicators, especially strategic ones.  There is also an access control system.  PLM-system where the designer stores the data about the products.  Technological program.  Five-axis machines.  Email.  IP telephony.  And so on. <br><br>  And then - once, and the business bought another company, became a holding, or entered another holding.  And there - their systems. <br><br>  Does a business spend millions of rubles to create and support tens and hundreds of integrations?  And the IT department does not say anything about it, but does it quietly spread this money in the budget? <br><br>  No, everything is simpler - the IT department simply <b>does not</b> integrate the system.  Limited to a minimum, such as unloading goods on the site and loading orders from there.  Everything. <br><br>  The remaining systems live separately.  But who is reducing the data?  After all, it is obvious that without a whole set of data, tools and analytics, it is impossible to make decisions effectively, based on reality (and not fictions and conjectures)? <br><br>  The answer is simple - <b>people do it</b> .  Operators, a variety of "managers", which are now in companies more than workers.  Order Managers, Purchasing Managers, Logistics Managers, Dispatch Managers, Nomenclature Managers, Site Managers, Content Managers, etc. <br><br>  The cost of these people - salary, taxes, jobs, premises, line managers (with salaries, taxes, bonuses, etc.) - is a smart topic for negotiating a new IT project.  And of course, the IT zoo, of course, half of which are referred to as "programmers", being, in fact, database and integration administrators. <br><br>  What is most unpleasant for a business is <b>not one-time costs, but fixed costs</b> .  A kind of subscription for inefficiency, a subscription to a meaningless waste of money, well, or just a stone around the neck of the business. <br><br><h4>  What do we need? </h4><br>  And here we are, on a white horse, <b>buy integration</b> . <br><br>  It is very easy to calculate company losses from people integrating systems manually.  You only need to know the region and the approximate number of them.  We take the average salary, add taxes, add one manager for 5 souls (do not forget taxes), the cost of the workplace. <br><br>  For example, in Chelyabinsk, 3 such people are <b>1.5–2 million rubles a year</b> .  Although, it would seem, only three lovely girls, with a salary of 30 tr., Carry papers, some files are loaded, they are corresponded by mail with the same "managers" of customers and suppliers. <br><br>  And what is the year for business?  Ugh.  He flies like a bullet.  And together with him, faster than a bullet, 2 million rubles fly nowhere.  This I still took a minimum.  For example, in a company of 100 people it is quite possible to scrape up to 10. <br><br>  Just no one does.  Do you know why?  Because to find these, “under dismissal”, should be those who “under dismissal”.  In companies of 100 people there are no analysts, but there are economists. <br><br>  So, who at gunpoint: <br><br><ol><li>  Accountants (you just take a look at how many <b>thousands of</b> papers they enter into the system and / or print, and then endlessly check); </li><li>  Any person whose position begins on the "Manager", but he does not direct anyone and is always in the office. </li><li>  Economists (1C - Excel - 1C - Excel - Excel - Excel - "vepeerit" - 1C, etc.); </li><li>  Operators (anything but machine tools). </li></ol><br>  Actually, everything.  You know how much a client’s business loses money per month, year, five-year plan, etc.  He will probably <b>know the amount from you</b> .  Upset. <br><br>  And you have a solution.  Integration - for example, for 1 million rubles.  It pays off in six months. <br><br>  Just do not tell the customer that you cemented it.  And do not forget to plant. <br><br>  And then some muddlers will make the type integration of electronic document management so that then any asshole can handle it, while they themselves sit and cry that they need to look for new customers. </div><p>Source: <a href="https://habr.com/ru/post/439056/">https://habr.com/ru/post/439056/</a></p>
+<section class="navigation-panel">
+<h4>More articles:</h4>
+<nav><ul class="list-of-pages">
+<li><a href="../438956/index.html">Magnetite in the teeth: sequencing of transcriptomes of the tissues of the radula of the shell of mollusc shell</a></li>
+<li><a href="../438958/index.html">ILV confirmed the existence of its "space station"</a></li>
+<li><a href="../438960/index.html">How I abandoned Ruby in favor of Python, working on a backend</a></li>
+<li><a href="../438962/index.html">For the most part, a positive outlook for the future of chips.</a></li>
+<li><a href="../438964/index.html">Who really stands behind popular free VPNs?</a></li>
+<li><a href="../438966/index.html">The history of wandering documentation Haproxy, or what you should pay attention to when it is configured</a></li>
+<li><a href="../438968/index.html">Marking shoes in Russia: The market is not ready, but will have to work</a></li>
+<li><a href="../438970/index.html">It is said that Haskell is a language for geniuses and academics. True?</a></li>
+<li><a href="../438972/index.html">The brain from the inside (Visualization of the passage of the pattern through the model of an artificial neural network)</a></li>
+<li><a href="../438974/index.html">Virtual reality helps to cope with mental disorders</a></li>
+<li><a href="../438976/index.html">The book "Spring. All design patterns »</a></li>
+<li><a href="../438980/index.html">Spring Boot 2: what's new?</a></li>
+<li><a href="../438982/index.html">Kubernetes tutorial, part 1: applications, microservices and containers</a></li>
+<li><a href="../438984/index.html">Kubernetes Handbook Part 2: Creating and Working With a Cluster</a></li>
+<li><a href="../438986/index.html">React Training Course Part 14: Workshop on Class Based Components, Component State</a></li>
+<li><a href="../438988/index.html">React Training Course, Part 15: Workshop on Working with Component State</a></li>
+<li><a href="../438992/index.html">Developer Diary or Bad Decisions</a></li>
+<li><a href="../438994/index.html">Intel Xeon W-3175X, hot drummer. Testing</a></li>
+<li><a href="../438996/index.html">Company network and MitM. Part 1</a></li>
+<li><a href="../438998/index.html">CGDevs Moscow Meetup # 2</a></li>
+<li><a href="../439000/index.html">Spatial manipulation in 2D using Signed Distance Fields</a></li>
+<li><a href="../439002/index.html">How to stop "writing TK" and start working?</a></li>
+<li><a href="../439006/index.html">How AI helps to master sign language</a></li>
+<li><a href="../439008/index.html">Mail.ru has released a new Atom browser with an emphasis on "security and privacy"</a></li>
+<li><a href="../439010/index.html">How is the consolidation of archives in DeviceLock DLP</a></li>
+<li><a href="../439012/index.html">Telephone directory of the organization - print version</a></li>
+<li><a href="../439016/index.html">Static Generic Tables</a></li>
+<li><a href="../439018/index.html">Setting up Sphinx search for an online store</a></li>
+<li><a href="../439020/index.html">Ticket to Ride. Europe - arithmetic, part two</a></li>
+<li><a href="../439022/index.html">CNC in the hobby workshop (part 3)</a></li>
+<li><a href="../439024/index.html">Results Slurm-3</a></li>
+<li><a href="../439028/index.html">How to improve network perimeter protection? Practical recommendations for Check Point and not only</a></li>
+<li><a href="../439030/index.html">A lot of managers</a></li>
+<li><a href="../439032/index.html">Amazon and Google are planning to enter the energy market</a></li>
+<li><a href="../439034/index.html">Group-IB Webinar: Red Team or Pentest 12.02.2019</a></li>
+<li><a href="../439036/index.html">The main thing is not to get into the mall under the reconciliation of hours</a></li>
+<li><a href="../439038/index.html">Making a neural network: how not to break the brain</a></li>
+<li><a href="../439040/index.html">To isolate the Runet need budget funds</a></li>
+<li><a href="../439042/index.html">Puma is looking for beta testers for self-tapping sneakers Fi</a></li>
+<li><a href="../439046/index.html">How to safely combine the network segments of the three major banks: share tricks</a></li>
+<li><a href="../439050/index.html">Training Cisco 200-125 CCNA v3.0. Cisco Certified Network Specialist (CCNA). Day 2. OSI and TCP-IP models</a></li>
+<li><a href="../439056/index.html">Cement Brand Integration</a></li>
+<li><a href="../439060/index.html">7 types of customers</a></li>
+<li><a href="../439062/index.html">Anisoprint Composer: 3D printing of high strength</a></li>
+<li><a href="../439064/index.html">Typical mesh error (Bootstrap Grid), or why the designer and layout designer do not understand each other</a></li>
+<li><a href="../439066/index.html">Operating system on Rust. Page memory: advanced level</a></li>
+<li><a href="../439068/index.html">Spam campaign “Love you” redirected to Japan</a></li>
+<li><a href="../439070/index.html">China refuses anti-corruption system Zero Trust AI because of its high efficiency</a></li>
+<li><a href="../439074/index.html">Password Checkup extension checks passwords with a base of 4 billion compromised accounts</a></li>
+<li><a href="../439076/index.html">In which applications to wait for an unknown malicious code?</a></li>
+<li><a href="../439078/index.html">Perm programmer arrested for creating a mobile application through which the pedophile acted</a></li>
+<li><a href="../439080/index.html">Unobvious RabbitMQ in Yii2 or why RabbitMQ writes to all queues at once</a></li>
+<li><a href="../439082/index.html">Walk through the plant of desires</a></li>
+<li><a href="../439086/index.html">Causes of ANR and how to avoid it</a></li>
+<li><a href="../439094/index.html">Scientists have found the oldest living vertebrate on Earth</a></li>
+<li><a href="../439096/index.html">Buildbot: a tale with examples of one more continuous integration system</a></li>
+<li><a href="../439098/index.html">Sasha Memus, Chatfuel: How to build a career in products after consulting, is it dangerous to meditate and how to change behavior</a></li>
+<li><a href="../439100/index.html">How to adapt UX / UI for permissions</a></li>
+<li><a href="../439102/index.html">Russians are 20% more likely to face insults on the Internet</a></li>
+<li><a href="../439104/index.html">Redux Simple as a rake</a></li>
+<li><a href="../439106/index.html">Programming in Russia will be introduced from primary school</a></li>
+<li><a href="../439108/index.html">Amateur radio measurements: when there is no frequency meter</a></li>
+<li><a href="../439112/index.html">Creator Kate Mobile arrested for using a pedophile for his service</a></li>
+<li><a href="../439118/index.html">New in browsers: Firefox 66 blocks video and sound by default, Chromium limits page budget</a></li>
+<li><a href="../439122/index.html">Simplicity and complexity of primitives or how to determine unnecessary preprocessing for a neural network</a></li>
+<li><a href="../439124/index.html">If software is created with public money, the code should be open.</a></li>
+<li><a href="../439126/index.html">Requests from users and product requirements</a></li>
+<li><a href="../439128/index.html">How to organize the work of QA. One practically applied method</a></li>
+<li><a href="../439130/index.html">13 trends in the cybersecurity and information security market 2019-2020</a></li>
+<li><a href="../439132/index.html">Unforgettable old age</a></li>
+<li><a href="../439134/index.html">Russian scientists are developing sitall (unbreakable glass) for LG smartphones</a></li>
+<li><a href="../439136/index.html">What is the difference between 4G and 5G?</a></li>
+<li><a href="../439138/index.html">Working with callbacks in React</a></li>
+<li><a href="../439140/index.html">Important message about invites in profile</a></li>
+<li><a href="../439142/index.html">Design maturity models</a></li>
+<li><a href="../439148/index.html">Working with nRF51822 using ST-Link and Clion + OpenOCD</a></li>
+<li><a href="../439150/index.html">Who should pay transaction costs</a></li>
+<li><a href="../439152/index.html">Salaries in IT in the second half of 2018: according to the “My Circle” salary calculator</a></li>
+<li><a href="../439154/index.html">How do freelancers live: book cover design, own production of backpacks and travel work</a></li>
+<li><a href="../439158/index.html">DataArt Launches Free CV Duck Resume Improvement Service</a></li>
+<li><a href="../439160/index.html">Algorithm state: what happens to indie developers on Steam?</a></li>
+<li><a href="../439162/index.html">How to debug front-end and backend: step-by-step instructions</a></li>
+<li><a href="../439166/index.html">mmWave on the road to commercialization in the form factor of a smartphone</a></li>
+<li><a href="../439170/index.html">Cellular operators will help banks verify the accuracy of customer data</a></li>
+<li><a href="../439172/index.html">Extending the assert () macro to implement minimal error handling</a></li>
+<li><a href="../439174/index.html">Safe Internet Day: what threats to pay attention to in 2019</a></li>
+<li><a href="../439182/index.html">How do we distribute orders between drivers in Yandex.Taxi</a></li>
+<li><a href="../439186/index.html">UX Editor: True Story, Rial Life</a></li>
+<li><a href="../439194/index.html">Controlling a character with SharedEvents</a></li>
+<li><a href="../439196/index.html">JPMorgan analysts: Apple should buy Blizzard, Netflix or Sonos to reassure investors</a></li>
+<li><a href="../439198/index.html">Generation of barrier islands</a></li>
+<li><a href="../439200/index.html">Composer for the smallest</a></li>
+<li><a href="../439202/index.html">Detection of web attacks using autoencoder Seq2Seq</a></li>
+<li><a href="../439204/index.html">Increasing the efficiency of photosynthesis by genetic modification of plants</a></li>
+<li><a href="../439210/index.html">Java after volcanic eruption</a></li>
+<li><a href="../439216/index.html">pudge embedded database in 500 lines on golang</a></li>
+<li><a href="../439218/index.html">VC bot on the knee, or how to please people February 14</a></li>
+<li><a href="../439222/index.html">What is API management?</a></li>
+<li><a href="../439224/index.html">Again about the Voronoi diagrams</a></li>
+<li><a href="../439232/index.html">JAMstack: How to create your blog using Gatsby + Contentful + Netlify</a></li>
+<li><a href="../439236/index.html">xenvman: Flexible environments for testing microservices (and not only)</a></li>
+<li><a href="../439238/index.html">Play Store now accepts progressive web applications (PWA)</a></li>
+<li><a href="../439240/index.html">Joomla Digest for January 2019</a></li>
+<li><a href="../439244/index.html">FAS strongly recommends to pre-install Russian software on smartphones and laptops sold in Russia</a></li>
+<li><a href="../439248/index.html">Alan Kay: “Could the ancient Romans build a computer?”</a></li>
+<li><a href="../439252/index.html">6 reasons to develop IT career in Armenia</a></li>
+<li><a href="../439254/index.html">Our all</a></li>
+<li><a href="../439260/index.html">The author of the book "The Witcher" will still receive compensation from CD Projekt Red</a></li>
+<li><a href="../439262/index.html">Deploy the code directly to the docker container. Or how not to prokrasinirovat after each commit</a></li>
+<li><a href="../439264/index.html">How to lead complex technical projects without hiring PMs: DataLine experience</a></li>
+<li><a href="../439266/index.html">The experience of creating an Android game alone from scratch and how it was captured on Google Play</a></li>
+<li><a href="../439268/index.html">How VR, AR and 3D printing work together: the VR Concept experience</a></li>
+<li><a href="../439270/index.html">An example of parsing C ++ code using libclang in Python</a></li>
+<li><a href="../439278/index.html">ACS my LCD - security on two bolts</a></li>
+<li><a href="../439280/index.html">Trautonium: the German wave in the history of synthesizers</a></li>
+<li><a href="../439282/index.html">Effects of filtering SVG. Part 1. SVG filters 101</a></li>
+<li><a href="../439288/index.html">SciPy Optimization</a></li>
+<li><a href="../439290/index.html">Accelerate compilation in Xcode to swift</a></li>
+<li><a href="../439292/index.html">Google has agreed to remove from the search banned sites in the Russian Federation</a></li>
+<li><a href="../439294/index.html">Translation review "If software is created with public money, the code must be open"</a></li>
+<li><a href="../439296/index.html">Soviet license plate and Kolmogorov complexity</a></li>
+<li><a href="../439298/index.html">What would the Internet system look like in the game EvE Online</a></li>
+<li><a href="../439300/index.html">Statistics for file types in the Wildfire cloud sandbox</a></li>
+<li><a href="../439302/index.html">Product Design Digest, January 2019</a></li>
+<li><a href="../439304/index.html">[Ekaterinburg, announcement] Mitap for Java-developers</a></li>
+<li><a href="../439308/index.html">Kill cancer: iridium, human serum albumin and some blue light</a></li>
+<li><a href="../439310/index.html">Why not take off the real estate portal. Part 2</a></li>
+<li><a href="../439312/index.html">Speed ​​up complex calculations with minimal RAM</a></li>
+<li><a href="../439314/index.html">Seven strange ways of dealing with recluse in remote work</a></li>
+<li><a href="../439316/index.html">“I stopped doing what I see no point in”: project managers about their work and training</a></li>
+<li><a href="../439318/index.html">Win procrastination gaming addiction</a></li>
+<li><a href="../439320/index.html">How to diversify programming lessons for children of different ages</a></li>
+<li><a href="../439322/index.html">OS Sailfish renamed OS "Aurora"</a></li>
+<li><a href="../439324/index.html">Using a binary tree in swift using enum using OCR as an example</a></li>
+<li><a href="../439326/index.html">Electric Ford F-150 EV - in the prototype and tested on the road</a></li>
+<li><a href="../439328/index.html">Okay, google! Are you good or evil?</a></li>
+<li><a href="../439332/index.html">How PageRank works: implementation in the R language through linear algebra and power-method</a></li>
+<li><a href="../439334/index.html">About 2 billion rubles allocated for the implementation of the draft law on sustainable runet</a></li>
+<li><a href="../439336/index.html">We are looking for a needle in a stack without using well-known algorithms.</a></li>
+<li><a href="../439338/index.html">Forget about privacy: you still have terrible targeting</a></li>
+<li><a href="../439340/index.html">GDPR backup — what a new tool will do</a></li>
+<li><a href="../439342/index.html">Winter DIYorDIE Meetup February 17</a></li>
+<li><a href="../439344/index.html">To be like a troll: how monopolists rule patents</a></li>
+<li><a href="../439346/index.html">Laravel + Docker: Our Successful Experience</a></li>
+<li><a href="../439348/index.html">Vision falls after laser vision correction - what to do? Or, doctor, make me an "enhancement"</a></li>
+<li><a href="../439350/index.html">Artificial intelligence as a machine of inventions</a></li>
+<li><a href="../439352/index.html">Making a bot prototype for fighting in Clash Royale</a></li>
+<li><a href="../439354/index.html">Rust news # 5 (January 2019)</a></li>
+<li><a href="../439356/index.html">Nontrivial metrics of the effectiveness of advertising campaigns</a></li>
+<li><a href="../439358/index.html">Excel metadata files</a></li>
+<li><a href="../439360/index.html">Training Cisco 200-125 CCNA v3.0. Cisco Certified Network Specialist (CCNA). Day 3. Subnets</a></li>
+<li><a href="../439362/index.html">How we teach Software Engineering at St. Petersburg HSE</a></li>
+<li><a href="../439364/index.html">Oculus Go glasses with “strawberry” content set up for sale</a></li>
+<li><a href="../439366/index.html">Automation of three nails</a></li>
+<li><a href="../439368/index.html">Animations in iOS applications born on the server</a></li>
+<li><a href="../439374/index.html">For those who want to play detective: find a bug in the function from Midnight Commander</a></li>
+<li><a href="../439376/index.html">"Interest club"</a></li>
+<li><a href="../439378/index.html">The Book of Genesis?). Reflections on the nature of mind. Part I</a></li>
+<li><a href="../439380/index.html">How I created an extension for Atom and VS Code: personal experience and source codes</a></li>
+<li><a href="../439382/index.html">Using Ansible, Terraform, Docker, Consul, Nomad in the Clouds (Alexey Vakhov, Uchi.ru)</a></li>
+<li><a href="../439390/index.html">The best innovations of social networks in 2018</a></li>
+<li><a href="../439392/index.html">The 2019 championship season is open! SNA Hackathon Launches ala ML Boot Camp 8</a></li>
+<li><a href="../439394/index.html">As a programmer dataseativistam wrote</a></li>
+<li><a href="../439396/index.html">UniFi Controller Password Reset</a></li>
+<li><a href="../439404/index.html">A brief history of electronic public procurement in Russia</a></li>
+<li><a href="../439408/index.html">Pseudo Lens Flare</a></li>
+<li><a href="../439410/index.html">Jeff Hawkins is finally ready to explain his brain research.</a></li>
+<li><a href="../439414/index.html">Client for "server push messages"</a></li>
+<li><a href="../439416/index.html">A-Frame Review</a></li>
+<li><a href="../439418/index.html">Pentaho Data Integration (PDI), Python and Deep Learning</a></li>
+<li><a href="../439420/index.html">Building the transport package without installing MODX</a></li>
+<li><a href="../439422/index.html">What does a programmer need to develop games and who really is a game developer on the part of a programmer</a></li>
+<li><a href="../439424/index.html">How I Fought Free Hosting and Composer</a></li>
+<li><a href="../439426/index.html">Situation: a new wave of attacks with the interception of DNS queries - we analyze the basic methods of protection</a></li>
+<li><a href="../439430/index.html">Believe me if you can. Water meters. part 1</a></li>
+<li><a href="../439432/index.html">How to become a Java developer in 1.5 years</a></li>
+<li><a href="../439434/index.html">NestJS - the very real nodejs backend</a></li>
+<li><a href="../439436/index.html">Cheaper price of small series of electronics in Russia. Case Internet radio WOLNA</a></li>
+<li><a href="../439440/index.html">Implementation of Zimbra Collaboration Open Source, authorization through AD and automatic creation of mailboxes</a></li>
+<li><a href="../439442/index.html">Julia. Report Generators and Documentation</a></li>
+<li><a href="../439446/index.html">What you need to know about JavaScript Engine Switcher 3.0</a></li>
+<li><a href="../439448/index.html">What virtualization questions do you expect from a graduate?</a></li>
+<li><a href="../439450/index.html">RS-485 on domestic microcontrollers from the company Milandr</a></li>
+<li><a href="../439454/index.html">Program as Art - a new software management paradigm</a></li>
+<li><a href="../439456/index.html">Hipster podcasts # 2</a></li>
+<li><a href="../439458/index.html">As we Republic website on Kubernetes translated</a></li>
+<li><a href="../439460/index.html">How marketers of Maxidom lose millions flirting in groz marketing: independent usability auditing</a></li>
+<li><a href="../439462/index.html">Civilization Springs, 5/5</a></li>
+<li><a href="../439464/index.html">VXinspect: part quality control in 10 minutes</a></li>
+<li><a href="../439466/index.html">NASA lunar orbital probe made the first pictures of the China Chang'e-4 station - two pixels of light</a></li>
+<li><a href="../439468/index.html">Where to lead the search for the perfect SCADA</a></li>
+<li><a href="../439470/index.html">Germany plans to abandon coal in the near future.</a></li>
+<li><a href="../439472/index.html">Automation of border control within the company</a></li>
+<li><a href="../439476/index.html">Cockney Slang: Modern History and Position</a></li>
+<li><a href="../439478/index.html">Entertaining C #. Five examples for a coffee break</a></li>
+<li><a href="../439480/index.html">Give way, or Why does your CRM (and CRM) slow down?</a></li>
+<li><a href="../439482/index.html">devleads - (not) financial motivation</a></li>
+<li><a href="../439484/index.html">Get the enum data in the Automapper projection</a></li>
+<li><a href="../439496/index.html">How is billing done there: when a customer and a developer speak different languages</a></li>
+<li><a href="../439498/index.html">What hardware to analyze a huge shaft of information?</a></li>
+<li><a href="../439500/index.html">Why are captcha so complicated</a></li>
+<li><a href="../439502/index.html">Undefined behavior and truth undefined</a></li>
+<li><a href="../439504/index.html">Does your Data Engineer team need it?</a></li>
+<li><a href="../439506/index.html">9 alternatives to a bad team (design pattern)</a></li>
+<li><a href="../439510/index.html">High-load distributed control system of a modern NPP</a></li>
+<li><a href="../439512/index.html">The era of dinosaurs or legally verified reinsurance?</a></li>
+<li><a href="../439516/index.html">00110001 00110100 00101110 00110000 00110010</a></li>
+<li><a href="../439524/index.html">Fortnite is the future, but for rather unexpected reasons.</a></li>
+<li><a href="../439526/index.html">Telecom operators will conduct a "field test" of the law on the stability of the Runet</a></li>
+<li><a href="../439532/index.html">What's new in javascript ES2019</a></li>
+<li><a href="../439534/index.html">Yield programming and the use of drones in oil production - 10 lectures from the conference GIS Tech Russia</a></li>
+<li><a href="../439538/index.html">Community programming</a></li>
+<li><a href="../439540/index.html">Etherblade.net - opensource project to create an ethernet traffic encapsulator on FPGA (part one)</a></li>
+<li><a href="../439542/index.html">Nintendo makes it clear that only piracy can save the history of video games</a></li>
+<li><a href="../439544/index.html">The colony. Chapter 24: Departure</a></li>
+<li><a href="../439556/index.html">TDMS Fairway. Methods PMBOK and Russian design organizations</a></li>
+<li><a href="../439558/index.html">New old phone. Reinvent the PSTN phone</a></li>
+<li><a href="../439560/index.html">The adapter for working with the blockchain Ethereum for the InterSystems IRIS data platform</a></li>
+<li><a href="../439562/index.html">Configure the Kubernetes HA cluster on bare metal with kubeadm. Part 1/3</a></li>
+<li><a href="../439564/index.html">Practical application of transformation of AST-trees on the example of Putout</a></li>
+<li><a href="../439566/index.html">Why SRE is important documentation. Part 3</a></li>
+<li><a href="../439568/index.html">QLC based SSD - hard drive killer? Not really</a></li>
+<li><a href="../439572/index.html">Automated design of electronic equipment</a></li>
+<li><a href="../439576/index.html">Extensive review of Python interviews. Hints and Tips</a></li>
+<li><a href="../439578/index.html">On the issue of transformations and other operations</a></li>
+<li><a href="../439584/index.html">Project Lenergy, how to rethink portable power sources</a></li>
+<li><a href="../439586/index.html">SPBm protocol as the basis of Extreme Automated Campus</a></li>
+<li><a href="../439588/index.html">ESET has discovered new versions of the DanaBot Trojan.</a></li>
+<li><a href="../439590/index.html">Quals: Saudi and Oman National Cyber ​​Security CTF 2019. WriteUp</a></li>
+<li><a href="../439592/index.html">Ethical Activity Automation</a></li>
+<li><a href="../439596/index.html">How I accelerated image processing on Android 15 times</a></li>
+<li><a href="../439598/index.html">Microsoft told about the cost of paid support for Windows 7</a></li>
+<li><a href="../439600/index.html">Finland summed up the preliminary results of the experiment with a guaranteed basic income</a></li>
+<li><a href="../439604/index.html">How does the barcode work?</a></li>
+<li><a href="../439606/index.html">Experimental production of electronics for the minimum price</a></li>
+<li><a href="../439608/index.html">Modern religion: what do people give to Google, Facebook, Amazon and Apple?</a></li>
+<li><a href="../439610/index.html">As in my Chevrolet Bolt electric car, under warranty, two battery modules were replaced, and the third was monitored</a></li>
+<li><a href="../439616/index.html">The digest of interesting IT projects on Kickstarter №7</a></li>
+<li><a href="../439618/index.html">PHP for beginners. File attachment</a></li>
+<li><a href="../439620/index.html">Understanding asynchronous JavaScript [Translated by Sukhjinder Arora]</a></li>
+<li><a href="../439624/index.html">Why keep data in orbit</a></li>
+<li><a href="../439626/index.html">Experience developing a free application for collectors OpenNumismat</a></li>
+<li><a href="../439628/index.html">Parallel data update in ASP.NET Web API</a></li>
+<li><a href="../439632/index.html">How to set up Continuous Deployment for your project: personal experience</a></li>
+<li><a href="../439636/index.html">The crisis of the concepts of improving road safety and a new concept of its solution</a></li>
+<li><a href="../439638/index.html">Getting FPGA to Python</a></li>
+<li><a href="../439640/index.html">Vinyl is back and it's different</a></li>
+<li><a href="../439642/index.html">Java pitfalls. Part 1</a></li>
+<li><a href="../439644/index.html">Anti-Aging: Senolithics and Stem Cell Therapy</a></li>
+<li><a href="../439646/index.html">Holding SoftBank sold a stake in Nvidia due to the fall in their prices, but still earned $ 3.3 billion</a></li>
+<li><a href="../439648/index.html">Internal and nested java classes. Part 1</a></li>
+<li><a href="../439652/index.html">How to transport your startup to the USA: 4 important steps</a></li>
+<li><a href="../439654/index.html">Full immersion: how do we cool ASIC chips in Bitfury</a></li>
+<li><a href="../439656/index.html">C # character calculator</a></li>
+<li><a href="../439676/index.html">Integration of React Native and C ++ for iOS and Android</a></li>
+<li><a href="../439680/index.html">About 50% of Russians are ready to sell their personal data</a></li>
+<li><a href="../439682/index.html">Training Cisco 200-125 CCNA v3.0. Cisco Certified Network Specialist (CCNA). Day 4. Gateway devices</a></li>
+<li><a href="../439686/index.html">Flickr introduces new rules regarding the number of photos and videos users.</a></li>
+<li><a href="../439688/index.html">Overview of AI & ML solutions in 2018 and forecasts for 2019: Part 1 - NLP, Computer Vision</a></li>
+<li><a href="../439690/index.html">Virtual machine performance comparison of 6 cloud platforms: Selectel, MCS, Ya.Oblako, Google Cloud, AWS and Azure</a></li>
+<li><a href="../439692/index.html">AT & T sued for changing the network icon from 4G to 5G E</a></li>
+<li><a href="../439694/index.html">Developed smart tissue that reacts to changes in body temperature</a></li>
+<li><a href="../439696/index.html">On the crest of a wave, or “I want to go to the mainstream” - is it worth it?</a></li>
+<li><a href="../439698/index.html">Introduction to programming: a simple 3D shooter from scratch over the weekend, part 1</a></li>
+<li><a href="../439700/index.html">Patent for a board game in Russia</a></li>
+<li><a href="../439704/index.html">From pool request to release. Report Yandex.Taxi</a></li>
+<li><a href="../439706/index.html">BLACK HAT conference. Survival lessons in a 300 Gbps DDOS attack. Part 1</a></li>
+<li><a href="../439710/index.html">Features of creating products for the US market</a></li>
+<li><a href="../439712/index.html">Government procurement: a balance between the Italian strike and the Russian criminal</a></li>
+<li><a href="../439716/index.html">Tails OS or how to protect yourself online</a></li>
+<li><a href="../439718/index.html">Developing Elixir / Phoenix Applications with Docker</a></li>
+<li><a href="../439720/index.html">Introduction to programming: a simple 3D shooter from scratch over the weekend, part 2</a></li>
+<li><a href="../439722/index.html">Effects of SVG filters. Part 2. Outline text with feMorphology</a></li>
+<li><a href="../439724/index.html">Overview of AI & ML solutions in 2018 and forecasts for 2019: Part 2 - Tools and Libraries, AutoML, RL, Ethics in AI</a></li>
+<li><a href="../439726/index.html">Lock-in: truth or fiction?</a></li>
+<li><a href="../439728/index.html">Setting up backup and recovery of Zimbra OSE entirely and in separate boxes without using Zextras</a></li>
+<li><a href="../439730/index.html">Organizing reducer through standard class</a></li>
+<li><a href="../439732/index.html">Lazarus - simple animation using the TImageFragment component</a></li>
+<li><a href="../439734/index.html">We deploy Kubernetes on the desktop in minutes with MicroK8s</a></li>
+<li><a href="../439736/index.html">IPSec VPN connection between MikroTik and Kerio Control</a></li>
+<li><a href="../439746/index.html">Understand the promises in javascript</a></li>
+<li><a href="../439748/index.html">The digest of interesting materials for the mobile developer # 285 (February 4 - 10)</a></li>
+<li><a href="../439750/index.html">Learn product management - where?</a></li>
+<li><a href="../439752/index.html">Multicore MRI Method</a></li>
+<li><a href="../439754/index.html">Google is going to be engaged in the development of smart watches</a></li>
+<li><a href="../439756/index.html">Why do I need a thermo-acoustic generator?</a></li>
+<li><a href="../439760/index.html">Engineers "twisted" the light in the fiber - a new technology will speed up the transfer of data a hundred times</a></li>
+<li><a href="../439764/index.html">Corporate fruit</a></li>
+<li><a href="../439772/index.html">Writing Unit Tests on Swift for Verifying Asynchronous Tasks</a></li>
+<li><a href="../439778/index.html">The digest of fresh materials from the world of the frontend for the last week No. 351 (February 4 - 10, 2019)</a></li>
+<li><a href="../439780/index.html">PHP Digest number 149 (January 28 - February 11, 2019)</a></li>
+<li><a href="../439782/index.html">Headless CMS - the future of content management</a></li>
+<li><a href="../439784/index.html">Methane engine "Raptor" broke the record RD-180</a></li>
+<li><a href="../439788/index.html">Regular oddities in the GOST Grasshopper and Stribog algorithms</a></li>
+<li><a href="../439790/index.html">Test JaCarta WebClient or store tokens in a safe</a></li>
+<li><a href="../439792/index.html">NASA is looking for partners in the American industry to create a partially reusable manned lender</a></li>
+<li><a href="../439794/index.html">Back pain - understanding from the perspective of modern medicine</a></li>
+<li><a href="../439796/index.html">Spring Boot 2: what is not written in release notes</a></li>
+<li><a href="../439800/index.html">RISEX and Julia. 5 stages of love customer and designer</a></li>
+<li><a href="../439806/index.html">Valid SSL domain names for local Docker containers</a></li>
+<li><a href="../439808/index.html">The biggest telescopes. From a notebook and eyes to 340 megapixel cameras and data centers. Part 1</a></li>
+<li><a href="../439810/index.html">Get acquainted with the Moleculer microservice framework</a></li>
+<li><a href="../439816/index.html">Practical blockchain in business</a></li>
+<li><a href="../439818/index.html">Features of approaches to design in the real manufacturing sector</a></li>
+<li><a href="../439820/index.html">We are trying to write a project alone. Introduction</a></li>
+<li><a href="../439822/index.html">Creating an alternative display for the Ensoniq EPS16 + and ASR10 synthesizer / sampler</a></li>
+<li><a href="../439824/index.html">When will the JavaScript frameworks disappear?</a></li>
+<li><a href="../439826/index.html">Disable analog. What will happen to the TV?</a></li>
+<li><a href="../439828/index.html">The network appeared "analog" Findface</a></li>
+<li><a href="../439840/index.html">Conference DUMP-2019: we invite you to speak in the sections Design, Management and Testing</a></li>
+<li><a href="../439852/index.html">Remote control application release: Aspia 1.1.0</a></li>
+<li><a href="../439858/index.html">Prometheus + Grafana + Node Exporter + Docker in Azure with notifications in Telegram</a></li>
+<li><a href="../439862/index.html">Digital events in Moscow from February 11 to 17</a></li>
+<li><a href="../439866/index.html">Principles of design reference books in 1C Enterprise Management 2 (ERP 2.4.6)</a></li>
+<li><a href="../439868/index.html">Life without Facebook: less radical views, good mood, more time for loved ones. Now proven by science</a></li>
+<li><a href="../439878/index.html">Creation of architecture for a new high-load startup in 2019</a></li>
+<li><a href="../439880/index.html">Security Week 07: Local IoT Device Vulnerabilities</a></li>
+<li><a href="../439886/index.html">How I trained the neural network to implement the position estimation function on the Russian AI Cup CodeBall 2018</a></li>
+<li><a href="../439894/index.html">How easy it is to monitor the site</a></li>
+<li><a href="../439900/index.html">Julia and the method of coordinate descent</a></li>
+<li><a href="../439902/index.html">Explaining the physical essence of the Wing Lift phenomenon without using the Bernouli equation. Part 2</a></li>
+<li><a href="../439906/index.html">Critical vulnerability in Zemana products and not only</a></li>
+<li><a href="../439908/index.html">Kohl, piss off ... Coax</a></li>
+<li><a href="../439912/index.html">Unsolved mystery of view</a></li>
+<li><a href="../439916/index.html">Unpacking: Dridex bootloader</a></li>
+<li><a href="../439922/index.html">Taxation of IP in Kazakhstan how to be a freelancer?</a></li>
+<li><a href="../439924/index.html">The volume of parcels from foreign online stores grew by 25%</a></li>
+</ul></nav>
+</section>
+<script src="../../js/main.js"></script>
+
+<!-- Yandex.Metrika counter -->
+<script type="text/javascript" >
+  (function (d, w, c) {
+      (w[c] = w[c] || []).push(function() {
+          try {
+              w.yaCounter52319614 = new Ya.Metrika({
+                  id:52319614,
+                  clickmap:true,
+                  trackLinks:true,
+                  accurateTrackBounce:true,
+                  webvisor:true
+              });
+          } catch(e) { }
+      });
+
+      var n = d.getElementsByTagName("script")[0],
+          s = d.createElement("script"),
+          f = function () { n.parentNode.insertBefore(s, n); };
+      s.type = "text/javascript";
+      s.async = true;
+      s.src = "https://mc.yandex.ru/metrika/watch.js";
+
+      if (w.opera == "[object Opera]") {
+          d.addEventListener("DOMContentLoaded", f, false);
+      } else { f(); }
+  })(document, window, "yandex_metrika_callbacks");
+</script>
+<noscript><div><img src="https://mc.yandex.ru/watch/52319614" style="position:absolute; left:-9999px;" alt="" /></div></noscript>
+
+<!-- Google Analytics -->
+  <script>
+    window.ga = function () { ga.q.push(arguments) }; ga.q = []; ga.l = +new Date;
+    ga('create', 'UA-134228602-1', 'auto'); ga('send', 'pageview')
+  </script>
+  <script src="https://www.google-analytics.com/analytics.js" async defer></script>
+
+</section>
+</body>
+
+</html>

@@ -1,0 +1,1 @@
+Extending the assert () macro to implement minimal error handling

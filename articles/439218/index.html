@@ -1,0 +1,412 @@
+<!doctype html>
+<html class="no-js" lang="en">
+
+<head>
+  <!-- Global site tag (gtag.js) - Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=UA-134228602-1"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'UA-134228602-1');
+  </script>
+
+  <meta charset="utf-8">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  <title>VC bot on the knee, or how to please people February 14</title>
+  <meta name="description" content="Of course, each of us loves gifts, but most of all we love the wishes that accompany them. And, until recently, we did not have the opportunity to ple...">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+  <link rel="stylesheet" href="../../css/main.css">
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+  <script>window.jQuery || document.write('<script src="../../js/vendors/jquery-3.3.1.min.js"><\/script>')</script>
+</head>
+
+<body>
+  <!--[if lte IE 9]>
+    <p class="browserupgrade">You are using an <strong>outdated</strong> browser. Please <a href="https://browsehappy.com/">upgrade your browser</a> to improve your experience and security.</p>
+  <![endif]-->
+  <nav class="page-headings-container js-page-headings-container"></nav>
+  <div class="tools-bar js-tools-bar">
+    <!-- <a href="https://quick-geek.github.io/search.html" title="Search">🔎</a> -->
+    <a class="js-list-of-headings-button" data-state="closed" href="#" title="Headings">📜</a>
+    <a class="js-go-to-top-button" href="#" title="Go to Top">⬆️</a>
+    <a class="js-go-to-bottom-button" href="#" title="Go to Bottom">⬇️</a>
+  </div>
+  <section class="page js-page"><h1>VC bot on the knee, or how to please people February 14</h1><div class="post__text post__text-html js-mediator-article">  Of course, each of us loves gifts, but most of all we love the wishes that accompany them.  And, until recently, we did not have the opportunity to pleasantly surprise a person with warm words until the idea came to mind: what if we give people the opportunity to exchange valentines (on February 14, on the nose, after all) without leaving the framework of the usual way chat - social network chat? <br><br>  Word for word, and here it is - a ready-made business plan for creating an atmosphere of the Valentine's Day holiday!  Make people happy? <br><br><div style="text-align:center;"><img src="https://habrastorage.org/webt/dl/mp/13/dlmp134rko91zu7m-evwm5mlhem.jpeg" width="70%"></div><br><a name="habracut"></a><h2>  For an idea on the moon! </h2><br>  Of course, first of all it was necessary to draw up a plan of action and describe the idea.  Due to the fact that people have become more shy, and are not always ready to trust anyone, the choice fell on writing a fashionable and convenient bot for VK, which has a familiar interface, will always be at hand, and the anonymity of the messages will be fixed in the program code. <br>  Unfortunately, in addition to all the above advantages, the communities have two disadvantages: low bandwidth (number of messages per second) and a ban on starting a dialogue with a random user (the user must be the <b>first</b> <b>to</b> express his consent to receive messages on behalf of the community). <br><br>  So, we have a user who is ready to send a valentine to his soulmate, a recipient and an intermediary in the form of a chat bot.  The interaction scheme is simple, the bot should: suggest sending → know the recipient → save until February 14 → deliver → repeat. <br><br>  But this, of course, was not enough for the gluttonous imagination of the mind, and, in order to increase the activity and involvement of the audience, a scheme of a different interaction was considered, allowing people to meet inside the system, sending messages to random people.  These “random valentines” can be appreciated, and if the valentines of two people like each other, we give them the opportunity to talk. <br><br><h4>  Disclaimer </h4><br>  <i>This project was created purely on enthusiasm by two people, a programmer (a <s>lesson)</s> (me) and an ideological inspirer (Stepan <a href="https://habr.com/ru/users/sadfun/" class="user_link">sadfun</a> Popov), does not carry the purpose of teaching you something (although it can help you understand the essence of the universe), only tell an interesting story of creation and follow the path from idea to naive implementation.</i> <br><br><hr><br><h2>  Learning to talk with VK </h2><br>  After <b>going</b> through 3-4 different libraries for the <b>“NodeJS VK API”</b> request, I realized that there are no simple and functional libraries that allow using promises, as well as working through execute.  Remember one of the problems described above?  Yes, the execution of requests to VKontakte indirectly, but in batches of 25, allows us <b>to</b> increase the capacity <b>at times</b> . <br><br><div style="text-align:center;"><img src="https://habrastorage.org/webt/v3/fl/bp/v3flbpnqymqn0wy51ohjddwenmo.png" width="70%"></div><br>  <i>Comparative ability of various methods of requests to VK</i> <br><br>  Therefore, it was decided to write something of their own, reliable and not very crutch decision, based on the <b>node-fetch</b> library. <br><br>  In order not to give all the code here, just describe the logic of the work. <br><br>  Since requests from the program need to be packaged into one execute, they are collected in a LIFO queue, and then sent if: <br><br><ul><li>  Calls 25 or more (maximum execute) </li><li>  Enough time has passed since the last dispatch, no less than 50 milliseconds, but no more than 150 (so that the queue moved, despite the small size) </li></ul><br>  Requests from the queue are assembled into the VK Script code, which (in this implementation) looks like this: <br><br><pre><code class="javascript hljs"><span class="hljs-keyword"><span class="hljs-keyword">var</span></span> returnables = []; returnables[<span class="hljs-number"><span class="hljs-number">0</span></span>] = API.messages.send({<span class="hljs-string"><span class="hljs-string">"message"</span></span>: <span class="hljs-string"><span class="hljs-string">"Привет, Хабр!"</span></span>, <span class="hljs-string"><span class="hljs-string">"peer_id"</span></span>: <span class="hljs-number"><span class="hljs-number">1</span></span>, <span class="hljs-string"><span class="hljs-string">"random_id"</span></span>: <span class="hljs-number"><span class="hljs-number">561427</span></span>}); returnables[<span class="hljs-number"><span class="hljs-number">1</span></span>] = API.users.get({<span class="hljs-string"><span class="hljs-string">"user_ids"</span></span>: <span class="hljs-number"><span class="hljs-number">1</span></span>, <span class="hljs-string"><span class="hljs-string">"fields"</span></span>: <span class="hljs-string"><span class="hljs-string">"sex"</span></span>}); <span class="hljs-keyword"><span class="hljs-keyword">return</span></span> returnables;</code> </pre> <br>  After executing the code with a request to VK, the result of each request (at the index <i>returnables</i> ) is returned to its callback, beautifully wrapped in Promise.  The effectiveness of the approach is off the scale - the <b>more</b> users (and, therefore, more requests to VKontakte to send), the <b>lower the</b> response delay.  In order to keep the limit under control, there is a counter in the dispatch system that shows the number of remaining requests for that second, which allows you to quickly process a surge of visitors. <br><br><h2>  Learning to listen to VK </h2><br>  There are two ways to receive notifications about events from VKontakte: <b>Longpoll-requests</b> and <b>Callback-server</b> .  Your server is convenient because it does not require special gestures to use, and also allows you to receive missed notifications (for example, when you restart the server).  Such a server can be written in several lines using the native <b>http.Server</b> class. <br><br>  All this creates an ideal ecosystem for the logic of the program, which is convenient to use. <br><br><h2>  Everything ever ends </h2><br>  Since the user is free to do anything in the chat, and we are not able to stop him, we need to restrict him to a reasonable framework.  The state machine perfectly copes with this, setting every possible transition inside the system, and using buttons (the <b>keyboard</b> parameter in messages.send) will make using the bot as simple as one touch of the screen. <br><br>  Here is a diagram of user interaction with the bot: <br><br><div style="text-align:center;"><img src="https://habrastorage.org/webt/sz/1o/fw/sz1ofwuethupwaiet4syf6ahl4u.png"></div><br>  All this turns into a set of states ("Main Menu", "Valentine's Input" and so on), the transitions between which are set and transmitted in the buttons, or are known initially and do not change. <br><br><div style="text-align:center;"><img src="https://habrastorage.org/webt/cq/dz/ml/cqdzmlalb1t2o-xpdet5mvfnnek.png"></div><br>  By the way, about the buttons.  Their color range is non-variable ( <b>4 colors</b> for all occasions), but it is the buttons that make keeping the number of user errors to a minimum.  On their basis, you can build absolutely any non-linear system, which is why they are used everywhere.  And in this project too. <br><br>  But you need to understand: if you are aiming at a large audience reach, you should consider another way of interaction, because someone may have an old application ( <b>VK for iPad</b> , for example, has not been updated for a very long time, I will not lie, but it seems more than a year and keyboard support is not there).  And it happens (yes, it happens, I checked) that people, not understanding that buttons can be pressed, simply rewrite their contents (and then the parameter of the payload button, of course, is not transmitted, and everything can break). <br><br>  It should be noted that not everything is as smooth as described in the diagram, and sometimes funny cases occur.  For example, the VKontakte link detection system incorrectly handled users whose short links began with <b>id</b> , and cut it off.  The surprise of the people who met with this bug cannot be described, because they wrote Valentine Valentine, but it turned out that Olezhka. <br><blockquote>  <b>What Olezhka ????</b> </blockquote><h2>  Accidents are not accidental </h2><br>  So, if everything is clear with ordinary valentines, there is a recipient and a sender, then how to bring two strangers together?  We need to exchange them with valentines, and if people like each other's valentines, they should be introduced!  Here it is, the formula of love! <br><br>  Although it sounds pathetic, but it works, and it becomes more interesting for people to work with the bot - they will get a positive response if there is at least one person (which, of course, the bot will take care of). <br><br>  This results in a big plus - the more people take advantage of this opportunity, the more chances they will get to know each other, and consequently, this, like a game, keeps a person in the chat.  It is worth admitting that the session of an average user is ~ 7 minutes, here there is the potential to tighten a person by <b>10-15</b> just for the sake of this feature. <br><br>  The message sending itself made a separate scheme, since there are several options for using this bot, the user can lose sight of something, and the bot reminds him of this neatly. <br><br><div style="text-align:center;"><img src="https://habrastorage.org/webt/pj/8a/bw/pj8abwsu2zjmkhotgiffi0jldse.jpeg"></div><br>  It is interesting how the second problem was solved, with the inability of the community to be the first to initiate a dialogue with the user: now this problem is solved with such a message. <br><blockquote>  But I have a condition!  For the recipient to receive your valentine, he must also write to me.  Your task now is to persuade him to write me something.  This is done so that you do not have the fear of talking to him! </blockquote>  In general, the traditional “No, bug, but feature!” <br><br><h2>  Fireworks at the end </h2><br>  Actually, that's all!  If you do not take into account some difficulties in understanding the logic of the VK API, as well as confirming the account with one of the providers, everything went too smoothly. <br><br><div style="text-align:center;"><img src="https://habrastorage.org/webt/-7/gb/yt/-7gbythuuwaf87k6c-v4k5-shok.png"></div><br>  <i>Sample chat with bot</i> <br><br>  The bot works and will please people with valentines, making them happy.  This is done to help people be kinder to each other.  Rate it all you can personally in the community <a href="http://vk.com/verylovebot">Valentinych - vk.com/verylovebot</a> , if you wish.  Thanks for attention! </div><p>Source: <a href="https://habr.com/ru/post/439218/">https://habr.com/ru/post/439218/</a></p>
+<section class="navigation-panel">
+<h4>More articles:</h4>
+<nav><ul class="list-of-pages">
+<li><a href="../438956/index.html">Magnetite in the teeth: sequencing of transcriptomes of the tissues of the radula of the shell of mollusc shell</a></li>
+<li><a href="../438958/index.html">ILV confirmed the existence of its "space station"</a></li>
+<li><a href="../438960/index.html">How I abandoned Ruby in favor of Python, working on a backend</a></li>
+<li><a href="../438962/index.html">For the most part, a positive outlook for the future of chips.</a></li>
+<li><a href="../438964/index.html">Who really stands behind popular free VPNs?</a></li>
+<li><a href="../438966/index.html">The history of wandering documentation Haproxy, or what you should pay attention to when it is configured</a></li>
+<li><a href="../438968/index.html">Marking shoes in Russia: The market is not ready, but will have to work</a></li>
+<li><a href="../438970/index.html">It is said that Haskell is a language for geniuses and academics. True?</a></li>
+<li><a href="../438972/index.html">The brain from the inside (Visualization of the passage of the pattern through the model of an artificial neural network)</a></li>
+<li><a href="../438974/index.html">Virtual reality helps to cope with mental disorders</a></li>
+<li><a href="../438976/index.html">The book "Spring. All design patterns »</a></li>
+<li><a href="../438980/index.html">Spring Boot 2: what's new?</a></li>
+<li><a href="../438982/index.html">Kubernetes tutorial, part 1: applications, microservices and containers</a></li>
+<li><a href="../438984/index.html">Kubernetes Handbook Part 2: Creating and Working With a Cluster</a></li>
+<li><a href="../438986/index.html">React Training Course Part 14: Workshop on Class Based Components, Component State</a></li>
+<li><a href="../438988/index.html">React Training Course, Part 15: Workshop on Working with Component State</a></li>
+<li><a href="../438992/index.html">Developer Diary or Bad Decisions</a></li>
+<li><a href="../438994/index.html">Intel Xeon W-3175X, hot drummer. Testing</a></li>
+<li><a href="../438996/index.html">Company network and MitM. Part 1</a></li>
+<li><a href="../438998/index.html">CGDevs Moscow Meetup # 2</a></li>
+<li><a href="../439000/index.html">Spatial manipulation in 2D using Signed Distance Fields</a></li>
+<li><a href="../439002/index.html">How to stop "writing TK" and start working?</a></li>
+<li><a href="../439006/index.html">How AI helps to master sign language</a></li>
+<li><a href="../439008/index.html">Mail.ru has released a new Atom browser with an emphasis on "security and privacy"</a></li>
+<li><a href="../439010/index.html">How is the consolidation of archives in DeviceLock DLP</a></li>
+<li><a href="../439012/index.html">Telephone directory of the organization - print version</a></li>
+<li><a href="../439016/index.html">Static Generic Tables</a></li>
+<li><a href="../439018/index.html">Setting up Sphinx search for an online store</a></li>
+<li><a href="../439020/index.html">Ticket to Ride. Europe - arithmetic, part two</a></li>
+<li><a href="../439022/index.html">CNC in the hobby workshop (part 3)</a></li>
+<li><a href="../439024/index.html">Results Slurm-3</a></li>
+<li><a href="../439028/index.html">How to improve network perimeter protection? Practical recommendations for Check Point and not only</a></li>
+<li><a href="../439030/index.html">A lot of managers</a></li>
+<li><a href="../439032/index.html">Amazon and Google are planning to enter the energy market</a></li>
+<li><a href="../439034/index.html">Group-IB Webinar: Red Team or Pentest 12.02.2019</a></li>
+<li><a href="../439036/index.html">The main thing is not to get into the mall under the reconciliation of hours</a></li>
+<li><a href="../439038/index.html">Making a neural network: how not to break the brain</a></li>
+<li><a href="../439040/index.html">To isolate the Runet need budget funds</a></li>
+<li><a href="../439042/index.html">Puma is looking for beta testers for self-tapping sneakers Fi</a></li>
+<li><a href="../439046/index.html">How to safely combine the network segments of the three major banks: share tricks</a></li>
+<li><a href="../439050/index.html">Training Cisco 200-125 CCNA v3.0. Cisco Certified Network Specialist (CCNA). Day 2. OSI and TCP-IP models</a></li>
+<li><a href="../439056/index.html">Cement Brand Integration</a></li>
+<li><a href="../439060/index.html">7 types of customers</a></li>
+<li><a href="../439062/index.html">Anisoprint Composer: 3D printing of high strength</a></li>
+<li><a href="../439064/index.html">Typical mesh error (Bootstrap Grid), or why the designer and layout designer do not understand each other</a></li>
+<li><a href="../439066/index.html">Operating system on Rust. Page memory: advanced level</a></li>
+<li><a href="../439068/index.html">Spam campaign “Love you” redirected to Japan</a></li>
+<li><a href="../439070/index.html">China refuses anti-corruption system Zero Trust AI because of its high efficiency</a></li>
+<li><a href="../439074/index.html">Password Checkup extension checks passwords with a base of 4 billion compromised accounts</a></li>
+<li><a href="../439076/index.html">In which applications to wait for an unknown malicious code?</a></li>
+<li><a href="../439078/index.html">Perm programmer arrested for creating a mobile application through which the pedophile acted</a></li>
+<li><a href="../439080/index.html">Unobvious RabbitMQ in Yii2 or why RabbitMQ writes to all queues at once</a></li>
+<li><a href="../439082/index.html">Walk through the plant of desires</a></li>
+<li><a href="../439086/index.html">Causes of ANR and how to avoid it</a></li>
+<li><a href="../439094/index.html">Scientists have found the oldest living vertebrate on Earth</a></li>
+<li><a href="../439096/index.html">Buildbot: a tale with examples of one more continuous integration system</a></li>
+<li><a href="../439098/index.html">Sasha Memus, Chatfuel: How to build a career in products after consulting, is it dangerous to meditate and how to change behavior</a></li>
+<li><a href="../439100/index.html">How to adapt UX / UI for permissions</a></li>
+<li><a href="../439102/index.html">Russians are 20% more likely to face insults on the Internet</a></li>
+<li><a href="../439104/index.html">Redux Simple as a rake</a></li>
+<li><a href="../439106/index.html">Programming in Russia will be introduced from primary school</a></li>
+<li><a href="../439108/index.html">Amateur radio measurements: when there is no frequency meter</a></li>
+<li><a href="../439112/index.html">Creator Kate Mobile arrested for using a pedophile for his service</a></li>
+<li><a href="../439118/index.html">New in browsers: Firefox 66 blocks video and sound by default, Chromium limits page budget</a></li>
+<li><a href="../439122/index.html">Simplicity and complexity of primitives or how to determine unnecessary preprocessing for a neural network</a></li>
+<li><a href="../439124/index.html">If software is created with public money, the code should be open.</a></li>
+<li><a href="../439126/index.html">Requests from users and product requirements</a></li>
+<li><a href="../439128/index.html">How to organize the work of QA. One practically applied method</a></li>
+<li><a href="../439130/index.html">13 trends in the cybersecurity and information security market 2019-2020</a></li>
+<li><a href="../439132/index.html">Unforgettable old age</a></li>
+<li><a href="../439134/index.html">Russian scientists are developing sitall (unbreakable glass) for LG smartphones</a></li>
+<li><a href="../439136/index.html">What is the difference between 4G and 5G?</a></li>
+<li><a href="../439138/index.html">Working with callbacks in React</a></li>
+<li><a href="../439140/index.html">Important message about invites in profile</a></li>
+<li><a href="../439142/index.html">Design maturity models</a></li>
+<li><a href="../439148/index.html">Working with nRF51822 using ST-Link and Clion + OpenOCD</a></li>
+<li><a href="../439150/index.html">Who should pay transaction costs</a></li>
+<li><a href="../439152/index.html">Salaries in IT in the second half of 2018: according to the “My Circle” salary calculator</a></li>
+<li><a href="../439154/index.html">How do freelancers live: book cover design, own production of backpacks and travel work</a></li>
+<li><a href="../439158/index.html">DataArt Launches Free CV Duck Resume Improvement Service</a></li>
+<li><a href="../439160/index.html">Algorithm state: what happens to indie developers on Steam?</a></li>
+<li><a href="../439162/index.html">How to debug front-end and backend: step-by-step instructions</a></li>
+<li><a href="../439166/index.html">mmWave on the road to commercialization in the form factor of a smartphone</a></li>
+<li><a href="../439170/index.html">Cellular operators will help banks verify the accuracy of customer data</a></li>
+<li><a href="../439172/index.html">Extending the assert () macro to implement minimal error handling</a></li>
+<li><a href="../439174/index.html">Safe Internet Day: what threats to pay attention to in 2019</a></li>
+<li><a href="../439182/index.html">How do we distribute orders between drivers in Yandex.Taxi</a></li>
+<li><a href="../439186/index.html">UX Editor: True Story, Rial Life</a></li>
+<li><a href="../439194/index.html">Controlling a character with SharedEvents</a></li>
+<li><a href="../439196/index.html">JPMorgan analysts: Apple should buy Blizzard, Netflix or Sonos to reassure investors</a></li>
+<li><a href="../439198/index.html">Generation of barrier islands</a></li>
+<li><a href="../439200/index.html">Composer for the smallest</a></li>
+<li><a href="../439202/index.html">Detection of web attacks using autoencoder Seq2Seq</a></li>
+<li><a href="../439204/index.html">Increasing the efficiency of photosynthesis by genetic modification of plants</a></li>
+<li><a href="../439210/index.html">Java after volcanic eruption</a></li>
+<li><a href="../439216/index.html">pudge embedded database in 500 lines on golang</a></li>
+<li><a href="../439218/index.html">VC bot on the knee, or how to please people February 14</a></li>
+<li><a href="../439222/index.html">What is API management?</a></li>
+<li><a href="../439224/index.html">Again about the Voronoi diagrams</a></li>
+<li><a href="../439232/index.html">JAMstack: How to create your blog using Gatsby + Contentful + Netlify</a></li>
+<li><a href="../439236/index.html">xenvman: Flexible environments for testing microservices (and not only)</a></li>
+<li><a href="../439238/index.html">Play Store now accepts progressive web applications (PWA)</a></li>
+<li><a href="../439240/index.html">Joomla Digest for January 2019</a></li>
+<li><a href="../439244/index.html">FAS strongly recommends to pre-install Russian software on smartphones and laptops sold in Russia</a></li>
+<li><a href="../439248/index.html">Alan Kay: “Could the ancient Romans build a computer?”</a></li>
+<li><a href="../439252/index.html">6 reasons to develop IT career in Armenia</a></li>
+<li><a href="../439254/index.html">Our all</a></li>
+<li><a href="../439260/index.html">The author of the book "The Witcher" will still receive compensation from CD Projekt Red</a></li>
+<li><a href="../439262/index.html">Deploy the code directly to the docker container. Or how not to prokrasinirovat after each commit</a></li>
+<li><a href="../439264/index.html">How to lead complex technical projects without hiring PMs: DataLine experience</a></li>
+<li><a href="../439266/index.html">The experience of creating an Android game alone from scratch and how it was captured on Google Play</a></li>
+<li><a href="../439268/index.html">How VR, AR and 3D printing work together: the VR Concept experience</a></li>
+<li><a href="../439270/index.html">An example of parsing C ++ code using libclang in Python</a></li>
+<li><a href="../439278/index.html">ACS my LCD - security on two bolts</a></li>
+<li><a href="../439280/index.html">Trautonium: the German wave in the history of synthesizers</a></li>
+<li><a href="../439282/index.html">Effects of filtering SVG. Part 1. SVG filters 101</a></li>
+<li><a href="../439288/index.html">SciPy Optimization</a></li>
+<li><a href="../439290/index.html">Accelerate compilation in Xcode to swift</a></li>
+<li><a href="../439292/index.html">Google has agreed to remove from the search banned sites in the Russian Federation</a></li>
+<li><a href="../439294/index.html">Translation review "If software is created with public money, the code must be open"</a></li>
+<li><a href="../439296/index.html">Soviet license plate and Kolmogorov complexity</a></li>
+<li><a href="../439298/index.html">What would the Internet system look like in the game EvE Online</a></li>
+<li><a href="../439300/index.html">Statistics for file types in the Wildfire cloud sandbox</a></li>
+<li><a href="../439302/index.html">Product Design Digest, January 2019</a></li>
+<li><a href="../439304/index.html">[Ekaterinburg, announcement] Mitap for Java-developers</a></li>
+<li><a href="../439308/index.html">Kill cancer: iridium, human serum albumin and some blue light</a></li>
+<li><a href="../439310/index.html">Why not take off the real estate portal. Part 2</a></li>
+<li><a href="../439312/index.html">Speed ​​up complex calculations with minimal RAM</a></li>
+<li><a href="../439314/index.html">Seven strange ways of dealing with recluse in remote work</a></li>
+<li><a href="../439316/index.html">“I stopped doing what I see no point in”: project managers about their work and training</a></li>
+<li><a href="../439318/index.html">Win procrastination gaming addiction</a></li>
+<li><a href="../439320/index.html">How to diversify programming lessons for children of different ages</a></li>
+<li><a href="../439322/index.html">OS Sailfish renamed OS "Aurora"</a></li>
+<li><a href="../439324/index.html">Using a binary tree in swift using enum using OCR as an example</a></li>
+<li><a href="../439326/index.html">Electric Ford F-150 EV - in the prototype and tested on the road</a></li>
+<li><a href="../439328/index.html">Okay, google! Are you good or evil?</a></li>
+<li><a href="../439332/index.html">How PageRank works: implementation in the R language through linear algebra and power-method</a></li>
+<li><a href="../439334/index.html">About 2 billion rubles allocated for the implementation of the draft law on sustainable runet</a></li>
+<li><a href="../439336/index.html">We are looking for a needle in a stack without using well-known algorithms.</a></li>
+<li><a href="../439338/index.html">Forget about privacy: you still have terrible targeting</a></li>
+<li><a href="../439340/index.html">GDPR backup — what a new tool will do</a></li>
+<li><a href="../439342/index.html">Winter DIYorDIE Meetup February 17</a></li>
+<li><a href="../439344/index.html">To be like a troll: how monopolists rule patents</a></li>
+<li><a href="../439346/index.html">Laravel + Docker: Our Successful Experience</a></li>
+<li><a href="../439348/index.html">Vision falls after laser vision correction - what to do? Or, doctor, make me an "enhancement"</a></li>
+<li><a href="../439350/index.html">Artificial intelligence as a machine of inventions</a></li>
+<li><a href="../439352/index.html">Making a bot prototype for fighting in Clash Royale</a></li>
+<li><a href="../439354/index.html">Rust news # 5 (January 2019)</a></li>
+<li><a href="../439356/index.html">Nontrivial metrics of the effectiveness of advertising campaigns</a></li>
+<li><a href="../439358/index.html">Excel metadata files</a></li>
+<li><a href="../439360/index.html">Training Cisco 200-125 CCNA v3.0. Cisco Certified Network Specialist (CCNA). Day 3. Subnets</a></li>
+<li><a href="../439362/index.html">How we teach Software Engineering at St. Petersburg HSE</a></li>
+<li><a href="../439364/index.html">Oculus Go glasses with “strawberry” content set up for sale</a></li>
+<li><a href="../439366/index.html">Automation of three nails</a></li>
+<li><a href="../439368/index.html">Animations in iOS applications born on the server</a></li>
+<li><a href="../439374/index.html">For those who want to play detective: find a bug in the function from Midnight Commander</a></li>
+<li><a href="../439376/index.html">"Interest club"</a></li>
+<li><a href="../439378/index.html">The Book of Genesis?). Reflections on the nature of mind. Part I</a></li>
+<li><a href="../439380/index.html">How I created an extension for Atom and VS Code: personal experience and source codes</a></li>
+<li><a href="../439382/index.html">Using Ansible, Terraform, Docker, Consul, Nomad in the Clouds (Alexey Vakhov, Uchi.ru)</a></li>
+<li><a href="../439390/index.html">The best innovations of social networks in 2018</a></li>
+<li><a href="../439392/index.html">The 2019 championship season is open! SNA Hackathon Launches ala ML Boot Camp 8</a></li>
+<li><a href="../439394/index.html">As a programmer dataseativistam wrote</a></li>
+<li><a href="../439396/index.html">UniFi Controller Password Reset</a></li>
+<li><a href="../439404/index.html">A brief history of electronic public procurement in Russia</a></li>
+<li><a href="../439408/index.html">Pseudo Lens Flare</a></li>
+<li><a href="../439410/index.html">Jeff Hawkins is finally ready to explain his brain research.</a></li>
+<li><a href="../439414/index.html">Client for "server push messages"</a></li>
+<li><a href="../439416/index.html">A-Frame Review</a></li>
+<li><a href="../439418/index.html">Pentaho Data Integration (PDI), Python and Deep Learning</a></li>
+<li><a href="../439420/index.html">Building the transport package without installing MODX</a></li>
+<li><a href="../439422/index.html">What does a programmer need to develop games and who really is a game developer on the part of a programmer</a></li>
+<li><a href="../439424/index.html">How I Fought Free Hosting and Composer</a></li>
+<li><a href="../439426/index.html">Situation: a new wave of attacks with the interception of DNS queries - we analyze the basic methods of protection</a></li>
+<li><a href="../439430/index.html">Believe me if you can. Water meters. part 1</a></li>
+<li><a href="../439432/index.html">How to become a Java developer in 1.5 years</a></li>
+<li><a href="../439434/index.html">NestJS - the very real nodejs backend</a></li>
+<li><a href="../439436/index.html">Cheaper price of small series of electronics in Russia. Case Internet radio WOLNA</a></li>
+<li><a href="../439440/index.html">Implementation of Zimbra Collaboration Open Source, authorization through AD and automatic creation of mailboxes</a></li>
+<li><a href="../439442/index.html">Julia. Report Generators and Documentation</a></li>
+<li><a href="../439446/index.html">What you need to know about JavaScript Engine Switcher 3.0</a></li>
+<li><a href="../439448/index.html">What virtualization questions do you expect from a graduate?</a></li>
+<li><a href="../439450/index.html">RS-485 on domestic microcontrollers from the company Milandr</a></li>
+<li><a href="../439454/index.html">Program as Art - a new software management paradigm</a></li>
+<li><a href="../439456/index.html">Hipster podcasts # 2</a></li>
+<li><a href="../439458/index.html">As we Republic website on Kubernetes translated</a></li>
+<li><a href="../439460/index.html">How marketers of Maxidom lose millions flirting in groz marketing: independent usability auditing</a></li>
+<li><a href="../439462/index.html">Civilization Springs, 5/5</a></li>
+<li><a href="../439464/index.html">VXinspect: part quality control in 10 minutes</a></li>
+<li><a href="../439466/index.html">NASA lunar orbital probe made the first pictures of the China Chang'e-4 station - two pixels of light</a></li>
+<li><a href="../439468/index.html">Where to lead the search for the perfect SCADA</a></li>
+<li><a href="../439470/index.html">Germany plans to abandon coal in the near future.</a></li>
+<li><a href="../439472/index.html">Automation of border control within the company</a></li>
+<li><a href="../439476/index.html">Cockney Slang: Modern History and Position</a></li>
+<li><a href="../439478/index.html">Entertaining C #. Five examples for a coffee break</a></li>
+<li><a href="../439480/index.html">Give way, or Why does your CRM (and CRM) slow down?</a></li>
+<li><a href="../439482/index.html">devleads - (not) financial motivation</a></li>
+<li><a href="../439484/index.html">Get the enum data in the Automapper projection</a></li>
+<li><a href="../439496/index.html">How is billing done there: when a customer and a developer speak different languages</a></li>
+<li><a href="../439498/index.html">What hardware to analyze a huge shaft of information?</a></li>
+<li><a href="../439500/index.html">Why are captcha so complicated</a></li>
+<li><a href="../439502/index.html">Undefined behavior and truth undefined</a></li>
+<li><a href="../439504/index.html">Does your Data Engineer team need it?</a></li>
+<li><a href="../439506/index.html">9 alternatives to a bad team (design pattern)</a></li>
+<li><a href="../439510/index.html">High-load distributed control system of a modern NPP</a></li>
+<li><a href="../439512/index.html">The era of dinosaurs or legally verified reinsurance?</a></li>
+<li><a href="../439516/index.html">00110001 00110100 00101110 00110000 00110010</a></li>
+<li><a href="../439524/index.html">Fortnite is the future, but for rather unexpected reasons.</a></li>
+<li><a href="../439526/index.html">Telecom operators will conduct a "field test" of the law on the stability of the Runet</a></li>
+<li><a href="../439532/index.html">What's new in javascript ES2019</a></li>
+<li><a href="../439534/index.html">Yield programming and the use of drones in oil production - 10 lectures from the conference GIS Tech Russia</a></li>
+<li><a href="../439538/index.html">Community programming</a></li>
+<li><a href="../439540/index.html">Etherblade.net - opensource project to create an ethernet traffic encapsulator on FPGA (part one)</a></li>
+<li><a href="../439542/index.html">Nintendo makes it clear that only piracy can save the history of video games</a></li>
+<li><a href="../439544/index.html">The colony. Chapter 24: Departure</a></li>
+<li><a href="../439556/index.html">TDMS Fairway. Methods PMBOK and Russian design organizations</a></li>
+<li><a href="../439558/index.html">New old phone. Reinvent the PSTN phone</a></li>
+<li><a href="../439560/index.html">The adapter for working with the blockchain Ethereum for the InterSystems IRIS data platform</a></li>
+<li><a href="../439562/index.html">Configure the Kubernetes HA cluster on bare metal with kubeadm. Part 1/3</a></li>
+<li><a href="../439564/index.html">Practical application of transformation of AST-trees on the example of Putout</a></li>
+<li><a href="../439566/index.html">Why SRE is important documentation. Part 3</a></li>
+<li><a href="../439568/index.html">QLC based SSD - hard drive killer? Not really</a></li>
+<li><a href="../439572/index.html">Automated design of electronic equipment</a></li>
+<li><a href="../439576/index.html">Extensive review of Python interviews. Hints and Tips</a></li>
+<li><a href="../439578/index.html">On the issue of transformations and other operations</a></li>
+<li><a href="../439584/index.html">Project Lenergy, how to rethink portable power sources</a></li>
+<li><a href="../439586/index.html">SPBm protocol as the basis of Extreme Automated Campus</a></li>
+<li><a href="../439588/index.html">ESET has discovered new versions of the DanaBot Trojan.</a></li>
+<li><a href="../439590/index.html">Quals: Saudi and Oman National Cyber ​​Security CTF 2019. WriteUp</a></li>
+<li><a href="../439592/index.html">Ethical Activity Automation</a></li>
+<li><a href="../439596/index.html">How I accelerated image processing on Android 15 times</a></li>
+<li><a href="../439598/index.html">Microsoft told about the cost of paid support for Windows 7</a></li>
+<li><a href="../439600/index.html">Finland summed up the preliminary results of the experiment with a guaranteed basic income</a></li>
+<li><a href="../439604/index.html">How does the barcode work?</a></li>
+<li><a href="../439606/index.html">Experimental production of electronics for the minimum price</a></li>
+<li><a href="../439608/index.html">Modern religion: what do people give to Google, Facebook, Amazon and Apple?</a></li>
+<li><a href="../439610/index.html">As in my Chevrolet Bolt electric car, under warranty, two battery modules were replaced, and the third was monitored</a></li>
+<li><a href="../439616/index.html">The digest of interesting IT projects on Kickstarter №7</a></li>
+<li><a href="../439618/index.html">PHP for beginners. File attachment</a></li>
+<li><a href="../439620/index.html">Understanding asynchronous JavaScript [Translated by Sukhjinder Arora]</a></li>
+<li><a href="../439624/index.html">Why keep data in orbit</a></li>
+<li><a href="../439626/index.html">Experience developing a free application for collectors OpenNumismat</a></li>
+<li><a href="../439628/index.html">Parallel data update in ASP.NET Web API</a></li>
+<li><a href="../439632/index.html">How to set up Continuous Deployment for your project: personal experience</a></li>
+<li><a href="../439636/index.html">The crisis of the concepts of improving road safety and a new concept of its solution</a></li>
+<li><a href="../439638/index.html">Getting FPGA to Python</a></li>
+<li><a href="../439640/index.html">Vinyl is back and it's different</a></li>
+<li><a href="../439642/index.html">Java pitfalls. Part 1</a></li>
+<li><a href="../439644/index.html">Anti-Aging: Senolithics and Stem Cell Therapy</a></li>
+<li><a href="../439646/index.html">Holding SoftBank sold a stake in Nvidia due to the fall in their prices, but still earned $ 3.3 billion</a></li>
+<li><a href="../439648/index.html">Internal and nested java classes. Part 1</a></li>
+<li><a href="../439652/index.html">How to transport your startup to the USA: 4 important steps</a></li>
+<li><a href="../439654/index.html">Full immersion: how do we cool ASIC chips in Bitfury</a></li>
+<li><a href="../439656/index.html">C # character calculator</a></li>
+<li><a href="../439676/index.html">Integration of React Native and C ++ for iOS and Android</a></li>
+<li><a href="../439680/index.html">About 50% of Russians are ready to sell their personal data</a></li>
+<li><a href="../439682/index.html">Training Cisco 200-125 CCNA v3.0. Cisco Certified Network Specialist (CCNA). Day 4. Gateway devices</a></li>
+<li><a href="../439686/index.html">Flickr introduces new rules regarding the number of photos and videos users.</a></li>
+<li><a href="../439688/index.html">Overview of AI & ML solutions in 2018 and forecasts for 2019: Part 1 - NLP, Computer Vision</a></li>
+<li><a href="../439690/index.html">Virtual machine performance comparison of 6 cloud platforms: Selectel, MCS, Ya.Oblako, Google Cloud, AWS and Azure</a></li>
+<li><a href="../439692/index.html">AT & T sued for changing the network icon from 4G to 5G E</a></li>
+<li><a href="../439694/index.html">Developed smart tissue that reacts to changes in body temperature</a></li>
+<li><a href="../439696/index.html">On the crest of a wave, or “I want to go to the mainstream” - is it worth it?</a></li>
+<li><a href="../439698/index.html">Introduction to programming: a simple 3D shooter from scratch over the weekend, part 1</a></li>
+<li><a href="../439700/index.html">Patent for a board game in Russia</a></li>
+<li><a href="../439704/index.html">From pool request to release. Report Yandex.Taxi</a></li>
+<li><a href="../439706/index.html">BLACK HAT conference. Survival lessons in a 300 Gbps DDOS attack. Part 1</a></li>
+<li><a href="../439710/index.html">Features of creating products for the US market</a></li>
+<li><a href="../439712/index.html">Government procurement: a balance between the Italian strike and the Russian criminal</a></li>
+<li><a href="../439716/index.html">Tails OS or how to protect yourself online</a></li>
+<li><a href="../439718/index.html">Developing Elixir / Phoenix Applications with Docker</a></li>
+<li><a href="../439720/index.html">Introduction to programming: a simple 3D shooter from scratch over the weekend, part 2</a></li>
+<li><a href="../439722/index.html">Effects of SVG filters. Part 2. Outline text with feMorphology</a></li>
+<li><a href="../439724/index.html">Overview of AI & ML solutions in 2018 and forecasts for 2019: Part 2 - Tools and Libraries, AutoML, RL, Ethics in AI</a></li>
+<li><a href="../439726/index.html">Lock-in: truth or fiction?</a></li>
+<li><a href="../439728/index.html">Setting up backup and recovery of Zimbra OSE entirely and in separate boxes without using Zextras</a></li>
+<li><a href="../439730/index.html">Organizing reducer through standard class</a></li>
+<li><a href="../439732/index.html">Lazarus - simple animation using the TImageFragment component</a></li>
+<li><a href="../439734/index.html">We deploy Kubernetes on the desktop in minutes with MicroK8s</a></li>
+<li><a href="../439736/index.html">IPSec VPN connection between MikroTik and Kerio Control</a></li>
+<li><a href="../439746/index.html">Understand the promises in javascript</a></li>
+<li><a href="../439748/index.html">The digest of interesting materials for the mobile developer # 285 (February 4 - 10)</a></li>
+<li><a href="../439750/index.html">Learn product management - where?</a></li>
+<li><a href="../439752/index.html">Multicore MRI Method</a></li>
+<li><a href="../439754/index.html">Google is going to be engaged in the development of smart watches</a></li>
+<li><a href="../439756/index.html">Why do I need a thermo-acoustic generator?</a></li>
+<li><a href="../439760/index.html">Engineers "twisted" the light in the fiber - a new technology will speed up the transfer of data a hundred times</a></li>
+<li><a href="../439764/index.html">Corporate fruit</a></li>
+<li><a href="../439772/index.html">Writing Unit Tests on Swift for Verifying Asynchronous Tasks</a></li>
+<li><a href="../439778/index.html">The digest of fresh materials from the world of the frontend for the last week No. 351 (February 4 - 10, 2019)</a></li>
+<li><a href="../439780/index.html">PHP Digest number 149 (January 28 - February 11, 2019)</a></li>
+<li><a href="../439782/index.html">Headless CMS - the future of content management</a></li>
+<li><a href="../439784/index.html">Methane engine "Raptor" broke the record RD-180</a></li>
+<li><a href="../439788/index.html">Regular oddities in the GOST Grasshopper and Stribog algorithms</a></li>
+<li><a href="../439790/index.html">Test JaCarta WebClient or store tokens in a safe</a></li>
+<li><a href="../439792/index.html">NASA is looking for partners in the American industry to create a partially reusable manned lender</a></li>
+<li><a href="../439794/index.html">Back pain - understanding from the perspective of modern medicine</a></li>
+<li><a href="../439796/index.html">Spring Boot 2: what is not written in release notes</a></li>
+<li><a href="../439800/index.html">RISEX and Julia. 5 stages of love customer and designer</a></li>
+<li><a href="../439806/index.html">Valid SSL domain names for local Docker containers</a></li>
+<li><a href="../439808/index.html">The biggest telescopes. From a notebook and eyes to 340 megapixel cameras and data centers. Part 1</a></li>
+<li><a href="../439810/index.html">Get acquainted with the Moleculer microservice framework</a></li>
+<li><a href="../439816/index.html">Practical blockchain in business</a></li>
+<li><a href="../439818/index.html">Features of approaches to design in the real manufacturing sector</a></li>
+<li><a href="../439820/index.html">We are trying to write a project alone. Introduction</a></li>
+<li><a href="../439822/index.html">Creating an alternative display for the Ensoniq EPS16 + and ASR10 synthesizer / sampler</a></li>
+<li><a href="../439824/index.html">When will the JavaScript frameworks disappear?</a></li>
+<li><a href="../439826/index.html">Disable analog. What will happen to the TV?</a></li>
+<li><a href="../439828/index.html">The network appeared "analog" Findface</a></li>
+<li><a href="../439840/index.html">Conference DUMP-2019: we invite you to speak in the sections Design, Management and Testing</a></li>
+<li><a href="../439852/index.html">Remote control application release: Aspia 1.1.0</a></li>
+<li><a href="../439858/index.html">Prometheus + Grafana + Node Exporter + Docker in Azure with notifications in Telegram</a></li>
+<li><a href="../439862/index.html">Digital events in Moscow from February 11 to 17</a></li>
+<li><a href="../439866/index.html">Principles of design reference books in 1C Enterprise Management 2 (ERP 2.4.6)</a></li>
+<li><a href="../439868/index.html">Life without Facebook: less radical views, good mood, more time for loved ones. Now proven by science</a></li>
+<li><a href="../439878/index.html">Creation of architecture for a new high-load startup in 2019</a></li>
+<li><a href="../439880/index.html">Security Week 07: Local IoT Device Vulnerabilities</a></li>
+<li><a href="../439886/index.html">How I trained the neural network to implement the position estimation function on the Russian AI Cup CodeBall 2018</a></li>
+<li><a href="../439894/index.html">How easy it is to monitor the site</a></li>
+<li><a href="../439900/index.html">Julia and the method of coordinate descent</a></li>
+<li><a href="../439902/index.html">Explaining the physical essence of the Wing Lift phenomenon without using the Bernouli equation. Part 2</a></li>
+<li><a href="../439906/index.html">Critical vulnerability in Zemana products and not only</a></li>
+<li><a href="../439908/index.html">Kohl, piss off ... Coax</a></li>
+<li><a href="../439912/index.html">Unsolved mystery of view</a></li>
+<li><a href="../439916/index.html">Unpacking: Dridex bootloader</a></li>
+<li><a href="../439922/index.html">Taxation of IP in Kazakhstan how to be a freelancer?</a></li>
+<li><a href="../439924/index.html">The volume of parcels from foreign online stores grew by 25%</a></li>
+</ul></nav>
+</section>
+<script src="../../js/main.js"></script>
+
+<!-- Yandex.Metrika counter -->
+<script type="text/javascript" >
+  (function (d, w, c) {
+      (w[c] = w[c] || []).push(function() {
+          try {
+              w.yaCounter52319614 = new Ya.Metrika({
+                  id:52319614,
+                  clickmap:true,
+                  trackLinks:true,
+                  accurateTrackBounce:true,
+                  webvisor:true
+              });
+          } catch(e) { }
+      });
+
+      var n = d.getElementsByTagName("script")[0],
+          s = d.createElement("script"),
+          f = function () { n.parentNode.insertBefore(s, n); };
+      s.type = "text/javascript";
+      s.async = true;
+      s.src = "https://mc.yandex.ru/metrika/watch.js";
+
+      if (w.opera == "[object Opera]") {
+          d.addEventListener("DOMContentLoaded", f, false);
+      } else { f(); }
+  })(document, window, "yandex_metrika_callbacks");
+</script>
+<noscript><div><img src="https://mc.yandex.ru/watch/52319614" style="position:absolute; left:-9999px;" alt="" /></div></noscript>
+
+<!-- Google Analytics -->
+  <script>
+    window.ga = function () { ga.q.push(arguments) }; ga.q = []; ga.l = +new Date;
+    ga('create', 'UA-134228602-1', 'auto'); ga('send', 'pageview')
+  </script>
+  <script src="https://www.google-analytics.com/analytics.js" async defer></script>
+
+</section>
+</body>
+
+</html>

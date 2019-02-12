@@ -1,0 +1,1 @@
+For those who want to play detective: find a bug in the function from Midnight Commander

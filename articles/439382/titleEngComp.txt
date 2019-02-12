@@ -1,0 +1,1 @@
+Using Ansible, Terraform, Docker, Consul, Nomad in the Clouds (Alexey Vakhov, Uchi.ru)

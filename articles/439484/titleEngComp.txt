@@ -1,0 +1,1 @@
+Get the enum data in the Automapper projection

@@ -1,0 +1,1 @@
+Deploy the code directly to the docker container. Or how not to prokrasinirovat after each commit

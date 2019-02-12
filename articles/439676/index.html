@@ -1,0 +1,412 @@
+<!doctype html>
+<html class="no-js" lang="en">
+
+<head>
+  <!-- Global site tag (gtag.js) - Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=UA-134228602-1"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'UA-134228602-1');
+  </script>
+
+  <meta charset="utf-8">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  <title>Integration of React Native and C ++ for iOS and Android</title>
+  <meta name="description" content="Recently I was offered to work on one interesting project. It was required to develop a mobile application for an American startup on iOS and Android ...">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+  <link rel="stylesheet" href="../../css/main.css">
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+  <script>window.jQuery || document.write('<script src="../../js/vendors/jquery-3.3.1.min.js"><\/script>')</script>
+</head>
+
+<body>
+  <!--[if lte IE 9]>
+    <p class="browserupgrade">You are using an <strong>outdated</strong> browser. Please <a href="https://browsehappy.com/">upgrade your browser</a> to improve your experience and security.</p>
+  <![endif]-->
+  <nav class="page-headings-container js-page-headings-container"></nav>
+  <div class="tools-bar js-tools-bar">
+    <!-- <a href="https://quick-geek.github.io/search.html" title="Search">🔎</a> -->
+    <a class="js-list-of-headings-button" data-state="closed" href="#" title="Headings">📜</a>
+    <a class="js-go-to-top-button" href="#" title="Go to Top">⬆️</a>
+    <a class="js-go-to-bottom-button" href="#" title="Go to Bottom">⬇️</a>
+  </div>
+  <section class="page js-page"><h1>Integration of React Native and C ++ for iOS and Android</h1><div class="post__text post__text-html js-mediator-article">  Recently I was offered to work on one interesting project.  It was required to develop a mobile application for an American startup on iOS and Android platforms using React Native.  The key technical feature and factor that clearly decided my participation in the project was the task of integrating the library written in C ++.  For me, this could be a new experience and a new professional challenge. <br><br><h4>  Why was it necessary to integrate C ++ library </h4><br>  This application was necessary for two-factor authentication using FIDO UAF and U2F protocols using biometric data, such as Face ID and Touch ID, and similar technologies for the Android platform.  The client for authentication was already ready.  It was a library written in C ++ and used by some other clients besides the mobile application.  So I was required to embed it in a similar way into a mobile application for React Native. <br><a name="habracut"></a><br><h4>  How i did it </h4><br>  <a href="https://facebook.github.io/react-native/docs/native-modules-ios">There is an approach</a> for integrating C ++ into the React Native application from Facebook.  However, the problem is that it works only for the iOS platform, and it is not clear what to do with Android in this case.  I also wanted to solve the problem for two platforms at once. <br><br>  <a href="https://github.com/sulewicz/Djinni-react-native">Fork of the Djinni tool from Dropbox</a> , which allows you to generate cross-platform type declarations.  In essence, it is a simple mobile application on React Native with a customized connection to Djinni.  I took it as a basis. <br><br>  For convenience, the application code is split into two git repositories.  <a href="https://github.com/andreysaleba/react-native-cpp">The first one</a> stores the source code of the React Native application, and <a href="https://github.com/andreysaleba/react-native-cpp-support">the second</a> stores the Djinni and necessary dependencies. <br><br><h4>  Further steps </h4><br>  First you need to declare the C ++ interaction interface and React Native code.  In Djinni, this is done using .idl files.  Open the file <i>react-native-cpp-support / idl / main.Djinni</i> in the project and take a look at its structure. <br><br>  In the project, for our convenience, we have already announced some JavaScript data types and binding for them.  Thus, we can work with the types String, Array, Map, Promise and others without any additional description. <br><br>  In the example, this file looks like this: <br><br><pre><code class="javascript hljs">DemoModule = interface +r { <span class="hljs-keyword"><span class="hljs-keyword">const</span></span> EVENT_NAME: string = <span class="hljs-string"><span class="hljs-string">"DEMO_MODULE_EVENT"</span></span>; <span class="hljs-keyword"><span class="hljs-keyword">const</span></span> STRING_CONSTANT: string = <span class="hljs-string"><span class="hljs-string">"STRING"</span></span>; <span class="hljs-keyword"><span class="hljs-keyword">const</span></span> INT_CONSTANT: i32 = <span class="hljs-number"><span class="hljs-number">13</span></span>; <span class="hljs-keyword"><span class="hljs-keyword">const</span></span> DOUBLE_CONSTANT: f64 = <span class="hljs-number"><span class="hljs-number">13.123</span></span>; <span class="hljs-keyword"><span class="hljs-keyword">const</span></span> BOOL_CONSTANT: bool = <span class="hljs-literal"><span class="hljs-literal">false</span></span>; testPromise(promise: JavascriptPromise); testCallback(callback: JavascriptCallback); testMap(map: JavascriptMap, <span class="hljs-attr"><span class="hljs-attr">promise</span></span>: JavascriptPromise); testArray(array: JavascriptArray, <span class="hljs-attr"><span class="hljs-attr">callback</span></span>: JavascriptCallback); testBool(value: bool, <span class="hljs-attr"><span class="hljs-attr">promise</span></span>: JavascriptPromise); testPrimitives(i: i32, <span class="hljs-attr"><span class="hljs-attr">d</span></span>: f64, <span class="hljs-attr"><span class="hljs-attr">callback</span></span>: JavascriptCallback); testString(value: string, <span class="hljs-attr"><span class="hljs-attr">promise</span></span>: JavascriptPromise); testEventWithArray(value: JavascriptArray); testEventWithMap(value: JavascriptMap); }</code> </pre> <br>  After making changes to the interfaces file, it is necessary to regenerate the Java / Objective-C / C ++ interfaces.  This is easy to do by running the <i>generate_wrappers.sh</i> script from the <i>react-native-cpp-support / idl /</i> folder.  This script will collect all the ads from our idl file and create the appropriate interfaces for them, it is very convenient. <br><br>  In the example there are two C ++ files of interest to us.  The first contains the description, and the second implementation of simple C ++ methods: <br><br>  <i>react-native-cpp / cpp / DemoModuleImpl.hpp</i> <i><br></i>  <i>react-native-cpp / cpp / DemoModuleImpl.cpp</i> <br><br>  Consider the code for one of the methods as an example: <br><br><pre> <code class="javascript hljs"><span class="hljs-keyword"><span class="hljs-keyword">void</span></span> DemoModuleImpl::testString(<span class="hljs-keyword"><span class="hljs-keyword">const</span></span> std::string &amp;value, <span class="hljs-keyword"><span class="hljs-keyword">const</span></span> std::shared_ptr&lt;::JavascriptPromise&gt; &amp;promise) { promise-&gt;resolveObject(JavascriptObject::fromString(<span class="hljs-string"><span class="hljs-string">"Success!"</span></span>)); }</code> </pre><br>  Note that the result is not returned using the <i>keyword return</i> , but using the <i>JavaScriptPromise</i> object passed in by the last parameter, as described in the <i>idl</i> file. <br><br>  Now it became clear how to describe the necessary code in C ++.  But how to interact with this in a React Native application?  To understand, it is enough to open the file from the folder <i>react-native-cpp / index.js</i> , where all the functions described in the example are called. <br><br>  The function from our example is called in JavaScript as follows: <br><br><pre> <code class="javascript hljs"><span class="hljs-keyword"><span class="hljs-keyword">import</span></span> { NativeAppEventEmitter, NativeModules... } <span class="hljs-keyword"><span class="hljs-keyword">from</span></span> <span class="hljs-string"><span class="hljs-string">'react-native'</span></span>; <span class="hljs-keyword"><span class="hljs-keyword">const</span></span> DemoModule = NativeModules.DemoModule; .... async promiseTest() { <span class="hljs-keyword"><span class="hljs-keyword">this</span></span>.appendLine(<span class="hljs-string"><span class="hljs-string">"testPromise: "</span></span> + <span class="hljs-keyword"><span class="hljs-keyword">await</span></span> DemoModule.testPromise()); <span class="hljs-keyword"><span class="hljs-keyword">this</span></span>.appendLine(<span class="hljs-string"><span class="hljs-string">"testMap: "</span></span> + <span class="hljs-built_in"><span class="hljs-built_in">JSON</span></span>.stringify(<span class="hljs-keyword"><span class="hljs-keyword">await</span></span> DemoModule.testMap({<span class="hljs-attr"><span class="hljs-attr">a</span></span>: DemoModule.INT_CONSTANT, <span class="hljs-attr"><span class="hljs-attr">b</span></span>: <span class="hljs-number"><span class="hljs-number">2</span></span>}))); <span class="hljs-keyword"><span class="hljs-keyword">this</span></span>.appendLine(<span class="hljs-string"><span class="hljs-string">"testBool: "</span></span> + <span class="hljs-keyword"><span class="hljs-keyword">await</span></span> DemoModule.testBool(DemoModule.BOOL_CONSTANT)); <span class="hljs-comment"><span class="hljs-comment">// our sample function this.appendLine("testString: " + await DemoModule.testString(DemoModule.STRING_CONSTANT)); }</span></span></code> </pre><br>  Now I understand how the test functions on the C ++ and JavaScript side work.  Similarly, you can add and code any other functions.  Next, I will look at how Android and iOS projects work with C ++. <br><br><h4>  React Native and C ++ for Android </h4><br>  For the interaction of Android and C ++, you must install the NDK.  Detailed instructions on how to do this are available at the <i><a href="https://developer.android.com/ndk/guides/">developer.android.com/ndk/guides</a></i> link. <br>  Then inside the <i>react-native-cpp / android / app / build.gradle file</i> you need to add the following settings: <br><br><pre> <code class="javascript hljs">android { ... defaultConfig { ... ndk { abiFilters <span class="hljs-string"><span class="hljs-string">"armeabi-v7a"</span></span>, <span class="hljs-string"><span class="hljs-string">"x86"</span></span> } externalNativeBuild { cmake { cppFlags <span class="hljs-string"><span class="hljs-string">"-std=c++14 -frtti -fexceptions"</span></span> <span class="hljs-built_in"><span class="hljs-built_in">arguments</span></span> <span class="hljs-string"><span class="hljs-string">"-DANDROID_TOOLCHAIN=clang"</span></span>, <span class="hljs-string"><span class="hljs-string">"-DANDROID_STL=c++_static"</span></span> } } } externalNativeBuild { cmake { path <span class="hljs-string"><span class="hljs-string">"CMakeLists.txt"</span></span> } } sourceSets { main { java.srcDirs <span class="hljs-string"><span class="hljs-string">'src/main/java'</span></span>, <span class="hljs-string"><span class="hljs-string">'../../../react-native-cpp-support/support-lib/java'</span></span> } } splits { abi { reset() enable enableSeparateBuildPerCPUArchitecture universalApk <span class="hljs-literal"><span class="hljs-literal">false</span></span> <span class="hljs-comment"><span class="hljs-comment">// If true, also generate a universal APK include "armeabi-v7a", "x86" } } ... }</span></span></code> </pre><br>  We just configured the program to build the application for the used architectures and added the necessary build flags for cmake, specified the <i>CMAkeLists</i> file, which we will describe in the future, and also add the java classes from Djinni that we will use. <br>  The next step in setting up an Android project is the description of the <i>CMakeLists.txt</i> file.  In finished form, it can be viewed on the path <i>react-native-cpp / android / app / CMakeLists.txt</i> . <br><br><pre> <code class="javascript hljs">cmake_minimum_required(VERSION <span class="hljs-number"><span class="hljs-number">3.4</span></span><span class="hljs-number"><span class="hljs-number">.1</span></span>) set( PROJECT_ROOT <span class="hljs-string"><span class="hljs-string">"${CMAKE_SOURCE_DIR}/../.."</span></span> ) set( SUPPORT_LIB_ROOT <span class="hljs-string"><span class="hljs-string">"${PROJECT_ROOT}/../react-native-cpp-support/support-lib"</span></span> ) file( GLOB JNI_CODE <span class="hljs-string"><span class="hljs-string">"src/main/cpp/*.cpp"</span></span> <span class="hljs-string"><span class="hljs-string">"src/main/cpp/gen/*.cpp"</span></span> ) file( GLOB PROJECT_CODE <span class="hljs-string"><span class="hljs-string">"${PROJECT_ROOT}/cpp/*.cpp"</span></span> <span class="hljs-string"><span class="hljs-string">"${PROJECT_ROOT}/cpp/gen/*.cpp"</span></span> ) file( GLOB PROJECT_HEADERS <span class="hljs-string"><span class="hljs-string">"${PROJECT_ROOT}/cpp/*.hpp"</span></span> <span class="hljs-string"><span class="hljs-string">"${PROJECT_ROOT}/cpp/gen/*.hpp"</span></span> ) file( GLOB DJINNI_CODE <span class="hljs-string"><span class="hljs-string">"${SUPPORT_LIB_ROOT}/cpp/*.cpp"</span></span> <span class="hljs-string"><span class="hljs-string">"${SUPPORT_LIB_ROOT}/jni/*.cpp"</span></span> ) file( GLOB DJINNI_HEADERS <span class="hljs-string"><span class="hljs-string">"${SUPPORT_LIB_ROOT}/cpp/*.hpp"</span></span> <span class="hljs-string"><span class="hljs-string">"${SUPPORT_LIB_ROOT}/jni/*.hpp"</span></span> ) include_directories( <span class="hljs-string"><span class="hljs-string">"${SUPPORT_LIB_ROOT}/cpp"</span></span> <span class="hljs-string"><span class="hljs-string">"${SUPPORT_LIB_ROOT}/jni"</span></span> <span class="hljs-string"><span class="hljs-string">"${PROJECT_ROOT}/cpp"</span></span> <span class="hljs-string"><span class="hljs-string">"${PROJECT_ROOT}/cpp/gen"</span></span> ) add_library( # Sets the name <span class="hljs-keyword"><span class="hljs-keyword">of</span></span> the library. native-lib # Sets the library <span class="hljs-keyword"><span class="hljs-keyword">as</span></span> a shared library. SHARED ${JNI_CODE} ${DJINNI_CODE} ${DJINNI_HEADERS} ${PROJECT_CODE} ${PROJECT_HEADERS} )</code> </pre><br>  Here we specified relative paths to the support library, added directories with the necessary C ++ code and JNI. <br><br>  Another important step is to add <i>DjinniModulesPackage</i> to our project.  To do this, in the file <i>react-native-cpp / android / app / src / main / java / com / rncpp / jni / DjinniModulesPackage.java,</i> we specify: <br><br><pre> <code class="javascript hljs">... import com.rncpp.jni.DjinniModulesPackage; ... public <span class="hljs-class"><span class="hljs-keyword"><span class="hljs-class"><span class="hljs-keyword">class</span></span></span><span class="hljs-class"> </span><span class="hljs-title"><span class="hljs-class"><span class="hljs-title">MainApplication</span></span></span><span class="hljs-class"> </span><span class="hljs-keyword"><span class="hljs-class"><span class="hljs-keyword">extends</span></span></span><span class="hljs-class"> </span><span class="hljs-title"><span class="hljs-class"><span class="hljs-title">Application</span></span></span><span class="hljs-class"> </span><span class="hljs-title"><span class="hljs-class"><span class="hljs-title">implements</span></span></span><span class="hljs-class"> </span><span class="hljs-title"><span class="hljs-class"><span class="hljs-title">ReactApplication</span></span></span><span class="hljs-class"> </span></span>{ ... @Override protected List&lt;ReactPackage&gt; getPackages() { <span class="hljs-keyword"><span class="hljs-keyword">return</span></span> Arrays.&lt;ReactPackage&gt;asList( <span class="hljs-keyword"><span class="hljs-keyword">new</span></span> MainReactPackage(), <span class="hljs-keyword"><span class="hljs-keyword">new</span></span> DjinniModulesPackage() ); } ... }</code> </pre><br>  The last important detail is the description of the <i>DjinniModulesPackage</i> class, which we have just used in the main class of our application.  It is located on the <i>path react-native-cpp / android / app / src / main / java / com / rncpp / jni / DjinniModulesPackage.java</i> and contains the following code: <br><br><pre> <code class="javascript hljs">package com.rncpp.jni; <span class="hljs-keyword"><span class="hljs-keyword">import</span></span> com.facebook.react.ReactPackage; <span class="hljs-keyword"><span class="hljs-keyword">import</span></span> com.facebook.react.bridge.NativeModule; <span class="hljs-keyword"><span class="hljs-keyword">import</span></span> com.facebook.react.bridge.ReactApplicationContext; <span class="hljs-keyword"><span class="hljs-keyword">import</span></span> com.facebook.react.uimanager.ViewManager; <span class="hljs-keyword"><span class="hljs-keyword">import</span></span> java.util.ArrayList; <span class="hljs-keyword"><span class="hljs-keyword">import</span></span> java.util.Collections; <span class="hljs-keyword"><span class="hljs-keyword">import</span></span> java.util.List; public <span class="hljs-class"><span class="hljs-keyword"><span class="hljs-class"><span class="hljs-keyword">class</span></span></span><span class="hljs-class"> </span><span class="hljs-title"><span class="hljs-class"><span class="hljs-title">DjinniModulesPackage</span></span></span><span class="hljs-class"> </span><span class="hljs-title"><span class="hljs-class"><span class="hljs-title">implements</span></span></span><span class="hljs-class"> </span><span class="hljs-title"><span class="hljs-class"><span class="hljs-title">ReactPackage</span></span></span><span class="hljs-class"> </span></span>{ <span class="hljs-keyword"><span class="hljs-keyword">static</span></span> { System.loadLibrary(<span class="hljs-string"><span class="hljs-string">"native-lib"</span></span>); } @Override public List&lt;ViewManager&gt; createViewManagers(ReactApplicationContext reactContext) { <span class="hljs-keyword"><span class="hljs-keyword">return</span></span> Collections.emptyList(); } @Override public List&lt;NativeModule&gt; createNativeModules(ReactApplicationContext reactContext) { List&lt;NativeModule&gt; modules = <span class="hljs-keyword"><span class="hljs-keyword">new</span></span> ArrayList&lt;&gt;(); modules.add(<span class="hljs-keyword"><span class="hljs-keyword">new</span></span> DemoModule(reactContext)); <span class="hljs-keyword"><span class="hljs-keyword">return</span></span> modules; } }</code> </pre><br>  The greatest interest in the above class is the string <i>System.loadLibrary ("native-lib");</i>  , thanks to which we load the library with our native code and Djinni code into the Android application. <br><br>  To understand how this works, I advise you to familiarize yourself with the jni-code from the <a href="">folder</a> , which is a jni-wrapper for working with the functionality of our module, and its interface is described in the idl-file. <br><br>  As a result, if the Android and React Native development environment is configured, you can build and run the React Native project on Android.  To do this, execute two commands in the terminal: <br><br>  <i>npm install</i> <i><br></i>  <i>npm run android</i> <br><br>  Hooray!  Our project is working! <br><br>  And we see the following image on the screen of the Android emulator (clickable): <br><br> <a href=""><img width="100" src="https://habrastorage.org/webt/d2/_b/ku/d2_bkuu0d7wftpkmekwbpgxyod8.png"></a> <br><br>  Now let's look at how iOS and React Native work with C ++. <br><br><h4>  React Native and C ++ for iOS </h4><br>  Open the react-native-cpp project in XCode. <br><br>  First, we add links to the code used in the Objective-C and C ++ projects from the support library.  To do this, transfer the contents of the <i>react-native-cpp-support / support-lib / objc /</i> and <i>react-native-cpp-support / support-lib / cpp /</i> folders to the XCode project.  As a result, folders with the code of the support library will be displayed in the project structure tree (the images are clickable): <br><br> <a href=""><img width="200" src="https://habrastorage.org/webt/wc/yv/lw/wcyvlw_dev544my3-t0jebtkxkg.png"></a> <br><br> <a href=""><img width="200" src="https://habrastorage.org/webt/ym/da/_l/ymda_l6b2aypzuh6diwqgzkk624.png"></a> <br><br>  Thus, we added descriptions of JavaScript types from the support library to the project. <br><br>  The next step is to add the generated objective-c wrappers for our test C ++ module.  We will need to transfer the code from the <i>react-native-cpp / ios / rncpp / Generated /</i> folder to the project. <br><br>  It remains to add the C ++ code of our module, for which we will transfer the code from the <i>react-native-cpp / cpp /</i> and <i>react-native-cpp / cpp / gen /</i> folders to the project. <br><br>  As a result, the project structure tree will look as follows (the image is clickable): <br><br> <a href=""><img width="200" src="https://habrastorage.org/webt/d9/ki/3i/d9ki3i1ni92_hjp2ez4bytyv5eq.png"></a> <br><br>  You need to make sure that the added files appear in the Compile Sources list inside the Build Phases tabs. <br><br> <a href=""><img src="https://habrastorage.org/webt/29/hy/db/29hydbdi23jo_zntc8coqjpx5n0.png"><br></a> <br>  (the picture is clickable) <br><br>  The last step is to change the code of the AppDelegate.m file to start the initialization of the Djinni module when the application starts.  And for this you will need to change the following lines of code: <br><br><pre> <code class="javascript hljs">... #<span class="hljs-keyword"><span class="hljs-keyword">import</span></span> <span class="hljs-string"><span class="hljs-string">"RCDjinniModulesInitializer.h"</span></span> ... @implementation AppDelegate - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions { ... id&lt;RCTBridgeDelegate&gt; moduleInitialiser = [[RCDjinniModulesInitializer alloc] initWithURL:jsCodeLocation]; RCTBridge *bridge = [[RCTBridge alloc] initWithDelegate:moduleInitialiser launchOptions:nil]; RCTRootView *rootView = [[RCTRootView alloc] initWithBridge:bridge moduleName:@<span class="hljs-string"><span class="hljs-string">"rncpp"</span></span> initialProperties: nil]; ... }</code> </pre><br>  Now we will launch our application on iOS.  (the picture is clickable) <br><br> <a href=""><img width="100" src="https://habrastorage.org/webt/pz/lm/fc/pzlmfc65__a1eomgafobtt1z87y.png"><br></a> <br><br>  The application works! <br><br><h4>  Adding C ++ library to our project. </h4><br>  For example, use the popular OpenSSL library. <br><br>  And let's start with Android. <br><br>  Clone the <a href="https://github.com/emileb/OpenSSL-for-Android-Prebuilt">repository</a> with the already compiled OpenSSL library for Android. <br><br>  Include the OpenSSL library in the CMakeLists.txt file: <br><br><pre> <code class="javascript hljs">.... SET(OPENSSL_ROOT_DIR /Users/andreysaleba/projects/OpenSSL-<span class="hljs-keyword"><span class="hljs-keyword">for</span></span>-Android-Prebuilt/openssl<span class="hljs-number"><span class="hljs-number">-1.0</span></span><span class="hljs-number"><span class="hljs-number">.2</span></span>) SET(OPENSSL_LIBRARIES_DIR <span class="hljs-string"><span class="hljs-string">"${OPENSSL_ROOT_DIR}/${ANDROID_ABI}/lib"</span></span>) SET(OPENSSL_INCLUDE_DIR ${OPENSSL_ROOT_DIR}/include) SET(OPENSSL_LIBRARIES <span class="hljs-string"><span class="hljs-string">"ssl"</span></span> <span class="hljs-string"><span class="hljs-string">"crypto"</span></span>) ... LINK_DIRECTORIES(${OPENSSL_LIBRARIES_DIR} ${ZLIB_LIBRARIES_DIR}) include_directories( <span class="hljs-string"><span class="hljs-string">"${SUPPORT_LIB_ROOT}/cpp"</span></span> <span class="hljs-string"><span class="hljs-string">"${SUPPORT_LIB_ROOT}/jni"</span></span> <span class="hljs-string"><span class="hljs-string">"${PROJECT_ROOT}/cpp"</span></span> <span class="hljs-string"><span class="hljs-string">"${PROJECT_ROOT}/cpp/gen"</span></span> <span class="hljs-string"><span class="hljs-string">"${OPENSSL_INCLUDE_DIR}"</span></span> ) add_library(libssl STATIC IMPORTED) add_library(libcrypto STATIC IMPORTED) ... set_target_properties( libssl PROPERTIES IMPORTED_LOCATION ${OPENSSL_LIBRARIES_DIR}/libssl.a ) set_target_properties( libcrypto PROPERTIES IMPORTED_LOCATION ${OPENSSL_LIBRARIES_DIR}/libcrypto.a ) target_link_libraries(native-lib PRIVATE libssl libcrypto)</code> </pre><br>  Then we add a simple function code to our C ++ module that returns the version of the OpenSSL library. <br><br>  In the <i>react-native-cpp / cpp / DemoModuleImpl.hpp file</i> we add: <br><br><pre> <code class="javascript hljs"><span class="hljs-keyword"><span class="hljs-keyword">void</span></span> getOpenSSLVersion(<span class="hljs-keyword"><span class="hljs-keyword">const</span></span> std::shared_ptr&lt;::JavascriptPromise&gt; &amp; promise) override;</code> </pre><br>  In the file <i>react-native-cpp / cpp / DemoModuleImpl.cpp</i> we add: <br><br><pre> <code class="javascript hljs">#include &lt;openssl/crypto.h&gt; ... void DemoModuleImpl::getOpenSSLVersion(<span class="hljs-keyword"><span class="hljs-keyword">const</span></span> std::shared_ptr&lt;::JavascriptPromise&gt; &amp;promise) { promise-&gt;resolveString(SSLeay_version(<span class="hljs-number"><span class="hljs-number">1</span></span>)); }</code> </pre><br>  It remains to describe the interface of the new function in the idl file <i>`react-native-cpp-support / idl / main.djinni`</i> : <br><br><pre> <code class="javascript hljs"> getOpenSSLVersion(promise: JavascriptPromise);</code> </pre><br>  Call the <i>`generate_wrappers.sh`</i> script from <i>the` react-native-cpp-support / idl / `</i> folder. <br><br>  Then in JavaScript we call the function we just created: <br><br><pre> <code class="javascript hljs"><span class="hljs-keyword"><span class="hljs-keyword">async</span></span> promiseTest() { ... this.appendLine(<span class="hljs-string"><span class="hljs-string">"openSSL version: "</span></span> + <span class="hljs-keyword"><span class="hljs-keyword">await</span></span> DemoModule.getOpenSSLVersion()); }</code> </pre><br>  For Android, everything is ready. <br>  Let's go to iOS. <br><br>  Clone the <a href="https://github.com/sinofool/build-openssl-ios">repository</a> with the compiled version of the OpenSSL library for iOS. <br><br>  Open the iOS project in Xcode and in the settings in the Build Settings tab add the path to the openssl library to the Other C Flags field (an example path on my computer is below): <br>  <i>-I / Users / andreysaleba / projects / prebuilt-openssl / dist / openssl-1.0.2d-ios / include</i> <br><br>  Add the following lines to the Other Linker Flags field: <br><br><pre> <code class="javascript hljs">-L/Users/andreysaleba/projects/prebuilt-openssl/dist/openssl<span class="hljs-number"><span class="hljs-number">-1.0</span></span><span class="hljs-number"><span class="hljs-number">.2</span></span>d-ios/lib -lcrypto -lssl</code> </pre><br>  All is ready.  The OpenSSL library has been added for both platforms. <br><br>  Thank you for watching! </div><p>Source: <a href="https://habr.com/ru/post/439676/">https://habr.com/ru/post/439676/</a></p>
+<section class="navigation-panel">
+<h4>More articles:</h4>
+<nav><ul class="list-of-pages">
+<li><a href="../438956/index.html">Magnetite in the teeth: sequencing of transcriptomes of the tissues of the radula of the shell of mollusc shell</a></li>
+<li><a href="../438958/index.html">ILV confirmed the existence of its "space station"</a></li>
+<li><a href="../438960/index.html">How I abandoned Ruby in favor of Python, working on a backend</a></li>
+<li><a href="../438962/index.html">For the most part, a positive outlook for the future of chips.</a></li>
+<li><a href="../438964/index.html">Who really stands behind popular free VPNs?</a></li>
+<li><a href="../438966/index.html">The history of wandering documentation Haproxy, or what you should pay attention to when it is configured</a></li>
+<li><a href="../438968/index.html">Marking shoes in Russia: The market is not ready, but will have to work</a></li>
+<li><a href="../438970/index.html">It is said that Haskell is a language for geniuses and academics. True?</a></li>
+<li><a href="../438972/index.html">The brain from the inside (Visualization of the passage of the pattern through the model of an artificial neural network)</a></li>
+<li><a href="../438974/index.html">Virtual reality helps to cope with mental disorders</a></li>
+<li><a href="../438976/index.html">The book "Spring. All design patterns »</a></li>
+<li><a href="../438980/index.html">Spring Boot 2: what's new?</a></li>
+<li><a href="../438982/index.html">Kubernetes tutorial, part 1: applications, microservices and containers</a></li>
+<li><a href="../438984/index.html">Kubernetes Handbook Part 2: Creating and Working With a Cluster</a></li>
+<li><a href="../438986/index.html">React Training Course Part 14: Workshop on Class Based Components, Component State</a></li>
+<li><a href="../438988/index.html">React Training Course, Part 15: Workshop on Working with Component State</a></li>
+<li><a href="../438992/index.html">Developer Diary or Bad Decisions</a></li>
+<li><a href="../438994/index.html">Intel Xeon W-3175X, hot drummer. Testing</a></li>
+<li><a href="../438996/index.html">Company network and MitM. Part 1</a></li>
+<li><a href="../438998/index.html">CGDevs Moscow Meetup # 2</a></li>
+<li><a href="../439000/index.html">Spatial manipulation in 2D using Signed Distance Fields</a></li>
+<li><a href="../439002/index.html">How to stop "writing TK" and start working?</a></li>
+<li><a href="../439006/index.html">How AI helps to master sign language</a></li>
+<li><a href="../439008/index.html">Mail.ru has released a new Atom browser with an emphasis on "security and privacy"</a></li>
+<li><a href="../439010/index.html">How is the consolidation of archives in DeviceLock DLP</a></li>
+<li><a href="../439012/index.html">Telephone directory of the organization - print version</a></li>
+<li><a href="../439016/index.html">Static Generic Tables</a></li>
+<li><a href="../439018/index.html">Setting up Sphinx search for an online store</a></li>
+<li><a href="../439020/index.html">Ticket to Ride. Europe - arithmetic, part two</a></li>
+<li><a href="../439022/index.html">CNC in the hobby workshop (part 3)</a></li>
+<li><a href="../439024/index.html">Results Slurm-3</a></li>
+<li><a href="../439028/index.html">How to improve network perimeter protection? Practical recommendations for Check Point and not only</a></li>
+<li><a href="../439030/index.html">A lot of managers</a></li>
+<li><a href="../439032/index.html">Amazon and Google are planning to enter the energy market</a></li>
+<li><a href="../439034/index.html">Group-IB Webinar: Red Team or Pentest 12.02.2019</a></li>
+<li><a href="../439036/index.html">The main thing is not to get into the mall under the reconciliation of hours</a></li>
+<li><a href="../439038/index.html">Making a neural network: how not to break the brain</a></li>
+<li><a href="../439040/index.html">To isolate the Runet need budget funds</a></li>
+<li><a href="../439042/index.html">Puma is looking for beta testers for self-tapping sneakers Fi</a></li>
+<li><a href="../439046/index.html">How to safely combine the network segments of the three major banks: share tricks</a></li>
+<li><a href="../439050/index.html">Training Cisco 200-125 CCNA v3.0. Cisco Certified Network Specialist (CCNA). Day 2. OSI and TCP-IP models</a></li>
+<li><a href="../439056/index.html">Cement Brand Integration</a></li>
+<li><a href="../439060/index.html">7 types of customers</a></li>
+<li><a href="../439062/index.html">Anisoprint Composer: 3D printing of high strength</a></li>
+<li><a href="../439064/index.html">Typical mesh error (Bootstrap Grid), or why the designer and layout designer do not understand each other</a></li>
+<li><a href="../439066/index.html">Operating system on Rust. Page memory: advanced level</a></li>
+<li><a href="../439068/index.html">Spam campaign “Love you” redirected to Japan</a></li>
+<li><a href="../439070/index.html">China refuses anti-corruption system Zero Trust AI because of its high efficiency</a></li>
+<li><a href="../439074/index.html">Password Checkup extension checks passwords with a base of 4 billion compromised accounts</a></li>
+<li><a href="../439076/index.html">In which applications to wait for an unknown malicious code?</a></li>
+<li><a href="../439078/index.html">Perm programmer arrested for creating a mobile application through which the pedophile acted</a></li>
+<li><a href="../439080/index.html">Unobvious RabbitMQ in Yii2 or why RabbitMQ writes to all queues at once</a></li>
+<li><a href="../439082/index.html">Walk through the plant of desires</a></li>
+<li><a href="../439086/index.html">Causes of ANR and how to avoid it</a></li>
+<li><a href="../439094/index.html">Scientists have found the oldest living vertebrate on Earth</a></li>
+<li><a href="../439096/index.html">Buildbot: a tale with examples of one more continuous integration system</a></li>
+<li><a href="../439098/index.html">Sasha Memus, Chatfuel: How to build a career in products after consulting, is it dangerous to meditate and how to change behavior</a></li>
+<li><a href="../439100/index.html">How to adapt UX / UI for permissions</a></li>
+<li><a href="../439102/index.html">Russians are 20% more likely to face insults on the Internet</a></li>
+<li><a href="../439104/index.html">Redux Simple as a rake</a></li>
+<li><a href="../439106/index.html">Programming in Russia will be introduced from primary school</a></li>
+<li><a href="../439108/index.html">Amateur radio measurements: when there is no frequency meter</a></li>
+<li><a href="../439112/index.html">Creator Kate Mobile arrested for using a pedophile for his service</a></li>
+<li><a href="../439118/index.html">New in browsers: Firefox 66 blocks video and sound by default, Chromium limits page budget</a></li>
+<li><a href="../439122/index.html">Simplicity and complexity of primitives or how to determine unnecessary preprocessing for a neural network</a></li>
+<li><a href="../439124/index.html">If software is created with public money, the code should be open.</a></li>
+<li><a href="../439126/index.html">Requests from users and product requirements</a></li>
+<li><a href="../439128/index.html">How to organize the work of QA. One practically applied method</a></li>
+<li><a href="../439130/index.html">13 trends in the cybersecurity and information security market 2019-2020</a></li>
+<li><a href="../439132/index.html">Unforgettable old age</a></li>
+<li><a href="../439134/index.html">Russian scientists are developing sitall (unbreakable glass) for LG smartphones</a></li>
+<li><a href="../439136/index.html">What is the difference between 4G and 5G?</a></li>
+<li><a href="../439138/index.html">Working with callbacks in React</a></li>
+<li><a href="../439140/index.html">Important message about invites in profile</a></li>
+<li><a href="../439142/index.html">Design maturity models</a></li>
+<li><a href="../439148/index.html">Working with nRF51822 using ST-Link and Clion + OpenOCD</a></li>
+<li><a href="../439150/index.html">Who should pay transaction costs</a></li>
+<li><a href="../439152/index.html">Salaries in IT in the second half of 2018: according to the “My Circle” salary calculator</a></li>
+<li><a href="../439154/index.html">How do freelancers live: book cover design, own production of backpacks and travel work</a></li>
+<li><a href="../439158/index.html">DataArt Launches Free CV Duck Resume Improvement Service</a></li>
+<li><a href="../439160/index.html">Algorithm state: what happens to indie developers on Steam?</a></li>
+<li><a href="../439162/index.html">How to debug front-end and backend: step-by-step instructions</a></li>
+<li><a href="../439166/index.html">mmWave on the road to commercialization in the form factor of a smartphone</a></li>
+<li><a href="../439170/index.html">Cellular operators will help banks verify the accuracy of customer data</a></li>
+<li><a href="../439172/index.html">Extending the assert () macro to implement minimal error handling</a></li>
+<li><a href="../439174/index.html">Safe Internet Day: what threats to pay attention to in 2019</a></li>
+<li><a href="../439182/index.html">How do we distribute orders between drivers in Yandex.Taxi</a></li>
+<li><a href="../439186/index.html">UX Editor: True Story, Rial Life</a></li>
+<li><a href="../439194/index.html">Controlling a character with SharedEvents</a></li>
+<li><a href="../439196/index.html">JPMorgan analysts: Apple should buy Blizzard, Netflix or Sonos to reassure investors</a></li>
+<li><a href="../439198/index.html">Generation of barrier islands</a></li>
+<li><a href="../439200/index.html">Composer for the smallest</a></li>
+<li><a href="../439202/index.html">Detection of web attacks using autoencoder Seq2Seq</a></li>
+<li><a href="../439204/index.html">Increasing the efficiency of photosynthesis by genetic modification of plants</a></li>
+<li><a href="../439210/index.html">Java after volcanic eruption</a></li>
+<li><a href="../439216/index.html">pudge embedded database in 500 lines on golang</a></li>
+<li><a href="../439218/index.html">VC bot on the knee, or how to please people February 14</a></li>
+<li><a href="../439222/index.html">What is API management?</a></li>
+<li><a href="../439224/index.html">Again about the Voronoi diagrams</a></li>
+<li><a href="../439232/index.html">JAMstack: How to create your blog using Gatsby + Contentful + Netlify</a></li>
+<li><a href="../439236/index.html">xenvman: Flexible environments for testing microservices (and not only)</a></li>
+<li><a href="../439238/index.html">Play Store now accepts progressive web applications (PWA)</a></li>
+<li><a href="../439240/index.html">Joomla Digest for January 2019</a></li>
+<li><a href="../439244/index.html">FAS strongly recommends to pre-install Russian software on smartphones and laptops sold in Russia</a></li>
+<li><a href="../439248/index.html">Alan Kay: “Could the ancient Romans build a computer?”</a></li>
+<li><a href="../439252/index.html">6 reasons to develop IT career in Armenia</a></li>
+<li><a href="../439254/index.html">Our all</a></li>
+<li><a href="../439260/index.html">The author of the book "The Witcher" will still receive compensation from CD Projekt Red</a></li>
+<li><a href="../439262/index.html">Deploy the code directly to the docker container. Or how not to prokrasinirovat after each commit</a></li>
+<li><a href="../439264/index.html">How to lead complex technical projects without hiring PMs: DataLine experience</a></li>
+<li><a href="../439266/index.html">The experience of creating an Android game alone from scratch and how it was captured on Google Play</a></li>
+<li><a href="../439268/index.html">How VR, AR and 3D printing work together: the VR Concept experience</a></li>
+<li><a href="../439270/index.html">An example of parsing C ++ code using libclang in Python</a></li>
+<li><a href="../439278/index.html">ACS my LCD - security on two bolts</a></li>
+<li><a href="../439280/index.html">Trautonium: the German wave in the history of synthesizers</a></li>
+<li><a href="../439282/index.html">Effects of filtering SVG. Part 1. SVG filters 101</a></li>
+<li><a href="../439288/index.html">SciPy Optimization</a></li>
+<li><a href="../439290/index.html">Accelerate compilation in Xcode to swift</a></li>
+<li><a href="../439292/index.html">Google has agreed to remove from the search banned sites in the Russian Federation</a></li>
+<li><a href="../439294/index.html">Translation review "If software is created with public money, the code must be open"</a></li>
+<li><a href="../439296/index.html">Soviet license plate and Kolmogorov complexity</a></li>
+<li><a href="../439298/index.html">What would the Internet system look like in the game EvE Online</a></li>
+<li><a href="../439300/index.html">Statistics for file types in the Wildfire cloud sandbox</a></li>
+<li><a href="../439302/index.html">Product Design Digest, January 2019</a></li>
+<li><a href="../439304/index.html">[Ekaterinburg, announcement] Mitap for Java-developers</a></li>
+<li><a href="../439308/index.html">Kill cancer: iridium, human serum albumin and some blue light</a></li>
+<li><a href="../439310/index.html">Why not take off the real estate portal. Part 2</a></li>
+<li><a href="../439312/index.html">Speed ​​up complex calculations with minimal RAM</a></li>
+<li><a href="../439314/index.html">Seven strange ways of dealing with recluse in remote work</a></li>
+<li><a href="../439316/index.html">“I stopped doing what I see no point in”: project managers about their work and training</a></li>
+<li><a href="../439318/index.html">Win procrastination gaming addiction</a></li>
+<li><a href="../439320/index.html">How to diversify programming lessons for children of different ages</a></li>
+<li><a href="../439322/index.html">OS Sailfish renamed OS "Aurora"</a></li>
+<li><a href="../439324/index.html">Using a binary tree in swift using enum using OCR as an example</a></li>
+<li><a href="../439326/index.html">Electric Ford F-150 EV - in the prototype and tested on the road</a></li>
+<li><a href="../439328/index.html">Okay, google! Are you good or evil?</a></li>
+<li><a href="../439332/index.html">How PageRank works: implementation in the R language through linear algebra and power-method</a></li>
+<li><a href="../439334/index.html">About 2 billion rubles allocated for the implementation of the draft law on sustainable runet</a></li>
+<li><a href="../439336/index.html">We are looking for a needle in a stack without using well-known algorithms.</a></li>
+<li><a href="../439338/index.html">Forget about privacy: you still have terrible targeting</a></li>
+<li><a href="../439340/index.html">GDPR backup — what a new tool will do</a></li>
+<li><a href="../439342/index.html">Winter DIYorDIE Meetup February 17</a></li>
+<li><a href="../439344/index.html">To be like a troll: how monopolists rule patents</a></li>
+<li><a href="../439346/index.html">Laravel + Docker: Our Successful Experience</a></li>
+<li><a href="../439348/index.html">Vision falls after laser vision correction - what to do? Or, doctor, make me an "enhancement"</a></li>
+<li><a href="../439350/index.html">Artificial intelligence as a machine of inventions</a></li>
+<li><a href="../439352/index.html">Making a bot prototype for fighting in Clash Royale</a></li>
+<li><a href="../439354/index.html">Rust news # 5 (January 2019)</a></li>
+<li><a href="../439356/index.html">Nontrivial metrics of the effectiveness of advertising campaigns</a></li>
+<li><a href="../439358/index.html">Excel metadata files</a></li>
+<li><a href="../439360/index.html">Training Cisco 200-125 CCNA v3.0. Cisco Certified Network Specialist (CCNA). Day 3. Subnets</a></li>
+<li><a href="../439362/index.html">How we teach Software Engineering at St. Petersburg HSE</a></li>
+<li><a href="../439364/index.html">Oculus Go glasses with “strawberry” content set up for sale</a></li>
+<li><a href="../439366/index.html">Automation of three nails</a></li>
+<li><a href="../439368/index.html">Animations in iOS applications born on the server</a></li>
+<li><a href="../439374/index.html">For those who want to play detective: find a bug in the function from Midnight Commander</a></li>
+<li><a href="../439376/index.html">"Interest club"</a></li>
+<li><a href="../439378/index.html">The Book of Genesis?). Reflections on the nature of mind. Part I</a></li>
+<li><a href="../439380/index.html">How I created an extension for Atom and VS Code: personal experience and source codes</a></li>
+<li><a href="../439382/index.html">Using Ansible, Terraform, Docker, Consul, Nomad in the Clouds (Alexey Vakhov, Uchi.ru)</a></li>
+<li><a href="../439390/index.html">The best innovations of social networks in 2018</a></li>
+<li><a href="../439392/index.html">The 2019 championship season is open! SNA Hackathon Launches ala ML Boot Camp 8</a></li>
+<li><a href="../439394/index.html">As a programmer dataseativistam wrote</a></li>
+<li><a href="../439396/index.html">UniFi Controller Password Reset</a></li>
+<li><a href="../439404/index.html">A brief history of electronic public procurement in Russia</a></li>
+<li><a href="../439408/index.html">Pseudo Lens Flare</a></li>
+<li><a href="../439410/index.html">Jeff Hawkins is finally ready to explain his brain research.</a></li>
+<li><a href="../439414/index.html">Client for "server push messages"</a></li>
+<li><a href="../439416/index.html">A-Frame Review</a></li>
+<li><a href="../439418/index.html">Pentaho Data Integration (PDI), Python and Deep Learning</a></li>
+<li><a href="../439420/index.html">Building the transport package without installing MODX</a></li>
+<li><a href="../439422/index.html">What does a programmer need to develop games and who really is a game developer on the part of a programmer</a></li>
+<li><a href="../439424/index.html">How I Fought Free Hosting and Composer</a></li>
+<li><a href="../439426/index.html">Situation: a new wave of attacks with the interception of DNS queries - we analyze the basic methods of protection</a></li>
+<li><a href="../439430/index.html">Believe me if you can. Water meters. part 1</a></li>
+<li><a href="../439432/index.html">How to become a Java developer in 1.5 years</a></li>
+<li><a href="../439434/index.html">NestJS - the very real nodejs backend</a></li>
+<li><a href="../439436/index.html">Cheaper price of small series of electronics in Russia. Case Internet radio WOLNA</a></li>
+<li><a href="../439440/index.html">Implementation of Zimbra Collaboration Open Source, authorization through AD and automatic creation of mailboxes</a></li>
+<li><a href="../439442/index.html">Julia. Report Generators and Documentation</a></li>
+<li><a href="../439446/index.html">What you need to know about JavaScript Engine Switcher 3.0</a></li>
+<li><a href="../439448/index.html">What virtualization questions do you expect from a graduate?</a></li>
+<li><a href="../439450/index.html">RS-485 on domestic microcontrollers from the company Milandr</a></li>
+<li><a href="../439454/index.html">Program as Art - a new software management paradigm</a></li>
+<li><a href="../439456/index.html">Hipster podcasts # 2</a></li>
+<li><a href="../439458/index.html">As we Republic website on Kubernetes translated</a></li>
+<li><a href="../439460/index.html">How marketers of Maxidom lose millions flirting in groz marketing: independent usability auditing</a></li>
+<li><a href="../439462/index.html">Civilization Springs, 5/5</a></li>
+<li><a href="../439464/index.html">VXinspect: part quality control in 10 minutes</a></li>
+<li><a href="../439466/index.html">NASA lunar orbital probe made the first pictures of the China Chang'e-4 station - two pixels of light</a></li>
+<li><a href="../439468/index.html">Where to lead the search for the perfect SCADA</a></li>
+<li><a href="../439470/index.html">Germany plans to abandon coal in the near future.</a></li>
+<li><a href="../439472/index.html">Automation of border control within the company</a></li>
+<li><a href="../439476/index.html">Cockney Slang: Modern History and Position</a></li>
+<li><a href="../439478/index.html">Entertaining C #. Five examples for a coffee break</a></li>
+<li><a href="../439480/index.html">Give way, or Why does your CRM (and CRM) slow down?</a></li>
+<li><a href="../439482/index.html">devleads - (not) financial motivation</a></li>
+<li><a href="../439484/index.html">Get the enum data in the Automapper projection</a></li>
+<li><a href="../439496/index.html">How is billing done there: when a customer and a developer speak different languages</a></li>
+<li><a href="../439498/index.html">What hardware to analyze a huge shaft of information?</a></li>
+<li><a href="../439500/index.html">Why are captcha so complicated</a></li>
+<li><a href="../439502/index.html">Undefined behavior and truth undefined</a></li>
+<li><a href="../439504/index.html">Does your Data Engineer team need it?</a></li>
+<li><a href="../439506/index.html">9 alternatives to a bad team (design pattern)</a></li>
+<li><a href="../439510/index.html">High-load distributed control system of a modern NPP</a></li>
+<li><a href="../439512/index.html">The era of dinosaurs or legally verified reinsurance?</a></li>
+<li><a href="../439516/index.html">00110001 00110100 00101110 00110000 00110010</a></li>
+<li><a href="../439524/index.html">Fortnite is the future, but for rather unexpected reasons.</a></li>
+<li><a href="../439526/index.html">Telecom operators will conduct a "field test" of the law on the stability of the Runet</a></li>
+<li><a href="../439532/index.html">What's new in javascript ES2019</a></li>
+<li><a href="../439534/index.html">Yield programming and the use of drones in oil production - 10 lectures from the conference GIS Tech Russia</a></li>
+<li><a href="../439538/index.html">Community programming</a></li>
+<li><a href="../439540/index.html">Etherblade.net - opensource project to create an ethernet traffic encapsulator on FPGA (part one)</a></li>
+<li><a href="../439542/index.html">Nintendo makes it clear that only piracy can save the history of video games</a></li>
+<li><a href="../439544/index.html">The colony. Chapter 24: Departure</a></li>
+<li><a href="../439556/index.html">TDMS Fairway. Methods PMBOK and Russian design organizations</a></li>
+<li><a href="../439558/index.html">New old phone. Reinvent the PSTN phone</a></li>
+<li><a href="../439560/index.html">The adapter for working with the blockchain Ethereum for the InterSystems IRIS data platform</a></li>
+<li><a href="../439562/index.html">Configure the Kubernetes HA cluster on bare metal with kubeadm. Part 1/3</a></li>
+<li><a href="../439564/index.html">Practical application of transformation of AST-trees on the example of Putout</a></li>
+<li><a href="../439566/index.html">Why SRE is important documentation. Part 3</a></li>
+<li><a href="../439568/index.html">QLC based SSD - hard drive killer? Not really</a></li>
+<li><a href="../439572/index.html">Automated design of electronic equipment</a></li>
+<li><a href="../439576/index.html">Extensive review of Python interviews. Hints and Tips</a></li>
+<li><a href="../439578/index.html">On the issue of transformations and other operations</a></li>
+<li><a href="../439584/index.html">Project Lenergy, how to rethink portable power sources</a></li>
+<li><a href="../439586/index.html">SPBm protocol as the basis of Extreme Automated Campus</a></li>
+<li><a href="../439588/index.html">ESET has discovered new versions of the DanaBot Trojan.</a></li>
+<li><a href="../439590/index.html">Quals: Saudi and Oman National Cyber ​​Security CTF 2019. WriteUp</a></li>
+<li><a href="../439592/index.html">Ethical Activity Automation</a></li>
+<li><a href="../439596/index.html">How I accelerated image processing on Android 15 times</a></li>
+<li><a href="../439598/index.html">Microsoft told about the cost of paid support for Windows 7</a></li>
+<li><a href="../439600/index.html">Finland summed up the preliminary results of the experiment with a guaranteed basic income</a></li>
+<li><a href="../439604/index.html">How does the barcode work?</a></li>
+<li><a href="../439606/index.html">Experimental production of electronics for the minimum price</a></li>
+<li><a href="../439608/index.html">Modern religion: what do people give to Google, Facebook, Amazon and Apple?</a></li>
+<li><a href="../439610/index.html">As in my Chevrolet Bolt electric car, under warranty, two battery modules were replaced, and the third was monitored</a></li>
+<li><a href="../439616/index.html">The digest of interesting IT projects on Kickstarter №7</a></li>
+<li><a href="../439618/index.html">PHP for beginners. File attachment</a></li>
+<li><a href="../439620/index.html">Understanding asynchronous JavaScript [Translated by Sukhjinder Arora]</a></li>
+<li><a href="../439624/index.html">Why keep data in orbit</a></li>
+<li><a href="../439626/index.html">Experience developing a free application for collectors OpenNumismat</a></li>
+<li><a href="../439628/index.html">Parallel data update in ASP.NET Web API</a></li>
+<li><a href="../439632/index.html">How to set up Continuous Deployment for your project: personal experience</a></li>
+<li><a href="../439636/index.html">The crisis of the concepts of improving road safety and a new concept of its solution</a></li>
+<li><a href="../439638/index.html">Getting FPGA to Python</a></li>
+<li><a href="../439640/index.html">Vinyl is back and it's different</a></li>
+<li><a href="../439642/index.html">Java pitfalls. Part 1</a></li>
+<li><a href="../439644/index.html">Anti-Aging: Senolithics and Stem Cell Therapy</a></li>
+<li><a href="../439646/index.html">Holding SoftBank sold a stake in Nvidia due to the fall in their prices, but still earned $ 3.3 billion</a></li>
+<li><a href="../439648/index.html">Internal and nested java classes. Part 1</a></li>
+<li><a href="../439652/index.html">How to transport your startup to the USA: 4 important steps</a></li>
+<li><a href="../439654/index.html">Full immersion: how do we cool ASIC chips in Bitfury</a></li>
+<li><a href="../439656/index.html">C # character calculator</a></li>
+<li><a href="../439676/index.html">Integration of React Native and C ++ for iOS and Android</a></li>
+<li><a href="../439680/index.html">About 50% of Russians are ready to sell their personal data</a></li>
+<li><a href="../439682/index.html">Training Cisco 200-125 CCNA v3.0. Cisco Certified Network Specialist (CCNA). Day 4. Gateway devices</a></li>
+<li><a href="../439686/index.html">Flickr introduces new rules regarding the number of photos and videos users.</a></li>
+<li><a href="../439688/index.html">Overview of AI & ML solutions in 2018 and forecasts for 2019: Part 1 - NLP, Computer Vision</a></li>
+<li><a href="../439690/index.html">Virtual machine performance comparison of 6 cloud platforms: Selectel, MCS, Ya.Oblako, Google Cloud, AWS and Azure</a></li>
+<li><a href="../439692/index.html">AT & T sued for changing the network icon from 4G to 5G E</a></li>
+<li><a href="../439694/index.html">Developed smart tissue that reacts to changes in body temperature</a></li>
+<li><a href="../439696/index.html">On the crest of a wave, or “I want to go to the mainstream” - is it worth it?</a></li>
+<li><a href="../439698/index.html">Introduction to programming: a simple 3D shooter from scratch over the weekend, part 1</a></li>
+<li><a href="../439700/index.html">Patent for a board game in Russia</a></li>
+<li><a href="../439704/index.html">From pool request to release. Report Yandex.Taxi</a></li>
+<li><a href="../439706/index.html">BLACK HAT conference. Survival lessons in a 300 Gbps DDOS attack. Part 1</a></li>
+<li><a href="../439710/index.html">Features of creating products for the US market</a></li>
+<li><a href="../439712/index.html">Government procurement: a balance between the Italian strike and the Russian criminal</a></li>
+<li><a href="../439716/index.html">Tails OS or how to protect yourself online</a></li>
+<li><a href="../439718/index.html">Developing Elixir / Phoenix Applications with Docker</a></li>
+<li><a href="../439720/index.html">Introduction to programming: a simple 3D shooter from scratch over the weekend, part 2</a></li>
+<li><a href="../439722/index.html">Effects of SVG filters. Part 2. Outline text with feMorphology</a></li>
+<li><a href="../439724/index.html">Overview of AI & ML solutions in 2018 and forecasts for 2019: Part 2 - Tools and Libraries, AutoML, RL, Ethics in AI</a></li>
+<li><a href="../439726/index.html">Lock-in: truth or fiction?</a></li>
+<li><a href="../439728/index.html">Setting up backup and recovery of Zimbra OSE entirely and in separate boxes without using Zextras</a></li>
+<li><a href="../439730/index.html">Organizing reducer through standard class</a></li>
+<li><a href="../439732/index.html">Lazarus - simple animation using the TImageFragment component</a></li>
+<li><a href="../439734/index.html">We deploy Kubernetes on the desktop in minutes with MicroK8s</a></li>
+<li><a href="../439736/index.html">IPSec VPN connection between MikroTik and Kerio Control</a></li>
+<li><a href="../439746/index.html">Understand the promises in javascript</a></li>
+<li><a href="../439748/index.html">The digest of interesting materials for the mobile developer # 285 (February 4 - 10)</a></li>
+<li><a href="../439750/index.html">Learn product management - where?</a></li>
+<li><a href="../439752/index.html">Multicore MRI Method</a></li>
+<li><a href="../439754/index.html">Google is going to be engaged in the development of smart watches</a></li>
+<li><a href="../439756/index.html">Why do I need a thermo-acoustic generator?</a></li>
+<li><a href="../439760/index.html">Engineers "twisted" the light in the fiber - a new technology will speed up the transfer of data a hundred times</a></li>
+<li><a href="../439764/index.html">Corporate fruit</a></li>
+<li><a href="../439772/index.html">Writing Unit Tests on Swift for Verifying Asynchronous Tasks</a></li>
+<li><a href="../439778/index.html">The digest of fresh materials from the world of the frontend for the last week No. 351 (February 4 - 10, 2019)</a></li>
+<li><a href="../439780/index.html">PHP Digest number 149 (January 28 - February 11, 2019)</a></li>
+<li><a href="../439782/index.html">Headless CMS - the future of content management</a></li>
+<li><a href="../439784/index.html">Methane engine "Raptor" broke the record RD-180</a></li>
+<li><a href="../439788/index.html">Regular oddities in the GOST Grasshopper and Stribog algorithms</a></li>
+<li><a href="../439790/index.html">Test JaCarta WebClient or store tokens in a safe</a></li>
+<li><a href="../439792/index.html">NASA is looking for partners in the American industry to create a partially reusable manned lender</a></li>
+<li><a href="../439794/index.html">Back pain - understanding from the perspective of modern medicine</a></li>
+<li><a href="../439796/index.html">Spring Boot 2: what is not written in release notes</a></li>
+<li><a href="../439800/index.html">RISEX and Julia. 5 stages of love customer and designer</a></li>
+<li><a href="../439806/index.html">Valid SSL domain names for local Docker containers</a></li>
+<li><a href="../439808/index.html">The biggest telescopes. From a notebook and eyes to 340 megapixel cameras and data centers. Part 1</a></li>
+<li><a href="../439810/index.html">Get acquainted with the Moleculer microservice framework</a></li>
+<li><a href="../439816/index.html">Practical blockchain in business</a></li>
+<li><a href="../439818/index.html">Features of approaches to design in the real manufacturing sector</a></li>
+<li><a href="../439820/index.html">We are trying to write a project alone. Introduction</a></li>
+<li><a href="../439822/index.html">Creating an alternative display for the Ensoniq EPS16 + and ASR10 synthesizer / sampler</a></li>
+<li><a href="../439824/index.html">When will the JavaScript frameworks disappear?</a></li>
+<li><a href="../439826/index.html">Disable analog. What will happen to the TV?</a></li>
+<li><a href="../439828/index.html">The network appeared "analog" Findface</a></li>
+<li><a href="../439840/index.html">Conference DUMP-2019: we invite you to speak in the sections Design, Management and Testing</a></li>
+<li><a href="../439852/index.html">Remote control application release: Aspia 1.1.0</a></li>
+<li><a href="../439858/index.html">Prometheus + Grafana + Node Exporter + Docker in Azure with notifications in Telegram</a></li>
+<li><a href="../439862/index.html">Digital events in Moscow from February 11 to 17</a></li>
+<li><a href="../439866/index.html">Principles of design reference books in 1C Enterprise Management 2 (ERP 2.4.6)</a></li>
+<li><a href="../439868/index.html">Life without Facebook: less radical views, good mood, more time for loved ones. Now proven by science</a></li>
+<li><a href="../439878/index.html">Creation of architecture for a new high-load startup in 2019</a></li>
+<li><a href="../439880/index.html">Security Week 07: Local IoT Device Vulnerabilities</a></li>
+<li><a href="../439886/index.html">How I trained the neural network to implement the position estimation function on the Russian AI Cup CodeBall 2018</a></li>
+<li><a href="../439894/index.html">How easy it is to monitor the site</a></li>
+<li><a href="../439900/index.html">Julia and the method of coordinate descent</a></li>
+<li><a href="../439902/index.html">Explaining the physical essence of the Wing Lift phenomenon without using the Bernouli equation. Part 2</a></li>
+<li><a href="../439906/index.html">Critical vulnerability in Zemana products and not only</a></li>
+<li><a href="../439908/index.html">Kohl, piss off ... Coax</a></li>
+<li><a href="../439912/index.html">Unsolved mystery of view</a></li>
+<li><a href="../439916/index.html">Unpacking: Dridex bootloader</a></li>
+<li><a href="../439922/index.html">Taxation of IP in Kazakhstan how to be a freelancer?</a></li>
+<li><a href="../439924/index.html">The volume of parcels from foreign online stores grew by 25%</a></li>
+</ul></nav>
+</section>
+<script src="../../js/main.js"></script>
+
+<!-- Yandex.Metrika counter -->
+<script type="text/javascript" >
+  (function (d, w, c) {
+      (w[c] = w[c] || []).push(function() {
+          try {
+              w.yaCounter52319614 = new Ya.Metrika({
+                  id:52319614,
+                  clickmap:true,
+                  trackLinks:true,
+                  accurateTrackBounce:true,
+                  webvisor:true
+              });
+          } catch(e) { }
+      });
+
+      var n = d.getElementsByTagName("script")[0],
+          s = d.createElement("script"),
+          f = function () { n.parentNode.insertBefore(s, n); };
+      s.type = "text/javascript";
+      s.async = true;
+      s.src = "https://mc.yandex.ru/metrika/watch.js";
+
+      if (w.opera == "[object Opera]") {
+          d.addEventListener("DOMContentLoaded", f, false);
+      } else { f(); }
+  })(document, window, "yandex_metrika_callbacks");
+</script>
+<noscript><div><img src="https://mc.yandex.ru/watch/52319614" style="position:absolute; left:-9999px;" alt="" /></div></noscript>
+
+<!-- Google Analytics -->
+  <script>
+    window.ga = function () { ga.q.push(arguments) }; ga.q = []; ga.l = +new Date;
+    ga('create', 'UA-134228602-1', 'auto'); ga('send', 'pageview')
+  </script>
+  <script src="https://www.google-analytics.com/analytics.js" async defer></script>
+
+</section>
+</body>
+
+</html>

@@ -1,0 +1,1 @@
+Configure the Kubernetes HA cluster on bare metal with kubeadm. Part 1/3

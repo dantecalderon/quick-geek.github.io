@@ -1,0 +1,1 @@
+Unobvious RabbitMQ in Yii2 or why RabbitMQ writes to all queues at once

@@ -1,0 +1,1 @@
+How I abandoned Ruby in favor of Python, working on a backend

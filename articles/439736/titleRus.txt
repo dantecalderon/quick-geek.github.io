@@ -1,0 +1,1 @@
+IPSec VPN-соединение между MikroTik и Kerio Control

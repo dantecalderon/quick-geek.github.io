@@ -1,0 +1,1 @@
+Effects of SVG filters. Part 2. Outline text with feMorphology

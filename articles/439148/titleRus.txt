@@ -1,0 +1,1 @@
+Работа с nRF51822 с помощью ST-Link и связки Clion + OpenOCD

@@ -1,0 +1,1 @@
+Situation: a new wave of attacks with the interception of DNS queries - we analyze the basic methods of protection

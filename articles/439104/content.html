@@ -1,0 +1,214 @@
+<div class="post__text post__text-html js-mediator-article">  I have already had the <a href="https://github.com/reduxjs/redux">opportunity to</a> look into the <a href="https://github.com/reduxjs/redux">redux</a> library <a href="https://github.com/reduxjs/redux">repository</a> , but from somewhere there was an idea to go deeper into its implementation.  In a way, I’d like to share my shocking or even disappointing discovery with the community. <br><br>  <b>TL; DR: the</b> redux basic logic is placed in 7 lines of JS code. <br><br>  About redux in brief (free translation of the github header): <br><blockquote>  Redux is a state management library for applications written in JavaScript. <br><br>  It helps to write applications that behave stably / predictably, work on different environments (client / server / native code) and are easily testable. </blockquote>  I <a href="https://github.com/reduxjs/redux">cloned the redux repository</a> , opened the source folder in the editor (ignoring <u>docs</u> , <u>examples</u> , etc.) and took the Delete key to the <s>scissors</s> : <br><br><ul><li>  <b>Removed all comments from code</b> <br>  Each library method is documented with JSDoc in great detail. <br></li><li>  <b>Removed validation and error logging</b> <br>  In each method, input parameters are tightly controlled with very nice detailed comments to the console. <br></li><li>  <b>Removed <u>bindActionCreators</u> , <u>subscribe</u> , <u>replaceReducer,</u> and <u>observable</u> methods</b> . <br><br>  ... because I could.  Well, or because I was too lazy to write examples for them.  But without corner cases, they are even less interesting than what awaits you ahead. <br></li></ul><br>  And now let's sort out what's left <br><a name="habracut"></a><br><hr><br><h3>  We write redux for 7 lines </h3><br>  All redux basic functionality fits into a tiny file for which hardly anyone will create a github repository :) <br><br><pre><code class="javascript hljs"><span class="hljs-function"><span class="hljs-keyword"><span class="hljs-function"><span class="hljs-keyword">function</span></span></span><span class="hljs-function"> </span><span class="hljs-title"><span class="hljs-function"><span class="hljs-title">createStore</span></span></span><span class="hljs-function">(</span><span class="hljs-params"><span class="hljs-function"><span class="hljs-params">reducer, initialState</span></span></span><span class="hljs-function">) </span></span>{
+    <span class="hljs-keyword"><span class="hljs-keyword">let</span></span> state = initialState
+    <span class="hljs-keyword"><span class="hljs-keyword">return</span></span> {
+        <span class="hljs-attr"><span class="hljs-attr">dispatch</span></span>: <span class="hljs-function"><span class="hljs-params"><span class="hljs-function"><span class="hljs-params">action</span></span></span><span class="hljs-function"> =&gt;</span></span> { state = reducer(state, action) },
+        <span class="hljs-attr"><span class="hljs-attr">getState</span></span>: <span class="hljs-function"><span class="hljs-params"><span class="hljs-function"><span class="hljs-params">()</span></span></span><span class="hljs-function"> =&gt;</span></span> state,
+    }
+}
+</code></pre><br>
+Всё. Да, серьёзно, <b>ВСЁ</b>.<br>
+<br>
+Так устроен redux. 18 страниц вакансий на HeadHunter с поисковым запросом «redux» — люди, которые надеются, что вы разберетесь в 7 строках кода. Всё остальное — синтаксический сахар.<br>
+<br>
+С этими 7 строками уже можно писать TodoApp. Или что угодно. Но мы быстренько перепишем <a href="https://redux.js.org/basics/example">TodoApp</a> из документации к redux.<br>
+<br>
+<pre><code class="javascript hljs"><span class="hljs-comment"><span class="hljs-comment">// Инициализация хранилища</span></span>
+<span class="hljs-function"><span class="hljs-keyword"><span class="hljs-function"><span class="hljs-keyword">function</span></span></span><span class="hljs-function"> </span><span class="hljs-title"><span class="hljs-function"><span class="hljs-title">todosReducer</span></span></span><span class="hljs-function">(</span><span class="hljs-params"><span class="hljs-function"><span class="hljs-params">state, action</span></span></span><span class="hljs-function">) </span></span>{
+  <span class="hljs-keyword"><span class="hljs-keyword">switch</span></span> (action.type) {
+    <span class="hljs-keyword"><span class="hljs-keyword">case</span></span> <span class="hljs-string"><span class="hljs-string">'ADD_TODO'</span></span>:
+      <span class="hljs-keyword"><span class="hljs-keyword">return</span></span> [
+        ...state,
+        {
+          <span class="hljs-attr"><span class="hljs-attr">id</span></span>: action.id,
+          <span class="hljs-attr"><span class="hljs-attr">text</span></span>: action.text,
+          <span class="hljs-attr"><span class="hljs-attr">completed</span></span>: <span class="hljs-literal"><span class="hljs-literal">false</span></span>
+        }
+      ]
+    <span class="hljs-keyword"><span class="hljs-keyword">case</span></span> <span class="hljs-string"><span class="hljs-string">'TOGGLE_TODO'</span></span>:
+      <span class="hljs-keyword"><span class="hljs-keyword">return</span></span> state.map(<span class="hljs-function"><span class="hljs-params"><span class="hljs-function"><span class="hljs-params">todo</span></span></span><span class="hljs-function"> =&gt;</span></span> {
+        <span class="hljs-keyword"><span class="hljs-keyword">if</span></span> (todo.id === action.id) {
+          <span class="hljs-keyword"><span class="hljs-keyword">return</span></span> { ...todo, <span class="hljs-attr"><span class="hljs-attr">completed</span></span>: !todo.completed }
+        }
+        <span class="hljs-keyword"><span class="hljs-keyword">return</span></span> todo
+      })
+    <span class="hljs-keyword"><span class="hljs-keyword">default</span></span>:
+      <span class="hljs-keyword"><span class="hljs-keyword">return</span></span> state
+  }
+}
+
+<span class="hljs-keyword"><span class="hljs-keyword">const</span></span> initialTodos = []
+
+<span class="hljs-keyword"><span class="hljs-keyword">const</span></span> store = createStore(todosReducer, initialTodos)
+
+<span class="hljs-comment"><span class="hljs-comment">// Использование</span></span>
+store.dispatch({
+  <span class="hljs-attr"><span class="hljs-attr">type</span></span>: <span class="hljs-string"><span class="hljs-string">'ADD_TODO'</span></span>,
+  <span class="hljs-attr"><span class="hljs-attr">id</span></span>: <span class="hljs-number"><span class="hljs-number">1</span></span>,
+  <span class="hljs-attr"><span class="hljs-attr">text</span></span>: <span class="hljs-string"><span class="hljs-string">'Понять насколько redux прост'</span></span>
+})
+
+store.getState() 
+<span class="hljs-comment"><span class="hljs-comment">// [{ id: 1, text: 'Понять насколько redux прост', completed: false }]</span></span>
+
+store.dispatch({
+  <span class="hljs-attr"><span class="hljs-attr">type</span></span>: <span class="hljs-string"><span class="hljs-string">'TOGGLE_TODO'</span></span>,
+  <span class="hljs-attr"><span class="hljs-attr">id</span></span>: <span class="hljs-number"><span class="hljs-number">1</span></span>
+})
+
+store.getState() 
+<span class="hljs-comment"><span class="hljs-comment">// [{ id: 1, text: 'Понять насколько redux прост', completed: true }]</span></span>
+</code></pre><br>
+Уже на этом этапе я думал бросить микрофон со сцены и уйти, но <i>show must go on</i>.<br>
+Давайте посмотрим, как устроен метод.<br>
+<br>
+<h3>combineReducers</h3><br>
+Это метод, который позволяет вместо того, чтобы создавать один огромный reducer для всего состояния приложения сразу, разбивать его на отдельные модули.<br>
+<br>
+Используется он так:<br>
+<br>
+<pre><code class="javascript hljs"><span class="hljs-comment"><span class="hljs-comment">// здесь мы переиспользуем метод todosReducer из прошлого примера</span></span>
+
+<span class="hljs-function"><span class="hljs-keyword"><span class="hljs-function"><span class="hljs-keyword">function</span></span></span><span class="hljs-function"> </span><span class="hljs-title"><span class="hljs-function"><span class="hljs-title">counterReducer</span></span></span><span class="hljs-function">(</span><span class="hljs-params"><span class="hljs-function"><span class="hljs-params">state, action</span></span></span><span class="hljs-function">) </span></span>{
+  <span class="hljs-keyword"><span class="hljs-keyword">if</span></span> (action.type === <span class="hljs-string"><span class="hljs-string">'ADD'</span></span>) {
+    <span class="hljs-keyword"><span class="hljs-keyword">return</span></span> state + <span class="hljs-number"><span class="hljs-number">1</span></span>
+  } <span class="hljs-keyword"><span class="hljs-keyword">else</span></span> {
+    <span class="hljs-keyword"><span class="hljs-keyword">return</span></span> state
+  }
+}
+
+<span class="hljs-keyword"><span class="hljs-keyword">const</span></span> reducer = combineReducers({
+  <span class="hljs-attr"><span class="hljs-attr">todoState</span></span>: todoReducer,
+  <span class="hljs-attr"><span class="hljs-attr">counterState</span></span>: counterReducer
+})
+
+<span class="hljs-keyword"><span class="hljs-keyword">const</span></span> initialState = {
+  <span class="hljs-attr"><span class="hljs-attr">todoState</span></span>: [],
+  <span class="hljs-attr"><span class="hljs-attr">counterState</span></span>: <span class="hljs-number"><span class="hljs-number">0</span></span>,
+}
+
+<span class="hljs-keyword"><span class="hljs-keyword">const</span></span> store = createStore(reducer, initialState)
+</code></pre><br>
+Дальше использовать этот store можно так же, как предыдущий.<br>
+<br>
+Разница моего примера и описанного в той же документации к <a href="https://redux.js.org/basics/example">TodoApp</a> довольно забавная.<br>
+<br>
+В документации используют модный синтаксис из ES6 (7/8/∞):<br>
+<br>
+<pre><code class="javascript hljs"><span class="hljs-keyword"><span class="hljs-keyword">const</span></span> reducer = combineReducers({ todos, counter })
+</code></pre><br>
+и соответственно переименовывают todoReducer в todos и counterReducer в counter. И многие в своём коде делают то же самое. В итоге разницы нет, но для человека, знакомящегося с redux, с первого раза эта штука выглядит магией, потому что ключ части состояния <i>(state.todos) </i>соответствует функции, названной также только по желанию разработчика <i>(function todos(){})</i>.<br>
+<br>
+Если бы нам нужно было написать такой функционал на нашем micro-redux, мы бы сделали так:<br>
+<br>
+<pre><code class="javascript hljs"><span class="hljs-function"><span class="hljs-keyword"><span class="hljs-function"><span class="hljs-keyword">function</span></span></span><span class="hljs-function"> </span><span class="hljs-title"><span class="hljs-function"><span class="hljs-title">reducer</span></span></span><span class="hljs-function">(</span><span class="hljs-params"><span class="hljs-function"><span class="hljs-params">state, action</span></span></span><span class="hljs-function">) </span></span>{
+  <span class="hljs-keyword"><span class="hljs-keyword">return</span></span> {
+    <span class="hljs-attr"><span class="hljs-attr">todoState</span></span>: todoReducer(state, action),
+    <span class="hljs-attr"><span class="hljs-attr">counterState</span></span>: counterReducer(state, action),
+  }
+}
+</code></pre><br>
+Этот код плохо масштабируется. Если у нас 2 «под-состояния», нам нужно дважды написать <b>(state, action)</b>, а хорошие программисты так не делают<i>, правда?</i><br>
+<blockquote>В следующем примере от вас ожидается, что вы не испугаетесь метода <a href="https://developer.mozilla.org/ru/docs/Web/JavaScript/Reference/Global_Objects/Object/entries">Object.entries</a> и <a href="https://developer.mozilla.org/ru/docs/Web/JavaScript/Reference/Operators/Destructuring_assignment">Деструктуризации параметров функции</a></blockquote> Однако реализация метода combineReducers довольно простая (напоминаю, это если убрать валидацию и вывод ошибок) <sub>и самую малость отрефакторить на свой вкус</sub>:<br>
+<br>
+<pre><code class="javascript hljs"><span class="hljs-function"><span class="hljs-keyword"><span class="hljs-function"><span class="hljs-keyword">function</span></span></span><span class="hljs-function"> </span><span class="hljs-title"><span class="hljs-function"><span class="hljs-title">combineReducers</span></span></span><span class="hljs-function">(</span><span class="hljs-params"><span class="hljs-function"><span class="hljs-params">reducersMap</span></span></span><span class="hljs-function">) </span></span>{
+  <span class="hljs-keyword"><span class="hljs-keyword">return</span></span> <span class="hljs-function"><span class="hljs-keyword"><span class="hljs-function"><span class="hljs-keyword">function</span></span></span><span class="hljs-function"> </span><span class="hljs-title"><span class="hljs-function"><span class="hljs-title">combinationReducer</span></span></span><span class="hljs-function">(</span><span class="hljs-params"><span class="hljs-function"><span class="hljs-params">state, action</span></span></span><span class="hljs-function">) </span></span>{
+    <span class="hljs-keyword"><span class="hljs-keyword">const</span></span> nextState = {}
+    <span class="hljs-built_in"><span class="hljs-built_in">Object</span></span>.entries(reducersMap).forEach(<span class="hljs-function"><span class="hljs-function">(</span><span class="hljs-params"><span class="hljs-function"><span class="hljs-params">[key, reducer]</span></span></span><span class="hljs-function">) =&gt;</span></span> {
+      nextState[key] = reducer(state[key], action)
+    })
+    <span class="hljs-keyword"><span class="hljs-keyword">return</span></span> nextState
+  }
+}
+</code></pre><br>
+Мы добавили к нашему детёнышу redux ещё 9 строк и массу удобства.<br>
+<br>
+Перейдём к ещё одной важной фиче, которая кажется слишком сложной, чтобы пройти мимо неё.<br>
+<br>
+<h3>applyMiddleware</h3><br>
+middleware в разрезе redux — это какая-то штука, которая слушает все dispatch и при определенных условиях делает <i>что-то</i>. Логирует, проигрывает звуки, делает запросы к серверу,… — <i>что-то</i>.<br>
+<br>
+В оригинальном коде middleware передаются как дополнительные параметры в createStore, но если не жалеть лишнюю строчку кода, то использование этого функционала выглядит так:<br>
+<br>
+<pre><code class="javascript hljs"><span class="hljs-keyword"><span class="hljs-keyword">const</span></span> createStoreWithMiddleware = applyMiddleware(someMiddleware)(createStore)
+<span class="hljs-keyword"><span class="hljs-keyword">const</span></span> store = createStoreWithMiddleware(reducer, initialState)
+</code></pre><br>
+При этом реализация метода applyMiddleware, когда ты потратишь 10 минут на ковыряние в чужом коде, сводится к очень простой вещи: createStore возвращает объект с полем «dispatch». dispatch, как мы помним (не помним) из первого листинга кода, — это функция, которая всего лишь применяет редюсер к нашему текущему состоянию (newState = reducer(state, action)). <br>
+Так вот applyMiddleware не более чем переопределяет метод <b>dispatch</b>, добавляя перед (или после) обновлением состояния какую-то пользовательскую логику. <br>
+<br>
+Возьмём, например, самый популярный middleware от создателей redux — <a href="https://github.com/reduxjs/redux-thunk">redux-thunk</a><br>
+<br>
+Его смысл сводится к тому, что можно делать не только <br>
+<br>
+<pre><code class="javascript hljs">store.dispatch({<span class="hljs-attr"><span class="hljs-attr">type</span></span>: <span class="hljs-string"><span class="hljs-string">'SOME_ACTION_TYPE'</span></span>, <span class="hljs-attr"><span class="hljs-attr">some_useful_data</span></span>: <span class="hljs-number"><span class="hljs-number">1</span></span> })</code></pre><br>
+но и передавать в store.dispatch сложные функции<br>
+<br>
+<pre><code class="javascript hljs"><span class="hljs-function"><span class="hljs-keyword"><span class="hljs-function"><span class="hljs-keyword">function</span></span></span><span class="hljs-function"> </span><span class="hljs-title"><span class="hljs-function"><span class="hljs-title">someStrangeAction</span></span></span><span class="hljs-function">(</span><span class="hljs-params"></span><span class="hljs-function"><span class="hljs-params"></span>) </span></span>{
+  <span class="hljs-keyword"><span class="hljs-keyword">return</span></span> <span class="hljs-keyword"><span class="hljs-keyword">async</span></span> <span class="hljs-function"><span class="hljs-keyword"><span class="hljs-function"><span class="hljs-keyword">function</span></span></span><span class="hljs-function">(</span><span class="hljs-params"><span class="hljs-function"><span class="hljs-params">dispatch, getState</span></span></span><span class="hljs-function">) </span></span>{
+    <span class="hljs-keyword"><span class="hljs-keyword">if</span></span>(getState().counterState % <span class="hljs-number"><span class="hljs-number">2</span></span>) {
+       dispatch({
+         <span class="hljs-attr"><span class="hljs-attr">type</span></span>: <span class="hljs-string"><span class="hljs-string">'ADD'</span></span>,
+       })
+    }
+    <span class="hljs-keyword"><span class="hljs-keyword">await</span></span> <span class="hljs-keyword"><span class="hljs-keyword">new</span></span> <span class="hljs-built_in"><span class="hljs-built_in">Promise</span></span>(<span class="hljs-function"><span class="hljs-params"><span class="hljs-function"><span class="hljs-params">resolve</span></span></span><span class="hljs-function"> =&gt;</span></span> setTimeout(resolve, <span class="hljs-number"><span class="hljs-number">1000</span></span>))
+    dispatch({
+      <span class="hljs-attr"><span class="hljs-attr">type</span></span>: <span class="hljs-string"><span class="hljs-string">'TOGGLE_TODO'</span></span>,
+      <span class="hljs-attr"><span class="hljs-attr">id</span></span>: <span class="hljs-number"><span class="hljs-number">1</span></span>
+    })
+  }
+}
+</code></pre><br>
+И теперь, когда мы выполним команду<br>
+<br>
+<pre><code class="javascript hljs">dispatch(someStrangeAction())
+</code></pre><br>
+то:<br>
+<br>
+<ul>
+<li>если значение store.getState().counterState не делится на 2, оно увеличится на 1</li>
+<li>через секунду после вызова нашего метода, todo с id=1 переключит completed true на false или наоборот.</li>
+</ul><br>
+Итак, я залез в репозиторий redux-thunk, и сделал то же самое что и с redux — удалил комментарии и параметры, которые расширяют базовый функционал, но не изменяют основной<br>
+<br>
+Получилось следующее:<br>
+<br>
+<pre><code class="javascript hljs"><span class="hljs-keyword"><span class="hljs-keyword">const</span></span> thunk = <span class="hljs-function"><span class="hljs-params"><span class="hljs-function"><span class="hljs-params">store</span></span></span><span class="hljs-function"> =&gt;</span></span> dispatch =&gt; <span class="hljs-function"><span class="hljs-params"><span class="hljs-function"><span class="hljs-params">action</span></span></span><span class="hljs-function"> =&gt;</span></span> {
+  <span class="hljs-keyword"><span class="hljs-keyword">if</span></span> (<span class="hljs-keyword"><span class="hljs-keyword">typeof</span></span> action === <span class="hljs-string"><span class="hljs-string">'function'</span></span>) {
+    <span class="hljs-keyword"><span class="hljs-keyword">return</span></span> action(store.dispatch, store.getState)
+  }
+  <span class="hljs-keyword"><span class="hljs-keyword">return</span></span> dispatch(action)
+}
+</code></pre><br>
+я понимаю, что конструкция <pre>const thunk = store =&gt; dispatch =&gt; action</pre> выглядит жутковато, но её тоже просто нужно вызвать пару раз с произвольными параметрами и вы осознаете, что всё не так страшно, это просто функция, возвращающая функцию, возвращающую функцию (ладно, согласен, страшно)<br>
+<br>
+Напомню, оригинальный метод <b>createStore</b> выглядел так<br>
+<br>
+<pre><code class="javascript hljs"><span class="hljs-function"><span class="hljs-keyword"><span class="hljs-function"><span class="hljs-keyword">function</span></span></span><span class="hljs-function"> </span><span class="hljs-title"><span class="hljs-function"><span class="hljs-title">createStore</span></span></span><span class="hljs-function">(</span><span class="hljs-params"><span class="hljs-function"><span class="hljs-params">reducer, initialState</span></span></span><span class="hljs-function">) </span></span>{
+    <span class="hljs-keyword"><span class="hljs-keyword">let</span></span> state = initialState
+    <span class="hljs-keyword"><span class="hljs-keyword">return</span></span> {
+        <span class="hljs-attr"><span class="hljs-attr">dispatch</span></span>: <span class="hljs-function"><span class="hljs-params"><span class="hljs-function"><span class="hljs-params">action</span></span></span><span class="hljs-function"> =&gt;</span></span> { state = reducer(state, action) },
+        <span class="hljs-attr"><span class="hljs-attr">getState</span></span>: <span class="hljs-function"><span class="hljs-params"><span class="hljs-function"><span class="hljs-params">()</span></span></span><span class="hljs-function"> =&gt;</span></span> state,
+    }
+}
+</code></pre><br>
+То есть он принимал атрибуты (reducer, initialState) и возвращал объект с ключами { dispatch, getState }.<br>
+<br>
+Оказалось, что реализовать метод <b>applyMiddleware</b> проще, чем понять, как он работает.<br>
+Мы берём уже реализованный метод <b>createStore</b> и переопределяем его возвращаемое значение:<br>
+<br>
+<pre><code class="javascript hljs"><span class="hljs-function"><span class="hljs-keyword"><span class="hljs-function"><span class="hljs-keyword">function</span></span></span><span class="hljs-function"> </span><span class="hljs-title"><span class="hljs-function"><span class="hljs-title">applyMiddleware</span></span></span><span class="hljs-function">(</span><span class="hljs-params"><span class="hljs-function"><span class="hljs-params">middleware</span></span></span><span class="hljs-function">) </span></span>{
+  <span class="hljs-keyword"><span class="hljs-keyword">return</span></span> <span class="hljs-function"><span class="hljs-keyword"><span class="hljs-function"><span class="hljs-keyword">function</span></span></span><span class="hljs-function"> </span><span class="hljs-title"><span class="hljs-function"><span class="hljs-title">createStoreWithMiddleware</span></span></span><span class="hljs-function">(</span><span class="hljs-params"><span class="hljs-function"><span class="hljs-params">createStore</span></span></span><span class="hljs-function">) </span></span>{
+    <span class="hljs-keyword"><span class="hljs-keyword">return</span></span> <span class="hljs-function"><span class="hljs-function">(</span><span class="hljs-params"><span class="hljs-function"><span class="hljs-params">reducer, state</span></span></span><span class="hljs-function">) =&gt;</span></span> {
+      <span class="hljs-keyword"><span class="hljs-keyword">const</span></span> store = createStore(reducer, state)
+
+      <span class="hljs-keyword"><span class="hljs-keyword">return</span></span> {
+        <span class="hljs-attr"><span class="hljs-attr">dispatch</span></span>: <span class="hljs-function"><span class="hljs-params"><span class="hljs-function"><span class="hljs-params">action</span></span></span><span class="hljs-function"> =&gt;</span></span> middleware(store)(store.dispatch)(action),
+        <span class="hljs-attr"><span class="hljs-attr">getState</span></span>: store.getState,
+      }
+    }
+  }
+}</code></pre><br>
+<h3>Вывод</h3><br>
+Под капотом redux содержатся очень простые логические операции. Операции на уровне «Если бензин в цилиндре загорается, давление увеличивается». А вот то, сможете ли вы построить на этих понятиях болид Формулы 1 — уже решайте сами.<br>
+<br>
+<h3>P.S.</h3><br>
+Для добавления в мой «micro-redux» упрощённого метода store.subscribe потребовалось 8 строк кода. А вам?</div>

@@ -1,0 +1,413 @@
+<!doctype html>
+<html class="no-js" lang="en">
+
+<head>
+  <!-- Global site tag (gtag.js) - Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=UA-134228602-1"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'UA-134228602-1');
+  </script>
+
+  <meta charset="utf-8">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  <title>Kubernetes tutorial, part 1: applications, microservices and containers</title>
+  <meta name="description" content="At our request, Habr created the Kubernetes hub and we are pleased to place the first publication in it. Subscribe! 
+ Kubernetes is easy. Why do banks...">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+  <link rel="stylesheet" href="../../css/main.css">
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+  <script>window.jQuery || document.write('<script src="../../js/vendors/jquery-3.3.1.min.js"><\/script>')</script>
+</head>
+
+<body>
+  <!--[if lte IE 9]>
+    <p class="browserupgrade">You are using an <strong>outdated</strong> browser. Please <a href="https://browsehappy.com/">upgrade your browser</a> to improve your experience and security.</p>
+  <![endif]-->
+  <nav class="page-headings-container js-page-headings-container"></nav>
+  <div class="tools-bar js-tools-bar">
+    <!-- <a href="https://quick-geek.github.io/search.html" title="Search">🔎</a> -->
+    <a class="js-list-of-headings-button" data-state="closed" href="#" title="Headings">📜</a>
+    <a class="js-go-to-top-button" href="#" title="Go to Top">⬆️</a>
+    <a class="js-go-to-bottom-button" href="#" title="Go to Bottom">⬇️</a>
+  </div>
+  <section class="page js-page"><h1>Kubernetes tutorial, part 1: applications, microservices and containers</h1><div class="post__text post__text-html js-mediator-article"><blockquote>  At our request, Habr created the <a href="https://habr.com/hub/kubernetes/">Kubernetes</a> hub and we are pleased to place the first publication in it.  Subscribe! </blockquote><br>  Kubernetes is easy.  Why do banks pay me for working in this area a lot of money, while anyone can master this technology in just a few hours? <br><br> <a href="https://habr.com/ru/company/ruvds/blog/438982/"><img src="https://habrastorage.org/webt/d3/4l/ic/d34licaikjsxfxisetkc9arcpdi.jpeg"></a> <br><a name="habracut"></a><br>  If you doubt that Kubernetes can be explored so quickly - I suggest you try to do it yourself.  Namely, having mastered this material, you will be able to launch an application based on microservices in the Kubernetes cluster.  I can guarantee this, since it is exactly according to the method used here that I teach our clients to work with Kubernetes.  What makes this guide different from others?  In fact - a lot of things.  So, most of these materials begin with an explanation of simple things — Kubernetes concepts and features of the kubectl command.  The authors of these materials assume that their reader is familiar with application development, with microservices and with Docker containers.  We will go the other way.  First, we will talk about how to run an application based on microservices on a computer.  Then we will consider assembly of images of containers for each microservice.  And after that we'll get to know Kubernetes and analyze the deployment of an application based on microservices in a cluster managed by Kubernetes. <br><br>  Such an approach, with a gradual approach to Kubernetes, will give a depth of understanding of what is happening, which is necessary for an ordinary person in order to understand how simple everything is in Kubernetes.  Kubernetes is, of course, a simple technology, provided that those who want to master it know where and how it is used. <br><br>  Now, without further ado, let's get to work and talk about the application with which we will work. <br><br><h2>  <font color="#3AC1EF">Experimental application</font> </h2><br>  Our application will perform only one function.  It accepts, as input, one sentence, after which, using text analysis tools, it performs a sentiment analysis of this sentence, receiving an assessment of the author’s emotional attitude towards an object. <br><br>  Here is the main window of this application. <br><br><div style="text-align:center;"><img src="https://habrastorage.org/getpro/habr/post_images/674/7e1/415/6747e14151585819867c880f52fa9d21.gif"></div><br>  <i><font color="#999999">Web application for analyzing the tonality of texts</font></i> <br><br>  From a technical point of view, the application consists of three microservices, each of which solves a specific set of tasks: <br><br><ul><li>  SA-Frontend is an Nginx web server that serves static React files. </li><li>  SA-WebApp is a web application written in Java that processes requests from the frontend. </li><li>  SA-Logic is a Python application that performs text tone analysis. </li></ul><br>  It is important to note that microservices do not exist in isolation.  They realize the idea of ​​“separation of duties”, but they, at the same time, need to interact with each other. <br><br><div style="text-align:center;"><img src="https://habrastorage.org/getpro/habr/post_images/94b/f93/0c0/94bf930c03220c1eec6957a0f7308046.gif"></div><br>  <i><font color="#999999">Data flows in the application</font></i> <br><br>  In the diagram above, you can see the numbered stages of the system, illustrating the data flows in the application.  Let's sort them out: <br><br><ol><li> The browser requests the server file <code>index.html</code> (which, in turn, downloads the package React-application). </li><li>  The user interacts with the application, this causes a call to a web application based on Spring. </li><li>  The web application redirects the text analysis request to the Python application. </li><li>  The Python application analyzes the text key and returns the result as a response to the request. </li><li>  Spring-application sends the response to the React-application (and, in turn, shows the result of the text analysis to the user). </li></ol><br>  The code for all these applications can be found <a href="https://github.com/rinormaloku/k8s-mastery">here</a> .  I recommend that you copy this repository to yourself right now, as there are many interesting experiments with it ahead of us. <br><br><h2>  <font color="#3AC1EF">Running a microservice based application on a local computer</font> </h2><br>  In order for the application to work, we need to run all three microservices.  Let's start with the cutest of them - with the frontend application. <br><br><h3>  <font color="#3AC1EF">▍Configuring React for Local Development</font> </h3><br>  In order to run the React application, you need to install the Node.js platform and NPM on your computer.  After you have installed all this, go to the <code>sa-frontend</code> project folder and use the following command: <br><br><pre> <code class="plaintext hljs">npm install</code> </pre> <br>  By executing this command, the dependencies of the React-application will be loaded into the <code>node_modules</code> folder, entries for which are in the <code>package.json</code> file.  After the dependencies are loaded in the same folder, execute the following command: <br><br><pre> <code class="plaintext hljs">npm start</code> </pre> <br>  That's all.  Now the React-application is running, you can get access to it by going to <code>localhost:3000</code> in the browser.  You can change something in his code.  You will immediately see the effect of these changes in the browser.  This is possible thanks to the so-called hot-swappable modules.  Thanks to this, front-end development turns into a simple and enjoyable experience. <br><br><h3>  <font color="#3AC1EF">▍Preparation of React-application to the conclusion in the production</font> </h3><br>  In order to actually use the React application, we need to convert it into a set of static files and give them to clients using a web server. <br><br>  To build the React application, again using the terminal, go to the <code>sa-frontend</code> folder and execute the following command: <br><br><pre> <code class="plaintext hljs">npm run build</code> </pre> <br>  This will create a <code>build</code> directory in the project folder.  It will contain all static files necessary for the operation of the React application. <br><br><h3>  <font color="#3AC1EF">▍Service static files using Nginx</font> </h3><br>  First you need to install and run the Nginx web server.  <a href="https://www.nginx.com/resources/wiki/start/topics/tutorials/install/">Here</a> you can download it and find instructions for installing and running.  Then you need to copy the contents of the <code>sa-frontend/build</code> folder to the <code>[your_nginx_installation_dir]/html</code> folder. <br><br>  With this approach, the <code>index.html</code> file generated during the assembly of the React application will be available at <code>[your_nginx_installation_dir]/html/index.html</code> .  This is the file that, by default, the Nginx server issues when accessing it.  The server is configured to listen on port <code>80</code> , but you can configure it as you need by editing the file <code>[your_nginx_installation_dir]/conf/nginx.conf</code> . <br><br>  Now open your browser and go to <code>localhost:80</code> .  You will see the React application page. <br><br><div style="text-align:center;"><img src="https://habrastorage.org/getpro/habr/post_images/a50/b83/f39/a50b83f390ff0434ef817f357a041941.png"></div><br>  <i><font color="#999999">React-application serviced by the server Nginx</font></i> <br><br>  If you enter something now in the <code>Type your sentence</code> field and click the <code>Send</code> button, nothing will happen.  But, if you look at the console, you can see error messages there.  In order to understand exactly where these errors occur, let’s analyze the application code. <br><br><h3>  <font color="#3AC1EF">ФронтAnalysis of front-end application code</font> </h3><br>  Looking at the code of the <code>App.js</code> file, we can see that clicking on the <code>Send</code> button calls the <code>analyzeSentence()</code> method.  The code for this method is shown below.  In this case, note that for each line to which there is a comment like <code># Номер</code> , there is an explanation given below code.  In the same way, we will parse other code fragments. <br><br><pre> <code class="plaintext hljs">analyzeSentence() {   fetch('http://localhost:8080/sentiment', {  // #1       method: 'POST',       headers: {           'Content-Type': 'application/json'       },       body: JSON.stringify({                      sentence: this.textField.getValue()})// #2   })       .then(response =&gt; response.json())       .then(data =&gt; this.setState(data));  // #3 }</code> </pre> <br>  <b>1. The</b> URL for the POST request.  It is implied that at this address there is an application waiting for such requests. <br><br>  <b>2.</b> The request body sent to the application.  Here is an example of the request body: <br><br><pre> <code class="plaintext hljs">{   sentence: "I like yogobella!" }</code> </pre> <br>  <b>3.</b> Upon receiving a response to the request, the status of the component is updated.  This causes the component to be re-rendered.  If we receive data (that is, a JSON object containing the data entered and the calculated text estimate), we will derive the <code>Polarity</code> component, since the corresponding conditions will be met.  Here is how we describe the component: <br><br><pre> <code class="plaintext hljs">const polarityComponent = this.state.polarity !== undefined ?   &lt;Polarity sentence={this.state.sentence}             polarity={this.state.polarity}/&gt; :   null;</code> </pre> <br>  The code, it seems, looks quite workable.  What is wrong here, after all?  If you assume that at the address to which the application tries to send a POST request, as long as there is nothing that can accept and process this request, then you will be absolutely right.  Namely, to handle requests coming in at <code>http://localhost:8080/sentiment</code> , we need to run a web application based on Spring. <br><br><div style="text-align:center;"><img src="https://habrastorage.org/getpro/habr/post_images/848/f16/5a3/848f165a308f9ae73ffd3f8186b23aee.png"></div><br>  <i><font color="#999999">We need a Spring application that can accept a POST request.</font></i> <br><br><h3>  <font color="#3AC1EF">▍Set up a Spring-based Web Application</font> </h3><br>  In order to deploy the Spring application, you need JDK8 and Maven and properly configured environment variables.  After you install all this, you can continue to work on our project. <br><br><h3>  <font color="#3AC1EF">▍ Packing an application in a jar file</font> </h3><br>  Navigate to the <code>sa-webapp</code> folder using the terminal and enter the following command: <br><br><pre> <code class="plaintext hljs">mvn install</code> </pre> <br>  After executing this command, the <code>target</code> directory will be created in the <code>sa-webapp</code> folder.  There will be a Java application packed in a jar file represented by the <code>sentiment-analysis-web-0.0.1-SNAPSHOT.jar</code> file. <br><br><h3>  <font color="#3AC1EF">▍ Start Java application</font> </h3><br>  Go to the <code>target</code> folder and start the application with the following command: <br><br><pre> <code class="plaintext hljs">java -jar sentiment-analysis-web-0.0.1-SNAPSHOT.jar</code> </pre> <br>  An error will occur during the execution of this command.  In order to proceed with its correction, we can analyze the exception information in the stack trace data: <br><br><pre> <code class="plaintext hljs">Error creating bean with name 'sentimentController': Injection of autowired dependencies failed; nested exception is java.lang.IllegalArgumentException: Could not resolve placeholder 'sa.logic.api.url' in value "${sa.logic.api.url}"</code> </pre> <br>  The most important thing for us here is the mention of the impossibility of finding out the meaning of <code>sa.logic.api.url</code> .  Let's analyze the code in which the error occurs. <br><br><h3>  <font color="#3AC1EF">▍A Java Application Code Analysis</font> </h3><br>  Here is the code snippet where the error occurs. <br><br><pre> <code class="plaintext hljs">@CrossOrigin(origins = "*") @RestController public class SentimentController {   @Value("${sa.logic.api.url}")    // #1   private String saLogicApiUrl;   @PostMapping("/sentiment")   public SentimentDto sentimentAnalysis(       @RequestBody SentenceDto sentenceDto)   {       RestTemplate restTemplate = new RestTemplate();       return restTemplate.postForEntity(               saLogicApiUrl + "/analyse/sentiment",    // #2               sentenceDto, SentimentDto.class)               .getBody();   } }</code> </pre> <br><ol><li>  In S <code>entimentController</code> there is a <code>saLogicApiUrl</code> field.  Its value is set by the <code>sa.logic.api.url</code> property. </li><li>  The <code>saLogicApiUrl</code> string <code>saLogicApiUrl</code> concatenated with the value <code>/analyse/sentiment</code> .  Together they form an address for making a request to microservice that performs text analysis. </li></ol><br><h3>  <font color="#3AC1EF">▍Property value setting</font> </h3><br>  In Spring, the standard source for property values ​​is the <code>application.properties</code> file, which can be found at <code>sa-webapp/src/main/resources</code> .  But using it is not the only way to set property values.  This can be done with the help of the following command: <br><br><pre> <code class="plaintext hljs">java -jar sentiment-analysis-web-0.0.1-SNAPSHOT.jar --sa.logic.api.url=WHAT.IS.THE.SA.LOGIC.API.URL</code> </pre> <br>  The value of this property should point to the address of our Python application. <br><br>  By customizing it, we tell the Spring web application where it needs to go in order to perform text analysis requests. <br><br>  In order not to complicate your life, we decide that the Python application will be available at <code>localhost:5000</code> and try not to forget about it.  As a result, the command to start the Spring application will look like this: <br><br><pre> <code class="plaintext hljs">java -jar sentiment-analysis-web-0.0.1-SNAPSHOT.jar --sa.logic.api.url=http://localhost:5000</code> </pre> <br><div style="text-align:center;"><img src="https://habrastorage.org/getpro/habr/post_images/30d/445/815/30d44581533865907366e867c029124e.png"></div><br>  <i><font color="#999999">Our system is missing a Python application.</font></i> <br><br>  Now we just have to start the Python application and the system will work as expected. <br><br><h3>  <font color="#3AC1EF">▍Python application setup</font> </h3><br>  In order to run a Python application, you need to have Python 3 and Pip installed, and you need to set the appropriate environment variables correctly. <br><br><h3>  <font color="#3AC1EF">▍Install dependencies</font> </h3><br>  Navigate to the <code>sa-logic/sa</code> project folder and run the following commands: <br><br><pre> <code class="plaintext hljs">python -m pip install -r requirements.txt python -m textblob.download_corpora</code> </pre> <br><h3>  <font color="#3AC1EF">▍ Start application</font> </h3><br>  After installing the dependencies, we are ready to run the application: <br><br><pre> <code class="plaintext hljs">python sentiment_analysis.py</code> </pre> <br>  After executing this command, we will be told the following: <br><br><pre> <code class="plaintext hljs">* Running on http://0.0.0.0:5000/ (Press CTRL+C to quit)</code> </pre> <br>  This means that the application is running and waiting for requests at <code>localhost:5000/</code> <br><br><h3>  <font color="#3AC1EF">▍ Code Investigation</font> </h3><br>  Consider the Python application code in order to understand how it responds to requests: <br><br><pre> <code class="plaintext hljs">from textblob import TextBlob from flask import Flask, request, jsonify app = Flask(__name__)                                   #1 @app.route("/analyse/sentiment", methods=['POST'])      #2 def analyse_sentiment():   sentence = request.get_json()['sentence']           #3   polarity = TextBlob(sentence).sentences[0].polarity #4   return jsonify(                                     #5       sentence=sentence,       polarity=polarity   ) if __name__ == '__main__':   app.run(host='0.0.0.0', port=5000)                #6</code> </pre> <br><ol><li>  Initializing the <code>Flask</code> object. </li><li>  Setting the address for performing POST requests to it. </li><li>  Extracting the <code>sentence</code> property from the request body. </li><li>  Initialization of an anonymous <code>TextBlob</code> object and getting the <code>polarity</code> value for the first sentence received in the request body (in our case this is the only sentence that is submitted for analysis). </li><li>  Return of the answer, the body of which contains the text of the sentence and the <code>polarity</code> index calculated for it. </li><li>  Launching a Flask application, which will be available at <code>0.0.0.0:5000</code> (you can access it using a <code>localhost:5000</code> type construction). </li></ol><br>  Now microservices of which the application consists are launched.  They are configured to interact with each other.  Here is the diagram of the application at this stage of work. <br><br><div style="text-align:center;"><img src="https://habrastorage.org/getpro/habr/post_images/75a/fcc/135/75afcc1352ed237efaf0a2280c2df295.png"></div><br>  <i><font color="#999999">All microservices of which the application consists are given in a healthy state.</font></i> <br><br>  Now, before continuing, open the React-application in the browser and try to analyze with the help of any proposal.  If everything is done correctly - after clicking on the <code>Send</code> button you will see the analysis results under the text field. <br><br>  In the next section, we will talk about how to run our microservices in Docker containers.  This is necessary in order to prepare the application to run in the Kubernetes cluster. <br><br><h2>  <font color="#3AC1EF">Docker Containers</font> </h2><br>  <a href="https://ru.wikipedia.org/wiki/Kubernetes">Kubernetes</a> is a system for automating the deployment, scaling, and management of containerized applications.  It is also called the “container orchestrator”.  If Kubernetes works with containers, then we need to get these containers first before using this system.  But first, let's talk about what containers are.  Perhaps the best answer to the question of what it is can be found in the Docker <a href="https://www.docker.com/resources/what-container">documentation</a> : <br><br>  <i>A container image is a lightweight, stand-alone, executable package containing an application that includes everything you need to run it: application code, runtime, system tools and libraries, settings.</i>  <i>Containerized programs can be used in Linux and Windows environments, while they will always work the same regardless of infrastructure.</i> <br><br>  This means that containers can be run on any computers, including production servers, and in any environments the applications enclosed in them will work in the same way. <br><br>  In order to explore the features of containers and compare them with other methods of launching applications, consider an example of servicing a React application using a virtual machine and a container. <br><br><h3>  <font color="#3AC1EF">▍Service of static files of a React-application by means of a virtual machine</font> </h3><br>  Trying to organize the maintenance of static files by means of virtual machines, we will encounter the following disadvantages: <br><br><ol><li>  Inefficient use of resources, since each virtual machine is a full-fledged operating system. </li><li>  Platform dependency.  What works on a local computer may well not make money on a production server. </li><li>  Slow and resource-intensive scaling solution based on virtual machines. </li></ol><br><div style="text-align:center;"><img src="https://habrastorage.org/getpro/habr/post_images/c26/927/523/c26927523b6072ce65bfaf8b01a1e330.png"></div><br>  <i><font color="#999999">Nginx web server serving static files running on a virtual machine</font></i> <br><br>  If, however, to solve a similar problem, use containers, then, in comparison with virtual machines, it will be possible to note the following strengths: <br><br><ol><li>  Efficient use of resources: working with the operating system using Docker. </li><li>  Platform independence.  A container that a developer can run on his computer will work anywhere. </li><li>  Lightweight deployment through the use of layers of images. </li></ol><br><div style="text-align:center;"><img src="https://habrastorage.org/getpro/habr/post_images/28b/593/b01/28b593b01ce003c246843d9c9f2bd05f.png"></div><br>  <i><font color="#999999">Nginx web server serving static files running in a container</font></i> <br><br>  We compared virtual machines and containers on only a few points, but even this is enough to feel the strengths of the containers.  Find out more about Docker containers here. <br><br><h3>  <font color="#3AC1EF">▍ Building a Container Image for a React Application</font> </h3><br>  The main building block of the Docker container is the <code>Dockerfile</code> file.  At the beginning of this file, make a record of the base image of the container, then there include a sequence of instructions indicating the order of creation of the container, which will meet the needs of some application. <br><br>  Before we work on the <code>Dockerfile</code> file, let’s recall what we did to prepare the React application files for display on the Nginx server: <br><br><ol><li>  Building a React-application package ( <code>npm run build</code> ). </li><li>  Starting Nginx server. </li><li>  Copying the contents of the <code>build</code> directory from the <code>sa-frontend</code> project folder to the <code>nginx/html</code> server folder. </li></ol><br>  Below you can see the parallels between the creation of the container and the above actions performed on the local computer. <br><br><h3>  <font color="#3AC1EF">▍Preparation of the Dockerfile file for the SA-Frontend application</font> </h3><br>  The instructions that will be contained in the <code>Dockerfile</code> for the <code>SA-Frontend</code> application consist of just two commands.  The fact is that the Nginx development team has prepared a basic <a href="https://hub.docker.com/_/nginx/">image</a> for Nginx, which we will use to create our image.  Here are the two steps we need to describe: <br><br><ol><li>  The basis of the image you need to make an image Nginx. </li><li>  The contents of the <code>sa-frontend/build</code> folder need to be copied to the <code>nginx/html</code> image folder. </li></ol><br>  If you move from this description to the <code>Dockerfile</code> file, then it will look like this: <br><br><pre> <code class="plaintext hljs">FROM nginx COPY build /usr/share/nginx/html</code> </pre> <br>  As you can see, everything is very simple, while the contents of the file even turns out to be quite readable and understandable.  This file tells the system that you need to take a <code>nginx</code> image with everything that already exists in it, and copy the contents of the <code>build</code> directory to the <code>nginx/html</code> directory. <br><br>  Here you may have a question regarding where I know about exactly where I need to copy files from the <code>build</code> folder, that is, where did the path <code>/usr/share/nginx/html</code> come from.  In fact, there is nothing complicated here either.  The fact is that relevant information can be found in the image <a href="https://hub.docker.com/_/nginx/">description</a> . <br><br><h3>  <font color="#3AC1EF">▍ Building the image and loading it into the repository</font> </h3><br>  Before we can work with the ready image, we need to send it to the repository of images.  To do this, we will use the free cloud platform for hosting Docker Hub images.  At this stage you need to do the following: <br><br><ol><li>  Install <a href="https://www.docker.com/community-edition">Docker</a> . </li><li>  Register on the Docker Hub website. </li><li>  Log in to your account by running the following command in the terminal: <br><br><pre> <code class="plaintext hljs">docker login -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD"</code> </pre> </li></ol><br>  Now you need to use the terminal to go to the <code>sa-frontend</code> directory and execute a command of the following form there: <br><br><pre> <code class="plaintext hljs">docker build -f Dockerfile -t $DOCKER_USER_ID/sentiment-analysis-frontend .</code> </pre> <br>  Hereinafter in similar commands <code>$DOCKER_USER_ID</code> you need to replace your username with Docker Hub.  For example, this part of the command might look like this: <code>rinormaloku/sentiment-analysis-frontend</code> . <br><br>  At the same time, this command can be shortened by removing <code>-f Dockerfile</code> from it, since this file already exists in the folder in which we execute this command. <br><br>  In order to send the finished image to the repository, we need the following command: <br><br><pre> <code class="plaintext hljs">docker push $DOCKER_USER_ID/sentiment-analysis-frontend</code> </pre> <br>  After its execution, check the list of your repositories on the Docker Hub in order to understand whether the image has been successfully sent to the cloud storage. <br><br><h3>  <font color="#3AC1EF">▍ Container launch</font> </h3><br>  Now, anyone can download and run an image known as <code>$DOCKER_USER_ID/sentiment-analysis-frontend</code> .  In order to do this, you need to run the following sequence of commands: <br><br><pre> <code class="plaintext hljs">docker pull $DOCKER_USER_ID/sentiment-analysis-frontend docker run -d -p 80:80 $DOCKER_USER_ID/sentiment-analysis-frontend</code> </pre> <br>  Now the container is running, and we can continue to work, creating other images we need.  But, before continuing, let's deal with the <code>80:80</code> construction, which is encountered in the image launch command and may seem confusing. <br><br><ul><li>  The first <code>80</code> is the port number of the host (that is, the local computer). </li><li>  The second number <code>80</code> is the port of the container to which the request should be redirected. </li></ul><br>  Consider the following illustration. <br><br><div style="text-align:center;"><img src="https://habrastorage.org/getpro/habr/post_images/775/394/6cd/7753946cde3287113b82f00921ced889.png"></div><br>  <i><font color="#999999">Port Forwarding</font></i> <br><br>  The system redirects requests from the <code>&lt;hostPort&gt;</code> port to the <code>&lt;containerPort&gt;</code> port.  That is, a call to port <code>80</code> computer is redirected to port <code>80</code> container. <br><br>  Since port <code>80</code> open on the local computer, you can access the application from this computer at <code>localhost:80</code> .  If your system does not support Docker, you can run the application on the Docker virtual machine, whose address will look like <code>&lt;docker-machine ip&gt;:80</code> .  To find out the IP address of the Docker virtual machine, you can use the command <code>docker-machine ip</code> . <br><br>  At this stage, after successfully launching the frontend application container, you should be able to open its page in the browser. <br><br><h3>  <font color="#3AC1EF">.File .dockerignore</font> </h3><br>  Collecting the image of the <code>SA-Frontend</code> application, we may have noticed that this process is extremely slow.  This is because the image assembly context must be sent to the Docker daemon.  The directory that represents the build context is specified by the last argument of the <code>docker build</code> .  In our case, there is a full stop at the end of this command.  This causes the following structure to be included in the build context: <br><br><pre> <code class="plaintext hljs">sa-frontend: |   .dockerignore |   Dockerfile |   package.json |   README.md +---build +---node_modules +---public \---src</code> </pre> <br>  But of all the folders present here, we only need the <code>build</code> folder.  Downloading anything else is a waste of time.  You can speed up the build by pointing Docker to which directories you can ignore.  It is in order to do this, we need the <code>.dockerignore</code> file.  To you, if you are familiar with the <code>.gitignore</code> file, the structure of this file will surely seem familiar.  It lists the directories that the image build system can ignore.  In our case, the contents of this file look like this: <br><br><pre> <code class="plaintext hljs">node_modules src public</code> </pre> <br>  The <code>.dockerignore</code> file must be in the same folder as the <code>Dockerfile</code> file.  Now the image will be assembled in seconds. <br><br> Займёмся теперь образом для Java-приложения. <br><br><h3> <font color="#3AC1EF">▍Сборка образа контейнера для Java-приложения</font> </h3><br> Знаете что, а ведь вы уже изучили всё необходимое для создания образов контейнеров. Именно поэтому данный раздел будет весьма коротким. <br><br> Откройте файл <code>Dockerfile</code> , который находится в папке проекта <code>sa-webapp</code> . Если вы прочтёте текст этого файла, то в нём вам встретятся всего две новые конструкции, начинающиеся с ключевых слов <code>ENV</code> и <code>EXPOSE</code> : <br><br><pre> <code class="plaintext hljs">ENV SA_LOGIC_API_URL http://localhost:5000 … EXPOSE 8080</code> </pre> <br> Ключевое слово <code>ENV</code> позволяет объявлять переменные окружения внутри контейнеров Docker. В частности, в нашем случае оно позволяет задать URL для доступа к API приложения, выполняющего анализ текста. <br><br> Ключевое слово <code>EXPOSE</code> позволяет указать Docker на то, что порт нужно открыть. Мы собираемся пользоваться этим портом в ходе работы с приложением. Тут можно заметить, что в <code>Dockerfile</code> для приложения <code>SA-Frontend</code> такой команды нет. Это нужно лишь для целей документирования, другим словами, эта конструкция предназначена для того, кто будет читать <code>Dockerfile</code> . <br><br> Сборка образа и отправка его в репозиторий выглядит точно так же, как в предыдущем примере. Если же вы пока не очень уверены в своих силах — соответствующие команды можно найти в файле <code>README.md</code> в папке <code>sa-webapp</code> . <br><br><h3> <font color="#3AC1EF">▍Сборка образа контейнера для Python-приложения</font> </h3><br> Если вы взглянете на содержимое файла <code>Dockerfile</code> в папке <code>sa-logic</code> , то ничего нового для себя вы там не найдёте. Команды для сборки образа и отправки его в репозиторий тоже должны быть уже вам знакомы, но их, как и в случае с другими нашими приложениями, можно найти в файле <code>README.md</code> в папке <code>sa-logic</code> . <br><br><h3> <font color="#3AC1EF">▍Тестирование контейнеризированных приложений</font> </h3><br> Можете ли вы доверять чему-то такому, что вы не протестировали? Я тоже не могу. Испытаем наши контейнеры. <br><br><ol><li> Запустим контейнер приложения <code>sa-logic</code> и настроим его на прослушивание порта <code>5050</code> : <br><br><pre> <code class="plaintext hljs">docker run -d -p 5050:5000 $DOCKER_USER_ID/sentiment-analysis-logic</code> </pre> </li><li> Запустим контейнер приложения <code>sa-webapp</code> и настроим его на прослушивание порта <code>8080</code> . Кроме того, нам нужно настроить порт, на котором Python-приложение будет ждать запросы от Java-приложения, переназначив переменную окружения <code>SA_LOGIC_API_URL</code> : <br><br><pre> <code class="plaintext hljs">$ docker run -d -p 8080:8080 -e SA_LOGIC_API_URL='http://&lt;container_ip or docker machine ip&gt;:5000' $DOCKER_USER_ID/sentiment-analysis-web-app</code> </pre> </li></ol><br> Для того чтобы узнать о том, как выяснить IP-адрес контейнера или виртуальной машины Docker — обратитесь к файлу <a href="">README</a> . <br><br> Запустим контейнер приложения <code>sa-frontend</code> : <br><br><pre> <code class="plaintext hljs">docker run -d -p 80:80 $DOCKER_USER_ID/sentiment-analysis-frontend</code> </pre> <br> Теперь всё готово к тому, чтобы перейти в браузере по адресу <code>localhost:80</code> и испытать приложение. <br><br> Обратите внимание на то, что если вы меняли порт для <code>sa-webapp</code> , или если вы работаете с виртуальной машиной Docker, вам понадобится отредактировать файл <code>App.js</code> из папки <code>sa-frontend</code> , поменяв IP-адрес или номер порта в методе <code>analyzeSentence()</code> , подставив вместо устаревших данных актуальные сведения. После этого нужно снова собрать образ и воспользоваться им. <br><br> Вот как выглядит схема нашего приложения теперь. <br><br><div style="text-align:center;"><img src="https://habrastorage.org/getpro/habr/post_images/796/71e/87a/79671e87adea76c8873cac180e2fe8c0.png"></div><br> <i><font color="#999999">Микросервисы выполняются в контейнерах</font></i> <br><br><h2> <font color="#3AC1EF">Итоги: зачем нам кластер Kubernetes?</font> </h2><br> Только что мы изучили файлы <code>Dockerfile</code> , поговорили о том, как собирать образы и отправлять их в репозиторий Docker. Кроме того, мы научились ускорять сборку образов, пользуясь файлом <code>.dockerignore</code> . В итоге наши микросервисы теперь выполняются в контейнерах Docker. Тут у вас может возникнуть вполне оправданный вопрос о том, зачем нам Kubernetes. Ответу на данный вопрос будет посвящена вторая часть этого материала. А пока подумайте над следующим вопросом: <br> Предположим, что наше веб-приложение для анализа текстов стало всемирно популярным. Каждую минуту к нему приходят миллионы запросов. Это значит, что микросервисы <code>sa-webapp</code> и <code>sa-logic</code> будут находиться под огромной нагрузкой. Как масштабировать контейнеры, в которых выполняются микросервисы? <br><br> <a href="https://ruvds.com/ru-rub/"><img src="https://habrastorage.org/files/1ba/550/d25/1ba550d25e8846ce8805de564da6aa63.png"></a> </div><p>Source: <a href="https://habr.com/ru/post/438982/">https://habr.com/ru/post/438982/</a></p>
+<section class="navigation-panel">
+<h4>More articles:</h4>
+<nav><ul class="list-of-pages">
+<li><a href="../438956/index.html">Magnetite in the teeth: sequencing of transcriptomes of the tissues of the radula of the shell of mollusc shell</a></li>
+<li><a href="../438958/index.html">ILV confirmed the existence of its "space station"</a></li>
+<li><a href="../438960/index.html">How I abandoned Ruby in favor of Python, working on a backend</a></li>
+<li><a href="../438962/index.html">For the most part, a positive outlook for the future of chips.</a></li>
+<li><a href="../438964/index.html">Who really stands behind popular free VPNs?</a></li>
+<li><a href="../438966/index.html">The history of wandering documentation Haproxy, or what you should pay attention to when it is configured</a></li>
+<li><a href="../438968/index.html">Marking shoes in Russia: The market is not ready, but will have to work</a></li>
+<li><a href="../438970/index.html">It is said that Haskell is a language for geniuses and academics. True?</a></li>
+<li><a href="../438972/index.html">The brain from the inside (Visualization of the passage of the pattern through the model of an artificial neural network)</a></li>
+<li><a href="../438974/index.html">Virtual reality helps to cope with mental disorders</a></li>
+<li><a href="../438976/index.html">The book "Spring. All design patterns »</a></li>
+<li><a href="../438980/index.html">Spring Boot 2: what's new?</a></li>
+<li><a href="../438982/index.html">Kubernetes tutorial, part 1: applications, microservices and containers</a></li>
+<li><a href="../438984/index.html">Kubernetes Handbook Part 2: Creating and Working With a Cluster</a></li>
+<li><a href="../438986/index.html">React Training Course Part 14: Workshop on Class Based Components, Component State</a></li>
+<li><a href="../438988/index.html">React Training Course, Part 15: Workshop on Working with Component State</a></li>
+<li><a href="../438992/index.html">Developer Diary or Bad Decisions</a></li>
+<li><a href="../438994/index.html">Intel Xeon W-3175X, hot drummer. Testing</a></li>
+<li><a href="../438996/index.html">Company network and MitM. Part 1</a></li>
+<li><a href="../438998/index.html">CGDevs Moscow Meetup # 2</a></li>
+<li><a href="../439000/index.html">Spatial manipulation in 2D using Signed Distance Fields</a></li>
+<li><a href="../439002/index.html">How to stop "writing TK" and start working?</a></li>
+<li><a href="../439006/index.html">How AI helps to master sign language</a></li>
+<li><a href="../439008/index.html">Mail.ru has released a new Atom browser with an emphasis on "security and privacy"</a></li>
+<li><a href="../439010/index.html">How is the consolidation of archives in DeviceLock DLP</a></li>
+<li><a href="../439012/index.html">Telephone directory of the organization - print version</a></li>
+<li><a href="../439016/index.html">Static Generic Tables</a></li>
+<li><a href="../439018/index.html">Setting up Sphinx search for an online store</a></li>
+<li><a href="../439020/index.html">Ticket to Ride. Europe - arithmetic, part two</a></li>
+<li><a href="../439022/index.html">CNC in the hobby workshop (part 3)</a></li>
+<li><a href="../439024/index.html">Results Slurm-3</a></li>
+<li><a href="../439028/index.html">How to improve network perimeter protection? Practical recommendations for Check Point and not only</a></li>
+<li><a href="../439030/index.html">A lot of managers</a></li>
+<li><a href="../439032/index.html">Amazon and Google are planning to enter the energy market</a></li>
+<li><a href="../439034/index.html">Group-IB Webinar: Red Team or Pentest 12.02.2019</a></li>
+<li><a href="../439036/index.html">The main thing is not to get into the mall under the reconciliation of hours</a></li>
+<li><a href="../439038/index.html">Making a neural network: how not to break the brain</a></li>
+<li><a href="../439040/index.html">To isolate the Runet need budget funds</a></li>
+<li><a href="../439042/index.html">Puma is looking for beta testers for self-tapping sneakers Fi</a></li>
+<li><a href="../439046/index.html">How to safely combine the network segments of the three major banks: share tricks</a></li>
+<li><a href="../439050/index.html">Training Cisco 200-125 CCNA v3.0. Cisco Certified Network Specialist (CCNA). Day 2. OSI and TCP-IP models</a></li>
+<li><a href="../439056/index.html">Cement Brand Integration</a></li>
+<li><a href="../439060/index.html">7 types of customers</a></li>
+<li><a href="../439062/index.html">Anisoprint Composer: 3D printing of high strength</a></li>
+<li><a href="../439064/index.html">Typical mesh error (Bootstrap Grid), or why the designer and layout designer do not understand each other</a></li>
+<li><a href="../439066/index.html">Operating system on Rust. Page memory: advanced level</a></li>
+<li><a href="../439068/index.html">Spam campaign “Love you” redirected to Japan</a></li>
+<li><a href="../439070/index.html">China refuses anti-corruption system Zero Trust AI because of its high efficiency</a></li>
+<li><a href="../439074/index.html">Password Checkup extension checks passwords with a base of 4 billion compromised accounts</a></li>
+<li><a href="../439076/index.html">In which applications to wait for an unknown malicious code?</a></li>
+<li><a href="../439078/index.html">Perm programmer arrested for creating a mobile application through which the pedophile acted</a></li>
+<li><a href="../439080/index.html">Unobvious RabbitMQ in Yii2 or why RabbitMQ writes to all queues at once</a></li>
+<li><a href="../439082/index.html">Walk through the plant of desires</a></li>
+<li><a href="../439086/index.html">Causes of ANR and how to avoid it</a></li>
+<li><a href="../439094/index.html">Scientists have found the oldest living vertebrate on Earth</a></li>
+<li><a href="../439096/index.html">Buildbot: a tale with examples of one more continuous integration system</a></li>
+<li><a href="../439098/index.html">Sasha Memus, Chatfuel: How to build a career in products after consulting, is it dangerous to meditate and how to change behavior</a></li>
+<li><a href="../439100/index.html">How to adapt UX / UI for permissions</a></li>
+<li><a href="../439102/index.html">Russians are 20% more likely to face insults on the Internet</a></li>
+<li><a href="../439104/index.html">Redux Simple as a rake</a></li>
+<li><a href="../439106/index.html">Programming in Russia will be introduced from primary school</a></li>
+<li><a href="../439108/index.html">Amateur radio measurements: when there is no frequency meter</a></li>
+<li><a href="../439112/index.html">Creator Kate Mobile arrested for using a pedophile for his service</a></li>
+<li><a href="../439118/index.html">New in browsers: Firefox 66 blocks video and sound by default, Chromium limits page budget</a></li>
+<li><a href="../439122/index.html">Simplicity and complexity of primitives or how to determine unnecessary preprocessing for a neural network</a></li>
+<li><a href="../439124/index.html">If software is created with public money, the code should be open.</a></li>
+<li><a href="../439126/index.html">Requests from users and product requirements</a></li>
+<li><a href="../439128/index.html">How to organize the work of QA. One practically applied method</a></li>
+<li><a href="../439130/index.html">13 trends in the cybersecurity and information security market 2019-2020</a></li>
+<li><a href="../439132/index.html">Unforgettable old age</a></li>
+<li><a href="../439134/index.html">Russian scientists are developing sitall (unbreakable glass) for LG smartphones</a></li>
+<li><a href="../439136/index.html">What is the difference between 4G and 5G?</a></li>
+<li><a href="../439138/index.html">Working with callbacks in React</a></li>
+<li><a href="../439140/index.html">Important message about invites in profile</a></li>
+<li><a href="../439142/index.html">Design maturity models</a></li>
+<li><a href="../439148/index.html">Working with nRF51822 using ST-Link and Clion + OpenOCD</a></li>
+<li><a href="../439150/index.html">Who should pay transaction costs</a></li>
+<li><a href="../439152/index.html">Salaries in IT in the second half of 2018: according to the “My Circle” salary calculator</a></li>
+<li><a href="../439154/index.html">How do freelancers live: book cover design, own production of backpacks and travel work</a></li>
+<li><a href="../439158/index.html">DataArt Launches Free CV Duck Resume Improvement Service</a></li>
+<li><a href="../439160/index.html">Algorithm state: what happens to indie developers on Steam?</a></li>
+<li><a href="../439162/index.html">How to debug front-end and backend: step-by-step instructions</a></li>
+<li><a href="../439166/index.html">mmWave on the road to commercialization in the form factor of a smartphone</a></li>
+<li><a href="../439170/index.html">Cellular operators will help banks verify the accuracy of customer data</a></li>
+<li><a href="../439172/index.html">Extending the assert () macro to implement minimal error handling</a></li>
+<li><a href="../439174/index.html">Safe Internet Day: what threats to pay attention to in 2019</a></li>
+<li><a href="../439182/index.html">How do we distribute orders between drivers in Yandex.Taxi</a></li>
+<li><a href="../439186/index.html">UX Editor: True Story, Rial Life</a></li>
+<li><a href="../439194/index.html">Controlling a character with SharedEvents</a></li>
+<li><a href="../439196/index.html">JPMorgan analysts: Apple should buy Blizzard, Netflix or Sonos to reassure investors</a></li>
+<li><a href="../439198/index.html">Generation of barrier islands</a></li>
+<li><a href="../439200/index.html">Composer for the smallest</a></li>
+<li><a href="../439202/index.html">Detection of web attacks using autoencoder Seq2Seq</a></li>
+<li><a href="../439204/index.html">Increasing the efficiency of photosynthesis by genetic modification of plants</a></li>
+<li><a href="../439210/index.html">Java after volcanic eruption</a></li>
+<li><a href="../439216/index.html">pudge embedded database in 500 lines on golang</a></li>
+<li><a href="../439218/index.html">VC bot on the knee, or how to please people February 14</a></li>
+<li><a href="../439222/index.html">What is API management?</a></li>
+<li><a href="../439224/index.html">Again about the Voronoi diagrams</a></li>
+<li><a href="../439232/index.html">JAMstack: How to create your blog using Gatsby + Contentful + Netlify</a></li>
+<li><a href="../439236/index.html">xenvman: Flexible environments for testing microservices (and not only)</a></li>
+<li><a href="../439238/index.html">Play Store now accepts progressive web applications (PWA)</a></li>
+<li><a href="../439240/index.html">Joomla Digest for January 2019</a></li>
+<li><a href="../439244/index.html">FAS strongly recommends to pre-install Russian software on smartphones and laptops sold in Russia</a></li>
+<li><a href="../439248/index.html">Alan Kay: “Could the ancient Romans build a computer?”</a></li>
+<li><a href="../439252/index.html">6 reasons to develop IT career in Armenia</a></li>
+<li><a href="../439254/index.html">Our all</a></li>
+<li><a href="../439260/index.html">The author of the book "The Witcher" will still receive compensation from CD Projekt Red</a></li>
+<li><a href="../439262/index.html">Deploy the code directly to the docker container. Or how not to prokrasinirovat after each commit</a></li>
+<li><a href="../439264/index.html">How to lead complex technical projects without hiring PMs: DataLine experience</a></li>
+<li><a href="../439266/index.html">The experience of creating an Android game alone from scratch and how it was captured on Google Play</a></li>
+<li><a href="../439268/index.html">How VR, AR and 3D printing work together: the VR Concept experience</a></li>
+<li><a href="../439270/index.html">An example of parsing C ++ code using libclang in Python</a></li>
+<li><a href="../439278/index.html">ACS my LCD - security on two bolts</a></li>
+<li><a href="../439280/index.html">Trautonium: the German wave in the history of synthesizers</a></li>
+<li><a href="../439282/index.html">Effects of filtering SVG. Part 1. SVG filters 101</a></li>
+<li><a href="../439288/index.html">SciPy Optimization</a></li>
+<li><a href="../439290/index.html">Accelerate compilation in Xcode to swift</a></li>
+<li><a href="../439292/index.html">Google has agreed to remove from the search banned sites in the Russian Federation</a></li>
+<li><a href="../439294/index.html">Translation review "If software is created with public money, the code must be open"</a></li>
+<li><a href="../439296/index.html">Soviet license plate and Kolmogorov complexity</a></li>
+<li><a href="../439298/index.html">What would the Internet system look like in the game EvE Online</a></li>
+<li><a href="../439300/index.html">Statistics for file types in the Wildfire cloud sandbox</a></li>
+<li><a href="../439302/index.html">Product Design Digest, January 2019</a></li>
+<li><a href="../439304/index.html">[Ekaterinburg, announcement] Mitap for Java-developers</a></li>
+<li><a href="../439308/index.html">Kill cancer: iridium, human serum albumin and some blue light</a></li>
+<li><a href="../439310/index.html">Why not take off the real estate portal. Part 2</a></li>
+<li><a href="../439312/index.html">Speed ​​up complex calculations with minimal RAM</a></li>
+<li><a href="../439314/index.html">Seven strange ways of dealing with recluse in remote work</a></li>
+<li><a href="../439316/index.html">“I stopped doing what I see no point in”: project managers about their work and training</a></li>
+<li><a href="../439318/index.html">Win procrastination gaming addiction</a></li>
+<li><a href="../439320/index.html">How to diversify programming lessons for children of different ages</a></li>
+<li><a href="../439322/index.html">OS Sailfish renamed OS "Aurora"</a></li>
+<li><a href="../439324/index.html">Using a binary tree in swift using enum using OCR as an example</a></li>
+<li><a href="../439326/index.html">Electric Ford F-150 EV - in the prototype and tested on the road</a></li>
+<li><a href="../439328/index.html">Okay, google! Are you good or evil?</a></li>
+<li><a href="../439332/index.html">How PageRank works: implementation in the R language through linear algebra and power-method</a></li>
+<li><a href="../439334/index.html">About 2 billion rubles allocated for the implementation of the draft law on sustainable runet</a></li>
+<li><a href="../439336/index.html">We are looking for a needle in a stack without using well-known algorithms.</a></li>
+<li><a href="../439338/index.html">Forget about privacy: you still have terrible targeting</a></li>
+<li><a href="../439340/index.html">GDPR backup — what a new tool will do</a></li>
+<li><a href="../439342/index.html">Winter DIYorDIE Meetup February 17</a></li>
+<li><a href="../439344/index.html">To be like a troll: how monopolists rule patents</a></li>
+<li><a href="../439346/index.html">Laravel + Docker: Our Successful Experience</a></li>
+<li><a href="../439348/index.html">Vision falls after laser vision correction - what to do? Or, doctor, make me an "enhancement"</a></li>
+<li><a href="../439350/index.html">Artificial intelligence as a machine of inventions</a></li>
+<li><a href="../439352/index.html">Making a bot prototype for fighting in Clash Royale</a></li>
+<li><a href="../439354/index.html">Rust news # 5 (January 2019)</a></li>
+<li><a href="../439356/index.html">Nontrivial metrics of the effectiveness of advertising campaigns</a></li>
+<li><a href="../439358/index.html">Excel metadata files</a></li>
+<li><a href="../439360/index.html">Training Cisco 200-125 CCNA v3.0. Cisco Certified Network Specialist (CCNA). Day 3. Subnets</a></li>
+<li><a href="../439362/index.html">How we teach Software Engineering at St. Petersburg HSE</a></li>
+<li><a href="../439364/index.html">Oculus Go glasses with “strawberry” content set up for sale</a></li>
+<li><a href="../439366/index.html">Automation of three nails</a></li>
+<li><a href="../439368/index.html">Animations in iOS applications born on the server</a></li>
+<li><a href="../439374/index.html">For those who want to play detective: find a bug in the function from Midnight Commander</a></li>
+<li><a href="../439376/index.html">"Interest club"</a></li>
+<li><a href="../439378/index.html">The Book of Genesis?). Reflections on the nature of mind. Part I</a></li>
+<li><a href="../439380/index.html">How I created an extension for Atom and VS Code: personal experience and source codes</a></li>
+<li><a href="../439382/index.html">Using Ansible, Terraform, Docker, Consul, Nomad in the Clouds (Alexey Vakhov, Uchi.ru)</a></li>
+<li><a href="../439390/index.html">The best innovations of social networks in 2018</a></li>
+<li><a href="../439392/index.html">The 2019 championship season is open! SNA Hackathon Launches ala ML Boot Camp 8</a></li>
+<li><a href="../439394/index.html">As a programmer dataseativistam wrote</a></li>
+<li><a href="../439396/index.html">UniFi Controller Password Reset</a></li>
+<li><a href="../439404/index.html">A brief history of electronic public procurement in Russia</a></li>
+<li><a href="../439408/index.html">Pseudo Lens Flare</a></li>
+<li><a href="../439410/index.html">Jeff Hawkins is finally ready to explain his brain research.</a></li>
+<li><a href="../439414/index.html">Client for "server push messages"</a></li>
+<li><a href="../439416/index.html">A-Frame Review</a></li>
+<li><a href="../439418/index.html">Pentaho Data Integration (PDI), Python and Deep Learning</a></li>
+<li><a href="../439420/index.html">Building the transport package without installing MODX</a></li>
+<li><a href="../439422/index.html">What does a programmer need to develop games and who really is a game developer on the part of a programmer</a></li>
+<li><a href="../439424/index.html">How I Fought Free Hosting and Composer</a></li>
+<li><a href="../439426/index.html">Situation: a new wave of attacks with the interception of DNS queries - we analyze the basic methods of protection</a></li>
+<li><a href="../439430/index.html">Believe me if you can. Water meters. part 1</a></li>
+<li><a href="../439432/index.html">How to become a Java developer in 1.5 years</a></li>
+<li><a href="../439434/index.html">NestJS - the very real nodejs backend</a></li>
+<li><a href="../439436/index.html">Cheaper price of small series of electronics in Russia. Case Internet radio WOLNA</a></li>
+<li><a href="../439440/index.html">Implementation of Zimbra Collaboration Open Source, authorization through AD and automatic creation of mailboxes</a></li>
+<li><a href="../439442/index.html">Julia. Report Generators and Documentation</a></li>
+<li><a href="../439446/index.html">What you need to know about JavaScript Engine Switcher 3.0</a></li>
+<li><a href="../439448/index.html">What virtualization questions do you expect from a graduate?</a></li>
+<li><a href="../439450/index.html">RS-485 on domestic microcontrollers from the company Milandr</a></li>
+<li><a href="../439454/index.html">Program as Art - a new software management paradigm</a></li>
+<li><a href="../439456/index.html">Hipster podcasts # 2</a></li>
+<li><a href="../439458/index.html">As we Republic website on Kubernetes translated</a></li>
+<li><a href="../439460/index.html">How marketers of Maxidom lose millions flirting in groz marketing: independent usability auditing</a></li>
+<li><a href="../439462/index.html">Civilization Springs, 5/5</a></li>
+<li><a href="../439464/index.html">VXinspect: part quality control in 10 minutes</a></li>
+<li><a href="../439466/index.html">NASA lunar orbital probe made the first pictures of the China Chang'e-4 station - two pixels of light</a></li>
+<li><a href="../439468/index.html">Where to lead the search for the perfect SCADA</a></li>
+<li><a href="../439470/index.html">Germany plans to abandon coal in the near future.</a></li>
+<li><a href="../439472/index.html">Automation of border control within the company</a></li>
+<li><a href="../439476/index.html">Cockney Slang: Modern History and Position</a></li>
+<li><a href="../439478/index.html">Entertaining C #. Five examples for a coffee break</a></li>
+<li><a href="../439480/index.html">Give way, or Why does your CRM (and CRM) slow down?</a></li>
+<li><a href="../439482/index.html">devleads - (not) financial motivation</a></li>
+<li><a href="../439484/index.html">Get the enum data in the Automapper projection</a></li>
+<li><a href="../439496/index.html">How is billing done there: when a customer and a developer speak different languages</a></li>
+<li><a href="../439498/index.html">What hardware to analyze a huge shaft of information?</a></li>
+<li><a href="../439500/index.html">Why are captcha so complicated</a></li>
+<li><a href="../439502/index.html">Undefined behavior and truth undefined</a></li>
+<li><a href="../439504/index.html">Does your Data Engineer team need it?</a></li>
+<li><a href="../439506/index.html">9 alternatives to a bad team (design pattern)</a></li>
+<li><a href="../439510/index.html">High-load distributed control system of a modern NPP</a></li>
+<li><a href="../439512/index.html">The era of dinosaurs or legally verified reinsurance?</a></li>
+<li><a href="../439516/index.html">00110001 00110100 00101110 00110000 00110010</a></li>
+<li><a href="../439524/index.html">Fortnite is the future, but for rather unexpected reasons.</a></li>
+<li><a href="../439526/index.html">Telecom operators will conduct a "field test" of the law on the stability of the Runet</a></li>
+<li><a href="../439532/index.html">What's new in javascript ES2019</a></li>
+<li><a href="../439534/index.html">Yield programming and the use of drones in oil production - 10 lectures from the conference GIS Tech Russia</a></li>
+<li><a href="../439538/index.html">Community programming</a></li>
+<li><a href="../439540/index.html">Etherblade.net - opensource project to create an ethernet traffic encapsulator on FPGA (part one)</a></li>
+<li><a href="../439542/index.html">Nintendo makes it clear that only piracy can save the history of video games</a></li>
+<li><a href="../439544/index.html">The colony. Chapter 24: Departure</a></li>
+<li><a href="../439556/index.html">TDMS Fairway. Methods PMBOK and Russian design organizations</a></li>
+<li><a href="../439558/index.html">New old phone. Reinvent the PSTN phone</a></li>
+<li><a href="../439560/index.html">The adapter for working with the blockchain Ethereum for the InterSystems IRIS data platform</a></li>
+<li><a href="../439562/index.html">Configure the Kubernetes HA cluster on bare metal with kubeadm. Part 1/3</a></li>
+<li><a href="../439564/index.html">Practical application of transformation of AST-trees on the example of Putout</a></li>
+<li><a href="../439566/index.html">Why SRE is important documentation. Part 3</a></li>
+<li><a href="../439568/index.html">QLC based SSD - hard drive killer? Not really</a></li>
+<li><a href="../439572/index.html">Automated design of electronic equipment</a></li>
+<li><a href="../439576/index.html">Extensive review of Python interviews. Hints and Tips</a></li>
+<li><a href="../439578/index.html">On the issue of transformations and other operations</a></li>
+<li><a href="../439584/index.html">Project Lenergy, how to rethink portable power sources</a></li>
+<li><a href="../439586/index.html">SPBm protocol as the basis of Extreme Automated Campus</a></li>
+<li><a href="../439588/index.html">ESET has discovered new versions of the DanaBot Trojan.</a></li>
+<li><a href="../439590/index.html">Quals: Saudi and Oman National Cyber ​​Security CTF 2019. WriteUp</a></li>
+<li><a href="../439592/index.html">Ethical Activity Automation</a></li>
+<li><a href="../439596/index.html">How I accelerated image processing on Android 15 times</a></li>
+<li><a href="../439598/index.html">Microsoft told about the cost of paid support for Windows 7</a></li>
+<li><a href="../439600/index.html">Finland summed up the preliminary results of the experiment with a guaranteed basic income</a></li>
+<li><a href="../439604/index.html">How does the barcode work?</a></li>
+<li><a href="../439606/index.html">Experimental production of electronics for the minimum price</a></li>
+<li><a href="../439608/index.html">Modern religion: what do people give to Google, Facebook, Amazon and Apple?</a></li>
+<li><a href="../439610/index.html">As in my Chevrolet Bolt electric car, under warranty, two battery modules were replaced, and the third was monitored</a></li>
+<li><a href="../439616/index.html">The digest of interesting IT projects on Kickstarter №7</a></li>
+<li><a href="../439618/index.html">PHP for beginners. File attachment</a></li>
+<li><a href="../439620/index.html">Understanding asynchronous JavaScript [Translated by Sukhjinder Arora]</a></li>
+<li><a href="../439624/index.html">Why keep data in orbit</a></li>
+<li><a href="../439626/index.html">Experience developing a free application for collectors OpenNumismat</a></li>
+<li><a href="../439628/index.html">Parallel data update in ASP.NET Web API</a></li>
+<li><a href="../439632/index.html">How to set up Continuous Deployment for your project: personal experience</a></li>
+<li><a href="../439636/index.html">The crisis of the concepts of improving road safety and a new concept of its solution</a></li>
+<li><a href="../439638/index.html">Getting FPGA to Python</a></li>
+<li><a href="../439640/index.html">Vinyl is back and it's different</a></li>
+<li><a href="../439642/index.html">Java pitfalls. Part 1</a></li>
+<li><a href="../439644/index.html">Anti-Aging: Senolithics and Stem Cell Therapy</a></li>
+<li><a href="../439646/index.html">Holding SoftBank sold a stake in Nvidia due to the fall in their prices, but still earned $ 3.3 billion</a></li>
+<li><a href="../439648/index.html">Internal and nested java classes. Part 1</a></li>
+<li><a href="../439652/index.html">How to transport your startup to the USA: 4 important steps</a></li>
+<li><a href="../439654/index.html">Full immersion: how do we cool ASIC chips in Bitfury</a></li>
+<li><a href="../439656/index.html">C # character calculator</a></li>
+<li><a href="../439676/index.html">Integration of React Native and C ++ for iOS and Android</a></li>
+<li><a href="../439680/index.html">About 50% of Russians are ready to sell their personal data</a></li>
+<li><a href="../439682/index.html">Training Cisco 200-125 CCNA v3.0. Cisco Certified Network Specialist (CCNA). Day 4. Gateway devices</a></li>
+<li><a href="../439686/index.html">Flickr introduces new rules regarding the number of photos and videos users.</a></li>
+<li><a href="../439688/index.html">Overview of AI & ML solutions in 2018 and forecasts for 2019: Part 1 - NLP, Computer Vision</a></li>
+<li><a href="../439690/index.html">Virtual machine performance comparison of 6 cloud platforms: Selectel, MCS, Ya.Oblako, Google Cloud, AWS and Azure</a></li>
+<li><a href="../439692/index.html">AT & T sued for changing the network icon from 4G to 5G E</a></li>
+<li><a href="../439694/index.html">Developed smart tissue that reacts to changes in body temperature</a></li>
+<li><a href="../439696/index.html">On the crest of a wave, or “I want to go to the mainstream” - is it worth it?</a></li>
+<li><a href="../439698/index.html">Introduction to programming: a simple 3D shooter from scratch over the weekend, part 1</a></li>
+<li><a href="../439700/index.html">Patent for a board game in Russia</a></li>
+<li><a href="../439704/index.html">From pool request to release. Report Yandex.Taxi</a></li>
+<li><a href="../439706/index.html">BLACK HAT conference. Survival lessons in a 300 Gbps DDOS attack. Part 1</a></li>
+<li><a href="../439710/index.html">Features of creating products for the US market</a></li>
+<li><a href="../439712/index.html">Government procurement: a balance between the Italian strike and the Russian criminal</a></li>
+<li><a href="../439716/index.html">Tails OS or how to protect yourself online</a></li>
+<li><a href="../439718/index.html">Developing Elixir / Phoenix Applications with Docker</a></li>
+<li><a href="../439720/index.html">Introduction to programming: a simple 3D shooter from scratch over the weekend, part 2</a></li>
+<li><a href="../439722/index.html">Effects of SVG filters. Part 2. Outline text with feMorphology</a></li>
+<li><a href="../439724/index.html">Overview of AI & ML solutions in 2018 and forecasts for 2019: Part 2 - Tools and Libraries, AutoML, RL, Ethics in AI</a></li>
+<li><a href="../439726/index.html">Lock-in: truth or fiction?</a></li>
+<li><a href="../439728/index.html">Setting up backup and recovery of Zimbra OSE entirely and in separate boxes without using Zextras</a></li>
+<li><a href="../439730/index.html">Organizing reducer through standard class</a></li>
+<li><a href="../439732/index.html">Lazarus - simple animation using the TImageFragment component</a></li>
+<li><a href="../439734/index.html">We deploy Kubernetes on the desktop in minutes with MicroK8s</a></li>
+<li><a href="../439736/index.html">IPSec VPN connection between MikroTik and Kerio Control</a></li>
+<li><a href="../439746/index.html">Understand the promises in javascript</a></li>
+<li><a href="../439748/index.html">The digest of interesting materials for the mobile developer # 285 (February 4 - 10)</a></li>
+<li><a href="../439750/index.html">Learn product management - where?</a></li>
+<li><a href="../439752/index.html">Multicore MRI Method</a></li>
+<li><a href="../439754/index.html">Google is going to be engaged in the development of smart watches</a></li>
+<li><a href="../439756/index.html">Why do I need a thermo-acoustic generator?</a></li>
+<li><a href="../439760/index.html">Engineers "twisted" the light in the fiber - a new technology will speed up the transfer of data a hundred times</a></li>
+<li><a href="../439764/index.html">Corporate fruit</a></li>
+<li><a href="../439772/index.html">Writing Unit Tests on Swift for Verifying Asynchronous Tasks</a></li>
+<li><a href="../439778/index.html">The digest of fresh materials from the world of the frontend for the last week No. 351 (February 4 - 10, 2019)</a></li>
+<li><a href="../439780/index.html">PHP Digest number 149 (January 28 - February 11, 2019)</a></li>
+<li><a href="../439782/index.html">Headless CMS - the future of content management</a></li>
+<li><a href="../439784/index.html">Methane engine "Raptor" broke the record RD-180</a></li>
+<li><a href="../439788/index.html">Regular oddities in the GOST Grasshopper and Stribog algorithms</a></li>
+<li><a href="../439790/index.html">Test JaCarta WebClient or store tokens in a safe</a></li>
+<li><a href="../439792/index.html">NASA is looking for partners in the American industry to create a partially reusable manned lender</a></li>
+<li><a href="../439794/index.html">Back pain - understanding from the perspective of modern medicine</a></li>
+<li><a href="../439796/index.html">Spring Boot 2: what is not written in release notes</a></li>
+<li><a href="../439800/index.html">RISEX and Julia. 5 stages of love customer and designer</a></li>
+<li><a href="../439806/index.html">Valid SSL domain names for local Docker containers</a></li>
+<li><a href="../439808/index.html">The biggest telescopes. From a notebook and eyes to 340 megapixel cameras and data centers. Part 1</a></li>
+<li><a href="../439810/index.html">Get acquainted with the Moleculer microservice framework</a></li>
+<li><a href="../439816/index.html">Practical blockchain in business</a></li>
+<li><a href="../439818/index.html">Features of approaches to design in the real manufacturing sector</a></li>
+<li><a href="../439820/index.html">We are trying to write a project alone. Introduction</a></li>
+<li><a href="../439822/index.html">Creating an alternative display for the Ensoniq EPS16 + and ASR10 synthesizer / sampler</a></li>
+<li><a href="../439824/index.html">When will the JavaScript frameworks disappear?</a></li>
+<li><a href="../439826/index.html">Disable analog. What will happen to the TV?</a></li>
+<li><a href="../439828/index.html">The network appeared "analog" Findface</a></li>
+<li><a href="../439840/index.html">Conference DUMP-2019: we invite you to speak in the sections Design, Management and Testing</a></li>
+<li><a href="../439852/index.html">Remote control application release: Aspia 1.1.0</a></li>
+<li><a href="../439858/index.html">Prometheus + Grafana + Node Exporter + Docker in Azure with notifications in Telegram</a></li>
+<li><a href="../439862/index.html">Digital events in Moscow from February 11 to 17</a></li>
+<li><a href="../439866/index.html">Principles of design reference books in 1C Enterprise Management 2 (ERP 2.4.6)</a></li>
+<li><a href="../439868/index.html">Life without Facebook: less radical views, good mood, more time for loved ones. Now proven by science</a></li>
+<li><a href="../439878/index.html">Creation of architecture for a new high-load startup in 2019</a></li>
+<li><a href="../439880/index.html">Security Week 07: Local IoT Device Vulnerabilities</a></li>
+<li><a href="../439886/index.html">How I trained the neural network to implement the position estimation function on the Russian AI Cup CodeBall 2018</a></li>
+<li><a href="../439894/index.html">How easy it is to monitor the site</a></li>
+<li><a href="../439900/index.html">Julia and the method of coordinate descent</a></li>
+<li><a href="../439902/index.html">Explaining the physical essence of the Wing Lift phenomenon without using the Bernouli equation. Part 2</a></li>
+<li><a href="../439906/index.html">Critical vulnerability in Zemana products and not only</a></li>
+<li><a href="../439908/index.html">Kohl, piss off ... Coax</a></li>
+<li><a href="../439912/index.html">Unsolved mystery of view</a></li>
+<li><a href="../439916/index.html">Unpacking: Dridex bootloader</a></li>
+<li><a href="../439922/index.html">Taxation of IP in Kazakhstan how to be a freelancer?</a></li>
+<li><a href="../439924/index.html">The volume of parcels from foreign online stores grew by 25%</a></li>
+</ul></nav>
+</section>
+<script src="../../js/main.js"></script>
+
+<!-- Yandex.Metrika counter -->
+<script type="text/javascript" >
+  (function (d, w, c) {
+      (w[c] = w[c] || []).push(function() {
+          try {
+              w.yaCounter52319614 = new Ya.Metrika({
+                  id:52319614,
+                  clickmap:true,
+                  trackLinks:true,
+                  accurateTrackBounce:true,
+                  webvisor:true
+              });
+          } catch(e) { }
+      });
+
+      var n = d.getElementsByTagName("script")[0],
+          s = d.createElement("script"),
+          f = function () { n.parentNode.insertBefore(s, n); };
+      s.type = "text/javascript";
+      s.async = true;
+      s.src = "https://mc.yandex.ru/metrika/watch.js";
+
+      if (w.opera == "[object Opera]") {
+          d.addEventListener("DOMContentLoaded", f, false);
+      } else { f(); }
+  })(document, window, "yandex_metrika_callbacks");
+</script>
+<noscript><div><img src="https://mc.yandex.ru/watch/52319614" style="position:absolute; left:-9999px;" alt="" /></div></noscript>
+
+<!-- Google Analytics -->
+  <script>
+    window.ga = function () { ga.q.push(arguments) }; ga.q = []; ga.l = +new Date;
+    ga('create', 'UA-134228602-1', 'auto'); ga('send', 'pageview')
+  </script>
+  <script src="https://www.google-analytics.com/analytics.js" async defer></script>
+
+</section>
+</body>
+
+</html>

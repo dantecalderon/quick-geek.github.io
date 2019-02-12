@@ -1,0 +1,1 @@
+New in browsers: Firefox 66 blocks video and sound by default, Chromium limits page budget

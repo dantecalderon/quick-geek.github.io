@@ -1,0 +1,1 @@
+Etherblade.net — opensource проект по созданию инкапсулятора ethernet-трафика на FPGA (часть первая)

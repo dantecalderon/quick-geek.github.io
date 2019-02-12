@@ -1,0 +1,412 @@
+<!doctype html>
+<html class="no-js" lang="en">
+
+<head>
+  <!-- Global site tag (gtag.js) - Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=UA-134228602-1"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'UA-134228602-1');
+  </script>
+
+  <meta charset="utf-8">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  <title>Making a bot prototype for fighting in Clash Royale</title>
+  <meta name="description" content="Have you ever found yourself stuck in some kind of simple game, thinking that artificial intelligence could easily cope with it? I've had it, and I de...">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+  <link rel="stylesheet" href="../../css/main.css">
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+  <script>window.jQuery || document.write('<script src="../../js/vendors/jquery-3.3.1.min.js"><\/script>')</script>
+</head>
+
+<body>
+  <!--[if lte IE 9]>
+    <p class="browserupgrade">You are using an <strong>outdated</strong> browser. Please <a href="https://browsehappy.com/">upgrade your browser</a> to improve your experience and security.</p>
+  <![endif]-->
+  <nav class="page-headings-container js-page-headings-container"></nav>
+  <div class="tools-bar js-tools-bar">
+    <!-- <a href="https://quick-geek.github.io/search.html" title="Search">🔎</a> -->
+    <a class="js-list-of-headings-button" data-state="closed" href="#" title="Headings">📜</a>
+    <a class="js-go-to-top-button" href="#" title="Go to Top">⬆️</a>
+    <a class="js-go-to-bottom-button" href="#" title="Go to Bottom">⬇️</a>
+  </div>
+  <section class="page js-page"><h1>Making a bot prototype for fighting in Clash Royale</h1><div class="post__text post__text-html js-mediator-article">  Have you ever found yourself stuck in some kind of simple game, thinking that artificial intelligence could easily cope with it?  I've had it, and I decided to try to create such a bot player.  Moreover, now there are a lot of tools for computer vision and machine learning, which allow building models without a deep understanding of implementation details.  "Mere mortals" can make a prototype, not building neural networks for months from scratch. <br><br><img src="https://habrastorage.org/webt/fs/7g/yb/fs7gyb9v-o6bessxnliwetns8u0.png"><br><br>  Under the cat you will find the process of creating a proof-of-concept bot for the game Clash Royale, in which I used Scala, Python, and the CV library.  Using computer vision and machine learning, I tried to create a game bot that interacts as a live player. <br><a name="habracut"></a><br>  My name is Sergey Tolmachyov, I am Lead Scala Developer in the Waves Platform and teach <a href="https://binarydistrict.com/ru/course/scala-basic/%3Futm_source%3Dblogs%26utm_medium%3Dhabrhabr%26utm_campaign%3Dclashroyale_bot%26roistat_param1%3Dscala%26roistat_param2%3D160219">Scala course</a> in the Binary District, and in my spare time I study other technologies, such as AI.  And I wanted to reinforce the obtained skills with some practical experience.  In contrast to the AI ​​competition, where your bot plays against the bots of other users, you can play Clash Royale against people, which sounds funny.  Your bot can learn to beat real players! <br><br><h2>  Clash Royale game mechanics </h2><br>  The mechanics of the game is quite simple.  You and your opponent have three buildings: a fortress and two towers.  Players before the game collect decks - 8 available units, which are then used in battle.  They have different levels, and they can be pumped, collecting more maps of these units and buying upgrades. <br>  After the start of the game, you can put available units at a safe distance from enemy towers, while spending units of mana, which are slowly restored during the game.  Units are sent to enemy buildings and are distracted by enemies encountered along the way.  The player can control only the initial position of the units - their further movement and damage can be affected only by the installation of other units. <br><br>  There are still spells that can be played anywhere in the field, usually they cause damage to units in different ways.  Spells can clone, freeze or speed up units in some area. <br><br><img src="https://habrastorage.org/webt/bk/xs/s2/bkxss2pfmjmvheqvnex86yy2wdk.png"><br><br>  The goal of the game is to destroy enemy buildings.  For a complete victory, you need to destroy the fortress or after two minutes of the game destroy more buildings (the rules depend on the game modes, but in general they sound like this). <br><br>  During the game, you need to take into account the movement of units, the possible mana number and current enemy cards.  You also need to consider how the installation of the unit affects the playing field. <br><br><h2>  We build a solution </h2><br>  Clash Royale is a mobile game, so I decided to run it on Android and interact with it via ADB.  This would allow to support work with a simulator or with a real device. <br><br>  I decided that the bot, like many other AI games, should work using the Perception-Analysis-Action algorithm.  The whole environment in the game is displayed on the screen, and it interacts with it using the screen tap.  Therefore, the bot must be a program, the input of which is a description of the current state in the game: the location and characteristics of units and buildings, the current possible maps and the amount of mana.  At the output, the bot must give an array of coordinates, where it is necessary to tap the unit. <br><br>  But before creating the bot itself, it was necessary to solve the problem of extracting information about the current state of the game from the screenshot.  By and large, this task is devoted to the further content of the article. <br><br>  To solve this problem, I decided to use Computer Vision.  Perhaps this is not the best solution: CV without much experience and resources clearly has limitations and cannot recognize everything at the human level. <br><br>  It would be more accurate to take data from the memory, but I had no such experience.  Root is required and in general this solution looks more complicated.  It is also unclear whether it is possible to achieve speed here around real time, if you look for objects with a heap JVM inside the device.  In addition, the CV task I wanted to solve more than this. <br>  In theory, one could make a proxy server and take information from there.  But the network protocol of the game often changes, proxy servers on the Internet come across, but quickly become obsolete and not supported. <br><br><h2>  Available game resources </h2><br>  To begin with, I decided to get acquainted with the available materials from the game.  I found a <a href="http://discord.me/RoyaleAPI">club of craftsmen</a> who got packed game resources <a href="https://github.com/smlbiobot/cr">[1]</a> <a href="https://github.com/RoyaleAPI/cr-api">[2]</a> .  First of all, I was interested in the pictures of units, but in the unpacked game package they are presented in the form of a tile map (pieces of which the unit consists). <br><br>  I also found footage of units' animations glued together (albeit not perfectly) using a script - they were useful for learning the recognition model. <br><br><img src="https://habrastorage.org/webt/b_/bp/zm/b_bpzm14pv9snavxmruq0k5q0cm.png"><br><br>  In addition, you can find csv with various game data in the resources - the number of HP, the damage of units of different levels, etc. This is useful when creating bot logic.  For example, from the data it became clear that the field is divided into 18 x 29 cells, and you can only place units on them.  Still there were all the images of maps of units, which will be useful to us later. <br><br><h2>  Computer Vision for the lazy </h2><br>  After searching for available CV-solutions, it became clear that in any case it would be necessary to train them on a marked dataset.  I made screenshots of the screen and was already ready to mark some screenshots with my hands.  This has proven to be a daunting task. <br><br>  The search for available recognition programs took some time.  I stopped at <a href="https://github.com/tzutalin/labelImg">labelImg</a> .  All the annotation applications that I found were quite primitive: many did not support keyboard shortcuts, the choice of objects and their types was made much less convenient than in labelImg. <br><br>  During the markup, it was helpful to have the source code of the application.  I took screenshots every couple of seconds of the match.  There are many objects on the screenshots (for example, an army of skeletons), and I made a modification in labelImg - by default, when marking the next image, labels from the previous one were taken.  Often, they just had to move under the new position of the units, remove the dead units and add several ones that appeared, rather than mark up from scratch. <br><br><img src="https://habrastorage.org/webt/cx/dh/rf/cxdhrf-uctqed-l84x2mg_9j4u8.png"><br><br>  The process turned out to be resource-intensive - in two days in quiet mode I marked about 200 screenshots.  The sample looks very small, but I decided to start experimenting.  You can always add more examples and improve the quality of the model. <br><br>  At the time of the markup, I did not know which training tool I would use, so I decided to save the markup results in the VOC format - one of the conservative and seemingly universal ones. <br><br>  The question may arise: why not just look for pixel-by-pixel images of units by complete coincidence?  The problem is that for this you would have to look for a huge number of different frames of animation of different units.  It would hardly work.  I wanted to make a universal solution that supports different resolutions.  In addition, units may have a different color depending on the effect applied to them - freezing, acceleration. <br><br><h2>  Why I chose YOLO </h2><br>  I started researching possible image recognition solutions.  I looked at the use of various algorithms: OpenCV, TensorFlow, Torch.  I wanted to make the recognition as fast as possible, even sacrificing accuracy, and get the POC as soon as possible. <br><br>  After reading the <a href="https://docs.opencv.org/3.3.0/dc/d88/tutorial_traincascade.html">articles</a> , I realized that my task does not fit with the HOG / LBP / SVM / HAAR / ... classifiers.  Although they are fast, they would have to be applied many times - according to the classifier for each unit - and then one by one to apply them to the image for search.  In addition, their principle of operation in theory would give bad results: units may have a different form, for example, when moving to the left and up. <br><br>  Theoretically, using a neural network, you can apply it once to an image and get all the units of different types with their position, so I began to dig in the direction of neural networks.  TensorFlow found support for Convolutional Neural Networks (CNN).  It turned out that it is not necessary to train neural networks from scratch - you can <a href="https://www.tensorflow.org/hub/tutorials/image_retraining">retrain an existing powerful network</a> . <br><br>  Then I found a more practical YOLO algorithm, which promises less complexity and, therefore, should provide a high speed search algorithm without sacrificing accuracy (and in some cases surpassing other models). <br><br>  <a href="https://pjreddie.com/darknet/yolo/">The YOLO website</a> promises a huge difference in speed using the “tiny” model and a smaller, optimized network.  YOLO also allows you to retrain the finished neural network for your task, with <a href="https://github.com/pjreddie/darknet">darknet</a> - opensource-framework for using various neural networks, the creators of which developed YOLO - is a simple native C application, and all work with it occurs through its calls with parameters. <br><br>  TensorFlow, written in Python, is in fact a Python library and is used using self-written scripts that need to be sorted out or sharpened to fit your needs.  Probably, for someone the flexibility of TensorFlow is a plus, but, without going into details, you can hardly take it quickly and use it.  Therefore, in my project, the choice fell on YOLO. <br><br><h2>  Model building </h2><br>  To work on learning the model, I installed Ubuntu 18.10, delivered the packages for the build, the OpenCL package from NVIDIA and other dependencies, I collected darknet. <br><br>  Github has a <a href="https://github.com/AlexeyAB/darknet">section with simple steps to retrain the YOLO model</a> : you need to download the model and configs, change them and run retraining. <br><br>  At first I wanted to try to retrain a simple YOLO model, then Tiny and compare them.  However, it turned out that for learning simple models you need 4 GB of video card memory, and I only had an NVIDIA GeForce GTX 1060 video card with 3 GB purchased for games.  Therefore, I was able to immediately train only the Tiny-model. <br><br>  The markup of units on the images I had was in the VOC format, and YOLO worked with its format, so I used the <a href="https://github.com/ssaru/convert2Yolo">convert2Yolo</a> utility to convert the annotation files. <br><br>  After a night of training in my 200 screenshots, I got the first results, and they surprised me - the model was really able to recognize something correctly!  I realized that I was moving in the right direction, and decided to make more teaching examples. <br><br><img src="https://habrastorage.org/webt/ek/rh/ik/ekrhikfcntuxljeawh09ikegnp0.png"><br><br>  I didn’t want to continue to lay out the screenshots, and I remembered the frames from the animations of the units.  I marked out all the small pictures of their classes and tried to train the network on this set.  The result was very bad.  I suppose that the model could not select the correct patterns from small pictures for use on large images. <br><br>  After that, I decided to place them on ready-made backgrounds of combat arenas and programmatically create a VOC markup file.  It turned out such a synthetic screenshot with automatic 100% accurate markup. <br><br>  I wrote a Scala script that divides the screenshot into 16 4x4 squares and sets the units in their center so that they do not overlap with each other.  The script also allowed me to customize the creation of training examples - when taking damage, the units are painted in the color of their team (red / blue), and when classifying, I separately recognize units of different colors.  In addition to coloring, the damaged units of different teams have small differences in clothing.  Also, I randomly increased and reduced units a little so that the model learned not to depend heavily on the size of the unit.  As a result, I learned how to create tens of thousands of educational examples, approximately similar to real screenshots. <br><br><img src="https://habrastorage.org/webt/uv/zi/_u/uvzi_uwhmohzcx0a7ylmpbyjady.png"><br><br>  Generation was not perfect.  Often, units were placed on top of buildings, although they would be behind them in the game;  There were no examples of overlapping a part of a unit, although this is not uncommon in the game.  But I decided to ignore all this for now. <br><br><img src="https://habrastorage.org/webt/zo/wk/uq/zowkuqkijfqocemk7_qflhhgavg.png"><br><br>  The model obtained after several nights of training on a mixture of 200 real screenshots and 5000 generated images that were recreated in the process of learning once a day, when tested on these screenshots, gave poor results.  It is not surprising, because the generated images have quite a few differences from the real ones. <br><br>  Therefore, I set the resulting model to train on a mean sample, in which there were only 200 of my screenshots.  After that, she began to work much better. <br><br><div class="spoiler">  <b class="spoiler_title">Damn shame</b> <div class="spoiler_text">  I apologize for operating with such unscientific measures as “much better”, but I don’t know how to cross-validate images quickly, so I tried several screenshots from a non-training sample and looked to see if the results satisfy me.  This is the most important.  We're lazy and make a prototype, right? <br><br>  The following steps to improve the model were understandable - mark up more real screenshots with your hands and train them on a model trained in the generated screenshots. <br></div></div><br><h2>  Let's get down to the bot </h2><br>  I decided to write a bot in Python - it has many tools available for ML.  I decided to use my model with OpenCV, which from <a href="https://habr.com/company/intel/blog/333612/">3.5 learned to use models of neural networks</a> , and I even found a <a href="https://github.com/spmallick/learnopencv/tree/master/ObjectDetection-YOLO">simple example</a> .  Having tried several libraries for working with ADB, I chose <a href="https://pypi.org/project/pure-python-adb/">pure-python-adb</a> - everything I need is simply implemented there: the function of obtaining the screen 'screencap' and performing the operation on the device 'shell';  I tap using 'input tap'. <br><br>  So, after receiving a screenshot of the game, recognizing units on it and poking at the screen, I continued to work on recognizing the game state.  In addition to units, I needed to make recognition of the current mana level and the cards available to the player. <br><br>  The level of mana in the game is displayed in the form of a progress bar and numbers.  Without thinking, I began to cut out the number, invert and recognize using <a href="https://github.com/madmaze/pytesseract">pytesseract</a> . <br><br>  To determine the available maps and their locations, I used the <a href="https://docs.opencv.org/3.4/db/d70/tutorial_akaze_matching.html">keypoint detector KAZE from OpenCV</a> .  I still did not want to return to the neural network training again, and I chose a method that was faster and simpler, although he eventually had the least sufficient accuracy in the case when you need to search for many objects. <br><br>  When launching the bot, I considered the keypoints for all the card pictures (there are several dozen of them), and during the game I searched for matches of all the cards with the player’s card area to reduce errors and increase speed.  They were sorted by accuracy and <i>x-</i> coordinate to get the order of the maps - information about how they are located on the screen. <br><br>  Having played a little with the parameters, in practice I got a lot of mistakes, although some complicated pictures of maps, which sometimes were mistaken for others by the algorithm, were recognized with great accuracy.  We had to add a buffer of three elements: if we get three recognitions in a row, we get the same values, then we conditionally believe that we can trust them. <br><br><img src="https://habrastorage.org/webt/vr/8a/mj/vr8amjw6_mpuh8kzethfk0zbkya.png"><br><br>  After getting all the necessary information (units and their approximate position, available mana and maps), you can make some decisions. <br><br>  To begin with, I decided to take something simple: for example, if I have enough mana for an available card, I can play it on the field.  But the bot still does not know how to “play” cards - he knows what cards we have, where the field is, you have to click on the desired card, and then on the desired cell on the field. <br><br>  Knowing the resolution of the screenshot, you can understand the coordinates of the map and the desired cells of the field.  Now I am tied to the exact screen resolution, but if necessary, this can be abstracted from.  The decision function will return an array of clicks that need to be done in the near future.  In general, our bot will be an infinite loop (simplified): <br><br><pre><code class="plaintext hljs">бесконечно:    изображение = получить изображение    если есть действия:        сделать действие(первое действие)        небольшая задержка для правдоподобности    иначе:        юниты = распознаем юнитов(изображение)        карты = распознаем карты(изображение)        мана = распознаем ману(изображение)        действия += анализ(изображение, юниты, карты, мана)</code> </pre> <br><br>  So far, the bot can only put units at one point, but already has enough information to build a more complex strategy. <br><br><h3>  First problems </h3><br>  In reality, I was faced with an unexpected and very unpleasant problem.  Creating a screenshot via ADB takes about 100 ms, which introduces a significant delay - I expected this maximum delay, taking into account all the calculations and the choice of action, but not at one step of creating a screenshot.  Simple and quick solutions could not be found.  In theory, using the Android emulator, you can take screenshots directly from the application window, or you can make a utility to stream the image from the phone with compression via UDP and connect to it with a bot, but I did not find quick solutions either. <br><br><h2>  so </h2><br>  Soberly assessing the state of my project, I decided to stop on this model for now.  I spent a few weeks of my free time on this, but the recognition of units is only part of the gameplay. <br><br>  I decided to develop parts of the bot gradually - to make the basic logic of perception, then the simple logic of the game and interaction with the game, and then it will be possible to improve the individual subsiding parts of the bot.  When the level of model recognition units becomes sufficient, adding information about HP and the level of units can lead the development of a game bot to a new level.  Perhaps this will be the next goal, but for now you definitely should not dwell on this task. <br><br>  <a href="https://github.com/clash-royale-bot-project/clash-royal-bot">Project repository on Github</a> <br><br>  I spent a lot of time on the project and, to be honest, I was tired of it, but I don’t regret a bit - I got a new experience in ML / CV. <br><br>  Maybe I will come back to him later - I will be glad if someone joins me.  If you are interested, join the <a href="https://t.me/joinchat/AF_oXheLnYheLfCay-WTyA">Telegram</a> group, and also come to my <a href="https://binarydistrict.com/ru/course/scala-basic/%3Futm_source%3Dblogs%26utm_medium%3Dhabrhabr%26utm_campaign%3Dclashroyale_bot%26roistat_param1%3Dscala%26roistat_param2%3D160219">Scala course</a> . </div><p>Source: <a href="https://habr.com/ru/post/439352/">https://habr.com/ru/post/439352/</a></p>
+<section class="navigation-panel">
+<h4>More articles:</h4>
+<nav><ul class="list-of-pages">
+<li><a href="../438956/index.html">Magnetite in the teeth: sequencing of transcriptomes of the tissues of the radula of the shell of mollusc shell</a></li>
+<li><a href="../438958/index.html">ILV confirmed the existence of its "space station"</a></li>
+<li><a href="../438960/index.html">How I abandoned Ruby in favor of Python, working on a backend</a></li>
+<li><a href="../438962/index.html">For the most part, a positive outlook for the future of chips.</a></li>
+<li><a href="../438964/index.html">Who really stands behind popular free VPNs?</a></li>
+<li><a href="../438966/index.html">The history of wandering documentation Haproxy, or what you should pay attention to when it is configured</a></li>
+<li><a href="../438968/index.html">Marking shoes in Russia: The market is not ready, but will have to work</a></li>
+<li><a href="../438970/index.html">It is said that Haskell is a language for geniuses and academics. True?</a></li>
+<li><a href="../438972/index.html">The brain from the inside (Visualization of the passage of the pattern through the model of an artificial neural network)</a></li>
+<li><a href="../438974/index.html">Virtual reality helps to cope with mental disorders</a></li>
+<li><a href="../438976/index.html">The book "Spring. All design patterns »</a></li>
+<li><a href="../438980/index.html">Spring Boot 2: what's new?</a></li>
+<li><a href="../438982/index.html">Kubernetes tutorial, part 1: applications, microservices and containers</a></li>
+<li><a href="../438984/index.html">Kubernetes Handbook Part 2: Creating and Working With a Cluster</a></li>
+<li><a href="../438986/index.html">React Training Course Part 14: Workshop on Class Based Components, Component State</a></li>
+<li><a href="../438988/index.html">React Training Course, Part 15: Workshop on Working with Component State</a></li>
+<li><a href="../438992/index.html">Developer Diary or Bad Decisions</a></li>
+<li><a href="../438994/index.html">Intel Xeon W-3175X, hot drummer. Testing</a></li>
+<li><a href="../438996/index.html">Company network and MitM. Part 1</a></li>
+<li><a href="../438998/index.html">CGDevs Moscow Meetup # 2</a></li>
+<li><a href="../439000/index.html">Spatial manipulation in 2D using Signed Distance Fields</a></li>
+<li><a href="../439002/index.html">How to stop "writing TK" and start working?</a></li>
+<li><a href="../439006/index.html">How AI helps to master sign language</a></li>
+<li><a href="../439008/index.html">Mail.ru has released a new Atom browser with an emphasis on "security and privacy"</a></li>
+<li><a href="../439010/index.html">How is the consolidation of archives in DeviceLock DLP</a></li>
+<li><a href="../439012/index.html">Telephone directory of the organization - print version</a></li>
+<li><a href="../439016/index.html">Static Generic Tables</a></li>
+<li><a href="../439018/index.html">Setting up Sphinx search for an online store</a></li>
+<li><a href="../439020/index.html">Ticket to Ride. Europe - arithmetic, part two</a></li>
+<li><a href="../439022/index.html">CNC in the hobby workshop (part 3)</a></li>
+<li><a href="../439024/index.html">Results Slurm-3</a></li>
+<li><a href="../439028/index.html">How to improve network perimeter protection? Practical recommendations for Check Point and not only</a></li>
+<li><a href="../439030/index.html">A lot of managers</a></li>
+<li><a href="../439032/index.html">Amazon and Google are planning to enter the energy market</a></li>
+<li><a href="../439034/index.html">Group-IB Webinar: Red Team or Pentest 12.02.2019</a></li>
+<li><a href="../439036/index.html">The main thing is not to get into the mall under the reconciliation of hours</a></li>
+<li><a href="../439038/index.html">Making a neural network: how not to break the brain</a></li>
+<li><a href="../439040/index.html">To isolate the Runet need budget funds</a></li>
+<li><a href="../439042/index.html">Puma is looking for beta testers for self-tapping sneakers Fi</a></li>
+<li><a href="../439046/index.html">How to safely combine the network segments of the three major banks: share tricks</a></li>
+<li><a href="../439050/index.html">Training Cisco 200-125 CCNA v3.0. Cisco Certified Network Specialist (CCNA). Day 2. OSI and TCP-IP models</a></li>
+<li><a href="../439056/index.html">Cement Brand Integration</a></li>
+<li><a href="../439060/index.html">7 types of customers</a></li>
+<li><a href="../439062/index.html">Anisoprint Composer: 3D printing of high strength</a></li>
+<li><a href="../439064/index.html">Typical mesh error (Bootstrap Grid), or why the designer and layout designer do not understand each other</a></li>
+<li><a href="../439066/index.html">Operating system on Rust. Page memory: advanced level</a></li>
+<li><a href="../439068/index.html">Spam campaign “Love you” redirected to Japan</a></li>
+<li><a href="../439070/index.html">China refuses anti-corruption system Zero Trust AI because of its high efficiency</a></li>
+<li><a href="../439074/index.html">Password Checkup extension checks passwords with a base of 4 billion compromised accounts</a></li>
+<li><a href="../439076/index.html">In which applications to wait for an unknown malicious code?</a></li>
+<li><a href="../439078/index.html">Perm programmer arrested for creating a mobile application through which the pedophile acted</a></li>
+<li><a href="../439080/index.html">Unobvious RabbitMQ in Yii2 or why RabbitMQ writes to all queues at once</a></li>
+<li><a href="../439082/index.html">Walk through the plant of desires</a></li>
+<li><a href="../439086/index.html">Causes of ANR and how to avoid it</a></li>
+<li><a href="../439094/index.html">Scientists have found the oldest living vertebrate on Earth</a></li>
+<li><a href="../439096/index.html">Buildbot: a tale with examples of one more continuous integration system</a></li>
+<li><a href="../439098/index.html">Sasha Memus, Chatfuel: How to build a career in products after consulting, is it dangerous to meditate and how to change behavior</a></li>
+<li><a href="../439100/index.html">How to adapt UX / UI for permissions</a></li>
+<li><a href="../439102/index.html">Russians are 20% more likely to face insults on the Internet</a></li>
+<li><a href="../439104/index.html">Redux Simple as a rake</a></li>
+<li><a href="../439106/index.html">Programming in Russia will be introduced from primary school</a></li>
+<li><a href="../439108/index.html">Amateur radio measurements: when there is no frequency meter</a></li>
+<li><a href="../439112/index.html">Creator Kate Mobile arrested for using a pedophile for his service</a></li>
+<li><a href="../439118/index.html">New in browsers: Firefox 66 blocks video and sound by default, Chromium limits page budget</a></li>
+<li><a href="../439122/index.html">Simplicity and complexity of primitives or how to determine unnecessary preprocessing for a neural network</a></li>
+<li><a href="../439124/index.html">If software is created with public money, the code should be open.</a></li>
+<li><a href="../439126/index.html">Requests from users and product requirements</a></li>
+<li><a href="../439128/index.html">How to organize the work of QA. One practically applied method</a></li>
+<li><a href="../439130/index.html">13 trends in the cybersecurity and information security market 2019-2020</a></li>
+<li><a href="../439132/index.html">Unforgettable old age</a></li>
+<li><a href="../439134/index.html">Russian scientists are developing sitall (unbreakable glass) for LG smartphones</a></li>
+<li><a href="../439136/index.html">What is the difference between 4G and 5G?</a></li>
+<li><a href="../439138/index.html">Working with callbacks in React</a></li>
+<li><a href="../439140/index.html">Important message about invites in profile</a></li>
+<li><a href="../439142/index.html">Design maturity models</a></li>
+<li><a href="../439148/index.html">Working with nRF51822 using ST-Link and Clion + OpenOCD</a></li>
+<li><a href="../439150/index.html">Who should pay transaction costs</a></li>
+<li><a href="../439152/index.html">Salaries in IT in the second half of 2018: according to the “My Circle” salary calculator</a></li>
+<li><a href="../439154/index.html">How do freelancers live: book cover design, own production of backpacks and travel work</a></li>
+<li><a href="../439158/index.html">DataArt Launches Free CV Duck Resume Improvement Service</a></li>
+<li><a href="../439160/index.html">Algorithm state: what happens to indie developers on Steam?</a></li>
+<li><a href="../439162/index.html">How to debug front-end and backend: step-by-step instructions</a></li>
+<li><a href="../439166/index.html">mmWave on the road to commercialization in the form factor of a smartphone</a></li>
+<li><a href="../439170/index.html">Cellular operators will help banks verify the accuracy of customer data</a></li>
+<li><a href="../439172/index.html">Extending the assert () macro to implement minimal error handling</a></li>
+<li><a href="../439174/index.html">Safe Internet Day: what threats to pay attention to in 2019</a></li>
+<li><a href="../439182/index.html">How do we distribute orders between drivers in Yandex.Taxi</a></li>
+<li><a href="../439186/index.html">UX Editor: True Story, Rial Life</a></li>
+<li><a href="../439194/index.html">Controlling a character with SharedEvents</a></li>
+<li><a href="../439196/index.html">JPMorgan analysts: Apple should buy Blizzard, Netflix or Sonos to reassure investors</a></li>
+<li><a href="../439198/index.html">Generation of barrier islands</a></li>
+<li><a href="../439200/index.html">Composer for the smallest</a></li>
+<li><a href="../439202/index.html">Detection of web attacks using autoencoder Seq2Seq</a></li>
+<li><a href="../439204/index.html">Increasing the efficiency of photosynthesis by genetic modification of plants</a></li>
+<li><a href="../439210/index.html">Java after volcanic eruption</a></li>
+<li><a href="../439216/index.html">pudge embedded database in 500 lines on golang</a></li>
+<li><a href="../439218/index.html">VC bot on the knee, or how to please people February 14</a></li>
+<li><a href="../439222/index.html">What is API management?</a></li>
+<li><a href="../439224/index.html">Again about the Voronoi diagrams</a></li>
+<li><a href="../439232/index.html">JAMstack: How to create your blog using Gatsby + Contentful + Netlify</a></li>
+<li><a href="../439236/index.html">xenvman: Flexible environments for testing microservices (and not only)</a></li>
+<li><a href="../439238/index.html">Play Store now accepts progressive web applications (PWA)</a></li>
+<li><a href="../439240/index.html">Joomla Digest for January 2019</a></li>
+<li><a href="../439244/index.html">FAS strongly recommends to pre-install Russian software on smartphones and laptops sold in Russia</a></li>
+<li><a href="../439248/index.html">Alan Kay: “Could the ancient Romans build a computer?”</a></li>
+<li><a href="../439252/index.html">6 reasons to develop IT career in Armenia</a></li>
+<li><a href="../439254/index.html">Our all</a></li>
+<li><a href="../439260/index.html">The author of the book "The Witcher" will still receive compensation from CD Projekt Red</a></li>
+<li><a href="../439262/index.html">Deploy the code directly to the docker container. Or how not to prokrasinirovat after each commit</a></li>
+<li><a href="../439264/index.html">How to lead complex technical projects without hiring PMs: DataLine experience</a></li>
+<li><a href="../439266/index.html">The experience of creating an Android game alone from scratch and how it was captured on Google Play</a></li>
+<li><a href="../439268/index.html">How VR, AR and 3D printing work together: the VR Concept experience</a></li>
+<li><a href="../439270/index.html">An example of parsing C ++ code using libclang in Python</a></li>
+<li><a href="../439278/index.html">ACS my LCD - security on two bolts</a></li>
+<li><a href="../439280/index.html">Trautonium: the German wave in the history of synthesizers</a></li>
+<li><a href="../439282/index.html">Effects of filtering SVG. Part 1. SVG filters 101</a></li>
+<li><a href="../439288/index.html">SciPy Optimization</a></li>
+<li><a href="../439290/index.html">Accelerate compilation in Xcode to swift</a></li>
+<li><a href="../439292/index.html">Google has agreed to remove from the search banned sites in the Russian Federation</a></li>
+<li><a href="../439294/index.html">Translation review "If software is created with public money, the code must be open"</a></li>
+<li><a href="../439296/index.html">Soviet license plate and Kolmogorov complexity</a></li>
+<li><a href="../439298/index.html">What would the Internet system look like in the game EvE Online</a></li>
+<li><a href="../439300/index.html">Statistics for file types in the Wildfire cloud sandbox</a></li>
+<li><a href="../439302/index.html">Product Design Digest, January 2019</a></li>
+<li><a href="../439304/index.html">[Ekaterinburg, announcement] Mitap for Java-developers</a></li>
+<li><a href="../439308/index.html">Kill cancer: iridium, human serum albumin and some blue light</a></li>
+<li><a href="../439310/index.html">Why not take off the real estate portal. Part 2</a></li>
+<li><a href="../439312/index.html">Speed ​​up complex calculations with minimal RAM</a></li>
+<li><a href="../439314/index.html">Seven strange ways of dealing with recluse in remote work</a></li>
+<li><a href="../439316/index.html">“I stopped doing what I see no point in”: project managers about their work and training</a></li>
+<li><a href="../439318/index.html">Win procrastination gaming addiction</a></li>
+<li><a href="../439320/index.html">How to diversify programming lessons for children of different ages</a></li>
+<li><a href="../439322/index.html">OS Sailfish renamed OS "Aurora"</a></li>
+<li><a href="../439324/index.html">Using a binary tree in swift using enum using OCR as an example</a></li>
+<li><a href="../439326/index.html">Electric Ford F-150 EV - in the prototype and tested on the road</a></li>
+<li><a href="../439328/index.html">Okay, google! Are you good or evil?</a></li>
+<li><a href="../439332/index.html">How PageRank works: implementation in the R language through linear algebra and power-method</a></li>
+<li><a href="../439334/index.html">About 2 billion rubles allocated for the implementation of the draft law on sustainable runet</a></li>
+<li><a href="../439336/index.html">We are looking for a needle in a stack without using well-known algorithms.</a></li>
+<li><a href="../439338/index.html">Forget about privacy: you still have terrible targeting</a></li>
+<li><a href="../439340/index.html">GDPR backup — what a new tool will do</a></li>
+<li><a href="../439342/index.html">Winter DIYorDIE Meetup February 17</a></li>
+<li><a href="../439344/index.html">To be like a troll: how monopolists rule patents</a></li>
+<li><a href="../439346/index.html">Laravel + Docker: Our Successful Experience</a></li>
+<li><a href="../439348/index.html">Vision falls after laser vision correction - what to do? Or, doctor, make me an "enhancement"</a></li>
+<li><a href="../439350/index.html">Artificial intelligence as a machine of inventions</a></li>
+<li><a href="../439352/index.html">Making a bot prototype for fighting in Clash Royale</a></li>
+<li><a href="../439354/index.html">Rust news # 5 (January 2019)</a></li>
+<li><a href="../439356/index.html">Nontrivial metrics of the effectiveness of advertising campaigns</a></li>
+<li><a href="../439358/index.html">Excel metadata files</a></li>
+<li><a href="../439360/index.html">Training Cisco 200-125 CCNA v3.0. Cisco Certified Network Specialist (CCNA). Day 3. Subnets</a></li>
+<li><a href="../439362/index.html">How we teach Software Engineering at St. Petersburg HSE</a></li>
+<li><a href="../439364/index.html">Oculus Go glasses with “strawberry” content set up for sale</a></li>
+<li><a href="../439366/index.html">Automation of three nails</a></li>
+<li><a href="../439368/index.html">Animations in iOS applications born on the server</a></li>
+<li><a href="../439374/index.html">For those who want to play detective: find a bug in the function from Midnight Commander</a></li>
+<li><a href="../439376/index.html">"Interest club"</a></li>
+<li><a href="../439378/index.html">The Book of Genesis?). Reflections on the nature of mind. Part I</a></li>
+<li><a href="../439380/index.html">How I created an extension for Atom and VS Code: personal experience and source codes</a></li>
+<li><a href="../439382/index.html">Using Ansible, Terraform, Docker, Consul, Nomad in the Clouds (Alexey Vakhov, Uchi.ru)</a></li>
+<li><a href="../439390/index.html">The best innovations of social networks in 2018</a></li>
+<li><a href="../439392/index.html">The 2019 championship season is open! SNA Hackathon Launches ala ML Boot Camp 8</a></li>
+<li><a href="../439394/index.html">As a programmer dataseativistam wrote</a></li>
+<li><a href="../439396/index.html">UniFi Controller Password Reset</a></li>
+<li><a href="../439404/index.html">A brief history of electronic public procurement in Russia</a></li>
+<li><a href="../439408/index.html">Pseudo Lens Flare</a></li>
+<li><a href="../439410/index.html">Jeff Hawkins is finally ready to explain his brain research.</a></li>
+<li><a href="../439414/index.html">Client for "server push messages"</a></li>
+<li><a href="../439416/index.html">A-Frame Review</a></li>
+<li><a href="../439418/index.html">Pentaho Data Integration (PDI), Python and Deep Learning</a></li>
+<li><a href="../439420/index.html">Building the transport package without installing MODX</a></li>
+<li><a href="../439422/index.html">What does a programmer need to develop games and who really is a game developer on the part of a programmer</a></li>
+<li><a href="../439424/index.html">How I Fought Free Hosting and Composer</a></li>
+<li><a href="../439426/index.html">Situation: a new wave of attacks with the interception of DNS queries - we analyze the basic methods of protection</a></li>
+<li><a href="../439430/index.html">Believe me if you can. Water meters. part 1</a></li>
+<li><a href="../439432/index.html">How to become a Java developer in 1.5 years</a></li>
+<li><a href="../439434/index.html">NestJS - the very real nodejs backend</a></li>
+<li><a href="../439436/index.html">Cheaper price of small series of electronics in Russia. Case Internet radio WOLNA</a></li>
+<li><a href="../439440/index.html">Implementation of Zimbra Collaboration Open Source, authorization through AD and automatic creation of mailboxes</a></li>
+<li><a href="../439442/index.html">Julia. Report Generators and Documentation</a></li>
+<li><a href="../439446/index.html">What you need to know about JavaScript Engine Switcher 3.0</a></li>
+<li><a href="../439448/index.html">What virtualization questions do you expect from a graduate?</a></li>
+<li><a href="../439450/index.html">RS-485 on domestic microcontrollers from the company Milandr</a></li>
+<li><a href="../439454/index.html">Program as Art - a new software management paradigm</a></li>
+<li><a href="../439456/index.html">Hipster podcasts # 2</a></li>
+<li><a href="../439458/index.html">As we Republic website on Kubernetes translated</a></li>
+<li><a href="../439460/index.html">How marketers of Maxidom lose millions flirting in groz marketing: independent usability auditing</a></li>
+<li><a href="../439462/index.html">Civilization Springs, 5/5</a></li>
+<li><a href="../439464/index.html">VXinspect: part quality control in 10 minutes</a></li>
+<li><a href="../439466/index.html">NASA lunar orbital probe made the first pictures of the China Chang'e-4 station - two pixels of light</a></li>
+<li><a href="../439468/index.html">Where to lead the search for the perfect SCADA</a></li>
+<li><a href="../439470/index.html">Germany plans to abandon coal in the near future.</a></li>
+<li><a href="../439472/index.html">Automation of border control within the company</a></li>
+<li><a href="../439476/index.html">Cockney Slang: Modern History and Position</a></li>
+<li><a href="../439478/index.html">Entertaining C #. Five examples for a coffee break</a></li>
+<li><a href="../439480/index.html">Give way, or Why does your CRM (and CRM) slow down?</a></li>
+<li><a href="../439482/index.html">devleads - (not) financial motivation</a></li>
+<li><a href="../439484/index.html">Get the enum data in the Automapper projection</a></li>
+<li><a href="../439496/index.html">How is billing done there: when a customer and a developer speak different languages</a></li>
+<li><a href="../439498/index.html">What hardware to analyze a huge shaft of information?</a></li>
+<li><a href="../439500/index.html">Why are captcha so complicated</a></li>
+<li><a href="../439502/index.html">Undefined behavior and truth undefined</a></li>
+<li><a href="../439504/index.html">Does your Data Engineer team need it?</a></li>
+<li><a href="../439506/index.html">9 alternatives to a bad team (design pattern)</a></li>
+<li><a href="../439510/index.html">High-load distributed control system of a modern NPP</a></li>
+<li><a href="../439512/index.html">The era of dinosaurs or legally verified reinsurance?</a></li>
+<li><a href="../439516/index.html">00110001 00110100 00101110 00110000 00110010</a></li>
+<li><a href="../439524/index.html">Fortnite is the future, but for rather unexpected reasons.</a></li>
+<li><a href="../439526/index.html">Telecom operators will conduct a "field test" of the law on the stability of the Runet</a></li>
+<li><a href="../439532/index.html">What's new in javascript ES2019</a></li>
+<li><a href="../439534/index.html">Yield programming and the use of drones in oil production - 10 lectures from the conference GIS Tech Russia</a></li>
+<li><a href="../439538/index.html">Community programming</a></li>
+<li><a href="../439540/index.html">Etherblade.net - opensource project to create an ethernet traffic encapsulator on FPGA (part one)</a></li>
+<li><a href="../439542/index.html">Nintendo makes it clear that only piracy can save the history of video games</a></li>
+<li><a href="../439544/index.html">The colony. Chapter 24: Departure</a></li>
+<li><a href="../439556/index.html">TDMS Fairway. Methods PMBOK and Russian design organizations</a></li>
+<li><a href="../439558/index.html">New old phone. Reinvent the PSTN phone</a></li>
+<li><a href="../439560/index.html">The adapter for working with the blockchain Ethereum for the InterSystems IRIS data platform</a></li>
+<li><a href="../439562/index.html">Configure the Kubernetes HA cluster on bare metal with kubeadm. Part 1/3</a></li>
+<li><a href="../439564/index.html">Practical application of transformation of AST-trees on the example of Putout</a></li>
+<li><a href="../439566/index.html">Why SRE is important documentation. Part 3</a></li>
+<li><a href="../439568/index.html">QLC based SSD - hard drive killer? Not really</a></li>
+<li><a href="../439572/index.html">Automated design of electronic equipment</a></li>
+<li><a href="../439576/index.html">Extensive review of Python interviews. Hints and Tips</a></li>
+<li><a href="../439578/index.html">On the issue of transformations and other operations</a></li>
+<li><a href="../439584/index.html">Project Lenergy, how to rethink portable power sources</a></li>
+<li><a href="../439586/index.html">SPBm protocol as the basis of Extreme Automated Campus</a></li>
+<li><a href="../439588/index.html">ESET has discovered new versions of the DanaBot Trojan.</a></li>
+<li><a href="../439590/index.html">Quals: Saudi and Oman National Cyber ​​Security CTF 2019. WriteUp</a></li>
+<li><a href="../439592/index.html">Ethical Activity Automation</a></li>
+<li><a href="../439596/index.html">How I accelerated image processing on Android 15 times</a></li>
+<li><a href="../439598/index.html">Microsoft told about the cost of paid support for Windows 7</a></li>
+<li><a href="../439600/index.html">Finland summed up the preliminary results of the experiment with a guaranteed basic income</a></li>
+<li><a href="../439604/index.html">How does the barcode work?</a></li>
+<li><a href="../439606/index.html">Experimental production of electronics for the minimum price</a></li>
+<li><a href="../439608/index.html">Modern religion: what do people give to Google, Facebook, Amazon and Apple?</a></li>
+<li><a href="../439610/index.html">As in my Chevrolet Bolt electric car, under warranty, two battery modules were replaced, and the third was monitored</a></li>
+<li><a href="../439616/index.html">The digest of interesting IT projects on Kickstarter №7</a></li>
+<li><a href="../439618/index.html">PHP for beginners. File attachment</a></li>
+<li><a href="../439620/index.html">Understanding asynchronous JavaScript [Translated by Sukhjinder Arora]</a></li>
+<li><a href="../439624/index.html">Why keep data in orbit</a></li>
+<li><a href="../439626/index.html">Experience developing a free application for collectors OpenNumismat</a></li>
+<li><a href="../439628/index.html">Parallel data update in ASP.NET Web API</a></li>
+<li><a href="../439632/index.html">How to set up Continuous Deployment for your project: personal experience</a></li>
+<li><a href="../439636/index.html">The crisis of the concepts of improving road safety and a new concept of its solution</a></li>
+<li><a href="../439638/index.html">Getting FPGA to Python</a></li>
+<li><a href="../439640/index.html">Vinyl is back and it's different</a></li>
+<li><a href="../439642/index.html">Java pitfalls. Part 1</a></li>
+<li><a href="../439644/index.html">Anti-Aging: Senolithics and Stem Cell Therapy</a></li>
+<li><a href="../439646/index.html">Holding SoftBank sold a stake in Nvidia due to the fall in their prices, but still earned $ 3.3 billion</a></li>
+<li><a href="../439648/index.html">Internal and nested java classes. Part 1</a></li>
+<li><a href="../439652/index.html">How to transport your startup to the USA: 4 important steps</a></li>
+<li><a href="../439654/index.html">Full immersion: how do we cool ASIC chips in Bitfury</a></li>
+<li><a href="../439656/index.html">C # character calculator</a></li>
+<li><a href="../439676/index.html">Integration of React Native and C ++ for iOS and Android</a></li>
+<li><a href="../439680/index.html">About 50% of Russians are ready to sell their personal data</a></li>
+<li><a href="../439682/index.html">Training Cisco 200-125 CCNA v3.0. Cisco Certified Network Specialist (CCNA). Day 4. Gateway devices</a></li>
+<li><a href="../439686/index.html">Flickr introduces new rules regarding the number of photos and videos users.</a></li>
+<li><a href="../439688/index.html">Overview of AI & ML solutions in 2018 and forecasts for 2019: Part 1 - NLP, Computer Vision</a></li>
+<li><a href="../439690/index.html">Virtual machine performance comparison of 6 cloud platforms: Selectel, MCS, Ya.Oblako, Google Cloud, AWS and Azure</a></li>
+<li><a href="../439692/index.html">AT & T sued for changing the network icon from 4G to 5G E</a></li>
+<li><a href="../439694/index.html">Developed smart tissue that reacts to changes in body temperature</a></li>
+<li><a href="../439696/index.html">On the crest of a wave, or “I want to go to the mainstream” - is it worth it?</a></li>
+<li><a href="../439698/index.html">Introduction to programming: a simple 3D shooter from scratch over the weekend, part 1</a></li>
+<li><a href="../439700/index.html">Patent for a board game in Russia</a></li>
+<li><a href="../439704/index.html">From pool request to release. Report Yandex.Taxi</a></li>
+<li><a href="../439706/index.html">BLACK HAT conference. Survival lessons in a 300 Gbps DDOS attack. Part 1</a></li>
+<li><a href="../439710/index.html">Features of creating products for the US market</a></li>
+<li><a href="../439712/index.html">Government procurement: a balance between the Italian strike and the Russian criminal</a></li>
+<li><a href="../439716/index.html">Tails OS or how to protect yourself online</a></li>
+<li><a href="../439718/index.html">Developing Elixir / Phoenix Applications with Docker</a></li>
+<li><a href="../439720/index.html">Introduction to programming: a simple 3D shooter from scratch over the weekend, part 2</a></li>
+<li><a href="../439722/index.html">Effects of SVG filters. Part 2. Outline text with feMorphology</a></li>
+<li><a href="../439724/index.html">Overview of AI & ML solutions in 2018 and forecasts for 2019: Part 2 - Tools and Libraries, AutoML, RL, Ethics in AI</a></li>
+<li><a href="../439726/index.html">Lock-in: truth or fiction?</a></li>
+<li><a href="../439728/index.html">Setting up backup and recovery of Zimbra OSE entirely and in separate boxes without using Zextras</a></li>
+<li><a href="../439730/index.html">Organizing reducer through standard class</a></li>
+<li><a href="../439732/index.html">Lazarus - simple animation using the TImageFragment component</a></li>
+<li><a href="../439734/index.html">We deploy Kubernetes on the desktop in minutes with MicroK8s</a></li>
+<li><a href="../439736/index.html">IPSec VPN connection between MikroTik and Kerio Control</a></li>
+<li><a href="../439746/index.html">Understand the promises in javascript</a></li>
+<li><a href="../439748/index.html">The digest of interesting materials for the mobile developer # 285 (February 4 - 10)</a></li>
+<li><a href="../439750/index.html">Learn product management - where?</a></li>
+<li><a href="../439752/index.html">Multicore MRI Method</a></li>
+<li><a href="../439754/index.html">Google is going to be engaged in the development of smart watches</a></li>
+<li><a href="../439756/index.html">Why do I need a thermo-acoustic generator?</a></li>
+<li><a href="../439760/index.html">Engineers "twisted" the light in the fiber - a new technology will speed up the transfer of data a hundred times</a></li>
+<li><a href="../439764/index.html">Corporate fruit</a></li>
+<li><a href="../439772/index.html">Writing Unit Tests on Swift for Verifying Asynchronous Tasks</a></li>
+<li><a href="../439778/index.html">The digest of fresh materials from the world of the frontend for the last week No. 351 (February 4 - 10, 2019)</a></li>
+<li><a href="../439780/index.html">PHP Digest number 149 (January 28 - February 11, 2019)</a></li>
+<li><a href="../439782/index.html">Headless CMS - the future of content management</a></li>
+<li><a href="../439784/index.html">Methane engine "Raptor" broke the record RD-180</a></li>
+<li><a href="../439788/index.html">Regular oddities in the GOST Grasshopper and Stribog algorithms</a></li>
+<li><a href="../439790/index.html">Test JaCarta WebClient or store tokens in a safe</a></li>
+<li><a href="../439792/index.html">NASA is looking for partners in the American industry to create a partially reusable manned lender</a></li>
+<li><a href="../439794/index.html">Back pain - understanding from the perspective of modern medicine</a></li>
+<li><a href="../439796/index.html">Spring Boot 2: what is not written in release notes</a></li>
+<li><a href="../439800/index.html">RISEX and Julia. 5 stages of love customer and designer</a></li>
+<li><a href="../439806/index.html">Valid SSL domain names for local Docker containers</a></li>
+<li><a href="../439808/index.html">The biggest telescopes. From a notebook and eyes to 340 megapixel cameras and data centers. Part 1</a></li>
+<li><a href="../439810/index.html">Get acquainted with the Moleculer microservice framework</a></li>
+<li><a href="../439816/index.html">Practical blockchain in business</a></li>
+<li><a href="../439818/index.html">Features of approaches to design in the real manufacturing sector</a></li>
+<li><a href="../439820/index.html">We are trying to write a project alone. Introduction</a></li>
+<li><a href="../439822/index.html">Creating an alternative display for the Ensoniq EPS16 + and ASR10 synthesizer / sampler</a></li>
+<li><a href="../439824/index.html">When will the JavaScript frameworks disappear?</a></li>
+<li><a href="../439826/index.html">Disable analog. What will happen to the TV?</a></li>
+<li><a href="../439828/index.html">The network appeared "analog" Findface</a></li>
+<li><a href="../439840/index.html">Conference DUMP-2019: we invite you to speak in the sections Design, Management and Testing</a></li>
+<li><a href="../439852/index.html">Remote control application release: Aspia 1.1.0</a></li>
+<li><a href="../439858/index.html">Prometheus + Grafana + Node Exporter + Docker in Azure with notifications in Telegram</a></li>
+<li><a href="../439862/index.html">Digital events in Moscow from February 11 to 17</a></li>
+<li><a href="../439866/index.html">Principles of design reference books in 1C Enterprise Management 2 (ERP 2.4.6)</a></li>
+<li><a href="../439868/index.html">Life without Facebook: less radical views, good mood, more time for loved ones. Now proven by science</a></li>
+<li><a href="../439878/index.html">Creation of architecture for a new high-load startup in 2019</a></li>
+<li><a href="../439880/index.html">Security Week 07: Local IoT Device Vulnerabilities</a></li>
+<li><a href="../439886/index.html">How I trained the neural network to implement the position estimation function on the Russian AI Cup CodeBall 2018</a></li>
+<li><a href="../439894/index.html">How easy it is to monitor the site</a></li>
+<li><a href="../439900/index.html">Julia and the method of coordinate descent</a></li>
+<li><a href="../439902/index.html">Explaining the physical essence of the Wing Lift phenomenon without using the Bernouli equation. Part 2</a></li>
+<li><a href="../439906/index.html">Critical vulnerability in Zemana products and not only</a></li>
+<li><a href="../439908/index.html">Kohl, piss off ... Coax</a></li>
+<li><a href="../439912/index.html">Unsolved mystery of view</a></li>
+<li><a href="../439916/index.html">Unpacking: Dridex bootloader</a></li>
+<li><a href="../439922/index.html">Taxation of IP in Kazakhstan how to be a freelancer?</a></li>
+<li><a href="../439924/index.html">The volume of parcels from foreign online stores grew by 25%</a></li>
+</ul></nav>
+</section>
+<script src="../../js/main.js"></script>
+
+<!-- Yandex.Metrika counter -->
+<script type="text/javascript" >
+  (function (d, w, c) {
+      (w[c] = w[c] || []).push(function() {
+          try {
+              w.yaCounter52319614 = new Ya.Metrika({
+                  id:52319614,
+                  clickmap:true,
+                  trackLinks:true,
+                  accurateTrackBounce:true,
+                  webvisor:true
+              });
+          } catch(e) { }
+      });
+
+      var n = d.getElementsByTagName("script")[0],
+          s = d.createElement("script"),
+          f = function () { n.parentNode.insertBefore(s, n); };
+      s.type = "text/javascript";
+      s.async = true;
+      s.src = "https://mc.yandex.ru/metrika/watch.js";
+
+      if (w.opera == "[object Opera]") {
+          d.addEventListener("DOMContentLoaded", f, false);
+      } else { f(); }
+  })(document, window, "yandex_metrika_callbacks");
+</script>
+<noscript><div><img src="https://mc.yandex.ru/watch/52319614" style="position:absolute; left:-9999px;" alt="" /></div></noscript>
+
+<!-- Google Analytics -->
+  <script>
+    window.ga = function () { ga.q.push(arguments) }; ga.q = []; ga.l = +new Date;
+    ga('create', 'UA-134228602-1', 'auto'); ga('send', 'pageview')
+  </script>
+  <script src="https://www.google-analytics.com/analytics.js" async defer></script>
+
+</section>
+</body>
+
+</html>

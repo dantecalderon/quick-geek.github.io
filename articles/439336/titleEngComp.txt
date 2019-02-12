@@ -1,0 +1,1 @@
+We are looking for a needle in a stack without using well-known algorithms.

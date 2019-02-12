@@ -1,0 +1,412 @@
+<!doctype html>
+<html class="no-js" lang="en">
+
+<head>
+  <!-- Global site tag (gtag.js) - Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=UA-134228602-1"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'UA-134228602-1');
+  </script>
+
+  <meta charset="utf-8">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  <title>Effects of filtering SVG. Part 1. SVG filters 101</title>
+  <meta name="description" content="Sara Soueidan, a freelance UI / UX developer of the interface and author of many technical articles living in Lebanon, offers a series of articles on ...">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+  <link rel="stylesheet" href="../../css/main.css">
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+  <script>window.jQuery || document.write('<script src="../../js/vendors/jquery-3.3.1.min.js"><\/script>')</script>
+</head>
+
+<body>
+  <!--[if lte IE 9]>
+    <p class="browserupgrade">You are using an <strong>outdated</strong> browser. Please <a href="https://browsehappy.com/">upgrade your browser</a> to improve your experience and security.</p>
+  <![endif]-->
+  <nav class="page-headings-container js-page-headings-container"></nav>
+  <div class="tools-bar js-tools-bar">
+    <!-- <a href="https://quick-geek.github.io/search.html" title="Search">🔎</a> -->
+    <a class="js-list-of-headings-button" data-state="closed" href="#" title="Headings">📜</a>
+    <a class="js-go-to-top-button" href="#" title="Go to Top">⬆️</a>
+    <a class="js-go-to-bottom-button" href="#" title="Go to Bottom">⬇️</a>
+  </div>
+  <section class="page js-page"><h1>Effects of filtering SVG. Part 1. SVG filters 101</h1><div class="post__text post__text-html js-mediator-article"><p>  Sara Soueidan, a freelance UI / UX developer of the interface and author of many technical articles living in Lebanon, offers a series of articles on the SVG filters and consists of the following articles: </p><br><h1 id="effekty-filtracii-svg">  Effects of filtering SVG </h1><br><ol><li>  SVG filters 101. </li><li>  <a href="https://habr.com/ru/post/439722/">Effects of SVG filters: outline text using feMorphology</a> . </li></ol><br><div class="spoiler">  <b class="spoiler_title">Not yet translated</b> <div class="spoiler_text"><ol><li>  <a href="https://tympanus.net/codrops/2019/01/29/svg-filter-effects-poster-image-effect-with-fecomponenttransfer/">SVG Filter Effects: Poster Image Effect with feComponentTransfer</a> . </li><li>  <a href="https://tympanus.net/codrops/2019/02/05/svg-filter-effects-duotone-images-with-fecomponenttransfer/">SVG Filter Effects: Duotone Images with feComponentTransfer</a> . </li></ol></div></div><br><p>  This is the first article in the series about SVG filters.  This guide will help you understand what it is and show you how to use them to create your own visual effects. </p><br><p><img src="https://habrastorage.org/webt/_8/ka/is/_8kaisnavnh_qmr3tvdsxofq0ii.png"></p><a name="habracut"></a><br><p>  <strong>CSS</strong> currently provides us with a way to apply color effects to images such as saturation, brightness, and contrast, among other effects, using the <strong>filter</strong> property and its functions that come with it. </p><br><p>  We now have 11 filter functions in CSS that perform a range of effects from blurring to changing color contrast and saturation and much more.  Detailed information on this can be <a href="https://tympanus.net/codrops/css_reference/filter/">found in the CSS reference</a> . </p><br><p>  Although powerful and very convenient, CSS filters are also very limited.  The effects that we can create with their help are often applicable to images and are limited to color manipulations and simple blurring.  Thus, to create more powerful effects that we can apply to a wider range of elements, we will need a wider range of functions.  These features are available today, and have been available for more than a decade in SVG.  In this article, which is the first in a series about SVG filters, you will learn about the functions of SVG filters, known as “primitives,” and how to use them. </p><br><p>  CSS filters imported from SVG.  They are fairly well optimized versions of a subset of filtering effects presented in SVG and existing in the SVG specification for many years. </p><br><p>  SVG has more filtering effects than CSS, and SVG versions are more powerful and perform much more complex effects than their CSS shortcuts.  For example, you can now blur an element using the <strong>blur ()</strong> CSS filtering feature.  Applying a blur effect using this function will create a uniform Gaussian blur of the element to which it is applied.  The following image shows the result of applying a 6px blur to an image in CSS: </p><br><p><img src="https://habrastorage.org/webt/b0/qa/fy/b0qafyst_uc08euvuxzilp13-wi.png" alt="Effect of using the function ** blur () ** - Gaussian blur"><br>  <em>Fig_1.</em>  <em>The effect of applying the CSS function <strong>blur ()</strong> - Gaussian blur.</em> </p><br><p>  The <strong>blur ()</strong> function creates a blur effect that is uniformly applied in both directions (X and Y) in the image.  But this function is just a simplified and limited reduction of the blur filter primitive available in SVG, which allows us to blur the image either evenly or apply a unidirectional blur effect along the X or Y axes. </p><br><p><img src="https://habrastorage.org/webt/e5/gp/rr/e5gprr6riymt0ede8sxusumcyfk.png" alt="The effect of applying the SVG function ** blur () ** separately along the axes"><br>  <em>Pic_2.</em>  <em>The effect of applying the SVG-function <strong>blur ()</strong> separately along the axes.</em> </p><br><p>  SVG filters can be applied to both HTML elements and SVG elements.  The SVG filtering effect can be applied to an HTML element in CSS using the url () filter function.  For example, if you have a filter effect with the identifier <strong>myAwesomeEffect</strong> defined in SVG (we’ll talk about defining filter effects in SVG soon), you can apply this effect to an HTML element or image like this: </p><br><pre><code class="plaintext hljs">.el { filter: url(#myAwesomeEffect); }</code> </pre> <br><p>  Best of all, as you will see in this article series, SVG filters are capable of creating Photoshop-level effects in a browser using a few lines of code.  I hope that this series will help dispel the aura of secrets and unleash some of the potential of SVG filters that will inspire you to use them in your own projects. </p><br><p>  But what about browser support, you ask ..? </p><br><h2 id="podderzhka-brauzerami">  Browser Support </h2><br><p>  <a href="https://caniuse.com/">Browser support for</a> most SVG filters is impressive.  However, the method of applying the effect may differ for some browsers depending on their support for certain filter primitives used in the SVG filtering effect, as well as on possible browser errors.  Browser support may also differ when the SVG filter is applied to SVG elements or to HTML elements. </p><br><p>  I would recommend that you consider filtering effects as an extension: you can almost always apply an effect as an improvement over a completely useful non-filter experience.  Many people know that I support the progressive approach of creating a UI, when it is possible.  Thus, we will not worry too much about browser support in this series of articles. </p><br><p>  Finally, despite the fact that support for SVG filters is generally good, keep in mind that some of the effects that we will consider later can be considered experimental.  I will point out any major problems or errors if and when they will. </p><br><p>  So, how to define and create a filtering effect in SVG? </p><br><h2 id="element--filter">  &lt;Filter&gt; element </h2><br><p>  Like linear gradients, masks, patterns and other graphic effects in SVG, filters have a conveniently-named specialized element: <strong>&lt;filter&gt;</strong> . </p><br><p>  It is never displayed directly, but is used only as an object that can be referenced using the <strong>filter</strong> attribute in SVG or the <strong>url ()</strong> function in CSS.  Elements that are not displayed without an explicit link are usually defined as templates within the <strong>&lt;defs&gt;</strong> elements in the SVG.  But SVG <strong>&lt;filter&gt;</strong> does not need to be packaged in a <strong>defs</strong> element.  Whether you wrap the filter in the <strong>defs</strong> element or not, it will still not be displayed. </p><br><p>  The reason for this is that the <strong>filter requires the original image to be processed</strong> .  And if you do not explicitly define this source image by calling a filter on it, the filter will not have anything to render, and therefore it will not work. </p><br><p>  A very simple, minimal code example defining an SVG filter and applying it to an original image in an SVG will look like this: </p><br><pre> <code class="plaintext hljs">&lt;svg width="600" height="450" viewBox="0 0 600 450"&gt; &lt;filter id="myFilter"&gt; &lt;!-- filter effects go in here --&gt; &lt;/filter&gt; &lt;image xlink:href="..." width="100%" height="100%" x="0" y="0" filter="url(#myFilter)"&gt;&lt;/image&gt; &lt;/svg&gt;</code> </pre> <br><p>  The filter in the above code example does nothing at the moment, as it is empty.  To create a filter effect, you need to define a series of one or more filtering operations that create this effect inside the filter.  In other words, the <strong>&lt;filter&gt;</strong> element is a container for a series of filtering operations that together create a filter effect.  These filtering operations in SVG are called “ <strong>filter primitives</strong> ”. </p><br><h2 id="primitivy-filtra">  Filter primitives </h2><br><p>  Thus, in SVG, each <strong>&lt;filter&gt;</strong> element contains a set of filter primitives as child elements.  Each filter primitive performs one elementary graphic operation on one or several inputs, creating a graphic result. </p><br><p>  Filter primitives are conveniently named after the graphic operations they perform.  For example, a primitive that applies a Gaussian Blur effect to a graphics source is called <strong>feGaussian Blur</strong> .  All primitives have the same prefix: fe, abbreviated from the “ <em>filter effect</em> ”.  Again, the names in the SVG are convenient to choose in order to understand what this element is or what it does. </p><br><p>  The following code snippet shows how a simple filter will look like if you apply a 5px Gaussian blur to an image: </p><br><pre> <code class="plaintext hljs">&lt;svg width="600" height="450" viewBox="0 0 600 450"&gt; &lt;filter id="myFilter"&gt; &lt;feGaussianBlur stDeviation="5"&gt;&lt;/feGaussianBlur&gt; &lt;/filter&gt; &lt;image xlink:href="..." width="100%" height="100%" x="0" y="0" filter="url(#myFilter)"&gt;&lt;/image&gt; &lt;/svg&gt;</code> </pre> <br><p>  Currently, <a href="https://www.w3.org/TR/filter-effects-1/">the <strong>SVG Filter</strong></a> specification defines 17 filter primitives that are capable of creating extremely powerful graphic effects, including, but not limited to, noise and texture generation, lighting effects, color manipulations (from channel to channel) and much more. </p><br><p>  The filter primitive works by taking a graphic source to input and outputting to another.  And the output of one filter effect can be used as an input to another.  This is very important and very effective, because with almost a countless number of combinations of filtering effects, you can create an almost countless number of graphic effects. </p><br><p>  Each filter primitive can take one or two inputs and output only one result.  The input to the filter primitive is specified in the in attribute.  The result of the operation is defined in the <strong>result</strong> attribute.  If the filter effect requires a second entry, it is indicated in the <strong>in2</strong> attribute.  The result of the operation can be used as input for any other operation, but if the input data of the operation is not specified in the in attribute, the result of the previous operation is automatically used as input data.  If you do not specify a <strong>result</strong> primitive, then its result will automatically be used as input for the next primitive.  This will become clearer when we start exploring code samples. </p><br><p>  As an input, the filter primitive can use other data types, the most important of which are: </p><br><ul><li>  <strong>SourceGraphic</strong> : the element to which the entire filter is applied;  for example, an image or a piece of text. </li><li>  <strong>SourceAlpha</strong> : this is the same as <strong>SourceGraphic</strong> , except that this graphic contains only the element's alpha channel.  For example, for a JPEG image, this is a black rectangle the size of the image itself. </li></ul><br><p>  You will find that sometimes you want to use a graphics source as input, and sometimes only its alpha channel.  Examples that we will look at in this and the following articles will provide a clear understanding of when and what to use. </p><br><p>  This code snippet is an example of how a filter with a package of filter primitives as child elements may look.  Do not worry about primitives and what they do.  At this stage, just pay attention to how the inputs and outputs of certain primitives are defined and used.  I added some comments for help. </p><br><pre> <code class="plaintext hljs">&lt;svg width="600" height="400" viewBox="0 0 850 650"&gt; &lt;filter id="filter"&gt; &lt;feOffset in="SourceAlpha" dx="20" dy="20"&gt;&lt;/feOffset&gt; &lt;!-- since the previous filter did not have a result defined and this following one does not have the input set, the result of the above primitive is automatically used as input to the following filter --&gt; &lt;feGaussianBlur stdDeviation="10" result="DROP"&gt;&lt;/feGaussianBlur&gt; &lt;!-- setting/defining the result names in all caps is a good way to make them more distinguishable and the overall code more readable --&gt; &lt;feFlood flood-color="#000" result="COLOR"&gt;&lt;/feFlood&gt; &lt;!-- This primitive is using the outputs of the previous two primitives as input, and outputting a new effect --&gt; &lt;feComposite in="DROP" in2="COLOR" operator="in" result="SHADOW1"&gt;&lt;/feComposite&gt; &lt;feComponentTransfer in="SHADOW1" result="SHADOW"&gt; &lt;feFuncA type="table" tableValues="0 0.5"&gt;&lt;/feFuncA&gt; &lt;/feComponentTransfer&gt; &lt;!-- You can use ANY two results as inputs to any primitive, regardless of their order in the DOM.--&gt; &lt;feMerge&gt; &lt;feMergeNode in="SHADOW"&gt;&lt;/feMergeNode&gt; &lt;feMergeNode in="SourceGraphic"&gt;&lt;/feMergeNode&gt; &lt;/feMerge&gt; &lt;/filter&gt; &lt;image xlink:href="..." x="0" y="0" width="100%" height="100%" filter="url(#filter)"&gt;&lt;/image&gt; &lt;/svg&gt;</code> </pre> <br><p>  Now the last concept, which I want to briefly explain before moving on to our first filter example, is the concept of a <strong>Filter Region</strong> . </p><br><h2 id="oblast-filtracii">  Filtration area </h2><br><p>  A set of filtering operations require an area for processing, an area to which they can be applied.  For example, you may have a complex SVG with many elements, and you want to apply the filtering effect only to a specific area or to one or a group of elements within that SVG itself. </p><br><p>  In SVG, elements have “areas” whose boundaries are defined by the edges of the rectangle bounding the element.  The bounding box (also abbreviated as “bbox”) is the smallest enclosing rectangle around an element.  For example, in the following image for a fragment of text, such a rectangle is highlighted in pink. </p><br><p><img src="https://habrastorage.org/webt/hu/uy/i1/huuyi1kr0i8ldvfpggxgwpdi6sm.png" alt="The smallest enclosing rectangle around a piece of text."><br>  <em>Fig_3.</em>  <em>The smallest enclosing rectangle around a piece of text.</em> </p><br><p>  Note that this rectangle may contain several more vertical spaces, since the height of the text line is taken into account when calculating the height of the bounding rectangle. </p><br><p>  By default, an element's filter area is the bordering box of the element.  Therefore, if you apply a filter effect to our text fragment, the effect will be limited to this rectangle, and any filtering result that is outside of it will be clipped.  Although this is reasonable, it is not very practical, because many filters will affect some pixels outside the bounding box, and by default these pixels will eventually be cut off. </p><br><p>  For example, if you apply a blur effect to our text fragment, you can see that it is clipped along the left and right edges of the rectangle bounding the text: </p><br><p><img src="https://habrastorage.org/webt/ll/ih/e4/llihe4hbwx94zl3xk-w9zmcmmkq.png" alt="The blur effect applied to text is clipped from both the right and left side of the area of ​​the rectangle bounding the text."><br>  <em>Fig_4.</em>  <em>The blur effect applied to text is clipped from both the right and left sides of the area of ​​the rectangle bounding the text.</em> </p><br><p>  So how do we prevent this?  The answer is: by expanding the filter area.  We can expand the area to which the filter is applied by changing the <strong>x</strong> , <strong>y</strong> , <strong>width</strong> and <strong>height</strong> attributes of the &lt;filter&gt; element. </p><br><p>  According to specification, </p><br><blockquote>  It is often necessary to provide fields in the filter area, since the filter effect can affect some bits outside the bounding box for a given object.  To do this, you can give negative percent values ​​to the <strong>X</strong> and <strong>Y</strong> properties, and values ​​greater than 100% to the <strong>width</strong> and <strong>height</strong> properties. </blockquote><p>  By default, filters have areas that extend the width and height of the bounding box in all four directions by 10%.  In other words, the default values ​​for the <strong>x</strong> , <strong>y</strong> , <strong>width,</strong> and <strong>height</strong> attributes are as follows: </p><br><pre> <code class="plaintext hljs">&lt;filter x="-10%" y="-10%" width="120%" height="120%" filterUnits="objectBoundingBox"&gt; &lt;!-- filter operations here --&gt; &lt;/filter&gt;</code> </pre> <br><p>  If you do not include these attributes in the <strong>&lt;filter&gt;</strong> element, the default values ​​will be used.  You can also redefine them to expand or shrink the area as needed. </p><br><p>  Keep in mind that the units used in the <strong>x</strong> , <strong>y</strong> , <strong>width,</strong> and <strong>height</strong> attributes depend on which <strong>filterUnits</strong> value is used.  It defines the coordinate system of the attributes <strong>x</strong> , <strong>y</strong> , <strong>width</strong> and <strong>height</strong> and can take one of two values: </p><br><ul><li>  <strong>objectBoundingBox</strong> .  This is the default value.  When <strong>filterUnits</strong> is set to <strong>objectBoundingBox</strong> , the values ​​of the <strong>x</strong> , <strong>y</strong> , <strong>width,</strong> and <strong>height</strong> attributes are percentages or fractions of the size of the bounding rectangle of the element.  It also means that you can use fractional values ​​instead of percentages, if you prefer. </li><li>  <strong>userSpaceOnUse</strong> If <strong>filterUnits</strong> is set to <strong>userSpaceOnUse</strong> , the coordinates of the x, y, width and height attributes are relative to the current coordinate system used by the user.  In other words, this is relative to the current coordinate system used in the SVG, which uses pixels as units of measurement and, as a rule, relative to the size of the SVG itself, assuming that the <strong>viewBox</strong> values ​​correspond to the values ​​of the original coordinate system. </li></ul><br><blockquote>  Everything you need to know about coordinate systems in SVG You can find out in this article, which I wrote a few years ago. </blockquote><br><pre> <code class="plaintext hljs">&lt;!-- Using objectBoundingBox units --&gt; &lt;filter id="filter" x="5%" y="5%" width="100%" height="100%"&gt; &lt;!-- Using userSpaceOnUse units --&gt; &lt;filter id="filter" filterUnits="userSpaceOnUse" x="5px" y="5px" width="500px" height="350px"&gt;</code> </pre> <br><h3 id="bystryy-sovet-vizualizaciya-tekuschey-oblasti-filtra-s-pomoschyu-feflood">  Quick tip: visualize the current filter area with feFlood </h3><br><p>  If you ever need to see the limits of the filter area, you can visualize it, filling it with some kind of color.  Conveniently, there is a filter primitive called <strong>feFlood</strong> , the only purpose of which is exactly this: fill the current filter area with the color specified in the <strong>flood-color</strong> attribute. </p><br><p>  So, if we assume that we have a piece of text, the filter area of ​​which we want to see, then the code might look something like this: </p><br><pre> <code class="plaintext hljs">&lt;svg width="600px" height="400px" viewBox="0 0 600 400"&gt; &lt;filter id="flooder" x="0" y="0" width="100%" height="100%"&gt; &lt;feFlood flood-color="#EB0066" flood-opacity=".9"&gt;&lt;/feFlood&gt; &lt;/filter&gt; &lt;text dx="100" dy="200" font-size="150" font-weight="bold" filter="url(#flooder)"&gt;Effect!&lt;/text&gt; &lt;/svg&gt;</code> </pre> <br><p>  As can be seen from the code snippet above, the <strong>feFlood</strong> primitive also accepts the <strong>flood-opacity</strong> attribute, which can be used to create transparency of the color fill layer. </p><br><p>  The above snippet fills the filter area with pink.  But here's the thing: when you fill the area with color, you literally fill it with color, which means that the color will cover everything in the filter area, including any elements and effects you created before, as well as the text itself.  In the end, this is the concept of fill, right? </p><br><p><img src="https://habrastorage.org/webt/aj/pc/qc/ajpcqctctaikdiirvjexjeuh6yg.png" alt="Before and after the color of the filter text area"><br>  <em>Pic_5.</em>  <em>Before and after filling the color of the filter text area.</em> </p><br><p>  To change this, we need to move the color layer below and show the original text layer on top. </p><br><p>  If you have several context layers that need to be displayed in the SVG filter over each other, you can use the filter primitive <strong>&lt;feMerge&gt;</strong> .  As the name implies, the primitive <strong>feMerge is</strong> used to combine layers of elements or effects together. </p><br><p>  Primitive <strong>has no in attribute.</strong>  <strong>To merge the layers inside <strong>&lt;feMerge&gt;</strong> , two or more <strong>&lt;feMergeNode&gt; are used</strong> , each of which has its own attribute <strong>in</strong> , representing the layer that we want to add.</strong> <br></p><p>  Laying a layer (or “node”) depends on the order of the source <strong>&lt;feMergeNode&gt;</strong> - the first <strong>&lt;feMergeNode&gt; is</strong> displayed “in” or “below” the second.  The last <strong>&lt;feMergeNode&gt;</strong> represents the topmost layer.  And so on. </p><br><p>  So, in our text example, the color fill is a layer, and the text source (graphics source) is another layer, and we want to place the text on top of the color fill.  Our code will look like this: </p><br><pre> <code class="plaintext hljs">&lt;svg width="600px" height="400px" viewBox="0 0 600 400"&gt; &lt;filter id="flooder"&gt; &lt;feFlood flood-color="#EB0066" flood-opacity=".9" result="FLOOD"&gt;&lt;/feFlood&gt; &lt;feMerge&gt; &lt;feMergeNode in="FLOOD" /&gt; &lt;feMergeNode in="SourceGraphic" /&gt; &lt;/feMerge&gt; &lt;/filter&gt; &lt;text dx="100" dy="200" font-size="150" font-weight="bold" filter="url(#flooder)"&gt;Effect!&lt;/text&gt; &lt;/svg&gt;</code> </pre> <br><p>  Notice how I called the result of <strong>feFlood</strong> in the <strong>result</strong> attribute so that I could use this name in the <strong>&lt;feMergeNode&gt;</strong> layer as input.  Because we want to display the source text on top of the stream color, we reference this text using <strong>SourceGraphic</strong> .  The following demo shows the result: </p><br><iframe width="560" height="315" src="https://www.youtube.com/embed/.googleusercontent.com/translate_c?depth=1&amp;rurl=translate.google.com&amp;sl=ru&amp;sp=nmt4&amp;tl=en&amp;u=https://codepen.io/SaraSoueidan/embed/preview/dJddbK" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen=""></iframe><br><h2 id="primenenie-teni-k-izobrazheniyu">  Apply a shadow to an image </h2><br><p>  Let me start with a brief warning: you had better create a simple shadow using the CSS <strong>drop-shadow ()</strong> filtering feature.  The SVG filter path is much more detailed.  After all, as we mentioned earlier, the CSS filter functions are convenient shortcuts.  But I still want to see this example as a simple entry point to more complex filter effects, which we will look at in future articles. </p><br><p>  So how is shadow created? </p><br><p>  A shadow is usually a light gray layer behind or below an element that has the same shape (or shape) as the element itself.  In other words, you can think of it as a blurred gray copy of the item. </p><br><p>  When creating SVG filters, you need to reason in stages.  What steps are needed to achieve this or that effect?  For a shadow, a blurred gray copy of an element can be created by blurring the black copy of the element, and then coloring this black copy, i.e.  make it gray.  This newly created blurred gray copy is then placed behind the original element and slightly shifted in both directions. </p><br><p>  So, we <strong>’ll start by getting a black copy of our element and blur it</strong> .  A black copy can be created using the element's alpha channel, using <strong>SourceAlpha</strong> as the input to the filter. </p><br><p>  The primitive <strong>feGaussian Blur</strong> will be used to apply a Gaussian blur to this Source Alpha layer.  The required amount of blur is set in the <strong>stdDeviation</strong> attribute (short for Standard Deviation).  If you specify a single value for the <strong>stdDeviation</strong> attribute, this value will be used to apply a uniform blurring of the input data.  You can also specify two numerical values, then the first will be used to blur the element in the horizontal direction, and the second - for vertical blur.  For the shadow, we need to apply a uniform blur, so our code will start with this: </p><br><pre> <code class="plaintext hljs">&lt;svg width="600" height="400" viewBox="0 0 850 650"&gt; &lt;filter id="drop-shadow"&gt; &lt;-- Grab a blakc copy of the source image and blur it by 10 --&gt; &lt;feGaussianBlur in="SourceAlpha" stdDeviation="10" result="DROP"&gt;&lt;/feGaussianBlur&gt; &lt;/filter&gt; &lt;image xlink:href="..." x="0" y="0" width="100%" height="100%" filter="url(#drop-shadow)"&gt;&lt;/image&gt; &lt;/svg&gt;</code> </pre> <br><p>  The above code snippet leads to the following effect, where at the moment only the blurred alpha channel of the image is displayed: </p><br><p><img src="https://habrastorage.org/webt/zd/e9/ye/zde9ye5ycftyjmi_cru94ty3jde.png" alt="Created black copy of image with blur (shadow)"><br>  <em>Fig_6.</em>  <em>Created black copy of image with blur (shadow).</em> </p><br><p>  Then we want <strong>to change the color of the shadow and make it gray</strong> .  We do this by applying a color fill to the filter area, and then we merge this color fill layer with the shadow layer we created. </p><br><p>  Combination is the connection of a graphic element with a blurred background.  The blurred background is the content behind the element with which the element is combined.  In our filter, the fill color is the top layer, and the blurred shadow is its background because it lies behind it.  We will look at the primitive <strong>feComposite in</strong> more detail in the following articles, so if you are not familiar with the composition and how it works, then I recommend reading the <strong>detailed article</strong> on this topic in my blog. </p><br><p>  The primitive <strong>feComposite</strong> has an <strong>operator</strong> attribute, which is used to indicate which composite operation we want to use. </p><br><p>  Using the <strong>in composite</strong> operator, the color fill layer will be “cropped”, and only the area of ​​color that matches our shadow layer will be displayed.  Both layers will be mixed where they intersect, i.e. серый цвет будет использоваться для окрашивания нашей черной тени. </p><br><p> Примитив <strong>feComposite</strong> требует двух входных данных для работы, указанных в атрибутах <strong>in</strong> и <strong>in2</strong> . Первый вход — это наш цветной слой, а второй — размытый теневой фон. С помощью составной операции, указанной в атрибуте <strong>operator</strong> , наш код теперь выглядит следующим образом: </p><br><pre> <code class="plaintext hljs">&lt;svg width="600" height="400" viewBox="0 0 850 650"&gt; &lt;filter id="drop-shadow"&gt; &lt;feGaussianBlur in="SourceAlpha" stdDeviation="10" result="DROP"&gt;&lt;/feGaussianBlur&gt; &lt;feFlood flood-color="#bbb" result="COLOR"&gt;&lt;/feFlood&gt; &lt;feComposite in="COLOR" in2="DROP" operator="in" result="SHADOW"&gt;&lt;/feComposite&gt; &lt;/filter&gt; &lt;image xlink:href="..." x="0" y="0" width="100%" height="100%" filter="url(#drop-shadow)"&gt;&lt;/image&gt; &lt;/svg&gt;</code> </pre> <br><p> Обратите внимание, как результаты <strong>feGaussianBlur</strong> и примитивов <strong>feFlood</strong> используются в качестве входных данных для композита. Теперь наше демо выглядит так: </p><br><p><img src="https://habrastorage.org/webt/_c/c7/an/_cc7an_zj43v7gv4jka--6mpnpi.png" alt="Теперь тень серая"><br> <em>Рис_7. Теперь тень серая.</em> </p><br><p> Перед тем, как мы наложим наше исходное изображение поверх тени, мы хотим сместить ее по вертикали и/или горизонтали. На сколько и в каком направлении полностью зависит от вас. Для этой демо я предположу, что у нас есть источник света, исходящего из верхнего левого угла нашего экрана, поэтому я смещу тень на несколько пикселей вниз и вправо. </p><br><p> Для смещения слоя в SVG используется примитив <strong>feOffset</strong> . Дополнительно к атрибутам <strong>in</strong> и <strong>result</strong> этот примитив принимает два главных атрибута: <strong>dx</strong> и <strong>dy</strong> , которые определяют расстояние, на которое вы хотите сместить слой вдоль осей X и Y соответственно. </p><br><p> После смещения тени, мы будет объединить ее с исходным изображением, используя <strong>feMerge</strong> , подобно тому, как мы объединяли текст и цветную заливку на предыдущем шаге — один <strong>mergeNode</strong> примет наши тени в качестве входных данных, а на другом <strong>mergeNode</strong> будет слой исходного изображения, используя <strong>SourceGraphic</strong> в качестве входных данных. Наш код теперь выглядит так: </p><br><pre> <code class="plaintext hljs">&lt;svg width="600" height="400" viewBox="0 0 850 650"&gt; &lt;filter id="drop-shadow"&gt; &lt;!-- Get the source alpha and blur it; we'll name the result "DROP" --&gt; &lt;feGaussianBlur in="SourceAlpha" stdDeviation="10" result="DROP"&gt;&lt;/feGaussianBlur&gt; &lt;!-- flood the region with a ligh grey color; we'll name this layer "COLOR" --&gt; &lt;feFlood flood-color="#bbb" result="COLOR"&gt;&lt;/feFlood&gt; &lt;!-- Composite the DROP and COLOR layers together to colorize the shadow. The result is named "SHADOW" --&gt; &lt;feComposite in="COLOR" in2="DROP" operator="in" result="SHADOW"&gt;&lt;/feComposite&gt; &lt;!-- Move the SHADOW layer 20 pixels down and to the right. The new layer is now called "DROPSHADOW" --&gt; &lt;feOffset in="SHADOW" dx="20" dy="20" result="DROPSHADOW"&gt;&lt;/feOffset&gt; &lt;!-- Layer the DROPSHADOW and the Source Image, ensuring the image is positioned on top (remember: MergeNode order matters) --&gt; &lt;feMerge&gt; &lt;feMergeNode in="DROPSHADOW"&gt;&lt;/feMergeNode&gt; &lt;feMergeNode in="SourceGraphic"&gt;&lt;/feMergeNode&gt; &lt;/feMerge&gt; &lt;/filter&gt; &lt;!-- Apply the filter to the source image in the `filter` attribute --&gt; &lt;image xlink:href="..." x="0" y="0" width="100%" height="100%" filter="url(#drop-shadow)"&gt;&lt;/image&gt; &lt;/svg&gt;</code> </pre> <br><p> И следующее демо для кода выше: </p><br><iframe width="560" height="315" src="https://www.youtube.com/embed/.googleusercontent.com/translate_c?depth=1&amp;rurl=translate.google.com&amp;sl=ru&amp;sp=nmt4&amp;tl=en&amp;u=https://codepen.io/SaraSoueidan/embed/preview/qpoqwQ" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen=""></iframe><br><p> И именно так вы применяете эффект фильтра в SVG, используя фильтры SVG. Вы найдете, что этот эффект работает во всех основных браузерах. </p><br><h2 id="est-drugoy-sposob"> Есть другой способ… </h2><br><p> Существует другой, более распространенный способ создания тени. Вместо того, чтобы создавать черную тень и применять к ней цвет, чтобы сделать ее светлее, вы можете применить к ней прозрачность, сделав ее полупрозрачной и, следовательно, светлее. </p><br><p> В предыдущем демо мы узнали, как применить цвет к тени, используя <strong>feFlood</strong> , технику окраски, которую вы, вероятно, посчитаете нужной и станете часто пользоваться. Вот почему я подумала, что ее необходимо рассмотреть. Это также полезно узнать, потому что это путь, которым вы захотите создать тень, которая, по какой-то причине, будет пестрой, например, вместо черной или серой. </p><br><p> Для изменения прозрачности слоя можно использовать либо примитив <strong>feColorMatrix</strong> , либо <strong>feComponentTransfer</strong> . О примитиве <strong>feComponentTransfer</strong> я расскажу более подробно в следующих статьях, поэтому сейчас воспользуемся <strong>feColorMatrix</strong> , чтобы уменьшить непрозрачность нашей тени. </p><br><p> Примитив <strong>feColorMatrix</strong> заслуживает отдельной статьи. На данный момент я настоятельно рекомендую прочитать статью <a href="https://alistapart.com/article/finessing-fecolormatrix">Una Kravet</a> , которая будет отличным введением с действительно хорошими примерами. </p><br><p> Короче говоря, этот фильтр применяет матричное преобразование к каналам R(Красный), G(зеленый), B(синий) и A(Альфа) каждого пикселя на входной графике для получения результата с новым набором цветов и Альфа-значений. Другими словами, для управления цветами объекта используется матричная операция. Основа матрицы цвета выглядит так: </p><br><pre> <code class="plaintext hljs">&lt;filter id="myFilter"&gt; &lt;feColorMatrix type="matrix" values="R 0 0 0 0 0 G 0 0 0 0 0 B 0 0 0 0 0 A 0 "/&gt; &lt;/feColorMatrix&gt; &lt;/filter&gt;</code> </pre> <br><p> Еще раз рекомендую проверить статью Уны, чтобы узнать больше о ее синтаксисе. </p><br><p> Поскольку мы хотим только уменьшить непрозрачность нашей тени, мы будем использовать тождественную матрицу, которая не изменяет каналы RGB, но мы уменьшим значение альфа-канала в этой матрице: </p><br><pre> <code class="plaintext hljs">&lt;filter id="filter"&gt; &lt;!-- Get the source alpha and blur it, --&gt; &lt;feGaussianBlur in="SourceAlpha" stdDeviation="10" result="DROP"&gt;&lt;/feGaussianBlur&gt; &lt;!-- offset the drop shadow --&gt; &lt;feOffset in="SHADOW" dx="20" dy="20" result="DROPSHADOW"&gt;&lt;/feOffset&gt; &lt;!-- make the shadow translucent by reducing the alpha channel value to 0.3 --&gt; &lt;feColorMatrix type="matrix" in="DROPSHADOW" result="FINALSHADOW" values="1 0 0 0 0 0 1 0 0 0 0 0 1 0 0 0 0 0 0.3 0"&gt; &lt;/feColorMatrix&gt; &lt;!-- Merge the shadow and the source image --&gt; &lt;feMerge&gt; &lt;feMergeNode in="FINALHADOW"&gt;&lt;/feMergeNode&gt; &lt;feMergeNode in="SourceGraphic"&gt;&lt;/feMergeNode&gt; &lt;/feMerge&gt; &lt;/filter&gt;</code> </pre> <br><p> А это наше живое демо: </p><br><iframe width="560" height="315" src="https://www.youtube.com/embed/.googleusercontent.com/translate_c?depth=1&amp;rurl=translate.google.com&amp;sl=ru&amp;sp=nmt4&amp;tl=en&amp;u=https://codepen.io/SaraSoueidan/embed/preview/opEZee" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen=""></iframe><br><h2 id="zaklyuchenie">  Conclusion </h2><br><p> В этой серии я постараюсь отойти от очень технических определений операций с фильтрами и придерживаться упрощенных и понятных определений. Зачастую вам не нужно вдаваться в мелкие детали того, что происходит под капотом. Поэтому вхождение в эти мелочи только добавит сложности статьям, пожалуй сделает их менее понятными и принесет мало пользы. Понимание того, что делает фильтр и как его использовать, на мой взгляд, более чем достаточно, чтобы использовать преимущества, которые он может предложить. Если вы хотите получить более подробную информацию, я рекомендую для начала проконсультироваться со <a href="https://www.w3.org/TR/filter-effects-1/">спецификацией</a> . Тем не менее, она может оказаться мало полезной, поэтому вы, в конечном итоге проведете свое собственное исследование на стороне. Я приведу список отличных ресурсов для дальнейшего изучения в заключительной статье этой серии. </p><br><p> Теперь, когда мы рассмотрели основы SVG-фильтров и способы их создания и применения, мы рассмотрим дополнительные примеры эффектов использования дополнительных примитивов фильтров в следующих статьях.  Stay with us. </p></div><p>Source: <a href="https://habr.com/ru/post/439282/">https://habr.com/ru/post/439282/</a></p>
+<section class="navigation-panel">
+<h4>More articles:</h4>
+<nav><ul class="list-of-pages">
+<li><a href="../438956/index.html">Magnetite in the teeth: sequencing of transcriptomes of the tissues of the radula of the shell of mollusc shell</a></li>
+<li><a href="../438958/index.html">ILV confirmed the existence of its "space station"</a></li>
+<li><a href="../438960/index.html">How I abandoned Ruby in favor of Python, working on a backend</a></li>
+<li><a href="../438962/index.html">For the most part, a positive outlook for the future of chips.</a></li>
+<li><a href="../438964/index.html">Who really stands behind popular free VPNs?</a></li>
+<li><a href="../438966/index.html">The history of wandering documentation Haproxy, or what you should pay attention to when it is configured</a></li>
+<li><a href="../438968/index.html">Marking shoes in Russia: The market is not ready, but will have to work</a></li>
+<li><a href="../438970/index.html">It is said that Haskell is a language for geniuses and academics. True?</a></li>
+<li><a href="../438972/index.html">The brain from the inside (Visualization of the passage of the pattern through the model of an artificial neural network)</a></li>
+<li><a href="../438974/index.html">Virtual reality helps to cope with mental disorders</a></li>
+<li><a href="../438976/index.html">The book "Spring. All design patterns »</a></li>
+<li><a href="../438980/index.html">Spring Boot 2: what's new?</a></li>
+<li><a href="../438982/index.html">Kubernetes tutorial, part 1: applications, microservices and containers</a></li>
+<li><a href="../438984/index.html">Kubernetes Handbook Part 2: Creating and Working With a Cluster</a></li>
+<li><a href="../438986/index.html">React Training Course Part 14: Workshop on Class Based Components, Component State</a></li>
+<li><a href="../438988/index.html">React Training Course, Part 15: Workshop on Working with Component State</a></li>
+<li><a href="../438992/index.html">Developer Diary or Bad Decisions</a></li>
+<li><a href="../438994/index.html">Intel Xeon W-3175X, hot drummer. Testing</a></li>
+<li><a href="../438996/index.html">Company network and MitM. Part 1</a></li>
+<li><a href="../438998/index.html">CGDevs Moscow Meetup # 2</a></li>
+<li><a href="../439000/index.html">Spatial manipulation in 2D using Signed Distance Fields</a></li>
+<li><a href="../439002/index.html">How to stop "writing TK" and start working?</a></li>
+<li><a href="../439006/index.html">How AI helps to master sign language</a></li>
+<li><a href="../439008/index.html">Mail.ru has released a new Atom browser with an emphasis on "security and privacy"</a></li>
+<li><a href="../439010/index.html">How is the consolidation of archives in DeviceLock DLP</a></li>
+<li><a href="../439012/index.html">Telephone directory of the organization - print version</a></li>
+<li><a href="../439016/index.html">Static Generic Tables</a></li>
+<li><a href="../439018/index.html">Setting up Sphinx search for an online store</a></li>
+<li><a href="../439020/index.html">Ticket to Ride. Europe - arithmetic, part two</a></li>
+<li><a href="../439022/index.html">CNC in the hobby workshop (part 3)</a></li>
+<li><a href="../439024/index.html">Results Slurm-3</a></li>
+<li><a href="../439028/index.html">How to improve network perimeter protection? Practical recommendations for Check Point and not only</a></li>
+<li><a href="../439030/index.html">A lot of managers</a></li>
+<li><a href="../439032/index.html">Amazon and Google are planning to enter the energy market</a></li>
+<li><a href="../439034/index.html">Group-IB Webinar: Red Team or Pentest 12.02.2019</a></li>
+<li><a href="../439036/index.html">The main thing is not to get into the mall under the reconciliation of hours</a></li>
+<li><a href="../439038/index.html">Making a neural network: how not to break the brain</a></li>
+<li><a href="../439040/index.html">To isolate the Runet need budget funds</a></li>
+<li><a href="../439042/index.html">Puma is looking for beta testers for self-tapping sneakers Fi</a></li>
+<li><a href="../439046/index.html">How to safely combine the network segments of the three major banks: share tricks</a></li>
+<li><a href="../439050/index.html">Training Cisco 200-125 CCNA v3.0. Cisco Certified Network Specialist (CCNA). Day 2. OSI and TCP-IP models</a></li>
+<li><a href="../439056/index.html">Cement Brand Integration</a></li>
+<li><a href="../439060/index.html">7 types of customers</a></li>
+<li><a href="../439062/index.html">Anisoprint Composer: 3D printing of high strength</a></li>
+<li><a href="../439064/index.html">Typical mesh error (Bootstrap Grid), or why the designer and layout designer do not understand each other</a></li>
+<li><a href="../439066/index.html">Operating system on Rust. Page memory: advanced level</a></li>
+<li><a href="../439068/index.html">Spam campaign “Love you” redirected to Japan</a></li>
+<li><a href="../439070/index.html">China refuses anti-corruption system Zero Trust AI because of its high efficiency</a></li>
+<li><a href="../439074/index.html">Password Checkup extension checks passwords with a base of 4 billion compromised accounts</a></li>
+<li><a href="../439076/index.html">In which applications to wait for an unknown malicious code?</a></li>
+<li><a href="../439078/index.html">Perm programmer arrested for creating a mobile application through which the pedophile acted</a></li>
+<li><a href="../439080/index.html">Unobvious RabbitMQ in Yii2 or why RabbitMQ writes to all queues at once</a></li>
+<li><a href="../439082/index.html">Walk through the plant of desires</a></li>
+<li><a href="../439086/index.html">Causes of ANR and how to avoid it</a></li>
+<li><a href="../439094/index.html">Scientists have found the oldest living vertebrate on Earth</a></li>
+<li><a href="../439096/index.html">Buildbot: a tale with examples of one more continuous integration system</a></li>
+<li><a href="../439098/index.html">Sasha Memus, Chatfuel: How to build a career in products after consulting, is it dangerous to meditate and how to change behavior</a></li>
+<li><a href="../439100/index.html">How to adapt UX / UI for permissions</a></li>
+<li><a href="../439102/index.html">Russians are 20% more likely to face insults on the Internet</a></li>
+<li><a href="../439104/index.html">Redux Simple as a rake</a></li>
+<li><a href="../439106/index.html">Programming in Russia will be introduced from primary school</a></li>
+<li><a href="../439108/index.html">Amateur radio measurements: when there is no frequency meter</a></li>
+<li><a href="../439112/index.html">Creator Kate Mobile arrested for using a pedophile for his service</a></li>
+<li><a href="../439118/index.html">New in browsers: Firefox 66 blocks video and sound by default, Chromium limits page budget</a></li>
+<li><a href="../439122/index.html">Simplicity and complexity of primitives or how to determine unnecessary preprocessing for a neural network</a></li>
+<li><a href="../439124/index.html">If software is created with public money, the code should be open.</a></li>
+<li><a href="../439126/index.html">Requests from users and product requirements</a></li>
+<li><a href="../439128/index.html">How to organize the work of QA. One practically applied method</a></li>
+<li><a href="../439130/index.html">13 trends in the cybersecurity and information security market 2019-2020</a></li>
+<li><a href="../439132/index.html">Unforgettable old age</a></li>
+<li><a href="../439134/index.html">Russian scientists are developing sitall (unbreakable glass) for LG smartphones</a></li>
+<li><a href="../439136/index.html">What is the difference between 4G and 5G?</a></li>
+<li><a href="../439138/index.html">Working with callbacks in React</a></li>
+<li><a href="../439140/index.html">Important message about invites in profile</a></li>
+<li><a href="../439142/index.html">Design maturity models</a></li>
+<li><a href="../439148/index.html">Working with nRF51822 using ST-Link and Clion + OpenOCD</a></li>
+<li><a href="../439150/index.html">Who should pay transaction costs</a></li>
+<li><a href="../439152/index.html">Salaries in IT in the second half of 2018: according to the “My Circle” salary calculator</a></li>
+<li><a href="../439154/index.html">How do freelancers live: book cover design, own production of backpacks and travel work</a></li>
+<li><a href="../439158/index.html">DataArt Launches Free CV Duck Resume Improvement Service</a></li>
+<li><a href="../439160/index.html">Algorithm state: what happens to indie developers on Steam?</a></li>
+<li><a href="../439162/index.html">How to debug front-end and backend: step-by-step instructions</a></li>
+<li><a href="../439166/index.html">mmWave on the road to commercialization in the form factor of a smartphone</a></li>
+<li><a href="../439170/index.html">Cellular operators will help banks verify the accuracy of customer data</a></li>
+<li><a href="../439172/index.html">Extending the assert () macro to implement minimal error handling</a></li>
+<li><a href="../439174/index.html">Safe Internet Day: what threats to pay attention to in 2019</a></li>
+<li><a href="../439182/index.html">How do we distribute orders between drivers in Yandex.Taxi</a></li>
+<li><a href="../439186/index.html">UX Editor: True Story, Rial Life</a></li>
+<li><a href="../439194/index.html">Controlling a character with SharedEvents</a></li>
+<li><a href="../439196/index.html">JPMorgan analysts: Apple should buy Blizzard, Netflix or Sonos to reassure investors</a></li>
+<li><a href="../439198/index.html">Generation of barrier islands</a></li>
+<li><a href="../439200/index.html">Composer for the smallest</a></li>
+<li><a href="../439202/index.html">Detection of web attacks using autoencoder Seq2Seq</a></li>
+<li><a href="../439204/index.html">Increasing the efficiency of photosynthesis by genetic modification of plants</a></li>
+<li><a href="../439210/index.html">Java after volcanic eruption</a></li>
+<li><a href="../439216/index.html">pudge embedded database in 500 lines on golang</a></li>
+<li><a href="../439218/index.html">VC bot on the knee, or how to please people February 14</a></li>
+<li><a href="../439222/index.html">What is API management?</a></li>
+<li><a href="../439224/index.html">Again about the Voronoi diagrams</a></li>
+<li><a href="../439232/index.html">JAMstack: How to create your blog using Gatsby + Contentful + Netlify</a></li>
+<li><a href="../439236/index.html">xenvman: Flexible environments for testing microservices (and not only)</a></li>
+<li><a href="../439238/index.html">Play Store now accepts progressive web applications (PWA)</a></li>
+<li><a href="../439240/index.html">Joomla Digest for January 2019</a></li>
+<li><a href="../439244/index.html">FAS strongly recommends to pre-install Russian software on smartphones and laptops sold in Russia</a></li>
+<li><a href="../439248/index.html">Alan Kay: “Could the ancient Romans build a computer?”</a></li>
+<li><a href="../439252/index.html">6 reasons to develop IT career in Armenia</a></li>
+<li><a href="../439254/index.html">Our all</a></li>
+<li><a href="../439260/index.html">The author of the book "The Witcher" will still receive compensation from CD Projekt Red</a></li>
+<li><a href="../439262/index.html">Deploy the code directly to the docker container. Or how not to prokrasinirovat after each commit</a></li>
+<li><a href="../439264/index.html">How to lead complex technical projects without hiring PMs: DataLine experience</a></li>
+<li><a href="../439266/index.html">The experience of creating an Android game alone from scratch and how it was captured on Google Play</a></li>
+<li><a href="../439268/index.html">How VR, AR and 3D printing work together: the VR Concept experience</a></li>
+<li><a href="../439270/index.html">An example of parsing C ++ code using libclang in Python</a></li>
+<li><a href="../439278/index.html">ACS my LCD - security on two bolts</a></li>
+<li><a href="../439280/index.html">Trautonium: the German wave in the history of synthesizers</a></li>
+<li><a href="../439282/index.html">Effects of filtering SVG. Part 1. SVG filters 101</a></li>
+<li><a href="../439288/index.html">SciPy Optimization</a></li>
+<li><a href="../439290/index.html">Accelerate compilation in Xcode to swift</a></li>
+<li><a href="../439292/index.html">Google has agreed to remove from the search banned sites in the Russian Federation</a></li>
+<li><a href="../439294/index.html">Translation review "If software is created with public money, the code must be open"</a></li>
+<li><a href="../439296/index.html">Soviet license plate and Kolmogorov complexity</a></li>
+<li><a href="../439298/index.html">What would the Internet system look like in the game EvE Online</a></li>
+<li><a href="../439300/index.html">Statistics for file types in the Wildfire cloud sandbox</a></li>
+<li><a href="../439302/index.html">Product Design Digest, January 2019</a></li>
+<li><a href="../439304/index.html">[Ekaterinburg, announcement] Mitap for Java-developers</a></li>
+<li><a href="../439308/index.html">Kill cancer: iridium, human serum albumin and some blue light</a></li>
+<li><a href="../439310/index.html">Why not take off the real estate portal. Part 2</a></li>
+<li><a href="../439312/index.html">Speed ​​up complex calculations with minimal RAM</a></li>
+<li><a href="../439314/index.html">Seven strange ways of dealing with recluse in remote work</a></li>
+<li><a href="../439316/index.html">“I stopped doing what I see no point in”: project managers about their work and training</a></li>
+<li><a href="../439318/index.html">Win procrastination gaming addiction</a></li>
+<li><a href="../439320/index.html">How to diversify programming lessons for children of different ages</a></li>
+<li><a href="../439322/index.html">OS Sailfish renamed OS "Aurora"</a></li>
+<li><a href="../439324/index.html">Using a binary tree in swift using enum using OCR as an example</a></li>
+<li><a href="../439326/index.html">Electric Ford F-150 EV - in the prototype and tested on the road</a></li>
+<li><a href="../439328/index.html">Okay, google! Are you good or evil?</a></li>
+<li><a href="../439332/index.html">How PageRank works: implementation in the R language through linear algebra and power-method</a></li>
+<li><a href="../439334/index.html">About 2 billion rubles allocated for the implementation of the draft law on sustainable runet</a></li>
+<li><a href="../439336/index.html">We are looking for a needle in a stack without using well-known algorithms.</a></li>
+<li><a href="../439338/index.html">Forget about privacy: you still have terrible targeting</a></li>
+<li><a href="../439340/index.html">GDPR backup — what a new tool will do</a></li>
+<li><a href="../439342/index.html">Winter DIYorDIE Meetup February 17</a></li>
+<li><a href="../439344/index.html">To be like a troll: how monopolists rule patents</a></li>
+<li><a href="../439346/index.html">Laravel + Docker: Our Successful Experience</a></li>
+<li><a href="../439348/index.html">Vision falls after laser vision correction - what to do? Or, doctor, make me an "enhancement"</a></li>
+<li><a href="../439350/index.html">Artificial intelligence as a machine of inventions</a></li>
+<li><a href="../439352/index.html">Making a bot prototype for fighting in Clash Royale</a></li>
+<li><a href="../439354/index.html">Rust news # 5 (January 2019)</a></li>
+<li><a href="../439356/index.html">Nontrivial metrics of the effectiveness of advertising campaigns</a></li>
+<li><a href="../439358/index.html">Excel metadata files</a></li>
+<li><a href="../439360/index.html">Training Cisco 200-125 CCNA v3.0. Cisco Certified Network Specialist (CCNA). Day 3. Subnets</a></li>
+<li><a href="../439362/index.html">How we teach Software Engineering at St. Petersburg HSE</a></li>
+<li><a href="../439364/index.html">Oculus Go glasses with “strawberry” content set up for sale</a></li>
+<li><a href="../439366/index.html">Automation of three nails</a></li>
+<li><a href="../439368/index.html">Animations in iOS applications born on the server</a></li>
+<li><a href="../439374/index.html">For those who want to play detective: find a bug in the function from Midnight Commander</a></li>
+<li><a href="../439376/index.html">"Interest club"</a></li>
+<li><a href="../439378/index.html">The Book of Genesis?). Reflections on the nature of mind. Part I</a></li>
+<li><a href="../439380/index.html">How I created an extension for Atom and VS Code: personal experience and source codes</a></li>
+<li><a href="../439382/index.html">Using Ansible, Terraform, Docker, Consul, Nomad in the Clouds (Alexey Vakhov, Uchi.ru)</a></li>
+<li><a href="../439390/index.html">The best innovations of social networks in 2018</a></li>
+<li><a href="../439392/index.html">The 2019 championship season is open! SNA Hackathon Launches ala ML Boot Camp 8</a></li>
+<li><a href="../439394/index.html">As a programmer dataseativistam wrote</a></li>
+<li><a href="../439396/index.html">UniFi Controller Password Reset</a></li>
+<li><a href="../439404/index.html">A brief history of electronic public procurement in Russia</a></li>
+<li><a href="../439408/index.html">Pseudo Lens Flare</a></li>
+<li><a href="../439410/index.html">Jeff Hawkins is finally ready to explain his brain research.</a></li>
+<li><a href="../439414/index.html">Client for "server push messages"</a></li>
+<li><a href="../439416/index.html">A-Frame Review</a></li>
+<li><a href="../439418/index.html">Pentaho Data Integration (PDI), Python and Deep Learning</a></li>
+<li><a href="../439420/index.html">Building the transport package without installing MODX</a></li>
+<li><a href="../439422/index.html">What does a programmer need to develop games and who really is a game developer on the part of a programmer</a></li>
+<li><a href="../439424/index.html">How I Fought Free Hosting and Composer</a></li>
+<li><a href="../439426/index.html">Situation: a new wave of attacks with the interception of DNS queries - we analyze the basic methods of protection</a></li>
+<li><a href="../439430/index.html">Believe me if you can. Water meters. part 1</a></li>
+<li><a href="../439432/index.html">How to become a Java developer in 1.5 years</a></li>
+<li><a href="../439434/index.html">NestJS - the very real nodejs backend</a></li>
+<li><a href="../439436/index.html">Cheaper price of small series of electronics in Russia. Case Internet radio WOLNA</a></li>
+<li><a href="../439440/index.html">Implementation of Zimbra Collaboration Open Source, authorization through AD and automatic creation of mailboxes</a></li>
+<li><a href="../439442/index.html">Julia. Report Generators and Documentation</a></li>
+<li><a href="../439446/index.html">What you need to know about JavaScript Engine Switcher 3.0</a></li>
+<li><a href="../439448/index.html">What virtualization questions do you expect from a graduate?</a></li>
+<li><a href="../439450/index.html">RS-485 on domestic microcontrollers from the company Milandr</a></li>
+<li><a href="../439454/index.html">Program as Art - a new software management paradigm</a></li>
+<li><a href="../439456/index.html">Hipster podcasts # 2</a></li>
+<li><a href="../439458/index.html">As we Republic website on Kubernetes translated</a></li>
+<li><a href="../439460/index.html">How marketers of Maxidom lose millions flirting in groz marketing: independent usability auditing</a></li>
+<li><a href="../439462/index.html">Civilization Springs, 5/5</a></li>
+<li><a href="../439464/index.html">VXinspect: part quality control in 10 minutes</a></li>
+<li><a href="../439466/index.html">NASA lunar orbital probe made the first pictures of the China Chang'e-4 station - two pixels of light</a></li>
+<li><a href="../439468/index.html">Where to lead the search for the perfect SCADA</a></li>
+<li><a href="../439470/index.html">Germany plans to abandon coal in the near future.</a></li>
+<li><a href="../439472/index.html">Automation of border control within the company</a></li>
+<li><a href="../439476/index.html">Cockney Slang: Modern History and Position</a></li>
+<li><a href="../439478/index.html">Entertaining C #. Five examples for a coffee break</a></li>
+<li><a href="../439480/index.html">Give way, or Why does your CRM (and CRM) slow down?</a></li>
+<li><a href="../439482/index.html">devleads - (not) financial motivation</a></li>
+<li><a href="../439484/index.html">Get the enum data in the Automapper projection</a></li>
+<li><a href="../439496/index.html">How is billing done there: when a customer and a developer speak different languages</a></li>
+<li><a href="../439498/index.html">What hardware to analyze a huge shaft of information?</a></li>
+<li><a href="../439500/index.html">Why are captcha so complicated</a></li>
+<li><a href="../439502/index.html">Undefined behavior and truth undefined</a></li>
+<li><a href="../439504/index.html">Does your Data Engineer team need it?</a></li>
+<li><a href="../439506/index.html">9 alternatives to a bad team (design pattern)</a></li>
+<li><a href="../439510/index.html">High-load distributed control system of a modern NPP</a></li>
+<li><a href="../439512/index.html">The era of dinosaurs or legally verified reinsurance?</a></li>
+<li><a href="../439516/index.html">00110001 00110100 00101110 00110000 00110010</a></li>
+<li><a href="../439524/index.html">Fortnite is the future, but for rather unexpected reasons.</a></li>
+<li><a href="../439526/index.html">Telecom operators will conduct a "field test" of the law on the stability of the Runet</a></li>
+<li><a href="../439532/index.html">What's new in javascript ES2019</a></li>
+<li><a href="../439534/index.html">Yield programming and the use of drones in oil production - 10 lectures from the conference GIS Tech Russia</a></li>
+<li><a href="../439538/index.html">Community programming</a></li>
+<li><a href="../439540/index.html">Etherblade.net - opensource project to create an ethernet traffic encapsulator on FPGA (part one)</a></li>
+<li><a href="../439542/index.html">Nintendo makes it clear that only piracy can save the history of video games</a></li>
+<li><a href="../439544/index.html">The colony. Chapter 24: Departure</a></li>
+<li><a href="../439556/index.html">TDMS Fairway. Methods PMBOK and Russian design organizations</a></li>
+<li><a href="../439558/index.html">New old phone. Reinvent the PSTN phone</a></li>
+<li><a href="../439560/index.html">The adapter for working with the blockchain Ethereum for the InterSystems IRIS data platform</a></li>
+<li><a href="../439562/index.html">Configure the Kubernetes HA cluster on bare metal with kubeadm. Part 1/3</a></li>
+<li><a href="../439564/index.html">Practical application of transformation of AST-trees on the example of Putout</a></li>
+<li><a href="../439566/index.html">Why SRE is important documentation. Part 3</a></li>
+<li><a href="../439568/index.html">QLC based SSD - hard drive killer? Not really</a></li>
+<li><a href="../439572/index.html">Automated design of electronic equipment</a></li>
+<li><a href="../439576/index.html">Extensive review of Python interviews. Hints and Tips</a></li>
+<li><a href="../439578/index.html">On the issue of transformations and other operations</a></li>
+<li><a href="../439584/index.html">Project Lenergy, how to rethink portable power sources</a></li>
+<li><a href="../439586/index.html">SPBm protocol as the basis of Extreme Automated Campus</a></li>
+<li><a href="../439588/index.html">ESET has discovered new versions of the DanaBot Trojan.</a></li>
+<li><a href="../439590/index.html">Quals: Saudi and Oman National Cyber ​​Security CTF 2019. WriteUp</a></li>
+<li><a href="../439592/index.html">Ethical Activity Automation</a></li>
+<li><a href="../439596/index.html">How I accelerated image processing on Android 15 times</a></li>
+<li><a href="../439598/index.html">Microsoft told about the cost of paid support for Windows 7</a></li>
+<li><a href="../439600/index.html">Finland summed up the preliminary results of the experiment with a guaranteed basic income</a></li>
+<li><a href="../439604/index.html">How does the barcode work?</a></li>
+<li><a href="../439606/index.html">Experimental production of electronics for the minimum price</a></li>
+<li><a href="../439608/index.html">Modern religion: what do people give to Google, Facebook, Amazon and Apple?</a></li>
+<li><a href="../439610/index.html">As in my Chevrolet Bolt electric car, under warranty, two battery modules were replaced, and the third was monitored</a></li>
+<li><a href="../439616/index.html">The digest of interesting IT projects on Kickstarter №7</a></li>
+<li><a href="../439618/index.html">PHP for beginners. File attachment</a></li>
+<li><a href="../439620/index.html">Understanding asynchronous JavaScript [Translated by Sukhjinder Arora]</a></li>
+<li><a href="../439624/index.html">Why keep data in orbit</a></li>
+<li><a href="../439626/index.html">Experience developing a free application for collectors OpenNumismat</a></li>
+<li><a href="../439628/index.html">Parallel data update in ASP.NET Web API</a></li>
+<li><a href="../439632/index.html">How to set up Continuous Deployment for your project: personal experience</a></li>
+<li><a href="../439636/index.html">The crisis of the concepts of improving road safety and a new concept of its solution</a></li>
+<li><a href="../439638/index.html">Getting FPGA to Python</a></li>
+<li><a href="../439640/index.html">Vinyl is back and it's different</a></li>
+<li><a href="../439642/index.html">Java pitfalls. Part 1</a></li>
+<li><a href="../439644/index.html">Anti-Aging: Senolithics and Stem Cell Therapy</a></li>
+<li><a href="../439646/index.html">Holding SoftBank sold a stake in Nvidia due to the fall in their prices, but still earned $ 3.3 billion</a></li>
+<li><a href="../439648/index.html">Internal and nested java classes. Part 1</a></li>
+<li><a href="../439652/index.html">How to transport your startup to the USA: 4 important steps</a></li>
+<li><a href="../439654/index.html">Full immersion: how do we cool ASIC chips in Bitfury</a></li>
+<li><a href="../439656/index.html">C # character calculator</a></li>
+<li><a href="../439676/index.html">Integration of React Native and C ++ for iOS and Android</a></li>
+<li><a href="../439680/index.html">About 50% of Russians are ready to sell their personal data</a></li>
+<li><a href="../439682/index.html">Training Cisco 200-125 CCNA v3.0. Cisco Certified Network Specialist (CCNA). Day 4. Gateway devices</a></li>
+<li><a href="../439686/index.html">Flickr introduces new rules regarding the number of photos and videos users.</a></li>
+<li><a href="../439688/index.html">Overview of AI & ML solutions in 2018 and forecasts for 2019: Part 1 - NLP, Computer Vision</a></li>
+<li><a href="../439690/index.html">Virtual machine performance comparison of 6 cloud platforms: Selectel, MCS, Ya.Oblako, Google Cloud, AWS and Azure</a></li>
+<li><a href="../439692/index.html">AT & T sued for changing the network icon from 4G to 5G E</a></li>
+<li><a href="../439694/index.html">Developed smart tissue that reacts to changes in body temperature</a></li>
+<li><a href="../439696/index.html">On the crest of a wave, or “I want to go to the mainstream” - is it worth it?</a></li>
+<li><a href="../439698/index.html">Introduction to programming: a simple 3D shooter from scratch over the weekend, part 1</a></li>
+<li><a href="../439700/index.html">Patent for a board game in Russia</a></li>
+<li><a href="../439704/index.html">From pool request to release. Report Yandex.Taxi</a></li>
+<li><a href="../439706/index.html">BLACK HAT conference. Survival lessons in a 300 Gbps DDOS attack. Part 1</a></li>
+<li><a href="../439710/index.html">Features of creating products for the US market</a></li>
+<li><a href="../439712/index.html">Government procurement: a balance between the Italian strike and the Russian criminal</a></li>
+<li><a href="../439716/index.html">Tails OS or how to protect yourself online</a></li>
+<li><a href="../439718/index.html">Developing Elixir / Phoenix Applications with Docker</a></li>
+<li><a href="../439720/index.html">Introduction to programming: a simple 3D shooter from scratch over the weekend, part 2</a></li>
+<li><a href="../439722/index.html">Effects of SVG filters. Part 2. Outline text with feMorphology</a></li>
+<li><a href="../439724/index.html">Overview of AI & ML solutions in 2018 and forecasts for 2019: Part 2 - Tools and Libraries, AutoML, RL, Ethics in AI</a></li>
+<li><a href="../439726/index.html">Lock-in: truth or fiction?</a></li>
+<li><a href="../439728/index.html">Setting up backup and recovery of Zimbra OSE entirely and in separate boxes without using Zextras</a></li>
+<li><a href="../439730/index.html">Organizing reducer through standard class</a></li>
+<li><a href="../439732/index.html">Lazarus - simple animation using the TImageFragment component</a></li>
+<li><a href="../439734/index.html">We deploy Kubernetes on the desktop in minutes with MicroK8s</a></li>
+<li><a href="../439736/index.html">IPSec VPN connection between MikroTik and Kerio Control</a></li>
+<li><a href="../439746/index.html">Understand the promises in javascript</a></li>
+<li><a href="../439748/index.html">The digest of interesting materials for the mobile developer # 285 (February 4 - 10)</a></li>
+<li><a href="../439750/index.html">Learn product management - where?</a></li>
+<li><a href="../439752/index.html">Multicore MRI Method</a></li>
+<li><a href="../439754/index.html">Google is going to be engaged in the development of smart watches</a></li>
+<li><a href="../439756/index.html">Why do I need a thermo-acoustic generator?</a></li>
+<li><a href="../439760/index.html">Engineers "twisted" the light in the fiber - a new technology will speed up the transfer of data a hundred times</a></li>
+<li><a href="../439764/index.html">Corporate fruit</a></li>
+<li><a href="../439772/index.html">Writing Unit Tests on Swift for Verifying Asynchronous Tasks</a></li>
+<li><a href="../439778/index.html">The digest of fresh materials from the world of the frontend for the last week No. 351 (February 4 - 10, 2019)</a></li>
+<li><a href="../439780/index.html">PHP Digest number 149 (January 28 - February 11, 2019)</a></li>
+<li><a href="../439782/index.html">Headless CMS - the future of content management</a></li>
+<li><a href="../439784/index.html">Methane engine "Raptor" broke the record RD-180</a></li>
+<li><a href="../439788/index.html">Regular oddities in the GOST Grasshopper and Stribog algorithms</a></li>
+<li><a href="../439790/index.html">Test JaCarta WebClient or store tokens in a safe</a></li>
+<li><a href="../439792/index.html">NASA is looking for partners in the American industry to create a partially reusable manned lender</a></li>
+<li><a href="../439794/index.html">Back pain - understanding from the perspective of modern medicine</a></li>
+<li><a href="../439796/index.html">Spring Boot 2: what is not written in release notes</a></li>
+<li><a href="../439800/index.html">RISEX and Julia. 5 stages of love customer and designer</a></li>
+<li><a href="../439806/index.html">Valid SSL domain names for local Docker containers</a></li>
+<li><a href="../439808/index.html">The biggest telescopes. From a notebook and eyes to 340 megapixel cameras and data centers. Part 1</a></li>
+<li><a href="../439810/index.html">Get acquainted with the Moleculer microservice framework</a></li>
+<li><a href="../439816/index.html">Practical blockchain in business</a></li>
+<li><a href="../439818/index.html">Features of approaches to design in the real manufacturing sector</a></li>
+<li><a href="../439820/index.html">We are trying to write a project alone. Introduction</a></li>
+<li><a href="../439822/index.html">Creating an alternative display for the Ensoniq EPS16 + and ASR10 synthesizer / sampler</a></li>
+<li><a href="../439824/index.html">When will the JavaScript frameworks disappear?</a></li>
+<li><a href="../439826/index.html">Disable analog. What will happen to the TV?</a></li>
+<li><a href="../439828/index.html">The network appeared "analog" Findface</a></li>
+<li><a href="../439840/index.html">Conference DUMP-2019: we invite you to speak in the sections Design, Management and Testing</a></li>
+<li><a href="../439852/index.html">Remote control application release: Aspia 1.1.0</a></li>
+<li><a href="../439858/index.html">Prometheus + Grafana + Node Exporter + Docker in Azure with notifications in Telegram</a></li>
+<li><a href="../439862/index.html">Digital events in Moscow from February 11 to 17</a></li>
+<li><a href="../439866/index.html">Principles of design reference books in 1C Enterprise Management 2 (ERP 2.4.6)</a></li>
+<li><a href="../439868/index.html">Life without Facebook: less radical views, good mood, more time for loved ones. Now proven by science</a></li>
+<li><a href="../439878/index.html">Creation of architecture for a new high-load startup in 2019</a></li>
+<li><a href="../439880/index.html">Security Week 07: Local IoT Device Vulnerabilities</a></li>
+<li><a href="../439886/index.html">How I trained the neural network to implement the position estimation function on the Russian AI Cup CodeBall 2018</a></li>
+<li><a href="../439894/index.html">How easy it is to monitor the site</a></li>
+<li><a href="../439900/index.html">Julia and the method of coordinate descent</a></li>
+<li><a href="../439902/index.html">Explaining the physical essence of the Wing Lift phenomenon without using the Bernouli equation. Part 2</a></li>
+<li><a href="../439906/index.html">Critical vulnerability in Zemana products and not only</a></li>
+<li><a href="../439908/index.html">Kohl, piss off ... Coax</a></li>
+<li><a href="../439912/index.html">Unsolved mystery of view</a></li>
+<li><a href="../439916/index.html">Unpacking: Dridex bootloader</a></li>
+<li><a href="../439922/index.html">Taxation of IP in Kazakhstan how to be a freelancer?</a></li>
+<li><a href="../439924/index.html">The volume of parcels from foreign online stores grew by 25%</a></li>
+</ul></nav>
+</section>
+<script src="../../js/main.js"></script>
+
+<!-- Yandex.Metrika counter -->
+<script type="text/javascript" >
+  (function (d, w, c) {
+      (w[c] = w[c] || []).push(function() {
+          try {
+              w.yaCounter52319614 = new Ya.Metrika({
+                  id:52319614,
+                  clickmap:true,
+                  trackLinks:true,
+                  accurateTrackBounce:true,
+                  webvisor:true
+              });
+          } catch(e) { }
+      });
+
+      var n = d.getElementsByTagName("script")[0],
+          s = d.createElement("script"),
+          f = function () { n.parentNode.insertBefore(s, n); };
+      s.type = "text/javascript";
+      s.async = true;
+      s.src = "https://mc.yandex.ru/metrika/watch.js";
+
+      if (w.opera == "[object Opera]") {
+          d.addEventListener("DOMContentLoaded", f, false);
+      } else { f(); }
+  })(document, window, "yandex_metrika_callbacks");
+</script>
+<noscript><div><img src="https://mc.yandex.ru/watch/52319614" style="position:absolute; left:-9999px;" alt="" /></div></noscript>
+
+<!-- Google Analytics -->
+  <script>
+    window.ga = function () { ga.q.push(arguments) }; ga.q = []; ga.l = +new Date;
+    ga('create', 'UA-134228602-1', 'auto'); ga('send', 'pageview')
+  </script>
+  <script src="https://www.google-analytics.com/analytics.js" async defer></script>
+
+</section>
+</body>
+
+</html>

@@ -1,0 +1,1 @@
+Internal and nested java classes. Part 1

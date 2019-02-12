@@ -1,0 +1,1 @@
+Использование Ansible, Terraform, Docker, Consul, Nomad в облаках (Алексей Вахов, Учи.ру)
