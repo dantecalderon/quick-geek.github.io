@@ -1,0 +1,1 @@
+Why do you need low-level optimization on Elbrus or how to speed up the recognition system by one and a half times

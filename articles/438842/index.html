@@ -1,0 +1,497 @@
+<!doctype html>
+<html class="no-js" lang="en">
+
+<head>
+  <!-- Global site tag (gtag.js) - Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=UA-134228602-1"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'UA-134228602-1');
+  </script>
+
+  <meta charset="utf-8">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  <title>Putting in order playlist Torrent-TV ("Superwash")</title>
+  <meta name="description" content="The torrent in the illegal service Torrent-TV (“Super Wash”) in the overwhelming majority are the original streams from the operators or from the sate...">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+  <link rel="stylesheet" href="../../css/main.css">
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+  <script>window.jQuery || document.write('<script src="../../js/vendors/jquery-3.3.1.min.js"><\/script>')</script>
+</head>
+
+<body>
+  <!--[if lte IE 9]>
+    <p class="browserupgrade">You are using an <strong>outdated</strong> browser. Please <a href="https://browsehappy.com/">upgrade your browser</a> to improve your experience and security.</p>
+  <![endif]-->
+  <nav class="page-headings-container js-page-headings-container"></nav>
+  <div class="tools-bar js-tools-bar">
+    <!-- <a href="https://quick-geek.github.io/search.html" title="Search">🔎</a> -->
+    <a class="js-list-of-headings-button" data-state="closed" href="#" title="Headings">📜</a>
+    <a class="js-go-to-top-button" href="#" title="Go to Top">⬆️</a>
+    <a class="js-go-to-bottom-button" href="#" title="Go to Bottom">⬇️</a>
+  </div>
+  <section class="page js-page"><h1>Putting in order playlist Torrent-TV ("Superwash")</h1><div class="post__text post__text-html js-mediator-article">  The torrent in the illegal service Torrent-TV (“Super Wash”) in the overwhelming majority are the original streams from the operators or from the satellite without clamping.  These are mainly streams with interlaced video.  Torrent-TV provides the highest possible quality, but low stability.  Today there are only channels, not tomorrow.  Today, some channels work well, tomorrow is bad.  This service is not suitable for constant trouble-free use - for which you paid, i.e.  not paid, then received.  But it is great when you need to watch something with high quality (if the channel at that moment will work stably).  Another problem is the formation of a convenient personal playlist.  This is exactly what will be discussed in the article. <br><br><img src="https://habrastorage.org/webt/-q/pn/q4/-qpnq4tysuha1lgfmqtcv7uu3ha.png"><br><a name="habracut"></a><br>  The basic playlist Torrent-TV ("Superwash") contains more than 1200 channels.  All sorts of regional, different countries, duplicates of SD and HD, various garbage cans, etc. The Russian audience includes 200-300 channels.  Moreover, not everyone is comfortable with the accepted channel grouping.  It would seem that you can take a playlist from Torrent-TV, arrange it as required by the perfectionist soul.  The problem is that AceStream-links to channels change periodically, and the prepared playlist will become useless.  Those.  You need to automatically generate a new current playlist in the form convenient for you.  That is what we will do. <br><br>  <b>You will need:</b> <br><br><ul><li>  Experience setting up programs for watching Torrent-TV (“Super Wash”) and knowing what it is. </li><li>  A router with support for Entware (if necessary, and some skills, you can easily adapt the instructions for OpenWrt or Entware on the boxes themselves). </li></ul><br>  <b>This note does not address the questions:</b> <br><br><ul><li>  Selecting and configuring an IPTV manager. </li><li>  System settings in general to view Torrent-TV. </li><li>  Features specific Android-boxes for working with interlaced video in general and Torrent-TV in particular. </li></ul><br>  We will use the program on the router, which, when requested by the link, download the current playlist Torrent-TV, form a new playlist from it and give it away: <br><br><ul><li>  Your own channel list based on a prepared list of favorite channels. </li><li>  You can automatically exclude SD channels if there are HD matches for them. </li><li>  Sort groups and their names according to your desire. </li><li>  Displayed channel names as you wish. </li><li>  Sort channels in the group by HD / SD (primary) and name. </li><li>  Embedded links to EPG sources. </li><li>  The source of the logos (as well as the logos themselves) and the EPG compliance for the channels of your choice. </li></ul><br><h2>  How will everything work after the setup? </h2><br>  Add a link to the playlist <a href="http://192.168.0.1:81/playlist.cgi">http://192.168.0.1:81/playlist.cgi</a> (replace 192.168.0.1 with the internal address of your router) in your IPTV manager.  Is done. <br><br><img src="https://habrastorage.org/webt/cm/on/1u/cmon1uarl1wclz_9v5zxk2f-p34.png"><br><br>  The principle of operation is very simple.  The playlist.cgi script on the router runs the ttv.py program, which, based on the actual Torrent-TV playlist (loaded at the time of access) and the specified list of favorite channels, generates a new playlist, and then gives it away. <br><br><h2>  Installing the necessary software on the router </h2><br>  Connect via SSH to the router.  In Windows, you can use the <a href="https://www.putty.org/">PuTTY</a> client to connect the connection. <br><br>  Install the necessary software: <br><br><pre><code class="bash hljs">opkg update opkg install wget ca-certificates mc python3 lighttpd-mod-cgi</code> </pre> <br>  <b>wget</b> is a program for downloading files.  It is only needed for the initial setup. <br><br>  <b>ca-certificates</b> - certificates for wget. <br><br>  <b>mc</b> is the Midnight Commander file manager.  It is needed only because of the convenient editor mcedit.  If you are used to using another text editor, then you can not install mc. <br><br>  <b>python3</b> is a python interpreter. <br><br>  <b>lighttpd-mod-cgi</b> - web server lighttpd. <br><br><h2>  Download the main files </h2><br><pre> <code class="bash hljs">mkdir -p /opt/etc/ttv wget --no-check-certificate -O /opt/etc/ttv/ttv.py https://raw.githubusercontent.com/Kyrie1965/ttv/master/ttv.py wget --no-check-certificate -O /opt/share/www/playlist.cgi https://raw.githubusercontent.com/Kyrie1965/ttv/master/playlist.cgi chmod +x /opt/share/www/playlist.cgi</code> </pre> <br>  I will tell about their appointment later, but for now I’ll just show you the contents.  Don't be fooled by the Python code, until that moment I had never written anything in Python. <br><br><div class="spoiler">  <b class="spoiler_title">Content /opt/etc/ttv/ttv.py</b> <div class="spoiler_text"><pre> <code class="python hljs">PLAYLIST_LOAD_URL = <span class="hljs-string"><span class="hljs-string">"http://91.92.66.82/trash/ttv-list/ttv.all.tag.player.m3u"</span></span> TEMPLATE_SAVE_PATH = <span class="hljs-string"><span class="hljs-string">"/opt/etc/ttv/template.txt"</span></span> FAVORITES_LOAD_PATH = <span class="hljs-string"><span class="hljs-string">"/opt/etc/ttv/favorites.txt"</span></span> PLAYLIST_SAVE_PATH = <span class="hljs-string"><span class="hljs-string">"/opt/etc/ttv/playlist.m3u"</span></span> LOGOS_URL = <span class="hljs-string"><span class="hljs-string">"https://raw.githubusercontent.com/Kyrie1965/ttv/master/logos/{}"</span></span> <span class="hljs-comment"><span class="hljs-comment">#LOGOS_URL = "{}" STREAM_URL = "http://127.0.0.1:6878/ace/getstream?id={}&amp;.mp4" #STREAM_URL = "acestream://{}" EPG_LINKS = "https://teleguide.info/download/new3/xmltv.xml.gz" #EPG_LINKS = "https://teleguide.info/download/new3/xmltv.xml.gz,http://programtv.ru/xmltv.xml.gz,http://api.torrent-tv.ru/ttv.xmltv.xml.gz" import re import urllib.request import os from operator import itemgetter as i from functools import cmp_to_key from urllib.parse import urlencode def cmp(a, b): return (a &gt; b) - (a &lt; b) def multikeysort(items, columns): comparers = [ ((i(col[1:].strip()), -1) if col.startswith('-') else (i(col.strip()), 1)) for col in columns ] def comparer(left, right): comparer_iter = ( cmp(fn(left), fn(right)) * mult for fn, mult in comparers ) return next((result for result in comparer_iter if result), 0) return sorted(items, key=cmp_to_key(comparer)) def loadChannels(content): lines = content.splitlines() returnChannels = {} pattern = re.compile("group-title=\"(.*?)\"") channelName = "" channelGroup = "" channelStreamID = "" waitURI = False for line in lines: if line.startswith("acestream"): if waitURI: channelStreamID = line[12:] HD = False if "HD" in channelName: HD = True tmpDict = {"name": channelName, "group": channelGroup, "stream": channelStreamID, "hd": HD} returnChannels[channelName] = tmpDict waitURI = False elif line.startswith("#EXTINF"): x = line.split("\",") if (len(x) != 2): continue channelName = x[1] match = pattern.search(x[0]) if match: channelGroup = match.group(1) else: channelGroup = "Общие" waitURI = True return returnChannels def saveTemplate(content, channels, path): lines = content.splitlines() pattern = re.compile("group-title=\"(.*?)\"") waitURI = False channelName = "" channelReplace = "" channelNewName = "" channelEPG = "" channelGroup = "" channelStreamID = "" groupDict = {} currentGroup = 1 template="" for line in lines: if line.startswith("acestream"): if waitURI: channelStreamID = line[12:] template += channelName template += "/" template += channelReplace template += "/" template += channelNewName template += "/" template += channelEPG template += "/" template += channelName + ".png" template += "/" template += channelGroup template += "\n" waitURI = False elif line.startswith("#EXTINF"): x = line.split("\",") if (len(x) != 2): continue channelName = x[1] channelNewName = x[1] channelEPG = x[1] if (channels.get(channelName + " HD") != None): channelReplace = channelName + " HD" else: channelReplace = "-" match = pattern.search(x[0]) if match: channelGroup = match.group(1) if (groupDict.get(channelGroup)): channelGroup = groupDict.get(channelGroup) else: newGroupName = "{:02d}_{}".format(currentGroup, channelGroup) currentGroup += 1 groupDict[channelGroup] = newGroupName channelGroup = newGroupName else: channelGroup = "00_Unsigned" waitURI = True file = open(path,'w', encoding='utf-8') file.write(template) file.close() return def loadFavorites(content): returnChannels = {} lines = content.splitlines() for line in lines: parts = line.split('/') if len(parts) == 6: tmpDict = {"name": parts[0], "replace": parts[1], "newName": parts[2], "EPG": parts[3], "logo": parts[4], "group": parts[5]} returnChannels[parts[0]] = tmpDict elif len(parts) == 5: #совместимость с предыдущим вариантом tmpDict = {"name": parts[0], "replace": parts[1], "newName": parts[2], "EPG": parts[3], "group": parts[4], "logo": parts[0] + ".png"} returnChannels[parts[0]] = tmpDict return returnChannels def savePlaylist(channels, favorites, path): returnChannels = [] currentChannels = set() for key, chDict in favorites.items(): if chDict["replace"] != "-": if favorites.get(chDict["replace"]) != None and channels.get(chDict["replace"]) != None: currentChannels.add(chDict["replace"]) elif channels.get(chDict["name"]) != None: currentChannels.add(chDict["name"]) elif channels.get(chDict["name"]) != None: currentChannels.add(chDict["name"]) for ch in currentChannels: chFromFavorites = favorites.get(ch) chFromChannels = channels.get(ch) tmpDict = {"name": chFromFavorites.get("newName"), "oldName": chFromFavorites.get("name"), "EPG": chFromFavorites.get("EPG"), "group": chFromFavorites.get("group"), "logo": chFromFavorites.get("logo"), "stream": chFromChannels.get("stream"), "hd": chFromChannels.get("hd")} returnChannels.append(tmpDict) result = multikeysort(returnChannels, ['group', '-hd', 'name']) template="" template += "#EXTM3U url-tvg=" template += "\"" template += EPG_LINKS template += "\"" template += "\n" for n in result: group = n.get("group") if group.find("_", 2, 3) != -1: group = group[3:] template += "#EXTINF:-1 tvg-name=\"{}\" tvg-logo=\"{}\" group-title=\"{}\" ,{}".format(n.get("EPG"), LOGOS_URL.format(urllib.parse.quote(n.get("logo"))), group, n.get("name")) template += "\n" template += STREAM_URL.format(n.get("stream")) template += "\n" file = open(path,'w', encoding='utf-8') file.write(template) file.close() return result response = urllib.request.urlopen(PLAYLIST_LOAD_URL) content = response.read().decode("utf-8") channels = loadChannels(content) if channels == None or (len(channels.keys()) == 0): exit() saveTemplate(content, channels, TEMPLATE_SAVE_PATH) exists = os.path.isfile(FAVORITES_LOAD_PATH) if exists: file = open(FAVORITES_LOAD_PATH,'r', encoding='utf-8') content = file.read() favorites = loadFavorites(content) savePlaylist(channels, favorites, PLAYLIST_SAVE_PATH)</span></span></code> </pre> <br></div></div><br><div class="spoiler">  <b class="spoiler_title">Content /opt/share/www/playlist.cgi</b> <div class="spoiler_text"><pre> <code class="bash hljs"><span class="hljs-comment"><span class="hljs-comment">#!/bin/sh PATH=/opt/sbin:/opt/bin:/opt/usr/sbin:/opt/usr/bin:/usr/sbin:/usr/bin:/sbin:/bin python3 /opt/etc/ttv/ttv.py echo "Content-Type: text/plain; charset=UTF-8" echo "" echo "$(cat /opt/etc/ttv/playlist.m3u)"</span></span></code> </pre> <br></div></div><br><h2>  Web server configuration and launch </h2><br>  Open the <b>/opt/etc/lighttpd/lighttpd.conf</b> file: <br><br><pre> <code class="bash hljs">mcedit /opt/etc/lighttpd/lighttpd.conf</code> </pre> <br>  To paste from the buffer, use Shift + Insert, save - F2, exit - F10. <br><br>  Change the line <b># server.port = 80</b> to: <br><br><pre> <code class="bash hljs">server.port = 81</code> </pre> <br>  Open the <b>/opt/etc/lighttpd/conf.d/30-cgi.conf</b> file: <br><br><pre> <code class="bash hljs">mcedit /opt/etc/lighttpd/conf.d/30-cgi.conf</code> </pre> <br>  Change <b>".cgi" =&gt; "/ opt / bin / perl"</b> to: <br><br><pre> <code class="bash hljs"><span class="hljs-string"><span class="hljs-string">".cgi"</span></span> =&gt; <span class="hljs-string"><span class="hljs-string">"/bin/sh"</span></span></code> </pre> <br>  Start the web server: <br><br><pre> <code class="bash hljs">/opt/etc/init.d/S80lighttpd start</code> </pre> <br><h2>  Create a list of favorite channels </h2><br>  Run the <b>ttv.py</b> program: <br><br><pre> <code class="bash hljs">python3 /opt/etc/ttv/ttv.py</code> </pre> <br>  A template file <b>template.txt</b> will be created in the <b>/ opt / etc / ttv</b> folder.  This is a simple text file.  It will always be relevant, i.e.  when you start the program, it is overwritten with actual data. <br><br>  Each line in this file corresponds to one channel of Torrent-TV and looks like: <br>  <b>CHANNEL_NAME / CHANNEL_CHANGE / YOUR_NAME_CHANNEL_NAME / YOUR_NAME_CHANNEL_V_EP__NAME / YOUR LOGO / YOUR_GROUP</b> <br><br>  For example: <br><br>  Amedia Premium / Amedia Premium HD / Amedia Premium / Amedia Premium / Amedia Premium.png / 11_Films <br>  Amedia Premium HD / - / Amedia Premium HD / Amedia Premium HD / Amedia Premium HD.png / 11_Films <br><br>  Save this file on your computer for easy editing (for example, using <a href="https://winscp.net/eng/docs/lang:ru">WinSCP</a> ).  Rename it to favorites.txt. <br><br>  Edit the file, leaving only those channels that you need. <br><br>  <b>NAME OF CHANNEL</b> - the name of the channel in the original playlist. <br><br>  <b>CHANNEL REPLACEMENT</b> - channel name in the original replacement playlist.  Put "-" if replacement is not needed.  By default, substitutions are automatically substituted in the template if the channel has an HD option.  For example, in the original playlist there are Amedia Premium and Amedia Premium HD.  In the final playlist will be only Amedia Premium HD. <br><br>  <b>YOUR_NAME_CHANNEL</b> - the display name in the IPTV-manager.  It can be any and affects only the display names in the IPTV manager.  For example, the original channel has the name “Paramount Comedy HD (Russia)”, and you rename it to “Paramount Comedy HD”. <br><br>  <b>YOUR_NAME_CANAL_B_EPG</b> - this is necessary for full compliance in the selected source EPG.  For example, the original channel is called "Match TV HD."  And in the EPG this channel is called “Match!”.  Change this parameter to “Match!” And get full match for your EPG source.  Thus, for all channels, you can bring the EPG match to 100%. <br><br>  <b>YOUR LOGO</b> is the name of the logo file. <br><br>  <b>YOUR GROUP</b> - the name of the channel group.  You can use an index, a two-digit number, in front of the group name.  This index determines the order of the groups in the final playlist (from the smallest to the largest).  After sorting the index will be automatically removed from the group name. <br><br><div class="spoiler">  <b class="spoiler_title">Here is an example of an edited file named favorites.txt.</b> <div class="spoiler_text"><pre> <code class="plaintext hljs">Amedia Premium/Amedia Premium HD/Amedia Premium/Amedia Premium/Amedia Premium.png/11_Фильмы и сериалы Amedia Premium HD/-/Amedia Premium HD/Amedia Premium HD/Amedia Premium HD.png/11_Фильмы и сериалы Дождь/Дождь HD/Дождь/Дождь/Дождь.png/12_Общие Дождь HD/-/Дождь HD/Дождь HD/Дождь HD.png/12_Общие Viasat History/-/Viasat History/Viasat History/Viasat History.png/01_Познавательные Discovery Channel/Discovery Channel HD/Discovery Channel/Discovery Channel/Discovery Channel.png/01_Познавательные Discovery Channel HD/-/Discovery Channel HD/Discovery Channel HD/Discovery Channel HD.png/01_Познавательные Discovery Science/Discovery Science HD/Discovery Science/Discovery Science/Discovery Science.png/01_Познавательные Discovery Science HD/-/Discovery Science HD/Discovery Science HD/Discovery Science HD.png/01_Познавательные Amedia Hit/Amedia Hit HD/Amedia Hit/Amedia Hit/Amedia Hit.png/11_Фильмы и сериалы Amedia Hit HD/-/Amedia Hit HD/Amedia Hit HD/Amedia Hit HD.png/11_Фильмы и сериалы Матч ТВ/Матч ТВ HD/Матч!/Матч!/Матч ТВ.png/03_Спортивные Матч ТВ HD/-/Матч! HD/Матч!/Матч ТВ HD.png/03_Спортивные Eurosport 1/Eurosport 1 HD/Eurosport 1/Eurosport 1/Eurosport 1.png/03_Спортивные Eurosport 1 HD/-/Eurosport 1 HD/Eurosport 1 HD/Eurosport 1 HD.png/03_Спортивные Paramount Comedy HD (Россия)/-/Paramount Comedy HD/Paramount Comedy HD (Россия)/Paramount Comedy HD (Россия).png/11_Фильмы и сериалы Матч! Футбол 1/Матч! Футбол 1 HD/Матч! Футбол 1/Матч! Футбол 1/Матч! Футбол 1.png/03_Спортивные Матч! Футбол 1 HD/-/Матч! Футбол 1 HD/Матч! Футбол 1 HD/Матч! Футбол 1 HD.png/03_Спортивные Россия 1/Россия HD/Россия 1/Россия 1/Россия 1.png/13_Зомби-пропаганда Россия HD/-/Россия HD/Россия HD/Россия HD.png/13_Зомби-пропаганда</code> </pre> <br></div></div><br>  Copy the prepared file <b>favorites.txt</b> to the <b>/ opt / etc / ttv folder</b> on the router. <br><br>  All is ready.  You can pick up a playlist at <a href="http://192.168.0.1:81/playlist.cgi">http://192.168.0.1:81/playlist.cgi</a> (replace 192.168.0.1 with the internal address of your router).  Just specify the link in the IPTV manager and you will always have your current playlist.  The playlist.cgi script runs the ttv.py program, which, based on the actual playlist Torrent-TV (loaded at the time of the call) and favorites.txt, generates a new playlist, and then gives this new playlist. <br><br>  At the exit, if all channels are present in the current playlist (otherwise the missing channels will be ignored), you will get such a neat playlist: <br><br><div class="spoiler">  <b class="spoiler_title">Playlist</b> <div class="spoiler_text"> <code>#EXTM3U url-tvg="https://teleguide.info/download/new3/xmltv.xml.gz" <br> #EXTINF:-1 tvg-name="Discovery Channel HD" tvg-logo="https://raw.githubusercontent.com/Kyrie1965/ttv/master/logos/Discovery%20Channel%20HD.png" group-title="Познавательные" ,Discovery Channel HD <br> http://127.0.0.1:6878/ace/getstream?id=da1232435c2d54cebdd114fb8e9632b4d8a2977e&amp;.mp4 <br> #EXTINF:-1 tvg-name="Discovery Science HD" tvg-logo="https://raw.githubusercontent.com/Kyrie1965/ttv/master/logos/Discovery%20Science%20HD.png" group-title="Познавательные" ,Discovery Science HD <br> http://127.0.0.1:6878/ace/getstream?id=03fb28986da9168dd56ec6891253bcc496c13eb5&amp;.mp4 <br> #EXTINF:-1 tvg-name="Viasat History" tvg-logo="https://raw.githubusercontent.com/Kyrie1965/ttv/master/logos/Viasat%20History.png" group-title="Познавательные" ,Viasat History <br> http://127.0.0.1:6878/ace/getstream?id=fca01ece6298f5ada1e26b0ab0236fa213312bea&amp;.mp4 <br> #EXTINF:-1 tvg-name="Eurosport 1 HD" tvg-logo="https://raw.githubusercontent.com/Kyrie1965/ttv/master/logos/Eurosport%201%20HD.png" group-title="Спортивные" ,Eurosport 1 HD <br> http://127.0.0.1:6878/ace/getstream?id=001be3c7f3a83322c57627d2ce12c563f37c7ab9&amp;.mp4 <br> #EXTINF:-1 tvg-name="Матч!" tvg-logo="https://raw.githubusercontent.com/Kyrie1965/ttv/master/logos/%D0%9C%D0%B0%D1%82%D1%87%20%D0%A2%D0%92%20HD.png" group-title="Спортивные" ,Матч! HD <br> http://127.0.0.1:6878/ace/getstream?id=8f33256291e7136bfdb1b0ab5a84717dff8e9a31&amp;.mp4 <br> #EXTINF:-1 tvg-name="Матч! Футбол 1 HD" tvg-logo="https://raw.githubusercontent.com/Kyrie1965/ttv/master/logos/%D0%9C%D0%B0%D1%82%D1%87%21%20%D0%A4%D1%83%D1%82%D0%B1%D0%BE%D0%BB%201%20HD.png" group-title="Спортивные" ,Матч! Футбол 1 HD <br> http://127.0.0.1:6878/ace/getstream?id=63dea7ffffdfeadca5a7cb50fd66bd1433de8d19&amp;.mp4 <br> #EXTINF:-1 tvg-name="Amedia Hit HD" tvg-logo="https://raw.githubusercontent.com/Kyrie1965/ttv/master/logos/Amedia%20Hit%20HD.png" group-title="Фильмы и сериалы" ,Amedia Hit HD <br> http://127.0.0.1:6878/ace/getstream?id=3f6a960f2051914b07b9ffc931b2e0b1b1d6a968&amp;.mp4 <br> #EXTINF:-1 tvg-name="Amedia Premium HD" tvg-logo="https://raw.githubusercontent.com/Kyrie1965/ttv/master/logos/Amedia%20Premium%20HD.png" group-title="Фильмы и сериалы" ,Amedia Premium HD <br> http://127.0.0.1:6878/ace/getstream?id=f78faf23a6339f4a13412178b4675c931d5fba08&amp;.mp4 <br> #EXTINF:-1 tvg-name="Paramount Comedy HD (Россия)" tvg-logo="https://raw.githubusercontent.com/Kyrie1965/ttv/master/logos/Paramount%20Comedy%20HD%20%28%D0%A0%D0%BE%D1%81%D1%81%D0%B8%D1%8F%29.png" group-title="Фильмы и сериалы" ,Paramount Comedy HD <br> http://127.0.0.1:6878/ace/getstream?id=a9023adab9228b8aa7f1b508b553140b69cecd80&amp;.mp4 <br> #EXTINF:-1 tvg-name="Дождь" tvg-logo="https://raw.githubusercontent.com/Kyrie1965/ttv/master/logos/%D0%94%D0%BE%D0%B6%D0%B4%D1%8C.png" group-title="Общие" ,Дождь <br> http://127.0.0.1:6878/ace/getstream?id=1bd74f323ca46413efa97ad77d1579e00eb0b79f&amp;.mp4 <br> #EXTINF:-1 tvg-name="Россия HD" tvg-logo="https://raw.githubusercontent.com/Kyrie1965/ttv/master/logos/%D0%A0%D0%BE%D1%81%D1%81%D0%B8%D1%8F%20HD.png" group-title="Зомби-пропаганда" ,Россия HD <br> http://127.0.0.1:6878/ace/getstream?id=7d5f9b63186bc7bbb9475f6a48fb8b2152f247c8&amp;.mp4</code> <br> </div></div><br><pre> <code class="bash hljs">Познавательные: Discovery Channel HD Discovery Science HD Viasat History Спортивные: Eurosport 1 HD Матч! HD Матч! Футбол 1 HD Фильмы и сериалы: Amedia Hit HD Amedia Premium HD Paramount Comedy HD Общие: Дождь Зомби-пропаганда: Россия HD</code> </pre> <br>  If necessary, you can change some parameters in the ttv.py program: <br><br><pre> <code class="bash hljs">mcedit /opt/etc/ttv/ttv.py</code> </pre> <br><div class="spoiler">  <b class="spoiler_title">Parameters that can be changed</b> <div class="spoiler_text"> <code>PLAYLIST_LOAD_URL = "http://91.92.66.82/trash/ttv-list/ttv.all.tag.player.m3u" <br> TEMPLATE_SAVE_PATH = "/opt/etc/ttv/template.txt" <br> FAVORITES_LOAD_PATH = "/opt/etc/ttv/favorites.txt" <br> PLAYLIST_SAVE_PATH = "/opt/etc/ttv/playlist.m3u" <br> LOGOS_URL = "https://raw.githubusercontent.com/Kyrie1965/ttv/master/logos/{}" <br> #LOGOS_URL = "{}" <br> STREAM_URL = "http://127.0.0.1:6878/ace/getstream?id={}&amp;.mp4" <br> #STREAM_URL = "acestream://{}" <br> EPG_LINKS = "https://teleguide.info/download/new3/xmltv.xml.gz" <br> #EPG_LINKS = "https://teleguide.info/download/new3/xmltv.xml.gz,http://programtv.ru/xmltv.xml.gz,http://api.torrent-tv.ru/ttv.xmltv.xml.gz"</code> <br> </div></div><br>  <b>PLAYLIST_LOAD_URL</b> - link to download the current playlist Torrent-TV. <br>  <b>TEMPLATE_SAVE_PATH</b> - the path to save the template. <br>  <b>FAVORITES_LOAD_PATH</b> - the path for downloading the list of favorite channels. <br>  <b>PLAYLIST_SAVE_PATH</b> - the path to save the new playlist. <br>  <b>LOGOS_URL</b> - link with channel logos. <br>  <b>STREAM_URL</b> - type of link to the stream in the final playlist.  This can be a direct link to Ace Stream or a link to Ace Stream Proxy.  It depends on which IPTV manager you use. <br>  <b>EPG_LINKS</b> is a list of EPG links.  All IPTV managers are different.  There are those who do not know how to take a link to the EPG from the playlist.  There are those that support only one EPG source from the playlist.  There are those who do not know how to combine EPG from different sources. <br><br>  You will be interested only in STREAM_URL, LOGOS_URL, EPG_LINKS, since  the appearance of the final playlist depends on them.  For them are given alternative examples in the file. <br><br><h2>  Conclusion </h2><br>  As a result, you get an up-to-date playlist of Torrent-TV (“Super-wash”) with its own channel list, with its own channel names, with its own groups and their arbitrary sorting, with its own logos, with its own EPG comparison, with the ability to eliminate duplicate HD / SD, with sorting channels within groups by HD / SD and title.  You only need to set everything up once and create a file of your favorite channels once.  And then all the devices in your home network will receive the desired playlist via the link, doing “everything is beautiful” right away without any additional settings. <br><br><iframe width="560" height="315" src="https://www.youtube.com/embed/bndudCB3Nps" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen=""></iframe></div><p>Source: <a href="https://habr.com/ru/post/438842/">https://habr.com/ru/post/438842/</a></p>
+<section class="navigation-panel">
+<h4>More articles:</h4>
+<nav><ul class="list-of-pages">
+<li><a href="../438840/index.html">Pride and Passion, the story of turning a dream into a space project</a></li>
+<li><a href="../438842/index.html">Putting in order playlist Torrent-TV ("Superwash")</a></li>
+<li><a href="../438850/index.html">Moscow JS 44 - Announcement</a></li>
+<li><a href="../438852/index.html">New GSM Gateways from OpenVox</a></li>
+<li><a href="../438854/index.html">Explaining the physical essence of the Wing Lift phenomenon without using the Bernoulli equation</a></li>
+<li><a href="../438856/index.html">Sagi from life</a></li>
+<li><a href="../438858/index.html">How to use segmentation, targeting and positioning (STP) in developing a marketing strategy</a></li>
+<li><a href="../438862/index.html">Deploim isomorphic web application on the example of Nuxt.js</a></li>
+<li><a href="../438866/index.html">Builders against Java syntax</a></li>
+<li><a href="../438868/index.html">Security Week 06: Live on FaceTime</a></li>
+<li><a href="../438870/index.html">Lombok returns greatness to java</a></li>
+<li><a href="../438874/index.html">Start friendship with VkNet</a></li>
+<li><a href="../438876/index.html">How to shorten the time-to-market: a story about test automation in M.Video</a></li>
+<li><a href="../438878/index.html">The appearance of the film in the torrent after the premiere increases the box office by 3%</a></li>
+<li><a href="../438880/index.html">When to use var, let and const in Javascript [translation of the article by Tyler McGinnis]</a></li>
+<li><a href="../438882/index.html">The probability of winning the match with a certain probability of winning points</a></li>
+<li><a href="../438884/index.html">True story advertising agency from the provinces: ups, downs and the introduction of CRM</a></li>
+<li><a href="../438886/index.html">Morty, we're at UltraHD! How to watch any movie in 4K by drawing it through a little-known neural network</a></li>
+<li><a href="../438888/index.html">Why Windows in 2019 does not steer, or ChYDNT?</a></li>
+<li><a href="../438890/index.html">Postgres in retrospect</a></li>
+<li><a href="../438892/index.html">What is a corporate blockchain?</a></li>
+<li><a href="../438896/index.html">Business do not worry</a></li>
+<li><a href="../438898/index.html">Chrome reverse and installation of extensions</a></li>
+<li><a href="../438900/index.html">On the way to the physical principles of biological evolution. Finish + full translation</a></li>
+<li><a href="../438902/index.html">Using DBREPLICATION when rolling out databases on Microsoft SQL Server</a></li>
+<li><a href="../438908/index.html">Training Cisco 200-125 CCNA v3.0. Cisco Certified Network Specialist (CCNA). Day 1. Network Basics</a></li>
+<li><a href="../438910/index.html">Samba as an ADDC on Solaris 11.4</a></li>
+<li><a href="../438916/index.html">Notes phytochemist. Potatoes. Part Three Bulba Fugu or SOLANIN</a></li>
+<li><a href="../438920/index.html">Avalonia first meeting</a></li>
+<li><a href="../438922/index.html">Encryption of traffic in Direct Connect, Part 2</a></li>
+<li><a href="../438924/index.html">Notes IoT-provider: nine problems of the Internet of Things, or why it is not good in Russia</a></li>
+<li><a href="../438926/index.html">Telegram again distributes money for developing simple CSS templates.</a></li>
+<li><a href="../438928/index.html">AI party in Silicon Valley: mayor, billionaire, presidents, geniuses, processor developers and a girl with bright hair</a></li>
+<li><a href="../438930/index.html">The authorities fundamentally change the strategy of control over the Internet</a></li>
+<li><a href="../438932/index.html">Pattern Recognition in Eidetic Artificial Intelligence</a></li>
+<li><a href="../438934/index.html">Creating and configuring a portable assembly Jupyter Notebook and Lab on Windows. Part 1</a></li>
+<li><a href="../438936/index.html">BotMan acquaintance</a></li>
+<li><a href="../438940/index.html">Open course "Deep Learning on the fingers"</a></li>
+<li><a href="../438946/index.html">DateTimeOffset (Strict)</a></li>
+<li><a href="../438948/index.html">Why do you need low-level optimization on Elbrus or how to speed up the recognition system by one and a half times</a></li>
+<li><a href="../438950/index.html">The Central Bank launched a robot to search for earnings schemes on the Internet</a></li>
+<li><a href="../438952/index.html">What can you learn when developing an audio player for different browsers?</a></li>
+<li><a href="../438954/index.html">Combining Signed Distance Fields in 2D</a></li>
+<li><a href="../438956/index.html">Magnetite in the teeth: sequencing of transcriptomes of the tissues of the radula of the shell of mollusc shell</a></li>
+<li><a href="../438958/index.html">ILV confirmed the existence of its "space station"</a></li>
+<li><a href="../438960/index.html">How I abandoned Ruby in favor of Python, working on a backend</a></li>
+<li><a href="../438962/index.html">For the most part, a positive outlook for the future of chips.</a></li>
+<li><a href="../438964/index.html">Who really stands behind popular free VPNs?</a></li>
+<li><a href="../438966/index.html">The history of wandering documentation Haproxy, or what you should pay attention to when it is configured</a></li>
+<li><a href="../438968/index.html">Marking shoes in Russia: The market is not ready, but will have to work</a></li>
+<li><a href="../438970/index.html">It is said that Haskell is a language for geniuses and academics. True?</a></li>
+<li><a href="../438972/index.html">The brain from the inside (Visualization of the passage of the pattern through the model of an artificial neural network)</a></li>
+<li><a href="../438974/index.html">Virtual reality helps to cope with mental disorders</a></li>
+<li><a href="../438976/index.html">The book "Spring. All design patterns »</a></li>
+<li><a href="../438980/index.html">Spring Boot 2: what's new?</a></li>
+<li><a href="../438982/index.html">Kubernetes tutorial, part 1: applications, microservices and containers</a></li>
+<li><a href="../438984/index.html">Kubernetes Handbook Part 2: Creating and Working With a Cluster</a></li>
+<li><a href="../438986/index.html">React Training Course Part 14: Workshop on Class Based Components, Component State</a></li>
+<li><a href="../438988/index.html">React Training Course, Part 15: Workshop on Working with Component State</a></li>
+<li><a href="../438992/index.html">Developer Diary or Bad Decisions</a></li>
+<li><a href="../438994/index.html">Intel Xeon W-3175X, hot drummer. Testing</a></li>
+<li><a href="../438996/index.html">Company network and MitM. Part 1</a></li>
+<li><a href="../438998/index.html">CGDevs Moscow Meetup # 2</a></li>
+<li><a href="../439000/index.html">Spatial manipulation in 2D using Signed Distance Fields</a></li>
+<li><a href="../439002/index.html">How to stop "writing TK" and start working?</a></li>
+<li><a href="../439006/index.html">How AI helps to master sign language</a></li>
+<li><a href="../439008/index.html">Mail.ru has released a new Atom browser with an emphasis on "security and privacy"</a></li>
+<li><a href="../439010/index.html">How is the consolidation of archives in DeviceLock DLP</a></li>
+<li><a href="../439012/index.html">Telephone directory of the organization - print version</a></li>
+<li><a href="../439016/index.html">Static Generic Tables</a></li>
+<li><a href="../439018/index.html">Setting up Sphinx search for an online store</a></li>
+<li><a href="../439020/index.html">Ticket to Ride. Europe - arithmetic, part two</a></li>
+<li><a href="../439022/index.html">CNC in the hobby workshop (part 3)</a></li>
+<li><a href="../439024/index.html">Results Slurm-3</a></li>
+<li><a href="../439028/index.html">How to improve network perimeter protection? Practical recommendations for Check Point and not only</a></li>
+<li><a href="../439030/index.html">A lot of managers</a></li>
+<li><a href="../439032/index.html">Amazon and Google are planning to enter the energy market</a></li>
+<li><a href="../439034/index.html">Group-IB Webinar: Red Team or Pentest 12.02.2019</a></li>
+<li><a href="../439036/index.html">The main thing is not to get into the mall under the reconciliation of hours</a></li>
+<li><a href="../439038/index.html">Making a neural network: how not to break the brain</a></li>
+<li><a href="../439040/index.html">To isolate the Runet need budget funds</a></li>
+<li><a href="../439042/index.html">Puma is looking for beta testers for self-tapping sneakers Fi</a></li>
+<li><a href="../439046/index.html">How to safely combine the network segments of the three major banks: share tricks</a></li>
+<li><a href="../439050/index.html">Training Cisco 200-125 CCNA v3.0. Cisco Certified Network Specialist (CCNA). Day 2. OSI and TCP-IP models</a></li>
+<li><a href="../439056/index.html">Cement Brand Integration</a></li>
+<li><a href="../439060/index.html">7 types of customers</a></li>
+<li><a href="../439062/index.html">Anisoprint Composer: 3D printing of high strength</a></li>
+<li><a href="../439064/index.html">Typical mesh error (Bootstrap Grid), or why the designer and layout designer do not understand each other</a></li>
+<li><a href="../439066/index.html">Operating system on Rust. Page memory: advanced level</a></li>
+<li><a href="../439068/index.html">Spam campaign “Love you” redirected to Japan</a></li>
+<li><a href="../439070/index.html">China refuses anti-corruption system Zero Trust AI because of its high efficiency</a></li>
+<li><a href="../439074/index.html">Password Checkup extension checks passwords with a base of 4 billion compromised accounts</a></li>
+<li><a href="../439076/index.html">In which applications to wait for an unknown malicious code?</a></li>
+<li><a href="../439078/index.html">Perm programmer arrested for creating a mobile application through which the pedophile acted</a></li>
+<li><a href="../439080/index.html">Unobvious RabbitMQ in Yii2 or why RabbitMQ writes to all queues at once</a></li>
+<li><a href="../439082/index.html">Walk through the plant of desires</a></li>
+<li><a href="../439086/index.html">Causes of ANR and how to avoid it</a></li>
+<li><a href="../439094/index.html">Scientists have found the oldest living vertebrate on Earth</a></li>
+<li><a href="../439096/index.html">Buildbot: a tale with examples of one more continuous integration system</a></li>
+<li><a href="../439098/index.html">Sasha Memus, Chatfuel: How to build a career in products after consulting, is it dangerous to meditate and how to change behavior</a></li>
+<li><a href="../439100/index.html">How to adapt UX / UI for permissions</a></li>
+<li><a href="../439102/index.html">Russians are 20% more likely to face insults on the Internet</a></li>
+<li><a href="../439104/index.html">Redux Simple as a rake</a></li>
+<li><a href="../439106/index.html">Programming in Russia will be introduced from primary school</a></li>
+<li><a href="../439108/index.html">Amateur radio measurements: when there is no frequency meter</a></li>
+<li><a href="../439112/index.html">Creator Kate Mobile arrested for using a pedophile for his service</a></li>
+<li><a href="../439118/index.html">New in browsers: Firefox 66 blocks video and sound by default, Chromium limits page budget</a></li>
+<li><a href="../439122/index.html">Simplicity and complexity of primitives or how to determine unnecessary preprocessing for a neural network</a></li>
+<li><a href="../439124/index.html">If software is created with public money, the code should be open.</a></li>
+<li><a href="../439126/index.html">Requests from users and product requirements</a></li>
+<li><a href="../439128/index.html">How to organize the work of QA. One practically applied method</a></li>
+<li><a href="../439130/index.html">13 trends in the cybersecurity and information security market 2019-2020</a></li>
+<li><a href="../439132/index.html">Unforgettable old age</a></li>
+<li><a href="../439134/index.html">Russian scientists are developing sitall (unbreakable glass) for LG smartphones</a></li>
+<li><a href="../439136/index.html">What is the difference between 4G and 5G?</a></li>
+<li><a href="../439138/index.html">Working with callbacks in React</a></li>
+<li><a href="../439140/index.html">Important message about invites in profile</a></li>
+<li><a href="../439142/index.html">Design maturity models</a></li>
+<li><a href="../439148/index.html">Working with nRF51822 using ST-Link and Clion + OpenOCD</a></li>
+<li><a href="../439150/index.html">Who should pay transaction costs</a></li>
+<li><a href="../439152/index.html">Salaries in IT in the second half of 2018: according to the “My Circle” salary calculator</a></li>
+<li><a href="../439154/index.html">How do freelancers live: book cover design, own production of backpacks and travel work</a></li>
+<li><a href="../439158/index.html">DataArt Launches Free CV Duck Resume Improvement Service</a></li>
+<li><a href="../439160/index.html">Algorithm state: what happens to indie developers on Steam?</a></li>
+<li><a href="../439162/index.html">How to debug front-end and backend: step-by-step instructions</a></li>
+<li><a href="../439166/index.html">mmWave on the road to commercialization in the form factor of a smartphone</a></li>
+<li><a href="../439170/index.html">Cellular operators will help banks verify the accuracy of customer data</a></li>
+<li><a href="../439172/index.html">Extending the assert () macro to implement minimal error handling</a></li>
+<li><a href="../439174/index.html">Safe Internet Day: what threats to pay attention to in 2019</a></li>
+<li><a href="../439182/index.html">How do we distribute orders between drivers in Yandex.Taxi</a></li>
+<li><a href="../439186/index.html">UX Editor: True Story, Rial Life</a></li>
+<li><a href="../439194/index.html">Controlling a character with SharedEvents</a></li>
+<li><a href="../439196/index.html">JPMorgan analysts: Apple should buy Blizzard, Netflix or Sonos to reassure investors</a></li>
+<li><a href="../439198/index.html">Generation of barrier islands</a></li>
+<li><a href="../439200/index.html">Composer for the smallest</a></li>
+<li><a href="../439202/index.html">Detection of web attacks using autoencoder Seq2Seq</a></li>
+<li><a href="../439204/index.html">Increasing the efficiency of photosynthesis by genetic modification of plants</a></li>
+<li><a href="../439210/index.html">Java after volcanic eruption</a></li>
+<li><a href="../439216/index.html">pudge embedded database in 500 lines on golang</a></li>
+<li><a href="../439218/index.html">VC bot on the knee, or how to please people February 14</a></li>
+<li><a href="../439222/index.html">What is API management?</a></li>
+<li><a href="../439224/index.html">Again about the Voronoi diagrams</a></li>
+<li><a href="../439232/index.html">JAMstack: How to create your blog using Gatsby + Contentful + Netlify</a></li>
+<li><a href="../439236/index.html">xenvman: Flexible environments for testing microservices (and not only)</a></li>
+<li><a href="../439238/index.html">Play Store now accepts progressive web applications (PWA)</a></li>
+<li><a href="../439240/index.html">Joomla Digest for January 2019</a></li>
+<li><a href="../439244/index.html">FAS strongly recommends to pre-install Russian software on smartphones and laptops sold in Russia</a></li>
+<li><a href="../439248/index.html">Alan Kay: “Could the ancient Romans build a computer?”</a></li>
+<li><a href="../439252/index.html">6 reasons to develop IT career in Armenia</a></li>
+<li><a href="../439254/index.html">Our all</a></li>
+<li><a href="../439260/index.html">The author of the book "The Witcher" will still receive compensation from CD Projekt Red</a></li>
+<li><a href="../439262/index.html">Deploy the code directly to the docker container. Or how not to prokrasinirovat after each commit</a></li>
+<li><a href="../439264/index.html">How to lead complex technical projects without hiring PMs: DataLine experience</a></li>
+<li><a href="../439266/index.html">The experience of creating an Android game alone from scratch and how it was captured on Google Play</a></li>
+<li><a href="../439268/index.html">How VR, AR and 3D printing work together: the VR Concept experience</a></li>
+<li><a href="../439270/index.html">An example of parsing C ++ code using libclang in Python</a></li>
+<li><a href="../439278/index.html">ACS my LCD - security on two bolts</a></li>
+<li><a href="../439280/index.html">Trautonium: the German wave in the history of synthesizers</a></li>
+<li><a href="../439282/index.html">Effects of filtering SVG. Part 1. SVG filters 101</a></li>
+<li><a href="../439288/index.html">SciPy Optimization</a></li>
+<li><a href="../439290/index.html">Accelerate compilation in Xcode to swift</a></li>
+<li><a href="../439292/index.html">Google has agreed to remove from the search banned sites in the Russian Federation</a></li>
+<li><a href="../439294/index.html">Translation review "If software is created with public money, the code must be open"</a></li>
+<li><a href="../439296/index.html">Soviet license plate and Kolmogorov complexity</a></li>
+<li><a href="../439298/index.html">What would the Internet system look like in the game EvE Online</a></li>
+<li><a href="../439300/index.html">Statistics for file types in the Wildfire cloud sandbox</a></li>
+<li><a href="../439302/index.html">Product Design Digest, January 2019</a></li>
+<li><a href="../439304/index.html">[Ekaterinburg, announcement] Mitap for Java-developers</a></li>
+<li><a href="../439308/index.html">Kill cancer: iridium, human serum albumin and some blue light</a></li>
+<li><a href="../439310/index.html">Why not take off the real estate portal. Part 2</a></li>
+<li><a href="../439312/index.html">Speed ​​up complex calculations with minimal RAM</a></li>
+<li><a href="../439314/index.html">Seven strange ways of dealing with recluse in remote work</a></li>
+<li><a href="../439316/index.html">“I stopped doing what I see no point in”: project managers about their work and training</a></li>
+<li><a href="../439318/index.html">Win procrastination gaming addiction</a></li>
+<li><a href="../439320/index.html">How to diversify programming lessons for children of different ages</a></li>
+<li><a href="../439322/index.html">OS Sailfish renamed OS "Aurora"</a></li>
+<li><a href="../439324/index.html">Using a binary tree in swift using enum using OCR as an example</a></li>
+<li><a href="../439326/index.html">Electric Ford F-150 EV - in the prototype and tested on the road</a></li>
+<li><a href="../439328/index.html">Okay, google! Are you good or evil?</a></li>
+<li><a href="../439332/index.html">How PageRank works: implementation in the R language through linear algebra and power-method</a></li>
+<li><a href="../439334/index.html">About 2 billion rubles allocated for the implementation of the draft law on sustainable runet</a></li>
+<li><a href="../439336/index.html">We are looking for a needle in a stack without using well-known algorithms.</a></li>
+<li><a href="../439338/index.html">Forget about privacy: you still have terrible targeting</a></li>
+<li><a href="../439340/index.html">GDPR backup — what a new tool will do</a></li>
+<li><a href="../439342/index.html">Winter DIYorDIE Meetup February 17</a></li>
+<li><a href="../439344/index.html">To be like a troll: how monopolists rule patents</a></li>
+<li><a href="../439346/index.html">Laravel + Docker: Our Successful Experience</a></li>
+<li><a href="../439348/index.html">Vision falls after laser vision correction - what to do? Or, doctor, make me an "enhancement"</a></li>
+<li><a href="../439350/index.html">Artificial intelligence as a machine of inventions</a></li>
+<li><a href="../439352/index.html">Making a bot prototype for fighting in Clash Royale</a></li>
+<li><a href="../439354/index.html">Rust news # 5 (January 2019)</a></li>
+<li><a href="../439356/index.html">Nontrivial metrics of the effectiveness of advertising campaigns</a></li>
+<li><a href="../439358/index.html">Excel metadata files</a></li>
+<li><a href="../439360/index.html">Training Cisco 200-125 CCNA v3.0. Cisco Certified Network Specialist (CCNA). Day 3. Subnets</a></li>
+<li><a href="../439362/index.html">How we teach Software Engineering at St. Petersburg HSE</a></li>
+<li><a href="../439364/index.html">Oculus Go glasses with “strawberry” content set up for sale</a></li>
+<li><a href="../439366/index.html">Automation of three nails</a></li>
+<li><a href="../439368/index.html">Animations in iOS applications born on the server</a></li>
+<li><a href="../439374/index.html">For those who want to play detective: find a bug in the function from Midnight Commander</a></li>
+<li><a href="../439376/index.html">"Interest club"</a></li>
+<li><a href="../439378/index.html">The Book of Genesis?). Reflections on the nature of mind. Part I</a></li>
+<li><a href="../439380/index.html">How I created an extension for Atom and VS Code: personal experience and source codes</a></li>
+<li><a href="../439382/index.html">Using Ansible, Terraform, Docker, Consul, Nomad in the Clouds (Alexey Vakhov, Uchi.ru)</a></li>
+<li><a href="../439390/index.html">The best innovations of social networks in 2018</a></li>
+<li><a href="../439392/index.html">The 2019 championship season is open! SNA Hackathon Launches ala ML Boot Camp 8</a></li>
+<li><a href="../439394/index.html">As a programmer dataseativistam wrote</a></li>
+<li><a href="../439396/index.html">UniFi Controller Password Reset</a></li>
+<li><a href="../439404/index.html">A brief history of electronic public procurement in Russia</a></li>
+<li><a href="../439408/index.html">Pseudo Lens Flare</a></li>
+<li><a href="../439410/index.html">Jeff Hawkins is finally ready to explain his brain research.</a></li>
+<li><a href="../439414/index.html">Client for "server push messages"</a></li>
+<li><a href="../439416/index.html">A-Frame Review</a></li>
+<li><a href="../439418/index.html">Pentaho Data Integration (PDI), Python and Deep Learning</a></li>
+<li><a href="../439420/index.html">Building the transport package without installing MODX</a></li>
+<li><a href="../439422/index.html">What does a programmer need to develop games and who really is a game developer on the part of a programmer</a></li>
+<li><a href="../439424/index.html">How I Fought Free Hosting and Composer</a></li>
+<li><a href="../439426/index.html">Situation: a new wave of attacks with the interception of DNS queries - we analyze the basic methods of protection</a></li>
+<li><a href="../439430/index.html">Believe me if you can. Water meters. part 1</a></li>
+<li><a href="../439432/index.html">How to become a Java developer in 1.5 years</a></li>
+<li><a href="../439434/index.html">NestJS - the very real nodejs backend</a></li>
+<li><a href="../439436/index.html">Cheaper price of small series of electronics in Russia. Case Internet radio WOLNA</a></li>
+<li><a href="../439440/index.html">Implementation of Zimbra Collaboration Open Source, authorization through AD and automatic creation of mailboxes</a></li>
+<li><a href="../439442/index.html">Julia. Report Generators and Documentation</a></li>
+<li><a href="../439446/index.html">What you need to know about JavaScript Engine Switcher 3.0</a></li>
+<li><a href="../439448/index.html">What virtualization questions do you expect from a graduate?</a></li>
+<li><a href="../439450/index.html">RS-485 on domestic microcontrollers from the company Milandr</a></li>
+<li><a href="../439454/index.html">Program as Art - a new software management paradigm</a></li>
+<li><a href="../439456/index.html">Hipster podcasts # 2</a></li>
+<li><a href="../439458/index.html">As we Republic website on Kubernetes translated</a></li>
+<li><a href="../439460/index.html">How marketers of Maxidom lose millions flirting in groz marketing: independent usability auditing</a></li>
+<li><a href="../439462/index.html">Civilization Springs, 5/5</a></li>
+<li><a href="../439464/index.html">VXinspect: part quality control in 10 minutes</a></li>
+<li><a href="../439466/index.html">NASA lunar orbital probe made the first pictures of the China Chang'e-4 station - two pixels of light</a></li>
+<li><a href="../439468/index.html">Where to lead the search for the perfect SCADA</a></li>
+<li><a href="../439470/index.html">Germany plans to abandon coal in the near future.</a></li>
+<li><a href="../439472/index.html">Automation of border control within the company</a></li>
+<li><a href="../439476/index.html">Cockney Slang: Modern History and Position</a></li>
+<li><a href="../439478/index.html">Entertaining C #. Five examples for a coffee break</a></li>
+<li><a href="../439480/index.html">Give way, or Why does your CRM (and CRM) slow down?</a></li>
+<li><a href="../439482/index.html">devleads - (not) financial motivation</a></li>
+<li><a href="../439484/index.html">Get the enum data in the Automapper projection</a></li>
+<li><a href="../439496/index.html">How is billing done there: when a customer and a developer speak different languages</a></li>
+<li><a href="../439498/index.html">What hardware to analyze a huge shaft of information?</a></li>
+<li><a href="../439500/index.html">Why are captcha so complicated</a></li>
+<li><a href="../439502/index.html">Undefined behavior and truth undefined</a></li>
+<li><a href="../439504/index.html">Does your Data Engineer team need it?</a></li>
+<li><a href="../439506/index.html">9 alternatives to a bad team (design pattern)</a></li>
+<li><a href="../439510/index.html">High-load distributed control system of a modern NPP</a></li>
+<li><a href="../439512/index.html">The era of dinosaurs or legally verified reinsurance?</a></li>
+<li><a href="../439516/index.html">00110001 00110100 00101110 00110000 00110010</a></li>
+<li><a href="../439524/index.html">Fortnite is the future, but for rather unexpected reasons.</a></li>
+<li><a href="../439526/index.html">Telecom operators will conduct a "field test" of the law on the stability of the Runet</a></li>
+<li><a href="../439532/index.html">What's new in javascript ES2019</a></li>
+<li><a href="../439534/index.html">Yield programming and the use of drones in oil production - 10 lectures from the conference GIS Tech Russia</a></li>
+<li><a href="../439538/index.html">Community programming</a></li>
+<li><a href="../439540/index.html">Etherblade.net - opensource project to create an ethernet traffic encapsulator on FPGA (part one)</a></li>
+<li><a href="../439542/index.html">Nintendo makes it clear that only piracy can save the history of video games</a></li>
+<li><a href="../439544/index.html">The colony. Chapter 24: Departure</a></li>
+<li><a href="../439556/index.html">TDMS Fairway. Methods PMBOK and Russian design organizations</a></li>
+<li><a href="../439558/index.html">New old phone. Reinvent the PSTN phone</a></li>
+<li><a href="../439560/index.html">The adapter for working with the blockchain Ethereum for the InterSystems IRIS data platform</a></li>
+<li><a href="../439562/index.html">Configure the Kubernetes HA cluster on bare metal with kubeadm. Part 1/3</a></li>
+<li><a href="../439564/index.html">Practical application of transformation of AST-trees on the example of Putout</a></li>
+<li><a href="../439566/index.html">Why SRE is important documentation. Part 3</a></li>
+<li><a href="../439568/index.html">QLC based SSD - hard drive killer? Not really</a></li>
+<li><a href="../439572/index.html">Automated design of electronic equipment</a></li>
+<li><a href="../439576/index.html">Extensive review of Python interviews. Hints and Tips</a></li>
+<li><a href="../439578/index.html">On the issue of transformations and other operations</a></li>
+<li><a href="../439584/index.html">Project Lenergy, how to rethink portable power sources</a></li>
+<li><a href="../439586/index.html">SPBm protocol as the basis of Extreme Automated Campus</a></li>
+<li><a href="../439588/index.html">ESET has discovered new versions of the DanaBot Trojan.</a></li>
+<li><a href="../439590/index.html">Quals: Saudi and Oman National Cyber ​​Security CTF 2019. WriteUp</a></li>
+<li><a href="../439592/index.html">Ethical Activity Automation</a></li>
+<li><a href="../439596/index.html">How I accelerated image processing on Android 15 times</a></li>
+<li><a href="../439598/index.html">Microsoft told about the cost of paid support for Windows 7</a></li>
+<li><a href="../439600/index.html">Finland summed up the preliminary results of the experiment with a guaranteed basic income</a></li>
+<li><a href="../439604/index.html">How does the barcode work?</a></li>
+<li><a href="../439606/index.html">Experimental production of electronics for the minimum price</a></li>
+<li><a href="../439608/index.html">Modern religion: what do people give to Google, Facebook, Amazon and Apple?</a></li>
+<li><a href="../439610/index.html">As in my Chevrolet Bolt electric car, under warranty, two battery modules were replaced, and the third was monitored</a></li>
+<li><a href="../439616/index.html">The digest of interesting IT projects on Kickstarter №7</a></li>
+<li><a href="../439618/index.html">PHP for beginners. File attachment</a></li>
+<li><a href="../439620/index.html">Understanding asynchronous JavaScript [Translated by Sukhjinder Arora]</a></li>
+<li><a href="../439624/index.html">Why keep data in orbit</a></li>
+<li><a href="../439626/index.html">Experience developing a free application for collectors OpenNumismat</a></li>
+<li><a href="../439628/index.html">Parallel data update in ASP.NET Web API</a></li>
+<li><a href="../439632/index.html">How to set up Continuous Deployment for your project: personal experience</a></li>
+<li><a href="../439636/index.html">The crisis of the concepts of improving road safety and a new concept of its solution</a></li>
+<li><a href="../439638/index.html">Getting FPGA to Python</a></li>
+<li><a href="../439640/index.html">Vinyl is back and it's different</a></li>
+<li><a href="../439642/index.html">Java pitfalls. Part 1</a></li>
+<li><a href="../439644/index.html">Anti-Aging: Senolithics and Stem Cell Therapy</a></li>
+<li><a href="../439646/index.html">Holding SoftBank sold a stake in Nvidia due to the fall in their prices, but still earned $ 3.3 billion</a></li>
+<li><a href="../439648/index.html">Internal and nested java classes. Part 1</a></li>
+<li><a href="../439652/index.html">How to transport your startup to the USA: 4 important steps</a></li>
+<li><a href="../439654/index.html">Full immersion: how do we cool ASIC chips in Bitfury</a></li>
+<li><a href="../439656/index.html">C # character calculator</a></li>
+<li><a href="../439676/index.html">Integration of React Native and C ++ for iOS and Android</a></li>
+<li><a href="../439680/index.html">About 50% of Russians are ready to sell their personal data</a></li>
+<li><a href="../439682/index.html">Training Cisco 200-125 CCNA v3.0. Cisco Certified Network Specialist (CCNA). Day 4. Gateway devices</a></li>
+<li><a href="../439686/index.html">Flickr introduces new rules regarding the number of photos and videos users.</a></li>
+<li><a href="../439688/index.html">Overview of AI & ML solutions in 2018 and forecasts for 2019: Part 1 - NLP, Computer Vision</a></li>
+<li><a href="../439690/index.html">Virtual machine performance comparison of 6 cloud platforms: Selectel, MCS, Ya.Oblako, Google Cloud, AWS and Azure</a></li>
+<li><a href="../439692/index.html">AT & T sued for changing the network icon from 4G to 5G E</a></li>
+<li><a href="../439694/index.html">Developed smart tissue that reacts to changes in body temperature</a></li>
+<li><a href="../439696/index.html">On the crest of a wave, or “I want to go to the mainstream” - is it worth it?</a></li>
+<li><a href="../439698/index.html">Introduction to programming: a simple 3D shooter from scratch over the weekend, part 1</a></li>
+<li><a href="../439700/index.html">Patent for a board game in Russia</a></li>
+<li><a href="../439704/index.html">From pool request to release. Report Yandex.Taxi</a></li>
+<li><a href="../439706/index.html">BLACK HAT conference. Survival lessons in a 300 Gbps DDOS attack. Part 1</a></li>
+<li><a href="../439710/index.html">Features of creating products for the US market</a></li>
+<li><a href="../439712/index.html">Government procurement: a balance between the Italian strike and the Russian criminal</a></li>
+<li><a href="../439716/index.html">Tails OS or how to protect yourself online</a></li>
+<li><a href="../439718/index.html">Developing Elixir / Phoenix Applications with Docker</a></li>
+<li><a href="../439720/index.html">Introduction to programming: a simple 3D shooter from scratch over the weekend, part 2</a></li>
+<li><a href="../439722/index.html">Effects of SVG filters. Part 2. Outline text with feMorphology</a></li>
+<li><a href="../439724/index.html">Overview of AI & ML solutions in 2018 and forecasts for 2019: Part 2 - Tools and Libraries, AutoML, RL, Ethics in AI</a></li>
+<li><a href="../439726/index.html">Lock-in: truth or fiction?</a></li>
+<li><a href="../439728/index.html">Setting up backup and recovery of Zimbra OSE entirely and in separate boxes without using Zextras</a></li>
+<li><a href="../439730/index.html">Organizing reducer through standard class</a></li>
+<li><a href="../439732/index.html">Lazarus - simple animation using the TImageFragment component</a></li>
+<li><a href="../439734/index.html">We deploy Kubernetes on the desktop in minutes with MicroK8s</a></li>
+<li><a href="../439736/index.html">IPSec VPN connection between MikroTik and Kerio Control</a></li>
+<li><a href="../439746/index.html">Understand the promises in javascript</a></li>
+<li><a href="../439748/index.html">The digest of interesting materials for the mobile developer # 285 (February 4 - 10)</a></li>
+<li><a href="../439750/index.html">Learn product management - where?</a></li>
+<li><a href="../439752/index.html">Multicore MRI Method</a></li>
+<li><a href="../439754/index.html">Google is going to be engaged in the development of smart watches</a></li>
+<li><a href="../439756/index.html">Why do I need a thermo-acoustic generator?</a></li>
+<li><a href="../439760/index.html">Engineers "twisted" the light in the fiber - a new technology will speed up the transfer of data a hundred times</a></li>
+<li><a href="../439764/index.html">Corporate fruit</a></li>
+<li><a href="../439772/index.html">Writing Unit Tests on Swift for Verifying Asynchronous Tasks</a></li>
+<li><a href="../439778/index.html">The digest of fresh materials from the world of the frontend for the last week No. 351 (February 4 - 10, 2019)</a></li>
+<li><a href="../439780/index.html">PHP Digest number 149 (January 28 - February 11, 2019)</a></li>
+<li><a href="../439782/index.html">Headless CMS - the future of content management</a></li>
+<li><a href="../439784/index.html">Methane engine "Raptor" broke the record RD-180</a></li>
+<li><a href="../439788/index.html">Regular oddities in the GOST Grasshopper and Stribog algorithms</a></li>
+<li><a href="../439790/index.html">Test JaCarta WebClient or store tokens in a safe</a></li>
+<li><a href="../439792/index.html">NASA is looking for partners in the American industry to create a partially reusable manned lender</a></li>
+<li><a href="../439794/index.html">Back pain - understanding from the perspective of modern medicine</a></li>
+<li><a href="../439796/index.html">Spring Boot 2: what is not written in release notes</a></li>
+<li><a href="../439800/index.html">RISEX and Julia. 5 stages of love customer and designer</a></li>
+<li><a href="../439806/index.html">Valid SSL domain names for local Docker containers</a></li>
+<li><a href="../439808/index.html">The biggest telescopes. From a notebook and eyes to 340 megapixel cameras and data centers. Part 1</a></li>
+<li><a href="../439810/index.html">Get acquainted with the Moleculer microservice framework</a></li>
+<li><a href="../439816/index.html">Practical blockchain in business</a></li>
+<li><a href="../439818/index.html">Features of approaches to design in the real manufacturing sector</a></li>
+<li><a href="../439820/index.html">We are trying to write a project alone. Introduction</a></li>
+<li><a href="../439822/index.html">Creating an alternative display for the Ensoniq EPS16 + and ASR10 synthesizer / sampler</a></li>
+<li><a href="../439824/index.html">When will the JavaScript frameworks disappear?</a></li>
+<li><a href="../439826/index.html">Disable analog. What will happen to the TV?</a></li>
+<li><a href="../439828/index.html">The network appeared "analog" Findface</a></li>
+<li><a href="../439840/index.html">Conference DUMP-2019: we invite you to speak in the sections Design, Management and Testing</a></li>
+<li><a href="../439852/index.html">Remote control application release: Aspia 1.1.0</a></li>
+<li><a href="../439858/index.html">Prometheus + Grafana + Node Exporter + Docker in Azure with notifications in Telegram</a></li>
+<li><a href="../439862/index.html">Digital events in Moscow from February 11 to 17</a></li>
+<li><a href="../439866/index.html">Principles of design reference books in 1C Enterprise Management 2 (ERP 2.4.6)</a></li>
+<li><a href="../439868/index.html">Life without Facebook: less radical views, good mood, more time for loved ones. Now proven by science</a></li>
+<li><a href="../439878/index.html">Creation of architecture for a new high-load startup in 2019</a></li>
+<li><a href="../439880/index.html">Security Week 07: Local IoT Device Vulnerabilities</a></li>
+<li><a href="../439886/index.html">How I trained the neural network to implement the position estimation function on the Russian AI Cup CodeBall 2018</a></li>
+<li><a href="../439894/index.html">How easy it is to monitor the site</a></li>
+<li><a href="../439900/index.html">Julia and the method of coordinate descent</a></li>
+<li><a href="../439902/index.html">Explaining the physical essence of the Wing Lift phenomenon without using the Bernouli equation. Part 2</a></li>
+<li><a href="../439906/index.html">Critical vulnerability in Zemana products and not only</a></li>
+<li><a href="../439908/index.html">Kohl, piss off ... Coax</a></li>
+<li><a href="../439912/index.html">Unsolved mystery of view</a></li>
+<li><a href="../439916/index.html">Unpacking: Dridex bootloader</a></li>
+<li><a href="../439922/index.html">Taxation of IP in Kazakhstan how to be a freelancer?</a></li>
+<li><a href="../439924/index.html">The volume of parcels from foreign online stores grew by 25%</a></li>
+<li><a href="../439926/index.html">Retain inside and outside ViewModel</a></li>
+<li><a href="../439928/index.html">Autonomous driving on the sidewalk through OpenCV and Tensorflow</a></li>
+<li><a href="../439932/index.html">How we opened development offices</a></li>
+<li><a href="../439934/index.html">Business processes. Extract BPMN model from document. Part 1</a></li>
+<li><a href="../439936/index.html">3D technology for foundry: how to create a mold for casting in a week</a></li>
+<li><a href="../439938/index.html">How to name: privacy policy and privacy policy</a></li>
+<li><a href="../439940/index.html">Teamlead Conf Msk 2019: Results of the Bid Campaign, Reports, Considerations</a></li>
+<li><a href="../439942/index.html">Docker'ization: what every .Net developer needs to know</a></li>
+<li><a href="../439946/index.html">Why did we choose Electron</a></li>
+<li><a href="../439950/index.html">3rd Turing Test: conditions of participation and prizes to the winners</a></li>
+<li><a href="../439952/index.html">Hosting Node.js https server with auto-updated SSL in the cloud and how I set up the development cycle (+ git, react)</a></li>
+<li><a href="../439958/index.html">CodeFest X March 30-31. Future section</a></li>
+<li><a href="../439964/index.html">Vulnerability CVE-2019-5736 in runc, allowing to get root privileges on the host</a></li>
+<li><a href="../439966/index.html">Simple parser for arithmetic operations</a></li>
+<li><a href="../439970/index.html">Report on problems and accessibility of the Internet in 2018-2019</a></li>
+<li><a href="../439974/index.html">Personal Agile Transformation: A Flexible Journey to Productivity</a></li>
+<li><a href="../439976/index.html">Will Node.js always be slower than Golang?</a></li>
+<li><a href="../439986/index.html">Chips VS Threats of Containerization Technology</a></li>
+<li><a href="../439994/index.html">XAMPP - virtual server setup</a></li>
+<li><a href="../439996/index.html">Analysis of Minor Violations Java code on the Duerank.com platform (part 1)</a></li>
+<li><a href="../440000/index.html">On "Vkontakte" sued for issuing personal data of the user of the Ministry of Internal Affairs</a></li>
+<li><a href="../440006/index.html">The draft law on sustainable work of the Runet was adopted in the first reading.</a></li>
+<li><a href="../440008/index.html">Increasing the informational content of errors in Go - github.com/ztrue/tracerr</a></li>
+<li><a href="../440012/index.html">Cases and growings practices in a product at Epic Growth Conference</a></li>
+<li><a href="../440014/index.html">Skills, self-education and programming languages ​​for novice developers: HackerRank research</a></li>
+<li><a href="../440016/index.html">When reading can be touched: a review of ONYX BOOX Monte Cristo 4</a></li>
+<li><a href="../440018/index.html">Dynamic local exposure</a></li>
+<li><a href="../440020/index.html">Regression or regression in testing</a></li>
+<li><a href="../440022/index.html">A bit of Ferrari: Fintech-startup Rally Rd will allow you to buy "shares" of rare cars</a></li>
+<li><a href="../440024/index.html">Redirecting printf () from STM32 to Qt Creator console</a></li>
+<li><a href="../440030/index.html">Point-by-round PKH locks on an OpenWrt router using WireGuard and DNSCrypt</a></li>
+<li><a href="../440040/index.html">In development - every man for himself. But sometimes it leads to a dead end.</a></li>
+<li><a href="../440046/index.html">Open lesson "Creating REST-clients on Spring"</a></li>
+<li><a href="../440048/index.html">Favorite metrics: 5 indicators that each sales team must follow</a></li>
+<li><a href="../440050/index.html">DNS proxy on Node.JS do it yourself</a></li>
+<li><a href="../440052/index.html">Static analysis "BIOS / UEFI" or how to get Dependency Graph</a></li>
+<li><a href="../440066/index.html">VSCode Extensions That Ease JavaScript and Vue Development</a></li>
+<li><a href="../440070/index.html">Julia, Gradient descent and simplex method</a></li>
+<li><a href="../440072/index.html">AresDB Demo: Uber's GPU-based, real-time open source analysis tool</a></li>
+<li><a href="../440074/index.html">"Roskomos" considers incorrect to compare the engines Raptor Ilona Mask and RD-180</a></li>
+<li><a href="../440084/index.html">10 billion software exports are negligible</a></li>
+<li><a href="../440094/index.html">Blooming gardens on Mars remain a dream: the Mars One project went bankrupt</a></li>
+</ul></nav>
+</section>
+<script src="../../js/main.js"></script>
+
+<!-- Yandex.Metrika counter -->
+<script type="text/javascript" >
+  (function (d, w, c) {
+      (w[c] = w[c] || []).push(function() {
+          try {
+              w.yaCounter52319614 = new Ya.Metrika({
+                  id:52319614,
+                  clickmap:true,
+                  trackLinks:true,
+                  accurateTrackBounce:true,
+                  webvisor:true
+              });
+          } catch(e) { }
+      });
+
+      var n = d.getElementsByTagName("script")[0],
+          s = d.createElement("script"),
+          f = function () { n.parentNode.insertBefore(s, n); };
+      s.type = "text/javascript";
+      s.async = true;
+      s.src = "https://mc.yandex.ru/metrika/watch.js";
+
+      if (w.opera == "[object Opera]") {
+          d.addEventListener("DOMContentLoaded", f, false);
+      } else { f(); }
+  })(document, window, "yandex_metrika_callbacks");
+</script>
+<noscript><div><img src="https://mc.yandex.ru/watch/52319614" style="position:absolute; left:-9999px;" alt="" /></div></noscript>
+
+<!-- Google Analytics -->
+  <script>
+    window.ga = function () { ga.q.push(arguments) }; ga.q = []; ga.l = +new Date;
+    ga('create', 'UA-134228602-1', 'auto'); ga('send', 'pageview')
+  </script>
+  <script src="https://www.google-analytics.com/analytics.js" async defer></script>
+
+</section>
+</body>
+
+</html>

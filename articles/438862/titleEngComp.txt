@@ -1,0 +1,1 @@
+Deploim isomorphic web application on the example of Nuxt.js

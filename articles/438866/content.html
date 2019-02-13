@@ -1,0 +1,245 @@
+<div class="post__text post__text-html js-mediator-article"><p>  The <a href="https://ru.wikipedia.org/wiki/%25D0%25A1%25D1%2582%25D1%2580%25D0%25BE%25D0%25B8%25D1%2582%25D0%25B5%25D0%25BB%25D1%258C_(%25D1%2588%25D0%25B0%25D0%25B1%25D0%25BB%25D0%25BE%25D0%25BD_%25D0%25BF%25D1%2580%25D0%25BE%25D0%25B5%25D0%25BA%25D1%2582%25D0%25B8%25D1%2580%25D0%25BE%25D0%25B2%25D0%25B0%25D0%25BD%25D0%25B8%25D1%258F)">builder</a> design pattern is <a href="https://www.quora.com/Which-are-the-important-and-widely-used-design-patterns-in-Java">one of the most popular</a> in Java. </p><br><p>  It is simple, it helps to make objects immutable, and it can be generated with tools like <a href="https://projectlombok.org/features/Builder">@Builder</a> in Project Lombok or <a href="https://immutables.github.io/">Immutables</a> . </p><br><p>  But is this pattern so convenient in Java? </p><a name="habracut"></a><br><p>  An example of this pattern with chaining methods: </p><br><pre><code class="java hljs"><span class="hljs-keyword"><span class="hljs-keyword">public</span></span> <span class="hljs-class"><span class="hljs-keyword"><span class="hljs-class"><span class="hljs-keyword">class</span></span></span><span class="hljs-class"> </span><span class="hljs-title"><span class="hljs-class"><span class="hljs-title">User</span></span></span><span class="hljs-class"> </span></span>{
+
+  <span class="hljs-keyword"><span class="hljs-keyword">private</span></span> <span class="hljs-keyword"><span class="hljs-keyword">final</span></span> String firstName;
+
+  <span class="hljs-keyword"><span class="hljs-keyword">private</span></span> <span class="hljs-keyword"><span class="hljs-keyword">final</span></span> String lastName;
+
+  User(String firstName, String lastName) {
+    <span class="hljs-keyword"><span class="hljs-keyword">this</span></span>.firstName = firstName;
+    <span class="hljs-keyword"><span class="hljs-keyword">this</span></span>.lastName = lastName;
+  }
+
+  <span class="hljs-function"><span class="hljs-keyword"><span class="hljs-function"><span class="hljs-keyword">public</span></span></span><span class="hljs-function"> </span><span class="hljs-keyword"><span class="hljs-function"><span class="hljs-keyword">static</span></span></span><span class="hljs-function"> Builder </span><span class="hljs-title"><span class="hljs-function"><span class="hljs-title">builder</span></span></span><span class="hljs-params"><span class="hljs-function"><span class="hljs-params">()</span></span></span><span class="hljs-function"> </span></span>{
+      <span class="hljs-keyword"><span class="hljs-keyword">return</span></span> <span class="hljs-keyword"><span class="hljs-keyword">new</span></span> Builder();
+  }
+
+  <span class="hljs-keyword"><span class="hljs-keyword">public</span></span> <span class="hljs-keyword"><span class="hljs-keyword">static</span></span> <span class="hljs-class"><span class="hljs-keyword"><span class="hljs-class"><span class="hljs-keyword">class</span></span></span><span class="hljs-class"> </span><span class="hljs-title"><span class="hljs-class"><span class="hljs-title">Builder</span></span></span><span class="hljs-class"> </span></span>{
+
+    String firstName;
+    String lastName;
+
+    <span class="hljs-function"><span class="hljs-function">Builder </span><span class="hljs-title"><span class="hljs-function"><span class="hljs-title">firstName</span></span></span><span class="hljs-params"><span class="hljs-function"><span class="hljs-params">(String value)</span></span></span><span class="hljs-function"> </span></span>{
+        <span class="hljs-keyword"><span class="hljs-keyword">this</span></span>.firstName = value;
+        <span class="hljs-keyword"><span class="hljs-keyword">return</span></span> <span class="hljs-keyword"><span class="hljs-keyword">this</span></span>;
+    }
+
+    <span class="hljs-function"><span class="hljs-function">Builder </span><span class="hljs-title"><span class="hljs-function"><span class="hljs-title">lastName</span></span></span><span class="hljs-params"><span class="hljs-function"><span class="hljs-params">(String value)</span></span></span><span class="hljs-function"> </span></span>{
+        <span class="hljs-keyword"><span class="hljs-keyword">this</span></span>.lastName = value;
+        <span class="hljs-keyword"><span class="hljs-keyword">return</span></span> <span class="hljs-keyword"><span class="hljs-keyword">this</span></span>;
+    }
+
+    <span class="hljs-function"><span class="hljs-keyword"><span class="hljs-function"><span class="hljs-keyword">public</span></span></span><span class="hljs-function"> User </span><span class="hljs-title"><span class="hljs-function"><span class="hljs-title">build</span></span></span><span class="hljs-params"><span class="hljs-function"><span class="hljs-params">()</span></span></span><span class="hljs-function"> </span></span>{
+        <span class="hljs-keyword"><span class="hljs-keyword">return</span></span> <span class="hljs-keyword"><span class="hljs-keyword">new</span></span> User(firstName, lastName);
+    }
+  }
+}</code></pre><br>
+<pre><code class="java hljs">User.Builder builder = User.builder().firstName(<span class="hljs-string"><span class="hljs-string">"Sergey"</span></span>).lastName(<span class="hljs-string"><span class="hljs-string">"Egorov"</span></span>);
+
+<span class="hljs-keyword"><span class="hljs-keyword">if</span></span> (newRules) {
+    builder.firstName(<span class="hljs-string"><span class="hljs-string">"Sergei"</span></span>);
+}
+
+User user = builder.build();</code></pre><br>
+<p>Что мы тут получаем:</p><br>
+<ol>
+<li>Класс User — иммутабельный, мы не можем изменить объект после создания.</li>
+<li>У его конструктора видимость в пределах пакета, и для создания экземпляра User надо обращаться к строителю.</li>
+<li>Поля Builder изменяемые, и перед созданием экземпляра User могут меняться неоднократно.</li>
+<li>Сеттеры собираются в цепочки и возвращают this (типа Builder).</li>
+</ol><br>
+<p>Так… и в чём тут проблема?</p><br>
+<h2>Проблема с наследованием</h2><br>
+<p>Представим, что мы захотели унаследовать класс User:</p><br>
+<pre><code class="java hljs"><span class="hljs-keyword"><span class="hljs-keyword">public</span></span> <span class="hljs-class"><span class="hljs-keyword"><span class="hljs-class"><span class="hljs-keyword">class</span></span></span><span class="hljs-class"> </span><span class="hljs-title"><span class="hljs-class"><span class="hljs-title">RussianUser</span></span></span><span class="hljs-class"> </span><span class="hljs-keyword"><span class="hljs-class"><span class="hljs-keyword">extends</span></span></span><span class="hljs-class"> </span><span class="hljs-title"><span class="hljs-class"><span class="hljs-title">User</span></span></span><span class="hljs-class"> </span></span>{
+    <span class="hljs-keyword"><span class="hljs-keyword">final</span></span> String patronymic;
+
+    RussianUser(String firstName, String lastName, String patronymic) {
+        <span class="hljs-keyword"><span class="hljs-keyword">super</span></span>(firstName, lastName);
+        <span class="hljs-keyword"><span class="hljs-keyword">this</span></span>.patronymic = patronymic;
+    }
+
+    <span class="hljs-keyword"><span class="hljs-keyword">public</span></span> <span class="hljs-keyword"><span class="hljs-keyword">static</span></span> RussianUser.<span class="hljs-function"><span class="hljs-function">Builder </span><span class="hljs-title"><span class="hljs-function"><span class="hljs-title">builder</span></span></span><span class="hljs-params"><span class="hljs-function"><span class="hljs-params">()</span></span></span><span class="hljs-function"> </span></span>{
+        <span class="hljs-keyword"><span class="hljs-keyword">return</span></span> <span class="hljs-keyword"><span class="hljs-keyword">new</span></span> RussianUser.Builder();
+    }
+
+    <span class="hljs-keyword"><span class="hljs-keyword">public</span></span> <span class="hljs-keyword"><span class="hljs-keyword">static</span></span> <span class="hljs-class"><span class="hljs-keyword"><span class="hljs-class"><span class="hljs-keyword">class</span></span></span><span class="hljs-class"> </span><span class="hljs-title"><span class="hljs-class"><span class="hljs-title">Builder</span></span></span><span class="hljs-class"> </span><span class="hljs-keyword"><span class="hljs-class"><span class="hljs-keyword">extends</span></span></span><span class="hljs-class"> </span><span class="hljs-title"><span class="hljs-class"><span class="hljs-title">User</span></span></span><span class="hljs-class">.</span><span class="hljs-title"><span class="hljs-class"><span class="hljs-title">Builder</span></span></span><span class="hljs-class"> </span></span>{
+
+        String patronymic;
+
+        <span class="hljs-function"><span class="hljs-keyword"><span class="hljs-function"><span class="hljs-keyword">public</span></span></span><span class="hljs-function"> Builder </span><span class="hljs-title"><span class="hljs-function"><span class="hljs-title">patronymic</span></span></span><span class="hljs-params"><span class="hljs-function"><span class="hljs-params">(String patronymic)</span></span></span><span class="hljs-function"> </span></span>{
+            <span class="hljs-keyword"><span class="hljs-keyword">this</span></span>.patronymic = patronymic;
+            <span class="hljs-keyword"><span class="hljs-keyword">return</span></span> <span class="hljs-keyword"><span class="hljs-keyword">this</span></span>;
+        }
+
+        <span class="hljs-function"><span class="hljs-keyword"><span class="hljs-function"><span class="hljs-keyword">public</span></span></span><span class="hljs-function"> RussianUser </span><span class="hljs-title"><span class="hljs-function"><span class="hljs-title">build</span></span></span><span class="hljs-params"><span class="hljs-function"><span class="hljs-params">()</span></span></span><span class="hljs-function"> </span></span>{
+            <span class="hljs-keyword"><span class="hljs-keyword">return</span></span> <span class="hljs-keyword"><span class="hljs-keyword">new</span></span> RussianUser(firstName, lastName, patronymic);
+        }
+    }
+}</code></pre><br>
+<pre><code class="java hljs">RussianUser me = RussianUser.builder()
+    .firstName(<span class="hljs-string"><span class="hljs-string">"Sergei"</span></span>) <span class="hljs-comment"><span class="hljs-comment">// возвращает User.Builder :(</span></span>
+    .patronymic(<span class="hljs-string"><span class="hljs-string">"Valeryevich"</span></span>) <span class="hljs-comment"><span class="hljs-comment">// Метод не вызвать!</span></span>
+    .lastName(<span class="hljs-string"><span class="hljs-string">"Egorov"</span></span>)
+    .build();</code></pre><br>
+<p>Проблема возникает в связи с тем, что метод firstName определён так:</p><br>
+<pre><code class="java hljs">   User.<span class="hljs-function"><span class="hljs-function">Builder </span><span class="hljs-title"><span class="hljs-function"><span class="hljs-title">firstName</span></span></span><span class="hljs-params"><span class="hljs-function"><span class="hljs-params">(String value)</span></span></span><span class="hljs-function"> </span></span>{
+        <span class="hljs-keyword"><span class="hljs-keyword">this</span></span>.value = value;
+        <span class="hljs-keyword"><span class="hljs-keyword">return</span></span> <span class="hljs-keyword"><span class="hljs-keyword">this</span></span>;
+    }</code></pre><br>
+<p>И у Java-компилятора нет никакой возможности определить, что в данном случае this означает RussianUser.Builder, а не просто User.Builder!</p><br>
+<p>Даже изменение порядка не поможет:</p><br>
+<pre><code class="java hljs">RussianUser me = RussianUser.builder()
+    .patronymic(<span class="hljs-string"><span class="hljs-string">"Valeryevich"</span></span>)
+    .firstName(<span class="hljs-string"><span class="hljs-string">"Sergei"</span></span>)
+    .lastName(<span class="hljs-string"><span class="hljs-string">"Egorov"</span></span>)
+    .build() <span class="hljs-comment"><span class="hljs-comment">// ошибка компиляции! User нельзя присвоить RussianUser</span></span>
+    ;</code></pre><br>
+<h2>Возможное решение: self typing</h2><br>
+<p>Один из способов решения проблемы — добавить к User.Builder дженерик, указывающий, какой тип надо вернуть:</p><br>
+<pre><code class="java hljs"> <span class="hljs-keyword"><span class="hljs-keyword">public</span></span> <span class="hljs-keyword"><span class="hljs-keyword">static</span></span> <span class="hljs-class"><span class="hljs-keyword"><span class="hljs-class"><span class="hljs-keyword">class</span></span></span><span class="hljs-class"> </span><span class="hljs-title"><span class="hljs-class"><span class="hljs-title">Builder</span></span></span><span class="hljs-class">&lt;</span><span class="hljs-title"><span class="hljs-class"><span class="hljs-title">SELF</span></span></span><span class="hljs-class"> </span><span class="hljs-keyword"><span class="hljs-class"><span class="hljs-keyword">extends</span></span></span><span class="hljs-class"> </span><span class="hljs-title"><span class="hljs-class"><span class="hljs-title">Builder</span></span></span><span class="hljs-class">&lt;</span><span class="hljs-title"><span class="hljs-class"><span class="hljs-title">SELF</span></span></span><span class="hljs-class">&gt;&gt; </span></span>{
+
+    <span class="hljs-function"><span class="hljs-function">SELF </span><span class="hljs-title"><span class="hljs-function"><span class="hljs-title">firstName</span></span></span><span class="hljs-params"><span class="hljs-function"><span class="hljs-params">(String value)</span></span></span><span class="hljs-function"> </span></span>{
+        <span class="hljs-keyword"><span class="hljs-keyword">this</span></span>.firstName = value;
+        <span class="hljs-keyword"><span class="hljs-keyword">return</span></span> (SELF) <span class="hljs-keyword"><span class="hljs-keyword">this</span></span>;
+    }</code></pre><br>
+<p>И установить там RussianUser.Builder:</p><br>
+<pre><code class="java hljs">   <span class="hljs-keyword"><span class="hljs-keyword">public</span></span> <span class="hljs-keyword"><span class="hljs-keyword">static</span></span> <span class="hljs-class"><span class="hljs-keyword"><span class="hljs-class"><span class="hljs-keyword">class</span></span></span><span class="hljs-class"> </span><span class="hljs-title"><span class="hljs-class"><span class="hljs-title">Builder</span></span></span><span class="hljs-class"> </span><span class="hljs-keyword"><span class="hljs-class"><span class="hljs-keyword">extends</span></span></span><span class="hljs-class"> </span><span class="hljs-title"><span class="hljs-class"><span class="hljs-title">User</span></span></span><span class="hljs-class">.</span><span class="hljs-title"><span class="hljs-class"><span class="hljs-title">Builder</span></span></span><span class="hljs-class">&lt;</span><span class="hljs-title"><span class="hljs-class"><span class="hljs-title">RussianUser</span></span></span><span class="hljs-class">.</span><span class="hljs-title"><span class="hljs-class"><span class="hljs-title">Builder</span></span></span><span class="hljs-class">&gt; </span></span>{</code></pre><br>
+<p>Теперь это работает:</p><br>
+<pre><code class="java hljs">RussianUser.builder()
+    .firstName(<span class="hljs-string"><span class="hljs-string">"Sergei"</span></span>) <span class="hljs-comment"><span class="hljs-comment">// возвращает RussianUser.Builder :)</span></span>
+    .patronymic(<span class="hljs-string"><span class="hljs-string">"Valeryevich"</span></span>) <span class="hljs-comment"><span class="hljs-comment">// RussianUser.Builder</span></span>
+    .lastName(<span class="hljs-string"><span class="hljs-string">"Egorov"</span></span>) <span class="hljs-comment"><span class="hljs-comment">// RussianUser.Builder</span></span>
+    .build(); <span class="hljs-comment"><span class="hljs-comment">// RussianUser</span></span></code></pre><br>
+<p>И с несколькими уровнями наследования тоже работает:</p><br>
+<pre><code class="java hljs"><span class="hljs-class"><span class="hljs-keyword"><span class="hljs-class"><span class="hljs-keyword">class</span></span></span><span class="hljs-class"> </span><span class="hljs-title"><span class="hljs-class"><span class="hljs-title">A</span></span></span><span class="hljs-class">&lt;</span><span class="hljs-title"><span class="hljs-class"><span class="hljs-title">SELF</span></span></span><span class="hljs-class"> </span><span class="hljs-keyword"><span class="hljs-class"><span class="hljs-keyword">extends</span></span></span><span class="hljs-class"> </span><span class="hljs-title"><span class="hljs-class"><span class="hljs-title">A</span></span></span><span class="hljs-class">&lt;</span><span class="hljs-title"><span class="hljs-class"><span class="hljs-title">SELF</span></span></span><span class="hljs-class">&gt;&gt; </span></span>{
+
+    <span class="hljs-function"><span class="hljs-function">SELF </span><span class="hljs-title"><span class="hljs-function"><span class="hljs-title">self</span></span></span><span class="hljs-params"><span class="hljs-function"><span class="hljs-params">()</span></span></span><span class="hljs-function"> </span></span>{
+        <span class="hljs-keyword"><span class="hljs-keyword">return</span></span> (SELF) <span class="hljs-keyword"><span class="hljs-keyword">this</span></span>;
+    }
+}
+
+<span class="hljs-class"><span class="hljs-keyword"><span class="hljs-class"><span class="hljs-keyword">class</span></span></span><span class="hljs-class"> </span><span class="hljs-title"><span class="hljs-class"><span class="hljs-title">B</span></span></span><span class="hljs-class">&lt;</span><span class="hljs-title"><span class="hljs-class"><span class="hljs-title">SELF</span></span></span><span class="hljs-class"> </span><span class="hljs-keyword"><span class="hljs-class"><span class="hljs-keyword">extends</span></span></span><span class="hljs-class"> </span><span class="hljs-title"><span class="hljs-class"><span class="hljs-title">B</span></span></span><span class="hljs-class">&lt;</span><span class="hljs-title"><span class="hljs-class"><span class="hljs-title">SELF</span></span></span><span class="hljs-class">&gt;&gt; </span><span class="hljs-keyword"><span class="hljs-class"><span class="hljs-keyword">extends</span></span></span><span class="hljs-class"> </span><span class="hljs-title"><span class="hljs-class"><span class="hljs-title">A</span></span></span><span class="hljs-class">&lt;</span><span class="hljs-title"><span class="hljs-class"><span class="hljs-title">SELF</span></span></span><span class="hljs-class">&gt; </span></span>{}
+
+<span class="hljs-class"><span class="hljs-keyword"><span class="hljs-class"><span class="hljs-keyword">class</span></span></span><span class="hljs-class"> </span><span class="hljs-title"><span class="hljs-class"><span class="hljs-title">C</span></span></span><span class="hljs-class"> </span><span class="hljs-keyword"><span class="hljs-class"><span class="hljs-keyword">extends</span></span></span><span class="hljs-class"> </span><span class="hljs-title"><span class="hljs-class"><span class="hljs-title">B</span></span></span><span class="hljs-class">&lt;</span><span class="hljs-title"><span class="hljs-class"><span class="hljs-title">C</span></span></span><span class="hljs-class">&gt; </span></span>{}</code></pre><br>
+<p>Так что, проблема решена? Не совсем… <b>Теперь невозможно получить объект базового типа!</b><br>
+Поскольку мы используем рекурсивное определение с дженериками, у нас появилась проблема с рекурсией!</p><br>
+<pre><code class="java hljs"><span class="hljs-keyword"><span class="hljs-keyword">new</span></span> A&lt;A&lt;A&lt;A&lt;A&lt;A&lt;A&lt;...&gt;&gt;&gt;&gt;&gt;&gt;&gt;()</code></pre><br>
+<div style="text-align:center;"><img src="https://habrastorage.org/webt/jk/kf/mk/jkkfmkg7qvbmmgjevnez9gmozru.jpeg" width="50%"></div><br>
+<p>В принципе, это можно решить (<a href="https://youtrack.jetbrains.com/issue/KT-17186">если вы не используете Kotlin</a>): </p><br>
+<pre><code class="java hljs">A a = <span class="hljs-keyword"><span class="hljs-keyword">new</span></span> A&lt;&gt;();</code></pre><br>
+<p>Тут мы используем «сырые типы» (raw types) и diamond operator из Java. Но, как упомянуто выше, это не работает с другими языками, да и вообще в целом это хак.</p><br>
+<h2>Идеальное решение: Self typing в Java</h2><br>
+<blockquote>Сразу предупрежу: этого решения не существует (по крайней мере, пока что).<br>
+Было бы здорово такое получить, но пока я не слышал о существовании JEP об этом.<br>
+P.S. Кто-нибудь знает, как заводить новые JEP? ;)<br>
+</blockquote><p>Self typing существует как языковая фича в языках вроде Swift.<br>
+Представьте следующий выдуманный Java-пример:</p><br>
+<pre><code class="java hljs"><span class="hljs-class"><span class="hljs-keyword"><span class="hljs-class"><span class="hljs-keyword">class</span></span></span><span class="hljs-class"> </span><span class="hljs-title"><span class="hljs-class"><span class="hljs-title">A</span></span></span><span class="hljs-class"> </span></span>{
+
+    <span class="hljs-meta"><span class="hljs-meta">@Self</span></span>
+    <span class="hljs-function"><span class="hljs-keyword"><span class="hljs-function"><span class="hljs-keyword">void</span></span></span><span class="hljs-function"> </span><span class="hljs-title"><span class="hljs-function"><span class="hljs-title">withSomething</span></span></span><span class="hljs-params"><span class="hljs-function"><span class="hljs-params">()</span></span></span><span class="hljs-function"> </span></span>{
+        System.out.println(<span class="hljs-string"><span class="hljs-string">"something"</span></span>);
+    }
+}
+
+<span class="hljs-class"><span class="hljs-keyword"><span class="hljs-class"><span class="hljs-keyword">class</span></span></span><span class="hljs-class"> </span><span class="hljs-title"><span class="hljs-class"><span class="hljs-title">B</span></span></span><span class="hljs-class"> </span><span class="hljs-keyword"><span class="hljs-class"><span class="hljs-keyword">extends</span></span></span><span class="hljs-class"> </span><span class="hljs-title"><span class="hljs-class"><span class="hljs-title">A</span></span></span><span class="hljs-class"> </span></span>{
+    <span class="hljs-meta"><span class="hljs-meta">@Self</span></span>
+    <span class="hljs-function"><span class="hljs-keyword"><span class="hljs-function"><span class="hljs-keyword">void</span></span></span><span class="hljs-function"> </span><span class="hljs-title"><span class="hljs-function"><span class="hljs-title">withSomethingElse</span></span></span><span class="hljs-params"><span class="hljs-function"><span class="hljs-params">()</span></span></span><span class="hljs-function"> </span></span>{
+        System.out.println(<span class="hljs-string"><span class="hljs-string">"something else"</span></span>);
+    }
+}</code></pre><br>
+<pre><code class="java hljs"><span class="hljs-keyword"><span class="hljs-keyword">new</span></span> B()
+    .withSomething() <span class="hljs-comment"><span class="hljs-comment">// использует получателя вместо void</span></span>
+    .withSomethingElse();</code></pre><br>
+<p>Как видите, проблема может быть решена на уровне компилятора.<br>
+Для этого существуют даже плагины к javac вроде аннотации Self в <a href="http://manifold.systems/docs.html">Manifold</a>.</p><br>
+<h2>Реальное решение: подойти иначе</h2><br>
+<p>Но что, если вместо попыток решить проблему возвращаемого типа, мы… уберём тип вообще?</p><br>
+<pre><code class="java hljs"><span class="hljs-keyword"><span class="hljs-keyword">public</span></span> <span class="hljs-class"><span class="hljs-keyword"><span class="hljs-class"><span class="hljs-keyword">class</span></span></span><span class="hljs-class"> </span><span class="hljs-title"><span class="hljs-class"><span class="hljs-title">User</span></span></span><span class="hljs-class"> </span></span>{
+
+  <span class="hljs-comment"><span class="hljs-comment">// ...</span></span>
+
+    <span class="hljs-keyword"><span class="hljs-keyword">public</span></span> <span class="hljs-keyword"><span class="hljs-keyword">static</span></span> <span class="hljs-class"><span class="hljs-keyword"><span class="hljs-class"><span class="hljs-keyword">class</span></span></span><span class="hljs-class"> </span><span class="hljs-title"><span class="hljs-class"><span class="hljs-title">Builder</span></span></span><span class="hljs-class"> </span></span>{
+
+        String firstName;
+        String lastName;
+
+        <span class="hljs-function"><span class="hljs-keyword"><span class="hljs-function"><span class="hljs-keyword">void</span></span></span><span class="hljs-function"> </span><span class="hljs-title"><span class="hljs-function"><span class="hljs-title">firstName</span></span></span><span class="hljs-params"><span class="hljs-function"><span class="hljs-params">(String value)</span></span></span><span class="hljs-function"> </span></span>{
+            <span class="hljs-keyword"><span class="hljs-keyword">this</span></span>.firstName = value;
+        }
+
+        <span class="hljs-function"><span class="hljs-keyword"><span class="hljs-function"><span class="hljs-keyword">void</span></span></span><span class="hljs-function"> </span><span class="hljs-title"><span class="hljs-function"><span class="hljs-title">lastName</span></span></span><span class="hljs-params"><span class="hljs-function"><span class="hljs-params">(String value)</span></span></span><span class="hljs-function"> </span></span>{
+            <span class="hljs-keyword"><span class="hljs-keyword">this</span></span>.lastName = value;
+        }
+
+        <span class="hljs-function"><span class="hljs-keyword"><span class="hljs-function"><span class="hljs-keyword">public</span></span></span><span class="hljs-function"> User </span><span class="hljs-title"><span class="hljs-function"><span class="hljs-title">build</span></span></span><span class="hljs-params"><span class="hljs-function"><span class="hljs-params">()</span></span></span><span class="hljs-function"> </span></span>{
+            <span class="hljs-keyword"><span class="hljs-keyword">return</span></span> <span class="hljs-keyword"><span class="hljs-keyword">new</span></span> User(firstName, lastName);
+        }
+    }
+}
+<span class="hljs-keyword"><span class="hljs-keyword">public</span></span> <span class="hljs-class"><span class="hljs-keyword"><span class="hljs-class"><span class="hljs-keyword">class</span></span></span><span class="hljs-class"> </span><span class="hljs-title"><span class="hljs-class"><span class="hljs-title">RussianUser</span></span></span><span class="hljs-class"> </span><span class="hljs-keyword"><span class="hljs-class"><span class="hljs-keyword">extends</span></span></span><span class="hljs-class"> </span><span class="hljs-title"><span class="hljs-class"><span class="hljs-title">User</span></span></span><span class="hljs-class"> </span></span>{
+
+    <span class="hljs-comment"><span class="hljs-comment">// ...</span></span>
+
+    <span class="hljs-keyword"><span class="hljs-keyword">public</span></span> <span class="hljs-keyword"><span class="hljs-keyword">static</span></span> <span class="hljs-class"><span class="hljs-keyword"><span class="hljs-class"><span class="hljs-keyword">class</span></span></span><span class="hljs-class"> </span><span class="hljs-title"><span class="hljs-class"><span class="hljs-title">Builder</span></span></span><span class="hljs-class"> </span><span class="hljs-keyword"><span class="hljs-class"><span class="hljs-keyword">extends</span></span></span><span class="hljs-class"> </span><span class="hljs-title"><span class="hljs-class"><span class="hljs-title">User</span></span></span><span class="hljs-class">.</span><span class="hljs-title"><span class="hljs-class"><span class="hljs-title">Builder</span></span></span><span class="hljs-class"> </span></span>{
+
+        String patronymic;
+
+        <span class="hljs-function"><span class="hljs-keyword"><span class="hljs-function"><span class="hljs-keyword">public</span></span></span><span class="hljs-function"> </span><span class="hljs-keyword"><span class="hljs-function"><span class="hljs-keyword">void</span></span></span><span class="hljs-function"> </span><span class="hljs-title"><span class="hljs-function"><span class="hljs-title">patronymic</span></span></span><span class="hljs-params"><span class="hljs-function"><span class="hljs-params">(String patronymic)</span></span></span><span class="hljs-function"> </span></span>{
+            <span class="hljs-keyword"><span class="hljs-keyword">this</span></span>.patronymic = patronymic;
+        }
+
+        <span class="hljs-function"><span class="hljs-keyword"><span class="hljs-function"><span class="hljs-keyword">public</span></span></span><span class="hljs-function"> RussianUser </span><span class="hljs-title"><span class="hljs-function"><span class="hljs-title">build</span></span></span><span class="hljs-params"><span class="hljs-function"><span class="hljs-params">()</span></span></span><span class="hljs-function"> </span></span>{
+            <span class="hljs-keyword"><span class="hljs-keyword">return</span></span> <span class="hljs-keyword"><span class="hljs-keyword">new</span></span> RussianUser(firstName, lastName, patronymic);
+        }
+    }
+}</code></pre><br>
+<pre><code class="java hljs">RussianUser.Builder b = RussianUser.builder();
+b.firstName(<span class="hljs-string"><span class="hljs-string">"Sergei"</span></span>);
+b.patronymic(<span class="hljs-string"><span class="hljs-string">"Valeryevich"</span></span>);
+b.lastName(<span class="hljs-string"><span class="hljs-string">"Egorov"</span></span>);
+RussianUser user = b.build(); <span class="hljs-comment"><span class="hljs-comment">// RussianUser</span></span></code></pre><br>
+<p>«Это неудобно и многословно, по крайней мере, в Java» — скажете вы.<br>
+И я соглашусь, но… является ли это проблемой самого паттерна Строитель?<br>
+Помните, как я сказал, что он может быть изменяемым? Давайте тогда этим воспользуемся!<br>
+Добавим это к нашему исходному строителю:</p><br>
+<pre><code class="java hljs"><span class="hljs-keyword"><span class="hljs-keyword">public</span></span> <span class="hljs-class"><span class="hljs-keyword"><span class="hljs-class"><span class="hljs-keyword">class</span></span></span><span class="hljs-class"> </span><span class="hljs-title"><span class="hljs-class"><span class="hljs-title">User</span></span></span><span class="hljs-class"> </span></span>{
+
+  <span class="hljs-comment"><span class="hljs-comment">// ...</span></span>
+
+    <span class="hljs-keyword"><span class="hljs-keyword">public</span></span> <span class="hljs-keyword"><span class="hljs-keyword">static</span></span> <span class="hljs-class"><span class="hljs-keyword"><span class="hljs-class"><span class="hljs-keyword">class</span></span></span><span class="hljs-class"> </span><span class="hljs-title"><span class="hljs-class"><span class="hljs-title">Builder</span></span></span><span class="hljs-class"> </span></span>{
+        <span class="hljs-function"><span class="hljs-keyword"><span class="hljs-function"><span class="hljs-keyword">public</span></span></span><span class="hljs-function"> </span><span class="hljs-title"><span class="hljs-function"><span class="hljs-title">Builder</span></span></span><span class="hljs-params"><span class="hljs-function"><span class="hljs-params">()</span></span></span><span class="hljs-function"> </span></span>{
+            <span class="hljs-keyword"><span class="hljs-keyword">this</span></span>.configure();
+        }
+
+        <span class="hljs-function"><span class="hljs-keyword"><span class="hljs-function"><span class="hljs-keyword">protected</span></span></span><span class="hljs-function"> </span><span class="hljs-keyword"><span class="hljs-function"><span class="hljs-keyword">void</span></span></span><span class="hljs-function"> </span><span class="hljs-title"><span class="hljs-function"><span class="hljs-title">configure</span></span></span><span class="hljs-params"><span class="hljs-function"><span class="hljs-params">()</span></span></span><span class="hljs-function"> </span></span>{}</code></pre><br>
+<p>И используем его как анонимный объект:</p><br>
+<pre><code class="plaintext hljs">RussianUser user = new RussianUser.Builder() {
+    @Override
+    protected void configure() {
+        firstName("Sergei"); // из User.Builder
+        patronymic("Valeryevich"); // из RussianUser.Builder
+        lastName("Egorov"); // из User.Builder
+    }
+}.build();</code></pre><br>
+<p>Наследование перестало быть проблемой, но многословность осталась.<br>
+Тут пригодится другая «фича» Java: <a href="http://wiki.c2.com/%3FDoubleBraceInitialization">инициализация с двойными фигурными скобками</a>.</p><br>
+<pre><code class="java hljs">RussianUser user = <span class="hljs-keyword"><span class="hljs-keyword">new</span></span> RussianUser.Builder() {{
+    firstName(<span class="hljs-string"><span class="hljs-string">"Sergei"</span></span>);
+    patronymic(<span class="hljs-string"><span class="hljs-string">"Valeryevich"</span></span>);
+    lastName(<span class="hljs-string"><span class="hljs-string">"Egorov"</span></span>);
+}}.build();</code></pre><br>
+<p>Тут мы используем блок инициализации, чтобы задать все поля. Любители Swing/Vaadin могут узнать этот подход ;)</p><br>
+<p>Некоторым он не нравится (кстати, напишите тогда в комментариях, почему). Мне нравится. Я не стал бы использовать его там, где критична производительность, но, скажем, в случае с тестами он выглядит соответствующим всем критериям:</p><br>
+<ol>
+<li>Может быть использован с любой версией Java со времён царя Гороха.</li>
+<li>Работает с другими JVM-языками.</li>
+<li>Краткий.</li>
+<li>Нативная возможность языка, а не хак.</li>
+</ol><br>
+<h2>Заключение</h2><br>
+<p>Как мы увидели, хоть Java и не предлагает синтаксис для self typing, мы можем решить проблему с помощью другой возможности Java (и не портя всю малину другим JVM-языкам). </p><br>
+<p>Хотя некоторые разработчики считают инициализацию с двойными фигурными скобками антипаттерном, она выглядит ценной для определённых сценариев. В конце концов, это просто синтаксический сахар для определения конструктора внутри анонимного класса.</p><br>
+<p>Мне интересно, как другие люди подходят к этой проблеме и что вы думаете о компромиссах разных подходов!</p><br>
+<p>P.S. Большое спасибо <a href="https://twitter.com/whichrich">Ричарду Норсу</a> и <a href="https://twitter.com/Kiview">Кевину Виттеку</a> за проверку текста.</p><br>
+<blockquote>Минутка рекламы. С прошлого года я работаю в Pivotal над Project Reactor, и на JPoint (5-6 апреля) выступлю с <a href="http://jpoint.ru/talks/7m8s8rp8df5oseq1aky6lk/%3Futm_source%3Dhabr%26utm_medium%3D438866">докладом</a> о нём — а в дискуссионной зоне после этого можно будет зарубиться хоть о Reactor, хоть о шаблонах проектирования!</blockquote></div>

@@ -1,0 +1,497 @@
+<!doctype html>
+<html class="no-js" lang="en">
+
+<head>
+  <!-- Global site tag (gtag.js) - Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=UA-134228602-1"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'UA-134228602-1');
+  </script>
+
+  <meta charset="utf-8">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  <title>Creating and configuring a portable assembly Jupyter Notebook and Lab on Windows. Part 1</title>
+  <meta name="description" content="Hello. When I started learning Python, installed Jupyter Notebook for the first time, then I tried to transfer the application I created to it to the ...">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+  <link rel="stylesheet" href="../../css/main.css">
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+  <script>window.jQuery || document.write('<script src="../../js/vendors/jquery-3.3.1.min.js"><\/script>')</script>
+</head>
+
+<body>
+  <!--[if lte IE 9]>
+    <p class="browserupgrade">You are using an <strong>outdated</strong> browser. Please <a href="https://browsehappy.com/">upgrade your browser</a> to improve your experience and security.</p>
+  <![endif]-->
+  <nav class="page-headings-container js-page-headings-container"></nav>
+  <div class="tools-bar js-tools-bar">
+    <!-- <a href="https://quick-geek.github.io/search.html" title="Search">🔎</a> -->
+    <a class="js-list-of-headings-button" data-state="closed" href="#" title="Headings">📜</a>
+    <a class="js-go-to-top-button" href="#" title="Go to Top">⬆️</a>
+    <a class="js-go-to-bottom-button" href="#" title="Go to Bottom">⬇️</a>
+  </div>
+  <section class="page js-page"><h1>Creating and configuring a portable assembly Jupyter Notebook and Lab on Windows. Part 1</h1><div class="post__text post__text-html js-mediator-article"><p>  Hello.  When I started learning Python, installed Jupyter Notebook for the first time, then I tried to transfer the application I created to it to the company, I often encountered various problems.  That Cyrillic in the user name interferes, then the settings are not transferred, then something else.  I mostly overcame all these problems on my own, using Google and spending a lot of time on solving them. </p><br><p>  As my experience grew, I learned how to create a folder in which virtual Python is transferred from one computer to another, Jupyter and Matplotlib settings, portable programs (ffmpeg, etc.) and fonts.  I could write a program at home, copy the entire folder to the computer of the enterprise, and be sure that nothing will be lost or broken on level ground.  Then I thought that this folder could be given to a newbie in Python, and he would get a fully configured and portable environment. </p><a name="habracut"></a><br><p>  <strong>Table of contents</strong> </p><br><ul><li>  <a href="https://habr.com/ru/post/438934/">Introduction</a> </li><li>  <a href="https://habr.com/ru/post/438934/">Brief instructions for creating a portable assembly Jupyter</a> </li><li>  <a href="https://habr.com/ru/post/438934/">Install Miniconda (Python 3.7)</a> </li><li>  <a href="https://habr.com/ru/post/438934/">Creating a directory structure</a> </li><li>  <a href="https://habr.com/ru/post/438934/">Creating a portable Python virtual environment</a> <br><ul><li>  <a href="https://habr.com/ru/post/438934/">Creating a virtual environment with conda</a> </li><li>  <a href="https://habr.com/ru/post/438934/">Correction of HTTP 000 CONNECTION FAILED error when creating a virtual environment</a> </li><li>  <a href="https://habr.com/ru/post/438934/">Activation of the virtual environment</a> </li><li>  <a href="https://habr.com/ru/post/438934/">Installing Python packages in a virtual environment</a> </li><li>  <a href="https://habr.com/ru/post/438934/">Exit from the virtual Python environment</a> </li></ul></li><li>  <a href="https://habr.com/ru/post/438934/">Preparing a portable build of Jupyter for launch</a> <br><ul><li>  <a href="https://habr.com/ru/post/438934/">Setting environment variables for Jupyter, IPython and Matplotlib</a> </li><li>  <a href="https://habr.com/ru/post/438934/">Creating a file to run Jupyter with user settings</a> </li><li>  <a href="https://habr.com/ru/post/438934/">Additional files for housekeeping</a> </li></ul></li><li>  <a href="https://habr.com/ru/post/438934/">Conclusion</a> </li></ul><br><a name="h-1"></a><br><h2 id="vvedenie">  Introduction </h2><br><p> In recent years, Python has become a popular programming language.  It is often used for writing mathematical calculations, analyzing big data, machine learning and building neural networks.  After the appearance of <code>asinc</code> and <code>await</code> constructions, writing fast web frameworks became possible.  Python performance gradually increases from release to release, and using Cython or Numba can make an application even faster than in other programming languages.  For example, the speed of the web framework <a href="https://vibora.io/">Vibora</a> <sup>(en) is</sup> comparable to the speed of the solutions on the <a href="https://golang.org/">Go</a> <sup>(en)</sup> .  In 2018, Python officially became the language of study in schools and universities of <a href="https://www.reddit.com/r/Python/comments/9y972g/python_will_be_the_official_programming_language/">France</a> <sup>(en)</sup> and <a href="https://www.reddit.com/r/Python/comments/9ybmyw/python_is_already_official_programming_language/">Kazakhstan</a> <sup>(en)</sup> .  In Russia, at least some of the departments have switched to Python, for example, the department <a href="https://rk6.bmstu.ru/">RK-6</a> <sup>(ru)</sup> at MSTU.  N.E.  Bauman. </p><br><p>  When starting to learn Python, new users sometimes have difficulty installing the necessary libraries and setting up the programming environment.  If the Windows username contains non-Latin characters, some of the libraries might not install or run.  Novice users may have problems configuring the Jupyter Notebook on their local computer.  If it is installed on the <code>C:\</code> drive, how to open the file on the <code>D:\</code> ?  When I took the first steps in Python, I also had to overcome these difficulties. </p><br><p>  Finally, if all the problems are behind, it can be difficult to transfer the application to another user.  I came across a situation where the virtual Python environment I created refused to work on another computer.  In addition, Jupyter Notebook and Matplotlib store their settings in the user's folder, which complicates the transfer of applications that use specific settings. </p><br><p>  The solution to the problems described above will be to create a fully portable assembly of Jupyter Notebook and / or Jupyter Lab on Windows.  It keeps the Python interpreter, its libraries and settings, the settings of all the necessary third-party libraries, including Matplotlib and Jupyter, is not tied to the user name and will not swear if you run it on another computer.  We can archive such an assembly into an archive, or write a script or program that will create the same assembly on an absolute beginner's computer.  For more advanced users, a portable build may be useful in that it allows you to store the Python environment and settings in libraries in different places.  You can place the settings folder in a special place that is synchronized with the cloud storage: Dropbox, Mail.ru * cloud, Yandex or Google.  Due to this, all computers will automatically have a locally working environment with the same settings. </p><br><p>  * Yes, the one whose client <a href="http://www.opennet.ru/opennews/art.shtml%3Fnum%3D50073">does not connect</a> to Linux <a href="http://www.opennet.ru/opennews/art.shtml%3Fnum%3D50073">anymore</a> <sup>(ru)</sup> .  If they remove the same for Windows, I will have to look for a replacement.  1 TB on the road for free is not lying. </p><br><p>  For simplicity, I decided to describe the creation of a portable assembly under Windows.  But this instruction with minimal changes is suitable for creating an assembly on Linux and Mac OS.  The article is primarily intended for beginners, so I tried to describe as much as possible and easier to read. </p><br><p>  The article consists of two parts.  In the first part we will create a portable assembly, in the second we will deal with the settings for Jupyter Notebook, Jupyter Lab, IPython and Matplotlib. </p><br><a name="h-1"></a><br><h2 id="kratkaya-instrukciya-po-sozdaniyu-portativnoy-sborki-jupyter">  Brief instructions for creating a portable assembly Jupyter </h2><br><ol><li><p>  Create a folder <code>C:\Dev</code> .  It will install Minconda and the portable assembly Jupyter *. <br>  * Here and below Jupyter = Jupyter Notebook + Juputer Lab. </p><br></li><li><p>  Download the Miniconda installer from <a href="https://conda.io/miniconda">https://conda.io/miniconda</a> <sup>(en)</sup> .  Choose Python 3 for Windows 64 bits or 32 bits depending on the bitness of your operating system.  Install Miniconda in the folder <code>C:\Dev\Miniconda3</code> . </p><br></li><li><p>  Create the following directory structure for the portable Jupyter build: </p><br><pre> <code class="plaintext hljs">C:\ Dev\ Jupyter\ dist\ apps\ conf\ backup\ ipython\ jupyter\ matplotlib\ fonts\ projects\</code> </pre> <br></li><li><p>  Create a virtual Python environment with <code>conda</code> *: </p><br><pre> <code class="plaintext hljs">C:\Dev\Miniconda3\Scripts\conda.exe create -p C:\Dev\Jupyter\dist\pyenv3.7-win64 --copy --yes python=3 conda</code> </pre> <br><p>  * You can use the <code>conda-forge</code> channel to install more recent libraries by adding the argument <code>-c conda-forge</code> : </p><br><pre> <code class="plaintext hljs">C:\Dev\Miniconda3\Scripts\conda.exe create -p C:\Dev\Jupyter\dist\pyenv3.7-win64 --copy --yes -c conda-forge python=3 conda</code> </pre> <br></li><li><p>  Activate the environment and install Python packages using <code>pip</code> *: </p><br><pre> <code class="plaintext hljs">C:\Dev\Jupyter\dist\pyenv3.7-win64\Scripts\activate pip --no-cache-dir install numpy scipy matplotlib jupyter jupyterlab</code> </pre> <br><p>  Note: if you need to install Numpy and Scipy, which use Intel's MKL library to speed up calculations, <a href="https://software.intel.com/en-us/articles/installing-the-intel-distribution-for-python-and-intel-performance-libraries-with-pip-and">use</a> <sup>(en)</sup> <code>intel-numpy</code> instead of <code>numpy</code> and <code>intel-scipy</code> instead of <code>scipy</code> (installed only in Python 3.6!): </p><br><pre> <code class="plaintext hljs">pip --no-cache-dir install intel-numpy intel-scipy matplotlib jupyter jupyterlab</code> </pre> <br><p>  After installation, run: </p><br><pre> <code class="plaintext hljs">conda.bat deactivate</code> </pre> <br><p>  * If errors occur during installation, try this: </p><br><pre> <code class="plaintext hljs">C:\Dev\Jupyter\dist\pyenv3.7-win64\Scirpts\activate conda config --add channels conda-forge conda install numpy scipy matplotlib jupyter jupyterlab</code> </pre> <br><p>  and after installation </p><br><pre> <code class="plaintext hljs">conda.bat deactivate</code> </pre> <br></li><li><p>  In the folder <code>C:\Dev\Jupyter\dist</code> create the file <code>setenv.bat</code> , which will control where Jupyter and Matplotlib will store their settings: </p><br><pre> <code class="plaintext hljs">@echo off set conf_path=%~dp0\conf set JUPYTER_CONFIG_DIR=%conf_path%\jupyter set JUPYTER_DATA_DIR=%conf_path%\jupyter\data set JUPYTER_RUNTIME_DIR=%conf_path%\jupyter\data\runtime set IPYTHONDIR=%conf_path%\ipython set MPLCONFIGDIR=%conf_path%\matplotlib REM Matplotlib search FFMPEG in PATH variable only! set PATH=%~dp0\apps\ffmpeg\bin;%PATH%</code> </pre> <br></li><li><p>  In the <code>C:\Dev\Jupyter\dist</code> folder, create a file <code>run_jupyter_notebook.bat</code> to launch Jupyter Notebook with the specified parameters: </p><br><pre> <code class="plaintext hljs">@echo off call %~dp0\setenv.bat call %~dp0\pyenv3.7-win64\Scripts\jupyter-notebook.exe --notebook-dir=%1</code> </pre> <br></li><li><p>  Similarly, in the folder <code>C:\Dev\Jupyter\dist</code> create the file <code>run_jupyter_lab.bat</code> to launch Jupyter Lab with the specified parameters: </p><br><pre> <code class="plaintext hljs">@echo off call %~dp0\setenv.bat call %~dp0\pyenv3.7-win64\Scripts\jupyter-lab.exe --notebook-dir=%1</code> </pre> <br></li><li><p>  In the <code>C:\Dev\Jupyter\dist</code> folder, create the file <code>enable_extension.bat</code> , which activates the specified extension in Jupyter Notebook: </p><br><pre> <code class="plaintext hljs">@echo off REM Enable extension in Jupyter Notebook. REM Example: REM enable_extension.bat widgetsnbextension call %~dp0\setenv.bat call %~dp0\pyenv3.7-win64\Scripts\jupyter-nbextension.exe enable %1</code> </pre> <br></li><li><p>  Assume that the work files are in the folder <code>D:\my-projects</code> .  In this folder, create shortcuts to the files <code>run_jupyter_notebook.bat</code> and <code>run_jupyter_lab.bat</code> .  After creating each of the shortcuts, go to its properties and clear the line "Working folder".  If you do not clear - Jupyter will not see the folder you need! </p><br></li><li><p>  Portable assembly Jupyter created and ready for configuration and operation.  To get started, just click on the created shortcuts.  If you decide not to delete the installed Miniconda, you can reduce the size of the <code>C:\Dev\Miniconda3</code> following command: </p><br><pre> <code class="plaintext hljs"> C:\Dev\Miniconda3\Scripts\conda.exe clean --all</code> </pre> <br><p>  After executing this command, go to the <code>C:\Dev\Miniconda3\pkgs</code> and clear the contents of the <code>.trash</code> folder.  Only then will we really reduce the size of the <code>Miniconda3</code> folder. </p><br></li></ol><br><a name="h-3"></a><br><h2 id="ustanovka-miniconda-python-37">  Install Miniconda (Python 3.7) </h2><br><p>  Let's create in the root of the drive <code>C:\</code> <code>Dev</code> folder.  In this folder, I add all the programs and development tools that for some reason prefer to be installed not in <code>C:\Program Files</code> .  For example, there I install Ruby, Go, Python, Jupyter, Msys, SQLite Studio, etc. </p><br><p>  First we need to install Python.  Python has two branches: Python 2 and Python 3. Python 2 is <a href="https://pythonclock.org/">supported</a> <sup>(en)</sup> until 2020, so we will install only Python 3. </p><br><p>  To install Python 3, they usually refer to the official site <a href="https://www.python.org/">python.org</a> <sup>(en)</sup> , from where they download it and install it.  However, we want to get a <em>portable</em> build, so we’ll do it differently: we download and install Miniconda. </p><br><p>  What is Miniconda?  In fact, it is Python with the <code>conda</code> package manager preinstalled and configured.  The <code>conda</code> console program will allow us to create a folder in which there will be a Python version we need no matter what version of Python comes with as part of Miniconda.  Also with the help of <code>conda</code> in this folder you can install almost all known libraries for Python: Numpy, Scipy, Matplotlib, Sympy, etc.  The folder in which Python and its libraries are installed is called a virtual environment.  Python libraries come in the form of special archives, called packages. </p><br><p>  The conda has distinctive features that make it convenient for both novice and experienced users: </p><br><ul><li>  Python packages, which are installed via conda, are already compiled under Windows.  There is less chance that an attempt to install it will result in an error *. </li><li>  You can create a virtual environment with the version of Python that you need.  It does not matter which version of Python is installed with Miniconda. </li></ul><br><p>  * It should be noted that the situation with installing packages in Python is improving from year to year.  A few years ago I was unable to install Numpy via <code>pip</code> (an error was issued), and I used a <code>conda</code> .  In 2018, I tried the latest version of <code>pip</code> , and I downloaded a file with the <code>.whl</code> extension (the so-called “wheel”) with the already compiled Numpy, and everything was fine. </p><br><p>  So, we need to download and install Miniconda.  To do this, go to <a href="https://conda.io/miniconda">https://conda.io/miniconda</a> <sup>(en)</sup> and select the 64-bit version for Windows in Python 3. If you have a 32-bit computer, you should download the 32-bit version. </p><br><p>  Miniconda is installed in the same way as a regular Windows application: </p><br><ol><li><p>  Run the installer, click Next. </p><br><p><img src="https://habrastorage.org/webt/kn/ya/ga/knyagazn9vmcn6tnwpjr4fcq5dq.png" alt="01"></p><br></li><li><p>  We agree with the license agreement I Agree </p><br><p><img src="https://habrastorage.org/webt/ad/yo/jv/adyojvkmyeledykuhwxwafvdvcq.png" alt="02"></p><br></li><li><p>  I prefer the installation for all users, because it will give me the opportunity to specify the path to install.  Select the item "All users": </p><br><p><img src="https://habrastorage.org/webt/y6/s7/8z/y6s78zpkghrewxpwz9ko5enmlmg.png" alt="03"></p><br></li><li><p>  Adjust the path for installation on <code>C:\Dev\Miniconda3</code> : </p><br><p><img src="https://habrastorage.org/webt/jf/0v/3u/jf0v3uv6odujxw4jufpq0tjw1ho.png" alt="04"></p><br></li><li><p>  Here I put both checkboxes.  The checkbox “Add Anaconda to the system PATH environment variable” will make the <code>conda</code> command available in the terminal from any directory.  If you do not check this box, the only thing that will change is that in the terminal instead of <code>conda</code> you will need to type the full path to <code>conda.exe</code> .  I do not install Anaconda, because it puts a lot of unnecessary things to me, so I ignore the undesirability of setting this flag.  If you check this box and change your mind after installation, you can simply remove the <code>conda</code> from the system variables.  It's simple.  But if you do not know, you can google or ask.  Contact at the end of the article. <br>  I also check the box “Register Anaconda as the system Python 3.7”.  If any program suddenly needs Python, it will use Python installed with Miniconda.  Also this flag will make the <code>python</code> command available in the terminal from any folder.  This checkbox is recommended if you have not installed Python before.  If some Python is already installed, I would not advise checking this box now, but adjust the system variables if necessary. <br>  After that, click Install and the installation process will start: </p><br><p><img src="https://habrastorage.org/webt/mu/9g/tg/mu9gtgenc_psjismr-ni90kw5le.png" alt="05"></p><br></li><li><p>  During installation, you can click Show details.  Thereby you will see more information about what exactly happens during installation.  But this is optional. </p><br><p><img src="https://habrastorage.org/webt/vj/er/ft/vjerftkxfjjctw8zecq-vutu2x8.png" alt="07"></p><br></li><li><p>  When the installation is complete, the phrase “Completed” will appear, and the Next button will become available.  Click Next </p><br><p><img src="https://habrastorage.org/webt/ag/tk/-s/agtk-skzzzhfairha6e86n8zxwk.png" alt="07"></p><br></li><li><p>  In the last window, we are invited to learn about Anaconda Cloud (this is the first box) and how to start working with Anaconda (second box).  I don't need any of this, so I clear all the checkboxes and click Finish.  Miniconda installation is complete. </p><br><p><img src="https://habrastorage.org/webt/if/jo/ap/ifjoaplhmkt7gbgbnnrxzbjdbdi.png" alt="08"></p><br></li></ol><br><p>  After installing Miniconda in the <code>C:\Dev</code> folder, we will see a new <code>Miniconda</code> folder weighing approximately 340 MB.  Yes, it is a lot, and she will still swell.  Later I will show how to reduce its volume quickly and safely. </p><br><p>  Go to the folder <code>Miniconda</code> .  Scrolling the file list a bit, we’ll see <code>python.exe</code> .  The same Python 3.7, which was installed in my case (in the screenshot of Directory Opus). </p><br><p><img src="https://habrastorage.org/webt/z6/yd/ho/z6ydhocs_l7mxbsr7o8lo8xod38.png" alt="09"></p><br><p>  If you double-click on <code>python.exe</code> , the console window will start, in which you can enter Python commands. </p><br><p><img src="https://habrastorage.org/webt/l_/_m/om/l__mom_bmuxd4cvk9dhe-yqfr2s.png" alt="ten"></p><br><p>  You can test after <code>&gt;&gt;&gt;</code> enter: </p><br><pre> <code class="python hljs"><span class="hljs-keyword"><span class="hljs-keyword">import</span></span> antigravity</code> </pre> <br><p>  and press Enter.  A default browser will open with a Python comic on <a href="https://xkcd.com/353/">xkcd</a> . </p><br><p>  In the folder <code>C:\Dev\Miniconda\Scripts</code> we will find <code>conda.exe</code> .  This is the console command with which we will create a virtual Python environment. </p><br><a name="h-4"></a><br><h2 id="sozdanie-struktury-katalogov">  Creating a directory structure </h2><br><p>  Now we are ready to start creating a portable assembly Jupyter Notebook.  First, create the following directory structure: </p><br><pre> <code class="plaintext hljs">C:\ Dev\ Jupyter\ dist\ apps\ conf\ backup\ ipython\ jupyter\ matplotlib\ fonts\ projects\</code> </pre> <br><p>  In the <code>Dev</code> folder, create a folder <code>Jupyter</code> .  In turn, in the folder <code>Jupyter</code> create folders <code>dist</code> and <code>projects</code> .  In the <code>dist</code> folder there will be a virtual Python environment with all the necessary libraries, configuration files, additional programs, fonts - all that is necessary for our development in Python in the Jupyter Notebook or Jupyter Lab environment.  The <code>projects</code> folder is the default location for projects.  I myself usually do not use this folder, and it remains empty.  But if I need to transfer the program to another user along with the configured Jupyter, I will put my program in this <code>projects</code> folder, make an archive of the entire <code>Jupyter</code> folder and send the archive to the user. </p><br><p>  The <code>apps</code> folder contains helper programs.  For example, I often put there a portable version of FFMPEG that Matplotlib needs to create animations. </p><br><p>  The <code>conf</code> folder contains settings for various libraries.  In our case for IPython, Jupyter and Matplotlib. </p><br><p>  In the folder <code>conf\backup</code> I put copies of my settings files in case there are a few things in the future with settings. </p><br><p>  The <code>fonts</code> folder contains fonts that can be used, for example, in Matplotlib.  Personally, I liked Roboto and PTSerif. </p><br><p>  In addition to the <code>apps</code> , <code>conf</code> and <code>fonts</code> folders, you can create other folders as you like.  For example, the <code>temp</code> folder for temporary files. </p><br><a name="h-5"></a><br><h2 id="sozdanie-perenosimogo-virtualnogo-okruzheniya-python">  Creating a portable Python virtual environment </h2><br><a name="h-6"></a><br><h3 id="sozdanie-virtualnogo-okruzheniya-s-pomoschyu-conda">  Creating a virtual environment with conda </h3><br><p>  Open a command prompt ( <img src="https://habrastorage.org/webt/hf/02/bp/hf02bp1qralemu6si3-rjscg0lo.png">  + R → <code>cmd.exe</code> → Enter) and enter *: </p><br><pre> <code class="plaintext hljs">C:\Dev\Miniconda3\Scripts\conda.exe create -p C:\Dev\Jupyter\dist\pyenv3.7-win64 --copy --yes python=3 conda</code> </pre> <br><p><img src="https://habrastorage.org/webt/7k/bg/g0/7kbgg0szrbb1osxvp9szvncw-au.png"></p><br><p>  * To install more recent versions of libraries, you can connect the channel <code>conda-forge</code> through the argument <code>-c conda-forge</code> : </p><br><pre> <code class="plaintext hljs">C:\Dev\Miniconda3\Scripts\conda.exe create -p C:\Dev\Jupyter\dist\pyenv3.7-win64 --copy --yes -c conda-forge python=3 conda</code> </pre> <br><p>  If you later need to delete the <code>conda-forge</code> channel, go to the <code>%userprofile%</code> folder in the Explorer, find the <code>.condarc</code> file in it, open it with a notepad and delete the line <code>conda-forge</code> . </p><br><p>  Consider this command.  First comes the full path to <code>conda.exe</code> .  If during the installation of Minconda you checked the “Add Anaconda to the system PATH environment variable” checkbox, instead of the full path you just need to write just <code>conda</code> . </p><br><p>  The word <code>create</code> gives the command to create a new environment.  The argument <code>-p</code> says that this environment should be created where we specify, and not in the folder <code>C:\Dev\Miniconda3\envs</code> .  The example contains the full path and name of the future folder <code>pyenv3.7-win64</code> (decoding: python 3.7 environment for Windows 64-bit).  If your command line is open in the <code>dist</code> folder or you have moved to this folder with the help of the <code>cd</code> , instead of the full path, you could just write <code>pyenv3.7-win64</code> . </p><br><p>  The <code>--copy</code> argument tells <code>conda</code> that the packages themselves must be installed in the virtual environment.  Otherwise, the package will be installed in the folder <code>C:\Dev\Miniconda3</code> , and in the virtual environment there will be a link to it.  You will not notice this substitution until you try to start a virtual environment on another computer. </p><br><p>  Next is the enumeration of packages.  First of all, we have to install the third version of Python itself.  I also indicate the <code>conda</code> .  Those.  The <code>conda</code> program will be installed twice: in Miniconda and in a virtual environment.  Installing a <code>conda</code> in a virtual environment increases its size quite a bit, but will allow the user to update packages in a virtual environment on a computer where Miniconda is not installed.  This makes the virtual environment completely autonomous.  You can even uninstall Miniconda after creating a virtual environment, and it will continue to work as if nothing had happened.  I, however, leave Miniconda in case some application needs Python. </p><br><p>  In general, besides Python and conda, you could immediately specify the necessary packages, but in 2018 I stopped doing this and instead began using <code>pip</code> to install packages.  First, the latest versions of <code>pip</code> began to download <code>.whl</code> files with already compiled libraries, and the problems with installing a number of libraries disappeared.  Secondly, the size of the virtual environment when installing packages via <code>pip</code> is 3 times smaller than when installing packages through <code>conda</code> . </p><br><a name="h-7"></a><br><h3 id="ispravlenie-oshibki-http-000-connection-failed-pri-sozdanii-virtualnogo-okruzheniya">  Correction of <code>HTTP 000 CONNECTION FAILED</code> error when creating a virtual environment </h3><br><p>  One of the users when executing the command </p><br><pre> <code class="plaintext hljs">C:\Dev\Miniconda3\Scripts\conda.exe create -p C:\Dev\Jupyter\dist\pyenv3.7-win64 --copy --yes -c conda-forge python=3 conda</code> </pre> <br><p>  encountered the following error: </p><br><pre> <code class="plaintext hljs">&gt; C:\Users\Asus&gt;C:\Dev\Miniconda3\Scripts\conda.exe create -p C:\Dev\Jupyter\dist\pyenv3.7-win64 --copy --yes -c conda-forge python=3 conda Collecting package metadata: failed CondaHTTPError: HTTP 000 CONNECTION FAILED for url &lt;https://conda.anaconda.org/conda-forge/win-64/repodata.json&gt; Elapsed: - An HTTP error occurred when trying to retrieve this URL. HTTP errors are often intermittent, and a simple retry will get you on your way. SSLError(MaxRetryError('HTTPSConnectionPool(host=\'conda.anaconda.org\', port=443): Max retries exceeded with url: /conda-forge/win-64/repodata.json (Caused by SSLError("Can\'t connect to HTTPS URL because the SSL module is not available."))'))</code> </pre> <br><p><img src="https://habrastorage.org/webt/b5/sm/9w/b5sm9wwkvacxxcd3z0hqqvrmpha.png"></p><br><p>  It took me more than one hour to deal with it, because at first glance the problem is either with an incorrect installation of Miniconda or with the network.  Some corporate users actually blocked this resource, but the problem occurred with the user at home.  Reinstalling Miniconda did not help. </p><br><p>  As a result, it turned out that this error means that <code>conda.exe</code> did not find the <code>openssl.exe</code> file.  As a result, the following solution was applied: </p><br><ol><li><p>  Create a folder <code>C:\Dev\openssl</code> . </p><br></li><li><p>  In the folder <code>C:\Dev\Miniconda3\pkgs</code> found a folder whose name starts with <code>openssl</code> .  For example, <code>openssl-1.1.1a-he774522_0</code> .  If there are several folders, select the one with the higher number in the title. </p><br></li><li><p>  In the found folder, look for the <code>openssl.exe</code> file and copy <code>openssl.exe</code> and <strong>all the files and folders</strong> that lie with <code>openssl.exe</code> in <code>C:\Dev\openssl</code> . </p><br><p><img src="https://habrastorage.org/webt/at/cy/yv/atcyyv4hhlcisdhqzfyw3hetidi.png"></p><br></li><li><p>  In Windows Explorer, go to "This computer" (which lists all the drives on the computer).  In the free space, right-click the mouse to open the context menu and select the “Properties” item at the very bottom. </p><br><p><img src="https://habrastorage.org/webt/bw/qr/0j/bwqr0jmx4hb8uzy6lbfkur2fe0o.png"></p><br></li><li><p>  In the window that opens, we find "Advanced system settings": </p><br><p><img src="https://habrastorage.org/webt/2f/we/vy/2fwevy8talpcoq7ivbhzjxggv8i.png" alt="1549300231528"></p><br></li><li><p>  On the Advanced tab, we find the Environment Variables button: </p><br><p><img src="https://habrastorage.org/webt/sl/o1/np/slo1npemtaxpqc9yeaieroygpnm.png"></p><br></li><li><p>  <strong>For Windows 7 and 8:</strong> in the “Environment Variables for User” section, double click on the <code>Path</code> variable.  If there is no semicolon at the end of the line, put it, and at the end of this line we add: </p><br><pre> <code class="plaintext hljs">C:\Dev\openssl;</code> </pre> <br><p><img src="https://habrastorage.org/webt/jt/gs/eb/jtgseb2tiivyyszam9uiemek0bs.png"></p><br><p>  <strong>For Windows 10:</strong> in the section “Environment Variables for a User”, double click on the <code>Path</code> variable.  As a result, this window should appear: </p><br><p><img src="https://habrastorage.org/webt/bb/mr/ve/bbmrveytykczvobawdcaznggnfk.png"><br>  Click the "Create" button and paste the path <code>C:\Dev\openssl</code> . </p><br></li><li><p>  Close and open the command prompt again.  Now everything should work.  If it doesn’t work, you have to google a mistake or go to the forums. </p><br></li></ol><br><a name="h-8"></a><br><h3 id="aktivaciya-virtualnogo-okruzheniya">  Activation of the virtual environment </h3><br><p>  When the creation of the virtual environment is finished, the window will look like this: </p><br><p><img src="https://habrastorage.org/webt/os/e0/48/ose048qyfj7l7ib7ebrtdrzjbw0.png" alt="13"></p><br><p>  After creating the virtual environment, install the packages via <code>pip</code> .  First you need to activate the virtual environment.  To do this, in the command window, enter: </p><br><pre> <code class="plaintext hljs">C:\Dev\Jupyter\dist\pyenv3.7-win64\Scripts\activate</code> </pre> <br><p>  As a result, you should get something like this: </p><br><p><img src="https://habrastorage.org/webt/d2/6y/jm/d26yjmjhbsbtmy9iqwbmzb3wgns.png"></p><br><p>  The word <code>(base)</code> at the beginning of the line indicates that we have entered the virtual environment we need. </p><br><a name="h-9"></a><br><h3 id="ustanovka-paketov-python-v-virtualnom-okruzhenii">  Installing Python packages in a virtual environment </h3><br><p>  Now you can install the packages *: </p><br><pre> <code class="plaintext hljs">pip --no-cache-dir install numpy scipy matplotlib jupyter jupyterlab</code> </pre> <br><p><img src="https://habrastorage.org/webt/fp/lu/-e/fplu-e6fhkpiia3hlcux9m0naw4.png"></p><br><p>  The <code>--no-cache-dir</code> argument tells <code>pip</code> not to cache downloaded packages.  This will allow us not to increase the size of the virtual environment folder. </p><br><p>  * There is an Intel-developed <a href="https://software.intel.com/en-us/mkl">MKL (Math Kernel Library)</a> library <sup>(en)</sup> that speeds up work on big data for popular Python libraries, in particular, Numpy and Scipy.  If you want to install Numpy and Scipy that use MKL, you should <a href="https://software.intel.com/en-us/articles/installing-the-intel-distribution-for-python-and-intel-performance-libraries-with-pip-and">use</a> <sup>(en)</sup> <code>intel-numpy</code> instead of <code>numpy</code> and <code>intel-scipy</code> instead of <code>scipy</code> : </p><br><pre> <code class="plaintext hljs">pip --no-cache-dir install intel-numpy intel-scipy matplotlib jupyter jupyterlab</code> </pre> <br><p>  I managed to install <code>intel-numpy</code> and <code>intel-scipy</code> only in a virtual environment with Python 3.6.  If you want to use Numpy and Scipy with MKL in an environment with Python 3.7, you need to use the command: </p><br><pre> <code class="plaintext hljs">conda install numpy scipy</code> </pre> <br><p>  If you are not sure what to bet, just use <code>numpy</code> and <code>scipy</code> . </p><br><p>  If the installation process fails with <code>pip</code> , try installing problem packages with <code>conda</code> .  Example: </p><br><pre> <code class="plaintext hljs">conda install numpy scipy matplotlib jupyter jupyterlab</code> </pre> <br><a name="h-10"></a><br><h3 id="vyhod-iz-virtualnogo-okruzheniya-python"> Выход из виртуального окружения Python </h3><br><p> После того, как установка завершена, необходимо выйти из виртуального окружения. Для этого в командной строке наберите*: </p><br><pre> <code class="plaintext hljs">conda.bat deactivate</code> </pre> <br><p> *Раньше я набирал просто <code>deactivate</code> , но это почему-то устарело, и надо набирать <code>conda.bat deactivate</code> . Даже <code>conda deactivate</code> будет неправильно. </p><br><a name="h-11"></a><br><h2 id="podgotovka-portativnoy-sborki-jupyter-k-zapusku"> Подготовка портативной сборки Jupyter к запуску </h2><br><p> Создадим несколько <code>.bat</code> файлов, которые будут заставят Jupyter и Matplotlib хранить настройки в папке <code>dist\config</code> , а также будут управлять запуском Jupyter Notebook и Jupyter Lab. </p><br><a name="h-12"></a><br><h3 id="nastroyka-peremennyh-okruzheniya-dlya-jupyter-ipython-i-matplotlib"> Настройка переменных окружения для Jupyter, IPython и Matplotlib </h3><br><p> Каталоги размещения настроек определяются переменными среды Windows. Изменив эти переменные, мы заставим Jupyter и Matplotlib хранить свои файлы там, где это нужно именно нам. В папке <code>C:\Dev\Jupyter\dist</code> создайте файл <code>setenv.bat</code> следующего содержания: </p><br><pre> <code class="plaintext hljs">@echo off set conf_path=%~dp0\conf set JUPYTER_CONFIG_DIR=%conf_path%\jupyter set JUPYTER_DATA_DIR=%conf_path%\jupyter\data set JUPYTER_RUNTIME_DIR=%conf_path%\jupyter\data\runtime set IPYTHONDIR=%conf_path%\ipython set MPLCONFIGDIR=%conf_path%\matplotlib REM Matplotlib search FFMPEG in PATH variable only! set PATH=%~dp0\apps\ffmpeg\bin;%PATH%</code> </pre> <br><p> Разберём, что делается в этом файле. </p><br><p> Команда <code>@echo off</code> необходима для того, чтобы в командной строке не выводилось сообщение при выполнении каждой строки нашего файла. </p><br><p> Команда <code>set</code> создаёт переменную. Конструкция <code>%~dp0</code> означает полный путь к <code>setenv.bat</code> . Обратите внимание, что пробелов до и после знака <code>=</code> быть не должно. </p><br><p> Затем мы настраиваем переменные для Jupyter: </p><br><ul><li> <code>JUPYTER_CONFIG_DIR</code> — папка для файлов конфигурации Jupyter ( <a href="https://jupyter.readthedocs.io/en/latest/projects/jupyter-directories.html">документация</a> <sup>(en)</sup> ), </li><li> <code>JUPYTER_DATA_DIR</code> — папка для устанавливаемых файлов данных (расширения и ядра ( <code>kernel</code> ) для Jupyter) ( <a href="https://jupyter.readthedocs.io/en/latest/projects/jupyter-directories.html">документация</a> <sup>(en)</sup> ), </li><li> <code>JUPYTER_RUNTIME_DIR</code> — папка для исполняемых файлов Jupyter ( <code>runtime files</code> ) ( <a href="https://jupyter.readthedocs.io/en/latest/projects/jupyter-directories.html">документация</a> <sup>(en)</sup> ), </li><li> <code>IPYTHONDIR</code> — папка для файлов конфигурации IPython ( <a href="https://ipython.readthedocs.io/en/stable/development/config.html">документация</a> <sup>(en)</sup> ), </li><li> <code>MPLCONFIGDIR</code> — папка, где Matplotlib хранит свои настройки и кэш ( <a href="https://matplotlib.org/faq/troubleshooting_faq.html">документация</a> <sup>(en)</sup> ). </li></ul><br><p> Если вы планируете создавать анимации с Matplotlib, вам понадобится <a href="https://ru.wikipedia.org/wiki/FFmpeg">FFMPEG</a> <sup>(ru)</sup> . Я <a href="https://ffmpeg.zeranoe.com/builds/">скачиваю</a> <sup>(en)</sup> zip архив FFMPEG, распаковываю его содержание <code>C:\Dev\Jupyter\dist\apps\ffmpeg</code> . </p><br><p> Строка, которая начинается с <code>REM</code> — комментарий. Matplotlib почему-то ищет FFMPEG только в <code>%PATH%</code> . Я записываю путь к FFMPEG в начало <code>%PATH</code> , а не в его конец, чтобы при поиске первым нашёлся тот FFMPEG, который я положил в <code>dist\apps</code> . </p><br><a name="h-13"></a><br><h3 id="sozdanie-fayla-dlya-zapuska-jupyter-s-nastroykami-polzovatelya"> Создание файла для запуска Jupyter с настройками пользователя </h3><br><p> В папке <code>C:\Dev\Jupyter\dist</code> создайте файл <code>run_jupyter_notebook.bat</code> следующего содержания: </p><br><pre> <code class="plaintext hljs">@echo off call %~dp0\setenv.bat call %~dp0\pyenv3.7-win64\Scripts\jupyter-notebook.exe --notebook-dir=%1</code> </pre> <br><p> Аналогично, в папке <code>C:\Dev\Jupyter\dist</code> создайте файл <code>run_jupyter_lab.bat</code> следующего содержания: </p><br><pre> <code class="plaintext hljs">@echo off call %~dp0\setenv.bat call %~dp0\pyenv3.7-win64\Scripts\jupyter-lab.exe --notebook-dir=%1</code> </pre> <br><p> Каждый из этих файлов сначала выполняет <code>setenv.bat</code> , т.е. настраивает переменные окружения, потом запускает Jupyte Notebook или Jupyter Lab и указывает ему, где папка с нашими файлами для проекта. </p><br><p> Предположим, что есть папка <code>D:\my-projects</code> , в которой мы будем хранить файлы Jupyter Notebook или Lab. В этой папке создайте ярлыки на файлы <code>run_jupyter_notebook.bat</code> и <code>run_jupyter_lab.bat</code> . После этого в обязательном порядке откройте свойства каждого из этих ярлыков и сделайте пустой строку «Рабочая папка». Если вы этого не сделаете — Jupyter не увидит вашу папку! </p><br><p><img src="https://habrastorage.org/webt/hx/sh/m2/hxshm2lldbosvdmezgsmvoevhcy.png"></p><br><p> После того, как это сделали, можете кликнуть дважды по любому из ярлыков. Сначала появится новое окно командной строки, потом откроется браузер по умолчанию и в нём запустится Jupyter Notebook или Lab в новой вкладке. Поздравляю: квест пройден! </p><br><a name="h-14"></a><br><h3 id="dopolnitelnye-fayly-dlya-vypolneniya-sluzhebnyh-deystviy"> Дополнительные файлы для выполнения служебных действий </h3><br><p> Для Jupyter Notebook написаны <a href="https://github.com/ipython-contrib/jupyter_contrib_nbextensions">расширения</a> (о них будет подробнее в части 2). Но их недостаточно установить. Их ещё надо активировать. Согласно <a href="https://jupyter-contrib-nbextensions.readthedocs.io/en/latest/install.html">документации</a> , вам нужно сделать следующее (не выполняйте эту команду!): </p><br><pre> <code class="plaintext hljs">jupyter nbextension enable &lt;nbextension require path&gt;</code> </pre> <br><p> Но мы не можем выполнить команду в таком виде, потому что настройки окажутся вне портативной сборки. Мы должны сделать иначе: </p><br><pre> <code class="plaintext hljs">C:\Dev\Jupyter\dist\setenv.bat C:\Dev\Jupyter\dist\pyenv3.7-win64\Scripts\jupyter.exe nbextension enable &lt;nbextension require path&gt;</code> </pre> <br><p> Чтобы упростить себе задачу, мы можем в папке <code>C:\Dev\Jupyter\dist</code> создать файл <code>enable_extension.bat</code> следующего содержания: </p><br><pre> <code class="plaintext hljs">@echo off REM Enable extension in Jupyter Notebook. REM Example: REM enable_extension.bat widgetsnbextension call %~dp0\setenv.bat call %~dp0\pyenv3.7-win64\Scripts\jupyter-nbextension.exe enable %1</code> </pre> <br><p> В итоге наша запись в окне командной строки сократится и станет такой: </p><br><pre> <code class="plaintext hljs">C:\Dev\Jupyter\dist\enable_extension.bat &lt;nbextension require path&gt;</code> </pre> <br><p> Если вам время от времени в окне команд нужно запускать различные действия с <code>jupyter</code> , можно создать в папке <code>C:\Dev\Jupyter\dist</code> файл <code>jupyter.bat</code> следующего содержания: </p><br><pre> <code class="plaintext hljs">@echo off call %~dp0\setenv.bat call %~dp0\pyenv3.7-win64\Scripts\jupyter.exe %1 %2 %3 %4 %5 %6 %7 %8 %9</code> </pre> <br><p> Аналогично можно сделать для запуска <code>IPython</code> и других случаев. </p><br><hr><br><a name="h-15"></a><br><h2 id="zaklyuchenie">  Conclusion </h2><br><p> Часть 1 подошла к концу. Мы создали полностью портативную и переносимую сборку Jupyter и можем работать с файлами, которые лежат в нужной нам папке. Для этого создаём ярлыки на <code>run_jupyter_notebook.bat</code> и <code>run_jupyter_lab.bat</code> , в свойствах ярлыков обязательно очищаем строку Рабочая папка», и всё готово к работе. </p><br><p> В части 2 будут рассмотрены различные вопросы кастомизации Jupyter Notebook, Jupyter Lab и Matplotlib. Научимся подключать расширения в Jupyter Notebook и Jupyter Lab, настраивать сочетания клавиш, размер шрифта и прочие настройки, напишем свои «магические команды». </p><br><p> Если у вас остались вопросы, но нет аккаунта на Хабре, вот мои контакты: </p><br><p> ВК: <a href="https://vk.me/sindzicat">https://vk.me/sindzicat</a> </p><br><p> Telegram: <a href="https://t.me/sindzicat">https://t.me/sindzicat</a> </p><br><p> E-mail: <a href="">sh.andr.gen@yandex.ru</a> </p></div><p>Source: <a href="https://habr.com/ru/post/438934/">https://habr.com/ru/post/438934/</a></p>
+<section class="navigation-panel">
+<h4>More articles:</h4>
+<nav><ul class="list-of-pages">
+<li><a href="../438840/index.html">Pride and Passion, the story of turning a dream into a space project</a></li>
+<li><a href="../438842/index.html">Putting in order playlist Torrent-TV ("Superwash")</a></li>
+<li><a href="../438850/index.html">Moscow JS 44 - Announcement</a></li>
+<li><a href="../438852/index.html">New GSM Gateways from OpenVox</a></li>
+<li><a href="../438854/index.html">Explaining the physical essence of the Wing Lift phenomenon without using the Bernoulli equation</a></li>
+<li><a href="../438856/index.html">Sagi from life</a></li>
+<li><a href="../438858/index.html">How to use segmentation, targeting and positioning (STP) in developing a marketing strategy</a></li>
+<li><a href="../438862/index.html">Deploim isomorphic web application on the example of Nuxt.js</a></li>
+<li><a href="../438866/index.html">Builders against Java syntax</a></li>
+<li><a href="../438868/index.html">Security Week 06: Live on FaceTime</a></li>
+<li><a href="../438870/index.html">Lombok returns greatness to java</a></li>
+<li><a href="../438874/index.html">Start friendship with VkNet</a></li>
+<li><a href="../438876/index.html">How to shorten the time-to-market: a story about test automation in M.Video</a></li>
+<li><a href="../438878/index.html">The appearance of the film in the torrent after the premiere increases the box office by 3%</a></li>
+<li><a href="../438880/index.html">When to use var, let and const in Javascript [translation of the article by Tyler McGinnis]</a></li>
+<li><a href="../438882/index.html">The probability of winning the match with a certain probability of winning points</a></li>
+<li><a href="../438884/index.html">True story advertising agency from the provinces: ups, downs and the introduction of CRM</a></li>
+<li><a href="../438886/index.html">Morty, we're at UltraHD! How to watch any movie in 4K by drawing it through a little-known neural network</a></li>
+<li><a href="../438888/index.html">Why Windows in 2019 does not steer, or ChYDNT?</a></li>
+<li><a href="../438890/index.html">Postgres in retrospect</a></li>
+<li><a href="../438892/index.html">What is a corporate blockchain?</a></li>
+<li><a href="../438896/index.html">Business do not worry</a></li>
+<li><a href="../438898/index.html">Chrome reverse and installation of extensions</a></li>
+<li><a href="../438900/index.html">On the way to the physical principles of biological evolution. Finish + full translation</a></li>
+<li><a href="../438902/index.html">Using DBREPLICATION when rolling out databases on Microsoft SQL Server</a></li>
+<li><a href="../438908/index.html">Training Cisco 200-125 CCNA v3.0. Cisco Certified Network Specialist (CCNA). Day 1. Network Basics</a></li>
+<li><a href="../438910/index.html">Samba as an ADDC on Solaris 11.4</a></li>
+<li><a href="../438916/index.html">Notes phytochemist. Potatoes. Part Three Bulba Fugu or SOLANIN</a></li>
+<li><a href="../438920/index.html">Avalonia first meeting</a></li>
+<li><a href="../438922/index.html">Encryption of traffic in Direct Connect, Part 2</a></li>
+<li><a href="../438924/index.html">Notes IoT-provider: nine problems of the Internet of Things, or why it is not good in Russia</a></li>
+<li><a href="../438926/index.html">Telegram again distributes money for developing simple CSS templates.</a></li>
+<li><a href="../438928/index.html">AI party in Silicon Valley: mayor, billionaire, presidents, geniuses, processor developers and a girl with bright hair</a></li>
+<li><a href="../438930/index.html">The authorities fundamentally change the strategy of control over the Internet</a></li>
+<li><a href="../438932/index.html">Pattern Recognition in Eidetic Artificial Intelligence</a></li>
+<li><a href="../438934/index.html">Creating and configuring a portable assembly Jupyter Notebook and Lab on Windows. Part 1</a></li>
+<li><a href="../438936/index.html">BotMan acquaintance</a></li>
+<li><a href="../438940/index.html">Open course "Deep Learning on the fingers"</a></li>
+<li><a href="../438946/index.html">DateTimeOffset (Strict)</a></li>
+<li><a href="../438948/index.html">Why do you need low-level optimization on Elbrus or how to speed up the recognition system by one and a half times</a></li>
+<li><a href="../438950/index.html">The Central Bank launched a robot to search for earnings schemes on the Internet</a></li>
+<li><a href="../438952/index.html">What can you learn when developing an audio player for different browsers?</a></li>
+<li><a href="../438954/index.html">Combining Signed Distance Fields in 2D</a></li>
+<li><a href="../438956/index.html">Magnetite in the teeth: sequencing of transcriptomes of the tissues of the radula of the shell of mollusc shell</a></li>
+<li><a href="../438958/index.html">ILV confirmed the existence of its "space station"</a></li>
+<li><a href="../438960/index.html">How I abandoned Ruby in favor of Python, working on a backend</a></li>
+<li><a href="../438962/index.html">For the most part, a positive outlook for the future of chips.</a></li>
+<li><a href="../438964/index.html">Who really stands behind popular free VPNs?</a></li>
+<li><a href="../438966/index.html">The history of wandering documentation Haproxy, or what you should pay attention to when it is configured</a></li>
+<li><a href="../438968/index.html">Marking shoes in Russia: The market is not ready, but will have to work</a></li>
+<li><a href="../438970/index.html">It is said that Haskell is a language for geniuses and academics. True?</a></li>
+<li><a href="../438972/index.html">The brain from the inside (Visualization of the passage of the pattern through the model of an artificial neural network)</a></li>
+<li><a href="../438974/index.html">Virtual reality helps to cope with mental disorders</a></li>
+<li><a href="../438976/index.html">The book "Spring. All design patterns »</a></li>
+<li><a href="../438980/index.html">Spring Boot 2: what's new?</a></li>
+<li><a href="../438982/index.html">Kubernetes tutorial, part 1: applications, microservices and containers</a></li>
+<li><a href="../438984/index.html">Kubernetes Handbook Part 2: Creating and Working With a Cluster</a></li>
+<li><a href="../438986/index.html">React Training Course Part 14: Workshop on Class Based Components, Component State</a></li>
+<li><a href="../438988/index.html">React Training Course, Part 15: Workshop on Working with Component State</a></li>
+<li><a href="../438992/index.html">Developer Diary or Bad Decisions</a></li>
+<li><a href="../438994/index.html">Intel Xeon W-3175X, hot drummer. Testing</a></li>
+<li><a href="../438996/index.html">Company network and MitM. Part 1</a></li>
+<li><a href="../438998/index.html">CGDevs Moscow Meetup # 2</a></li>
+<li><a href="../439000/index.html">Spatial manipulation in 2D using Signed Distance Fields</a></li>
+<li><a href="../439002/index.html">How to stop "writing TK" and start working?</a></li>
+<li><a href="../439006/index.html">How AI helps to master sign language</a></li>
+<li><a href="../439008/index.html">Mail.ru has released a new Atom browser with an emphasis on "security and privacy"</a></li>
+<li><a href="../439010/index.html">How is the consolidation of archives in DeviceLock DLP</a></li>
+<li><a href="../439012/index.html">Telephone directory of the organization - print version</a></li>
+<li><a href="../439016/index.html">Static Generic Tables</a></li>
+<li><a href="../439018/index.html">Setting up Sphinx search for an online store</a></li>
+<li><a href="../439020/index.html">Ticket to Ride. Europe - arithmetic, part two</a></li>
+<li><a href="../439022/index.html">CNC in the hobby workshop (part 3)</a></li>
+<li><a href="../439024/index.html">Results Slurm-3</a></li>
+<li><a href="../439028/index.html">How to improve network perimeter protection? Practical recommendations for Check Point and not only</a></li>
+<li><a href="../439030/index.html">A lot of managers</a></li>
+<li><a href="../439032/index.html">Amazon and Google are planning to enter the energy market</a></li>
+<li><a href="../439034/index.html">Group-IB Webinar: Red Team or Pentest 12.02.2019</a></li>
+<li><a href="../439036/index.html">The main thing is not to get into the mall under the reconciliation of hours</a></li>
+<li><a href="../439038/index.html">Making a neural network: how not to break the brain</a></li>
+<li><a href="../439040/index.html">To isolate the Runet need budget funds</a></li>
+<li><a href="../439042/index.html">Puma is looking for beta testers for self-tapping sneakers Fi</a></li>
+<li><a href="../439046/index.html">How to safely combine the network segments of the three major banks: share tricks</a></li>
+<li><a href="../439050/index.html">Training Cisco 200-125 CCNA v3.0. Cisco Certified Network Specialist (CCNA). Day 2. OSI and TCP-IP models</a></li>
+<li><a href="../439056/index.html">Cement Brand Integration</a></li>
+<li><a href="../439060/index.html">7 types of customers</a></li>
+<li><a href="../439062/index.html">Anisoprint Composer: 3D printing of high strength</a></li>
+<li><a href="../439064/index.html">Typical mesh error (Bootstrap Grid), or why the designer and layout designer do not understand each other</a></li>
+<li><a href="../439066/index.html">Operating system on Rust. Page memory: advanced level</a></li>
+<li><a href="../439068/index.html">Spam campaign “Love you” redirected to Japan</a></li>
+<li><a href="../439070/index.html">China refuses anti-corruption system Zero Trust AI because of its high efficiency</a></li>
+<li><a href="../439074/index.html">Password Checkup extension checks passwords with a base of 4 billion compromised accounts</a></li>
+<li><a href="../439076/index.html">In which applications to wait for an unknown malicious code?</a></li>
+<li><a href="../439078/index.html">Perm programmer arrested for creating a mobile application through which the pedophile acted</a></li>
+<li><a href="../439080/index.html">Unobvious RabbitMQ in Yii2 or why RabbitMQ writes to all queues at once</a></li>
+<li><a href="../439082/index.html">Walk through the plant of desires</a></li>
+<li><a href="../439086/index.html">Causes of ANR and how to avoid it</a></li>
+<li><a href="../439094/index.html">Scientists have found the oldest living vertebrate on Earth</a></li>
+<li><a href="../439096/index.html">Buildbot: a tale with examples of one more continuous integration system</a></li>
+<li><a href="../439098/index.html">Sasha Memus, Chatfuel: How to build a career in products after consulting, is it dangerous to meditate and how to change behavior</a></li>
+<li><a href="../439100/index.html">How to adapt UX / UI for permissions</a></li>
+<li><a href="../439102/index.html">Russians are 20% more likely to face insults on the Internet</a></li>
+<li><a href="../439104/index.html">Redux Simple as a rake</a></li>
+<li><a href="../439106/index.html">Programming in Russia will be introduced from primary school</a></li>
+<li><a href="../439108/index.html">Amateur radio measurements: when there is no frequency meter</a></li>
+<li><a href="../439112/index.html">Creator Kate Mobile arrested for using a pedophile for his service</a></li>
+<li><a href="../439118/index.html">New in browsers: Firefox 66 blocks video and sound by default, Chromium limits page budget</a></li>
+<li><a href="../439122/index.html">Simplicity and complexity of primitives or how to determine unnecessary preprocessing for a neural network</a></li>
+<li><a href="../439124/index.html">If software is created with public money, the code should be open.</a></li>
+<li><a href="../439126/index.html">Requests from users and product requirements</a></li>
+<li><a href="../439128/index.html">How to organize the work of QA. One practically applied method</a></li>
+<li><a href="../439130/index.html">13 trends in the cybersecurity and information security market 2019-2020</a></li>
+<li><a href="../439132/index.html">Unforgettable old age</a></li>
+<li><a href="../439134/index.html">Russian scientists are developing sitall (unbreakable glass) for LG smartphones</a></li>
+<li><a href="../439136/index.html">What is the difference between 4G and 5G?</a></li>
+<li><a href="../439138/index.html">Working with callbacks in React</a></li>
+<li><a href="../439140/index.html">Important message about invites in profile</a></li>
+<li><a href="../439142/index.html">Design maturity models</a></li>
+<li><a href="../439148/index.html">Working with nRF51822 using ST-Link and Clion + OpenOCD</a></li>
+<li><a href="../439150/index.html">Who should pay transaction costs</a></li>
+<li><a href="../439152/index.html">Salaries in IT in the second half of 2018: according to the “My Circle” salary calculator</a></li>
+<li><a href="../439154/index.html">How do freelancers live: book cover design, own production of backpacks and travel work</a></li>
+<li><a href="../439158/index.html">DataArt Launches Free CV Duck Resume Improvement Service</a></li>
+<li><a href="../439160/index.html">Algorithm state: what happens to indie developers on Steam?</a></li>
+<li><a href="../439162/index.html">How to debug front-end and backend: step-by-step instructions</a></li>
+<li><a href="../439166/index.html">mmWave on the road to commercialization in the form factor of a smartphone</a></li>
+<li><a href="../439170/index.html">Cellular operators will help banks verify the accuracy of customer data</a></li>
+<li><a href="../439172/index.html">Extending the assert () macro to implement minimal error handling</a></li>
+<li><a href="../439174/index.html">Safe Internet Day: what threats to pay attention to in 2019</a></li>
+<li><a href="../439182/index.html">How do we distribute orders between drivers in Yandex.Taxi</a></li>
+<li><a href="../439186/index.html">UX Editor: True Story, Rial Life</a></li>
+<li><a href="../439194/index.html">Controlling a character with SharedEvents</a></li>
+<li><a href="../439196/index.html">JPMorgan analysts: Apple should buy Blizzard, Netflix or Sonos to reassure investors</a></li>
+<li><a href="../439198/index.html">Generation of barrier islands</a></li>
+<li><a href="../439200/index.html">Composer for the smallest</a></li>
+<li><a href="../439202/index.html">Detection of web attacks using autoencoder Seq2Seq</a></li>
+<li><a href="../439204/index.html">Increasing the efficiency of photosynthesis by genetic modification of plants</a></li>
+<li><a href="../439210/index.html">Java after volcanic eruption</a></li>
+<li><a href="../439216/index.html">pudge embedded database in 500 lines on golang</a></li>
+<li><a href="../439218/index.html">VC bot on the knee, or how to please people February 14</a></li>
+<li><a href="../439222/index.html">What is API management?</a></li>
+<li><a href="../439224/index.html">Again about the Voronoi diagrams</a></li>
+<li><a href="../439232/index.html">JAMstack: How to create your blog using Gatsby + Contentful + Netlify</a></li>
+<li><a href="../439236/index.html">xenvman: Flexible environments for testing microservices (and not only)</a></li>
+<li><a href="../439238/index.html">Play Store now accepts progressive web applications (PWA)</a></li>
+<li><a href="../439240/index.html">Joomla Digest for January 2019</a></li>
+<li><a href="../439244/index.html">FAS strongly recommends to pre-install Russian software on smartphones and laptops sold in Russia</a></li>
+<li><a href="../439248/index.html">Alan Kay: “Could the ancient Romans build a computer?”</a></li>
+<li><a href="../439252/index.html">6 reasons to develop IT career in Armenia</a></li>
+<li><a href="../439254/index.html">Our all</a></li>
+<li><a href="../439260/index.html">The author of the book "The Witcher" will still receive compensation from CD Projekt Red</a></li>
+<li><a href="../439262/index.html">Deploy the code directly to the docker container. Or how not to prokrasinirovat after each commit</a></li>
+<li><a href="../439264/index.html">How to lead complex technical projects without hiring PMs: DataLine experience</a></li>
+<li><a href="../439266/index.html">The experience of creating an Android game alone from scratch and how it was captured on Google Play</a></li>
+<li><a href="../439268/index.html">How VR, AR and 3D printing work together: the VR Concept experience</a></li>
+<li><a href="../439270/index.html">An example of parsing C ++ code using libclang in Python</a></li>
+<li><a href="../439278/index.html">ACS my LCD - security on two bolts</a></li>
+<li><a href="../439280/index.html">Trautonium: the German wave in the history of synthesizers</a></li>
+<li><a href="../439282/index.html">Effects of filtering SVG. Part 1. SVG filters 101</a></li>
+<li><a href="../439288/index.html">SciPy Optimization</a></li>
+<li><a href="../439290/index.html">Accelerate compilation in Xcode to swift</a></li>
+<li><a href="../439292/index.html">Google has agreed to remove from the search banned sites in the Russian Federation</a></li>
+<li><a href="../439294/index.html">Translation review "If software is created with public money, the code must be open"</a></li>
+<li><a href="../439296/index.html">Soviet license plate and Kolmogorov complexity</a></li>
+<li><a href="../439298/index.html">What would the Internet system look like in the game EvE Online</a></li>
+<li><a href="../439300/index.html">Statistics for file types in the Wildfire cloud sandbox</a></li>
+<li><a href="../439302/index.html">Product Design Digest, January 2019</a></li>
+<li><a href="../439304/index.html">[Ekaterinburg, announcement] Mitap for Java-developers</a></li>
+<li><a href="../439308/index.html">Kill cancer: iridium, human serum albumin and some blue light</a></li>
+<li><a href="../439310/index.html">Why not take off the real estate portal. Part 2</a></li>
+<li><a href="../439312/index.html">Speed ​​up complex calculations with minimal RAM</a></li>
+<li><a href="../439314/index.html">Seven strange ways of dealing with recluse in remote work</a></li>
+<li><a href="../439316/index.html">“I stopped doing what I see no point in”: project managers about their work and training</a></li>
+<li><a href="../439318/index.html">Win procrastination gaming addiction</a></li>
+<li><a href="../439320/index.html">How to diversify programming lessons for children of different ages</a></li>
+<li><a href="../439322/index.html">OS Sailfish renamed OS "Aurora"</a></li>
+<li><a href="../439324/index.html">Using a binary tree in swift using enum using OCR as an example</a></li>
+<li><a href="../439326/index.html">Electric Ford F-150 EV - in the prototype and tested on the road</a></li>
+<li><a href="../439328/index.html">Okay, google! Are you good or evil?</a></li>
+<li><a href="../439332/index.html">How PageRank works: implementation in the R language through linear algebra and power-method</a></li>
+<li><a href="../439334/index.html">About 2 billion rubles allocated for the implementation of the draft law on sustainable runet</a></li>
+<li><a href="../439336/index.html">We are looking for a needle in a stack without using well-known algorithms.</a></li>
+<li><a href="../439338/index.html">Forget about privacy: you still have terrible targeting</a></li>
+<li><a href="../439340/index.html">GDPR backup — what a new tool will do</a></li>
+<li><a href="../439342/index.html">Winter DIYorDIE Meetup February 17</a></li>
+<li><a href="../439344/index.html">To be like a troll: how monopolists rule patents</a></li>
+<li><a href="../439346/index.html">Laravel + Docker: Our Successful Experience</a></li>
+<li><a href="../439348/index.html">Vision falls after laser vision correction - what to do? Or, doctor, make me an "enhancement"</a></li>
+<li><a href="../439350/index.html">Artificial intelligence as a machine of inventions</a></li>
+<li><a href="../439352/index.html">Making a bot prototype for fighting in Clash Royale</a></li>
+<li><a href="../439354/index.html">Rust news # 5 (January 2019)</a></li>
+<li><a href="../439356/index.html">Nontrivial metrics of the effectiveness of advertising campaigns</a></li>
+<li><a href="../439358/index.html">Excel metadata files</a></li>
+<li><a href="../439360/index.html">Training Cisco 200-125 CCNA v3.0. Cisco Certified Network Specialist (CCNA). Day 3. Subnets</a></li>
+<li><a href="../439362/index.html">How we teach Software Engineering at St. Petersburg HSE</a></li>
+<li><a href="../439364/index.html">Oculus Go glasses with “strawberry” content set up for sale</a></li>
+<li><a href="../439366/index.html">Automation of three nails</a></li>
+<li><a href="../439368/index.html">Animations in iOS applications born on the server</a></li>
+<li><a href="../439374/index.html">For those who want to play detective: find a bug in the function from Midnight Commander</a></li>
+<li><a href="../439376/index.html">"Interest club"</a></li>
+<li><a href="../439378/index.html">The Book of Genesis?). Reflections on the nature of mind. Part I</a></li>
+<li><a href="../439380/index.html">How I created an extension for Atom and VS Code: personal experience and source codes</a></li>
+<li><a href="../439382/index.html">Using Ansible, Terraform, Docker, Consul, Nomad in the Clouds (Alexey Vakhov, Uchi.ru)</a></li>
+<li><a href="../439390/index.html">The best innovations of social networks in 2018</a></li>
+<li><a href="../439392/index.html">The 2019 championship season is open! SNA Hackathon Launches ala ML Boot Camp 8</a></li>
+<li><a href="../439394/index.html">As a programmer dataseativistam wrote</a></li>
+<li><a href="../439396/index.html">UniFi Controller Password Reset</a></li>
+<li><a href="../439404/index.html">A brief history of electronic public procurement in Russia</a></li>
+<li><a href="../439408/index.html">Pseudo Lens Flare</a></li>
+<li><a href="../439410/index.html">Jeff Hawkins is finally ready to explain his brain research.</a></li>
+<li><a href="../439414/index.html">Client for "server push messages"</a></li>
+<li><a href="../439416/index.html">A-Frame Review</a></li>
+<li><a href="../439418/index.html">Pentaho Data Integration (PDI), Python and Deep Learning</a></li>
+<li><a href="../439420/index.html">Building the transport package without installing MODX</a></li>
+<li><a href="../439422/index.html">What does a programmer need to develop games and who really is a game developer on the part of a programmer</a></li>
+<li><a href="../439424/index.html">How I Fought Free Hosting and Composer</a></li>
+<li><a href="../439426/index.html">Situation: a new wave of attacks with the interception of DNS queries - we analyze the basic methods of protection</a></li>
+<li><a href="../439430/index.html">Believe me if you can. Water meters. part 1</a></li>
+<li><a href="../439432/index.html">How to become a Java developer in 1.5 years</a></li>
+<li><a href="../439434/index.html">NestJS - the very real nodejs backend</a></li>
+<li><a href="../439436/index.html">Cheaper price of small series of electronics in Russia. Case Internet radio WOLNA</a></li>
+<li><a href="../439440/index.html">Implementation of Zimbra Collaboration Open Source, authorization through AD and automatic creation of mailboxes</a></li>
+<li><a href="../439442/index.html">Julia. Report Generators and Documentation</a></li>
+<li><a href="../439446/index.html">What you need to know about JavaScript Engine Switcher 3.0</a></li>
+<li><a href="../439448/index.html">What virtualization questions do you expect from a graduate?</a></li>
+<li><a href="../439450/index.html">RS-485 on domestic microcontrollers from the company Milandr</a></li>
+<li><a href="../439454/index.html">Program as Art - a new software management paradigm</a></li>
+<li><a href="../439456/index.html">Hipster podcasts # 2</a></li>
+<li><a href="../439458/index.html">As we Republic website on Kubernetes translated</a></li>
+<li><a href="../439460/index.html">How marketers of Maxidom lose millions flirting in groz marketing: independent usability auditing</a></li>
+<li><a href="../439462/index.html">Civilization Springs, 5/5</a></li>
+<li><a href="../439464/index.html">VXinspect: part quality control in 10 minutes</a></li>
+<li><a href="../439466/index.html">NASA lunar orbital probe made the first pictures of the China Chang'e-4 station - two pixels of light</a></li>
+<li><a href="../439468/index.html">Where to lead the search for the perfect SCADA</a></li>
+<li><a href="../439470/index.html">Germany plans to abandon coal in the near future.</a></li>
+<li><a href="../439472/index.html">Automation of border control within the company</a></li>
+<li><a href="../439476/index.html">Cockney Slang: Modern History and Position</a></li>
+<li><a href="../439478/index.html">Entertaining C #. Five examples for a coffee break</a></li>
+<li><a href="../439480/index.html">Give way, or Why does your CRM (and CRM) slow down?</a></li>
+<li><a href="../439482/index.html">devleads - (not) financial motivation</a></li>
+<li><a href="../439484/index.html">Get the enum data in the Automapper projection</a></li>
+<li><a href="../439496/index.html">How is billing done there: when a customer and a developer speak different languages</a></li>
+<li><a href="../439498/index.html">What hardware to analyze a huge shaft of information?</a></li>
+<li><a href="../439500/index.html">Why are captcha so complicated</a></li>
+<li><a href="../439502/index.html">Undefined behavior and truth undefined</a></li>
+<li><a href="../439504/index.html">Does your Data Engineer team need it?</a></li>
+<li><a href="../439506/index.html">9 alternatives to a bad team (design pattern)</a></li>
+<li><a href="../439510/index.html">High-load distributed control system of a modern NPP</a></li>
+<li><a href="../439512/index.html">The era of dinosaurs or legally verified reinsurance?</a></li>
+<li><a href="../439516/index.html">00110001 00110100 00101110 00110000 00110010</a></li>
+<li><a href="../439524/index.html">Fortnite is the future, but for rather unexpected reasons.</a></li>
+<li><a href="../439526/index.html">Telecom operators will conduct a "field test" of the law on the stability of the Runet</a></li>
+<li><a href="../439532/index.html">What's new in javascript ES2019</a></li>
+<li><a href="../439534/index.html">Yield programming and the use of drones in oil production - 10 lectures from the conference GIS Tech Russia</a></li>
+<li><a href="../439538/index.html">Community programming</a></li>
+<li><a href="../439540/index.html">Etherblade.net - opensource project to create an ethernet traffic encapsulator on FPGA (part one)</a></li>
+<li><a href="../439542/index.html">Nintendo makes it clear that only piracy can save the history of video games</a></li>
+<li><a href="../439544/index.html">The colony. Chapter 24: Departure</a></li>
+<li><a href="../439556/index.html">TDMS Fairway. Methods PMBOK and Russian design organizations</a></li>
+<li><a href="../439558/index.html">New old phone. Reinvent the PSTN phone</a></li>
+<li><a href="../439560/index.html">The adapter for working with the blockchain Ethereum for the InterSystems IRIS data platform</a></li>
+<li><a href="../439562/index.html">Configure the Kubernetes HA cluster on bare metal with kubeadm. Part 1/3</a></li>
+<li><a href="../439564/index.html">Practical application of transformation of AST-trees on the example of Putout</a></li>
+<li><a href="../439566/index.html">Why SRE is important documentation. Part 3</a></li>
+<li><a href="../439568/index.html">QLC based SSD - hard drive killer? Not really</a></li>
+<li><a href="../439572/index.html">Automated design of electronic equipment</a></li>
+<li><a href="../439576/index.html">Extensive review of Python interviews. Hints and Tips</a></li>
+<li><a href="../439578/index.html">On the issue of transformations and other operations</a></li>
+<li><a href="../439584/index.html">Project Lenergy, how to rethink portable power sources</a></li>
+<li><a href="../439586/index.html">SPBm protocol as the basis of Extreme Automated Campus</a></li>
+<li><a href="../439588/index.html">ESET has discovered new versions of the DanaBot Trojan.</a></li>
+<li><a href="../439590/index.html">Quals: Saudi and Oman National Cyber ​​Security CTF 2019. WriteUp</a></li>
+<li><a href="../439592/index.html">Ethical Activity Automation</a></li>
+<li><a href="../439596/index.html">How I accelerated image processing on Android 15 times</a></li>
+<li><a href="../439598/index.html">Microsoft told about the cost of paid support for Windows 7</a></li>
+<li><a href="../439600/index.html">Finland summed up the preliminary results of the experiment with a guaranteed basic income</a></li>
+<li><a href="../439604/index.html">How does the barcode work?</a></li>
+<li><a href="../439606/index.html">Experimental production of electronics for the minimum price</a></li>
+<li><a href="../439608/index.html">Modern religion: what do people give to Google, Facebook, Amazon and Apple?</a></li>
+<li><a href="../439610/index.html">As in my Chevrolet Bolt electric car, under warranty, two battery modules were replaced, and the third was monitored</a></li>
+<li><a href="../439616/index.html">The digest of interesting IT projects on Kickstarter №7</a></li>
+<li><a href="../439618/index.html">PHP for beginners. File attachment</a></li>
+<li><a href="../439620/index.html">Understanding asynchronous JavaScript [Translated by Sukhjinder Arora]</a></li>
+<li><a href="../439624/index.html">Why keep data in orbit</a></li>
+<li><a href="../439626/index.html">Experience developing a free application for collectors OpenNumismat</a></li>
+<li><a href="../439628/index.html">Parallel data update in ASP.NET Web API</a></li>
+<li><a href="../439632/index.html">How to set up Continuous Deployment for your project: personal experience</a></li>
+<li><a href="../439636/index.html">The crisis of the concepts of improving road safety and a new concept of its solution</a></li>
+<li><a href="../439638/index.html">Getting FPGA to Python</a></li>
+<li><a href="../439640/index.html">Vinyl is back and it's different</a></li>
+<li><a href="../439642/index.html">Java pitfalls. Part 1</a></li>
+<li><a href="../439644/index.html">Anti-Aging: Senolithics and Stem Cell Therapy</a></li>
+<li><a href="../439646/index.html">Holding SoftBank sold a stake in Nvidia due to the fall in their prices, but still earned $ 3.3 billion</a></li>
+<li><a href="../439648/index.html">Internal and nested java classes. Part 1</a></li>
+<li><a href="../439652/index.html">How to transport your startup to the USA: 4 important steps</a></li>
+<li><a href="../439654/index.html">Full immersion: how do we cool ASIC chips in Bitfury</a></li>
+<li><a href="../439656/index.html">C # character calculator</a></li>
+<li><a href="../439676/index.html">Integration of React Native and C ++ for iOS and Android</a></li>
+<li><a href="../439680/index.html">About 50% of Russians are ready to sell their personal data</a></li>
+<li><a href="../439682/index.html">Training Cisco 200-125 CCNA v3.0. Cisco Certified Network Specialist (CCNA). Day 4. Gateway devices</a></li>
+<li><a href="../439686/index.html">Flickr introduces new rules regarding the number of photos and videos users.</a></li>
+<li><a href="../439688/index.html">Overview of AI & ML solutions in 2018 and forecasts for 2019: Part 1 - NLP, Computer Vision</a></li>
+<li><a href="../439690/index.html">Virtual machine performance comparison of 6 cloud platforms: Selectel, MCS, Ya.Oblako, Google Cloud, AWS and Azure</a></li>
+<li><a href="../439692/index.html">AT & T sued for changing the network icon from 4G to 5G E</a></li>
+<li><a href="../439694/index.html">Developed smart tissue that reacts to changes in body temperature</a></li>
+<li><a href="../439696/index.html">On the crest of a wave, or “I want to go to the mainstream” - is it worth it?</a></li>
+<li><a href="../439698/index.html">Introduction to programming: a simple 3D shooter from scratch over the weekend, part 1</a></li>
+<li><a href="../439700/index.html">Patent for a board game in Russia</a></li>
+<li><a href="../439704/index.html">From pool request to release. Report Yandex.Taxi</a></li>
+<li><a href="../439706/index.html">BLACK HAT conference. Survival lessons in a 300 Gbps DDOS attack. Part 1</a></li>
+<li><a href="../439710/index.html">Features of creating products for the US market</a></li>
+<li><a href="../439712/index.html">Government procurement: a balance between the Italian strike and the Russian criminal</a></li>
+<li><a href="../439716/index.html">Tails OS or how to protect yourself online</a></li>
+<li><a href="../439718/index.html">Developing Elixir / Phoenix Applications with Docker</a></li>
+<li><a href="../439720/index.html">Introduction to programming: a simple 3D shooter from scratch over the weekend, part 2</a></li>
+<li><a href="../439722/index.html">Effects of SVG filters. Part 2. Outline text with feMorphology</a></li>
+<li><a href="../439724/index.html">Overview of AI & ML solutions in 2018 and forecasts for 2019: Part 2 - Tools and Libraries, AutoML, RL, Ethics in AI</a></li>
+<li><a href="../439726/index.html">Lock-in: truth or fiction?</a></li>
+<li><a href="../439728/index.html">Setting up backup and recovery of Zimbra OSE entirely and in separate boxes without using Zextras</a></li>
+<li><a href="../439730/index.html">Organizing reducer through standard class</a></li>
+<li><a href="../439732/index.html">Lazarus - simple animation using the TImageFragment component</a></li>
+<li><a href="../439734/index.html">We deploy Kubernetes on the desktop in minutes with MicroK8s</a></li>
+<li><a href="../439736/index.html">IPSec VPN connection between MikroTik and Kerio Control</a></li>
+<li><a href="../439746/index.html">Understand the promises in javascript</a></li>
+<li><a href="../439748/index.html">The digest of interesting materials for the mobile developer # 285 (February 4 - 10)</a></li>
+<li><a href="../439750/index.html">Learn product management - where?</a></li>
+<li><a href="../439752/index.html">Multicore MRI Method</a></li>
+<li><a href="../439754/index.html">Google is going to be engaged in the development of smart watches</a></li>
+<li><a href="../439756/index.html">Why do I need a thermo-acoustic generator?</a></li>
+<li><a href="../439760/index.html">Engineers "twisted" the light in the fiber - a new technology will speed up the transfer of data a hundred times</a></li>
+<li><a href="../439764/index.html">Corporate fruit</a></li>
+<li><a href="../439772/index.html">Writing Unit Tests on Swift for Verifying Asynchronous Tasks</a></li>
+<li><a href="../439778/index.html">The digest of fresh materials from the world of the frontend for the last week No. 351 (February 4 - 10, 2019)</a></li>
+<li><a href="../439780/index.html">PHP Digest number 149 (January 28 - February 11, 2019)</a></li>
+<li><a href="../439782/index.html">Headless CMS - the future of content management</a></li>
+<li><a href="../439784/index.html">Methane engine "Raptor" broke the record RD-180</a></li>
+<li><a href="../439788/index.html">Regular oddities in the GOST Grasshopper and Stribog algorithms</a></li>
+<li><a href="../439790/index.html">Test JaCarta WebClient or store tokens in a safe</a></li>
+<li><a href="../439792/index.html">NASA is looking for partners in the American industry to create a partially reusable manned lender</a></li>
+<li><a href="../439794/index.html">Back pain - understanding from the perspective of modern medicine</a></li>
+<li><a href="../439796/index.html">Spring Boot 2: what is not written in release notes</a></li>
+<li><a href="../439800/index.html">RISEX and Julia. 5 stages of love customer and designer</a></li>
+<li><a href="../439806/index.html">Valid SSL domain names for local Docker containers</a></li>
+<li><a href="../439808/index.html">The biggest telescopes. From a notebook and eyes to 340 megapixel cameras and data centers. Part 1</a></li>
+<li><a href="../439810/index.html">Get acquainted with the Moleculer microservice framework</a></li>
+<li><a href="../439816/index.html">Practical blockchain in business</a></li>
+<li><a href="../439818/index.html">Features of approaches to design in the real manufacturing sector</a></li>
+<li><a href="../439820/index.html">We are trying to write a project alone. Introduction</a></li>
+<li><a href="../439822/index.html">Creating an alternative display for the Ensoniq EPS16 + and ASR10 synthesizer / sampler</a></li>
+<li><a href="../439824/index.html">When will the JavaScript frameworks disappear?</a></li>
+<li><a href="../439826/index.html">Disable analog. What will happen to the TV?</a></li>
+<li><a href="../439828/index.html">The network appeared "analog" Findface</a></li>
+<li><a href="../439840/index.html">Conference DUMP-2019: we invite you to speak in the sections Design, Management and Testing</a></li>
+<li><a href="../439852/index.html">Remote control application release: Aspia 1.1.0</a></li>
+<li><a href="../439858/index.html">Prometheus + Grafana + Node Exporter + Docker in Azure with notifications in Telegram</a></li>
+<li><a href="../439862/index.html">Digital events in Moscow from February 11 to 17</a></li>
+<li><a href="../439866/index.html">Principles of design reference books in 1C Enterprise Management 2 (ERP 2.4.6)</a></li>
+<li><a href="../439868/index.html">Life without Facebook: less radical views, good mood, more time for loved ones. Now proven by science</a></li>
+<li><a href="../439878/index.html">Creation of architecture for a new high-load startup in 2019</a></li>
+<li><a href="../439880/index.html">Security Week 07: Local IoT Device Vulnerabilities</a></li>
+<li><a href="../439886/index.html">How I trained the neural network to implement the position estimation function on the Russian AI Cup CodeBall 2018</a></li>
+<li><a href="../439894/index.html">How easy it is to monitor the site</a></li>
+<li><a href="../439900/index.html">Julia and the method of coordinate descent</a></li>
+<li><a href="../439902/index.html">Explaining the physical essence of the Wing Lift phenomenon without using the Bernouli equation. Part 2</a></li>
+<li><a href="../439906/index.html">Critical vulnerability in Zemana products and not only</a></li>
+<li><a href="../439908/index.html">Kohl, piss off ... Coax</a></li>
+<li><a href="../439912/index.html">Unsolved mystery of view</a></li>
+<li><a href="../439916/index.html">Unpacking: Dridex bootloader</a></li>
+<li><a href="../439922/index.html">Taxation of IP in Kazakhstan how to be a freelancer?</a></li>
+<li><a href="../439924/index.html">The volume of parcels from foreign online stores grew by 25%</a></li>
+<li><a href="../439926/index.html">Retain inside and outside ViewModel</a></li>
+<li><a href="../439928/index.html">Autonomous driving on the sidewalk through OpenCV and Tensorflow</a></li>
+<li><a href="../439932/index.html">How we opened development offices</a></li>
+<li><a href="../439934/index.html">Business processes. Extract BPMN model from document. Part 1</a></li>
+<li><a href="../439936/index.html">3D technology for foundry: how to create a mold for casting in a week</a></li>
+<li><a href="../439938/index.html">How to name: privacy policy and privacy policy</a></li>
+<li><a href="../439940/index.html">Teamlead Conf Msk 2019: Results of the Bid Campaign, Reports, Considerations</a></li>
+<li><a href="../439942/index.html">Docker'ization: what every .Net developer needs to know</a></li>
+<li><a href="../439946/index.html">Why did we choose Electron</a></li>
+<li><a href="../439950/index.html">3rd Turing Test: conditions of participation and prizes to the winners</a></li>
+<li><a href="../439952/index.html">Hosting Node.js https server with auto-updated SSL in the cloud and how I set up the development cycle (+ git, react)</a></li>
+<li><a href="../439958/index.html">CodeFest X March 30-31. Future section</a></li>
+<li><a href="../439964/index.html">Vulnerability CVE-2019-5736 in runc, allowing to get root privileges on the host</a></li>
+<li><a href="../439966/index.html">Simple parser for arithmetic operations</a></li>
+<li><a href="../439970/index.html">Report on problems and accessibility of the Internet in 2018-2019</a></li>
+<li><a href="../439974/index.html">Personal Agile Transformation: A Flexible Journey to Productivity</a></li>
+<li><a href="../439976/index.html">Will Node.js always be slower than Golang?</a></li>
+<li><a href="../439986/index.html">Chips VS Threats of Containerization Technology</a></li>
+<li><a href="../439994/index.html">XAMPP - virtual server setup</a></li>
+<li><a href="../439996/index.html">Analysis of Minor Violations Java code on the Duerank.com platform (part 1)</a></li>
+<li><a href="../440000/index.html">On "Vkontakte" sued for issuing personal data of the user of the Ministry of Internal Affairs</a></li>
+<li><a href="../440006/index.html">The draft law on sustainable work of the Runet was adopted in the first reading.</a></li>
+<li><a href="../440008/index.html">Increasing the informational content of errors in Go - github.com/ztrue/tracerr</a></li>
+<li><a href="../440012/index.html">Cases and growings practices in a product at Epic Growth Conference</a></li>
+<li><a href="../440014/index.html">Skills, self-education and programming languages ​​for novice developers: HackerRank research</a></li>
+<li><a href="../440016/index.html">When reading can be touched: a review of ONYX BOOX Monte Cristo 4</a></li>
+<li><a href="../440018/index.html">Dynamic local exposure</a></li>
+<li><a href="../440020/index.html">Regression or regression in testing</a></li>
+<li><a href="../440022/index.html">A bit of Ferrari: Fintech-startup Rally Rd will allow you to buy "shares" of rare cars</a></li>
+<li><a href="../440024/index.html">Redirecting printf () from STM32 to Qt Creator console</a></li>
+<li><a href="../440030/index.html">Point-by-round PKH locks on an OpenWrt router using WireGuard and DNSCrypt</a></li>
+<li><a href="../440040/index.html">In development - every man for himself. But sometimes it leads to a dead end.</a></li>
+<li><a href="../440046/index.html">Open lesson "Creating REST-clients on Spring"</a></li>
+<li><a href="../440048/index.html">Favorite metrics: 5 indicators that each sales team must follow</a></li>
+<li><a href="../440050/index.html">DNS proxy on Node.JS do it yourself</a></li>
+<li><a href="../440052/index.html">Static analysis "BIOS / UEFI" or how to get Dependency Graph</a></li>
+<li><a href="../440066/index.html">VSCode Extensions That Ease JavaScript and Vue Development</a></li>
+<li><a href="../440070/index.html">Julia, Gradient descent and simplex method</a></li>
+<li><a href="../440072/index.html">AresDB Demo: Uber's GPU-based, real-time open source analysis tool</a></li>
+<li><a href="../440074/index.html">"Roskomos" considers incorrect to compare the engines Raptor Ilona Mask and RD-180</a></li>
+<li><a href="../440084/index.html">10 billion software exports are negligible</a></li>
+<li><a href="../440094/index.html">Blooming gardens on Mars remain a dream: the Mars One project went bankrupt</a></li>
+</ul></nav>
+</section>
+<script src="../../js/main.js"></script>
+
+<!-- Yandex.Metrika counter -->
+<script type="text/javascript" >
+  (function (d, w, c) {
+      (w[c] = w[c] || []).push(function() {
+          try {
+              w.yaCounter52319614 = new Ya.Metrika({
+                  id:52319614,
+                  clickmap:true,
+                  trackLinks:true,
+                  accurateTrackBounce:true,
+                  webvisor:true
+              });
+          } catch(e) { }
+      });
+
+      var n = d.getElementsByTagName("script")[0],
+          s = d.createElement("script"),
+          f = function () { n.parentNode.insertBefore(s, n); };
+      s.type = "text/javascript";
+      s.async = true;
+      s.src = "https://mc.yandex.ru/metrika/watch.js";
+
+      if (w.opera == "[object Opera]") {
+          d.addEventListener("DOMContentLoaded", f, false);
+      } else { f(); }
+  })(document, window, "yandex_metrika_callbacks");
+</script>
+<noscript><div><img src="https://mc.yandex.ru/watch/52319614" style="position:absolute; left:-9999px;" alt="" /></div></noscript>
+
+<!-- Google Analytics -->
+  <script>
+    window.ga = function () { ga.q.push(arguments) }; ga.q = []; ga.l = +new Date;
+    ga('create', 'UA-134228602-1', 'auto'); ga('send', 'pageview')
+  </script>
+  <script src="https://www.google-analytics.com/analytics.js" async defer></script>
+
+</section>
+</body>
+
+</html>

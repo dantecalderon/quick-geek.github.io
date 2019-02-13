@@ -1,0 +1,1 @@
+Samba в роли ADDC в Solaris 11.4

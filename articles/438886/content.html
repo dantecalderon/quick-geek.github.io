@@ -1,0 +1,48 @@
+<div class="post__text post__text-html js-mediator-article">  Probably, you heard about the technology of Yandex DeepHD, with the help of which they once improved the quality of Soviet cartoons.  Alas, it is not yet publicly available, and we, ordinary programmers, are unlikely to have the strength to write their own solution.  But personally I, as the owner of the Retina-display ( <b>2880x1800</b> ), recently wanted to see "Rick and Morty" very much.  What was my disappointment when I saw how 1080r looks like a soap on this screen, in which there are originals of this animated series!  (this is an excellent quality and usually it is quite enough, but believe me, the retina is so arranged that the animation with its clear lines in 1080p looks soapy, like 480r on an FHD monitor) <br><br>  I firmly decided that I wanted to see this animated series in 4K, although I absolutely could not write neural networks.  However, a solution was found!  It’s curious that we don’t even have to write code, we need only <b>~ 100 GB of disk space</b> and some patience.  And the result is a clear image in 4K, which looks more worthy than any interpolation. <br><br><img src="https://habrastorage.org/webt/s3/ms/fa/s3msfas7tbjkbve_adjcdlohpyw.jpeg" alt="image"><br><a name="habracut"></a><br><h3>  Training </h3><br>  First, we must immediately understand that there is no technology in open access to increase video using neural networks.  At all.  But there are several projects that can increase photos.  And if so, let's transcode our video into a huge pile of frames! <br><br>  This can be done through Adobe Premiere Pro or another program for working with video, but I am sure that not everyone has it installed.  So let's use the <a href="https://www.ffmpeg.org/">ffmpeg</a> console utility.  I took the first episode of the first season, and it started: <br><br><pre><code class="bash hljs">$ ffmpeg -i RiM01x01_4K.mp4 -q:v 1 IM/01x01_%05d.jpg</code></pre><br>
+<div class="spoiler"><b class="spoiler_title">Почему JPG, а не PNG?</b><div class="spoiler_text">Справедливый вопрос. Дело в том, что 31 000 PNG, которые бы мы получили бы на выходе, весили умопомрачительно много. Настолько много, что можно незначительно пожертвовать качеством.<br>
+<br>
+К слову, параметр -q:v 1 означает, что мы выводим JPG в максимально возможном качестве.<br>
+</div></div><br>
+Подождав примерно 10 минут, мы получим большущую папку с изображениями. У меня она заняла <b>26 ГБ.</b><br>
+<img src="https://habrastorage.org/webt/g0/5r/1p/g05r1pwaaed4fh4i98a9gkykjya.png"><br>
+Осталось обработать каждый из этих кадров!<br>
+<br>
+<h3>Как будем обрабатывать?</h3><br>
+Я нашел три варианта, работающих более-менее нормально — это небезизвестный <a href="http://letsenhance.io/">Let's Enhance</a>, <a href="https://github.com/nagadomi/waifu2x">waifu2x</a> (натренирован на аниме) и Mail.ru Vision.<br>
+<br>
+Чуть позже я обязательно покажу примеры.<br>
+<br>
+Mail.ru Vision и Let's Enhance неплохо обрабатывали изображения, но они, к сожалению, не опенсорсные, то есть для обработки 31000 картинок нам придется писать создателям на почту и, вероятно, немало заплатить. Поэтому я пригляделся к оставшемуся waifu2x, но он не порадовал меня качественным результатом, были шумы и нечеткости. Все-таки «Рик и Морти» — это не аниме.<br>
+<br>
+Я уже было отчаялся бесконечно листать Github и тематические форумы, но… Спасение вдруг пришло! Нашелся вариант, который работает на машине локально, обрабатывает картинку меньше, чем за секунду, и показывает отличное качество. И вы не поверите, кто в очередной раз пришел нам на помощь!<br>
+<br>
+<b>Adobe Photoshop! </b><br>
+<br>
+И нет, я не буду рассказывать true story о том, как там можно парочкой фильтров сделать хорошую картинку. Adobe действительно натренировали самую настоящую нейросеть, которая при масштабировании внутри программы может дорисовать изображение!<br>
+<br>
+Для начала нужно открыть исходное изображение, затем перейти через верхнее меню в Изображение &gt; Размер изображения… и выбрать ресамплинг «Сохранение Деталей 2.0».<br>
+<br>
+<img src="https://habrastorage.org/webt/s-/cx/zi/s-cxziv3m4estgesnx8ojtlecrs.png"><br>
+<br>
+Результат приятно удивил! Пожалуй, впереди только Let's Enhance. Вот и обещанное сравнение (исходное изображение приближено примерно в 8 раз):<br>
+<br>
+<img src="https://habrastorage.org/webt/92/oe/te/92oeteuqdojm8845t5ckrd9wj_s.jpeg"><br>
+<br>
+<i> — И что теперь, вручную обрабатывать каждый кадр через фотошоп?</i><br>
+Конечно, нет! В фотошопе есть инструмент Actions, который позволяет сначала записать последовательность действий, а потом применить ее на целую папку с изображениями. Не буду расписывать весь процесс, он легко гуглится.<br>
+<br>
+Я оставил свой ноутбук обрабатывать тридцать одну тысячу кадров на ночь по шаблону «сделай апскейл в два раза и сохрани». Проснулся утром — все готово! Еще одна папка с кучей кадров, но теперь уже в 4К и с размером в <b>82 ГБ</b>.<br>
+<br>
+<h3>Назад, в видео</h3><br>
+Нам снова поможет ffmpeg. <br>
+<br>
+Понимаем, что мы совсем забыли про аудиодорожку, и достаем ее из оригинального файла:<br>
+<br>
+<pre><code class="bash hljs">ffmpeg -i RiM01x01_1080p.mp4 -vn -ar 44100 -ac 2 -ab 320K -f mp3 sound.mp3</code></pre><br>
+А потом скидываем саунд в папку со всеми 4К-кадрами. Все наши труды прошли не зря, мы готовы к финальной склейке!<br>
+<br>
+<pre><code class="bash hljs">ffmpeg -i 01x01_%05d.jpg -i sn.mp3 -vcodec libx264 -preset veryslow -crf 10 -r 23.976 RiM_01x01_4K.mp4</code></pre><br>
+<b>Будьте внимательны</b>: после -r ставьте именно такое количество кадров, <b>какое было в оригинале</b>, иначе звук не будет совпадать с картинкой!<br>
+<br>
+<h3>Готово!</h3><br>
+Мы получили первую серию «Рика и Морти» в 4К. Вот <a href="https://yadi.sk/d/3TvUrOPQXS_Wrg">сэмпл</a>. Конечно, это было немного по-ламерски, что ли… Но на самом деле у такого подхода есть серьезное преимущество. При работе с другими фильмами или мультиками мы можем удобнейшим образом, прямо через Photoshop доводить их кадры до идеала. Подобрали идеальную резкость и балансировку цветов под несколько кадров из фильма, потом записали свои действия в Action, распространили на весь фильм, и получили отличный результат без всяких математических сложностей. Это делает чудо-апскейл чуть ближе к обычному пользователю. Сложнейшие вещи, к которым люди шли веками, воспроизводятся быстро и без специальных знаний — что это, если не будущее?</div>
