@@ -1,0 +1,1 @@
+Environmental monitoring in the server room (Bolid + Zabbix)

@@ -1,0 +1,1 @@
+Lazarus - write component for sprite animation

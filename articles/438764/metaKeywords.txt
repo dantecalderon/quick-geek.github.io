@@ -1,0 +1,1 @@
+c, c++, c/c++, code review, chromium, open source, open-source, pvs-studio, static code analysis, memset, malloc, undefined behavior, null, си, си++, статический анализ кода, статический анализатор кода, обработка ошибок

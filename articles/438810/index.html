@@ -1,0 +1,533 @@
+<!doctype html>
+<html class="no-js" lang="en">
+
+<head>
+  <!-- Global site tag (gtag.js) - Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=UA-134228602-1"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'UA-134228602-1');
+  </script>
+
+  <meta charset="utf-8">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  <title>HTTP / 3: from root to tip</title>
+  <meta name="description" content="The application layer protocol HTTP is the basis of the Internet. He began his life in 1991 as HTTP / 0.9, and by 1999 turned into HTTP / 1.1, which w...">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+  <link rel="stylesheet" href="../../css/main.css">
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+  <script>window.jQuery || document.write('<script src="../../js/vendors/jquery-3.3.1.min.js"><\/script>')</script>
+</head>
+
+<body>
+  <!--[if lte IE 9]>
+    <p class="browserupgrade">You are using an <strong>outdated</strong> browser. Please <a href="https://browsehappy.com/">upgrade your browser</a> to improve your experience and security.</p>
+  <![endif]-->
+  <nav class="page-headings-container js-page-headings-container"></nav>
+  <div class="tools-bar js-tools-bar">
+    <!-- <a href="https://quick-geek.github.io/search.html" title="Search">🔎</a> -->
+    <a class="js-list-of-headings-button" data-state="closed" href="#" title="Headings">📜</a>
+    <a class="js-go-to-top-button" href="#" title="Go to Top">⬆️</a>
+    <a class="js-go-to-bottom-button" href="#" title="Go to Bottom">⬇️</a>
+  </div>
+  <section class="page js-page"><h1>HTTP / 3: from root to tip</h1><div class="post__text post__text-html js-mediator-article">  The application layer protocol HTTP is the basis of the Internet.  He began his life in 1991 as HTTP / 0.9, and by 1999 turned into HTTP / 1.1, which was standardized by the Internet Engineering Task Force (IETF). <br><br>  HTTP / 1.1 satisfied everyone for a long time, but the growing needs of the Network required an upgrade - and in 2015 they accepted HTTP / 2.  The story is not over: just recently, the IETF announced a new version of HTTP / 3.  For some, this came as a surprise and caused some confusion.  If you are not tracking IETF, HTTP / 3 may seem to come from nowhere.  Nevertheless, we can trace its origin in the history of experiments and the evolution of web protocols, in particular, the QUIC transport protocol. <br><br>  If you are not familiar with QUIC, my Cloudflare colleagues have covered various aspects in some detail: for example, see the articles on the <a href="https://blog.cloudflare.com/the-quicening/">real disadvantages of modern HTTP</a> and <a href="https://blog.cloudflare.com/the-road-to-quic/">details on the transport layer protocol</a> .  We have collected these and other materials on <a href="https://cloudflare-quic.com/">cloudflare-quic.com</a> .  And if you're interested, be sure to check out <a href="https://blog.cloudflare.com/enjoy-a-slice-of-quic-and-rust/">quiche</a> : this is our own QUIC implementation, written in Rust with open source code. <br><a name="habracut"></a><br>  HTTP / 3 - translation of the QUIC transport protocol for the application layer.  The name HTTP / 3 was officially approved only recently, in the 17th version of the draft ( <a href="http-17">draft-ietf-quic-http-17</a> ).  It was proposed at the end of October 2018, and consensus was reached at the IETF 103 meeting in Bangkok in November. <br><br>  Previously, HTTP / 3 was known as HTTP by QUIC, and before that it was known as HTTP / 2 by gQUIC, and even earlier - SPDY by gQUIC.  But the bottom line is that HTTP / 3 is just the new HTTP syntax that runs on the IETF QUIC protocol, a multiplexed and secure UDP-based transport. <br><br>  In this article, we will look at the history of some of the previous HTTP / 3 names and present the motivation for the last name change.  Let's go back to the first days of HTTP and everything that happened during this time.  If you want to get the full picture, you can go directly to the end of the article or open <a href="">this very detailed version of SVG</a> . <br><br><img src="https://habrastorage.org/getpro/habr/post_images/d2b/841/607/d2b841607ca3e0a8bffad1a787913c5f.png"><br>  <i><font color="gray">HTTP / 3 layer cake</font></i> <br><br><h1>  Situation </h1><br>  Just before focusing on HTTP, it’s worth recalling that there are two protocols called QUIC.  As we have already <a href="https://blog.cloudflare.com/the-road-to-quic/">explained</a> , gQUIC is commonly used as an acronym for Google QUIC (the original protocol), and QUIC as an IETF version that differs from gQUIC. <br><br>  Since the beginning of the 90s, the needs of the Internet have changed.  We have new versions of HTTP and a new level of security in the form of the Transport Layer Security (TLS) protocol.  In this article we will only touch on TLS, and in <a href="https://blog.cloudflare.com/tag/tls/">other articles of</a> our blog you can study the topic in more detail. <br><br>  The history of HTTP and TLS cannot be expressed by a simple list of dates, since some branches evolved in parallel and overlapped in time.  When you are trying to connect all the points for almost 30 years of Internet history, you cannot do without visualization.  So I made this schedule: Cloudflare Secure Web Timeline.  (note: technically this is a <a href="https://en.wikipedia.org/wiki/Cladogram">cladogram</a> , although people are more familiar with the word "chart"). <br><br> <a href=""><img src="https://habrastorage.org/webt/j_/uv/ww/j_uvww5d_hmiykedtaritata8ja.png"></a> <br><br>  For the sake of beauty, I dropped some of the information, focusing only on the successful branches in the IETF space.  For example, the efforts of the HTTP-NG working group of the W3 consortium are not shown here, as well as some exotic technologies that the authors are still trying to explain their pronunciation: <a href="http-with-minimal-protocol.html">HMURR</a> (pronounced "hummer") and <a href="https://github.com/HTTPWorkshop/workshop2017/blob/master/talks/waka.pdf">WAKA</a> (pronounced "wah-kah"). <br><br>  In the following sections, we will go through this cladogram and consider some turning points in the HTTP history.  I hope this helps to understand why standardization is beneficial to all, and how the IETF approaches this issue.  Therefore, let us begin with a very brief overview of the topic, before returning to the wig itself.  Feel free to skip the next section if you are already familiar with the IETF. <br><br><h1>  Types of Internet Standard </h1><br>  Typically, standards define general competence, scope, limitations, applicability, and other considerations.  Standards exist in different shapes and sizes.  They can be informal (de facto standard) or formal (agreed / published by a standard setting organization such as IETF, ISO or MPEG).  Standards are used in many areas, there is even a formal British tea-making standard - BS 6008. <br><br>  The first definitions of the HTTP and SSL protocols were published outside the IETF: they are marked with <b>red lines</b> in the graph.  But widespread use made them de facto standards. <br><br>  At some point, it was decided to formalize these protocols (some reasons are described below).  Internet standards are usually defined in the IETF, which is guided by the unofficial principle of “exemplary consensus and current code” based on actual applications on the Internet.  This is different from the “clean room” approach when someone tries to develop ideal protocols in a vacuum. <br><br>  IETF standards are commonly known as RFCs.  This is difficult to explain in brief, therefore I recommend the article <a href="https://www.ietf.org/blog/how-read-rfc/">“How to read RFCs”</a> from Mark Nottingham, co-chair of the QUIC working group.  A working group or WG is, in essence, just a mailing list. <br><br>  Three meetings are held each year for the personal meetings of members of all working groups, if they so wish.  The agenda for these weeks can be very rich, there is not enough time for an in-depth discussion of technical issues.  Therefore, some prefer to have more interim meetings between general IETF meetings.  Since 2017, the QUIC working group has held several intermediate meetings, the full list is available on the <a href="https://datatracker.ietf.org/wg/quic/meetings/">page for meetings</a> . <br><br>  These meetings have the opportunity to meet with experts from other organizations, such as <a href="https://www.iab.org/">the Internet Architecture Board</a> (IAB) or the <a href="https://irtf.org/">Internet Technology Research Group</a> (IRTF).  In recent years, the IETF <a href="https://www.ietf.org/how/runningcode/hackathons/">hackathon</a> has traditionally been held at the weekend before the IETF meeting.  This is where real code is developed and, importantly, pass compatibility tests.  This helps to find problems in the specifications that can be discussed directly at the meeting. <br><br>  It is important to understand that RFCs do not arise from nowhere.  They go through a whole process.  It usually starts with the IETF Internet Draft (ID) draft that is submitted for review.  In the case when the specification is already published, the preparation of the ID will be a simple reformat.  The service life of the ID is 6 months from the date of publication.  To keep it active, you need to publish new versions.  In practice, there is nothing terrible in the fact that the ID expires.  This happens quite often.  Documents are still stored on the IETF website and are open to all. <br><br>  On the cladogram, drafts are presented in <b>purple</b> .  Each has its <i>own</i> name in the <i>draft- {author} - {working group} - {theme} - {version}</i> format.  The WG field is optional, it may indicate a future IETF working group and sometimes changes.  If the ID is approved by the IETF or initiated directly within the IETF, then the draft is called <i>draft-ietf- {working group} - {topic} - {version}</i> .  IDs may branch, merge or fade.  The version starts at 00 and is increased by one with each new project.  For example, the fourth draft will receive the version number 03. Each time the ID name is changed, its version is reset to 00. <br><br>  It is important to note that anyone can submit a draft to the IETF: they cannot be considered as standards.  But if the standardization process reaches a consensus and the final document passes the test, we will get an RFC.  At this stage, the name is changed again.  Each RFC receives a unique number, for example, <a href="https://tools.ietf.org/html/rfc7230">RFC 7230</a> .  Documents with this status are presented in the form of <b>blue lines</b> . <br><br>  RFC is forbidden to change.  That is, changes in the RFC require the adoption of a document with a new number.  Changes are allowed only for the correction of editorial or technical errors or for a simple optimization of the layout.  Newer RFCs can completely replace old ones or supplement them. <br><br>  All IETF documents are publicly available at <a href="http://tools.ietf.org/">http://tools.ietf.org</a> .  Personally, it seems to me a bit more comfortable with <a href="https://datatracker.ietf.org/">IETF Datatracker</a> , because the document path from ID to RFC is visually displayed there. <br><br>  Below is an example that shows the evolution of the <a href="https://tools.ietf.org/html/rfc1945">RFC 1945</a> standard, that is, HTTP / 1.0. <br><br><img src="https://habrastorage.org/getpro/habr/post_images/c38/ce9/2bb/c38ce92bb2a76e0e029c695597f6ccd0.png"><br>  <i><font color="gray">RFC 1945 history in the IETF Datatracker interface</font></i> <br><br>  Interestingly, in the course of the work, I found that the above visualization is incorrect.  For some reason, <a href="http-v10-spec-05">draft-ietf-http-v10-spec-05 is</a> missing.  Since the ID lifetime is 6 months, it probably expired before the adoption of the RFC, although in reality the draft was active until August 1996. <br><br><h1>  Cladogram study </h1><br>  After a small theoretical introduction, we can proceed to the study of the cladogram.  This section presents some excerpts from the most important parts.  Each dot indicates the date of submission of the document or function.  For clarity, IETF documents have project numbers omitted, but they are all in the <a href="">full version</a> . <br><br>  HTTP appeared in 1991 as the HTTP / 0.9 protocol, and in 1994 a draft <a href="http-spec-00">draft-fielding-http-spec-00</a> was published.  Soon it was adopted by the IETF, with the result that the name changed to <a href="http-v10-spec-00">draft-ietf-http-v10-spec-00</a> .  After six drafts of the draft in 1996, the <a href="https://tools.ietf.org/html/rfc1945">RFC 1945</a> standard was adopted - HTTP / 1.0. <br><br><img src="https://habrastorage.org/getpro/habr/post_images/ae8/ca6/67c/ae8ca667c9e3f471863cc33ff3e9935e.png"><br><br>  However, even before the completion of work on HTTP / 1.0, a separate HTTP / 1.1 project was launched.  The draft version of <a href="http-v11-spec-00">draft-ietf-http-v11-spec-00 was</a> published in November 1995, and officially adopted as <a href="https://tools.ietf.org/html/rfc2068">RFC 2068</a> in 1997.  The keen eye will notice that the cladogram does not quite reflect this sequence of events - an unsuccessful visualization tool glitch.  I tried as much as possible to minimize such problems. <br><br>  In mid-1997, HTTP / 1.1 revision began as <a href="http-v11-spec-rev-00">draft-ietf-http-v11-spec-rev-00</a> .  It ended in 1999 with the publication of <a href="https://tools.ietf.org/html/rfc2616">RFC 2616</a> .  Until 2007, everything was quiet in the IETF HTTP world.  Let's come back to this later. <br><br><h1>  SSL and TLS history </h1><br><img src="https://habrastorage.org/getpro/habr/post_images/902/65c/c12/90265cc128b3bc4445c3845d7ded1726.png"><br><br>  Let's switch attention to the SSL trajectory.  We see that the SSL 2.0 specification came out around 1995, and SSL 3.0 came out in November 1996.  Interestingly, SSL 3.0 is approved in <a href="https://tools.ietf.org/html/rfc6101">RFC 6101</a> , which appeared only in August 2011.  It is located in the <b>historical</b> section.  <a href="https://www.ietf.org/blog/iesg-statement-designating-rfcs-historic/%3Fprimary_topic%3D7%26">According to the IETF</a> , it was created “to document ideas that were reviewed and rejected, or protocols that already existed by the time they decided to document them.”  In this case, an IETF document with a description of SSL 3.0 was needed to be used everywhere as a canonical link. <br><br>  We are more interested in how SSL inspired the engineers to develop TLS, which began with a draft <a href="https://tools.ietf.org/html/draft-ietf-tls-protocol-00">draft-ietf-tls-protocol-00</a> in November 1996.  It went through 6 draft versions and was published as <a href="https://tools.ietf.org/html/rfc2246">RFC 2246</a> - TLS 1.0 in early 1999. <br><br>  In 1995-1999, SSL and TLS protocols were used to protect HTTP connections on the Internet.  It worked great as a de facto standard.  Only in January 1998, with the publication of the draft <a href="https-00">draft-ietf-tls-https-00</a> , the process of official standardization of HTTPS began.  The work ended in May 2000 with the publication of <a href="https://tools.ietf.org/html/rfc2616">RFC 2616</a> - HTTP over TLS. <br><br>  TLS continued to evolve from 2000 to 2007, with the adoption of TLS 1.1 and 1.2 standards.  Then there was a seven-year pause before work began on the next version of the TLS protocol, which will be published as <a href="https://tools.ietf.org/html/draft-ietf-tls-tls13-00">draft-ietf-tls-tls13-00</a> in April 2014, and after 28 drafts will be <a href="https://tools.ietf.org/html/rfc8446">approved</a> as <a href="https://tools.ietf.org/html/rfc8446">RFC 8446</a> - TLS 1.3 in August 2018. <br><br><h1>  Internet standardization process </h1><br>  After a brief introduction to the cladogram, I hope it became better to understand how the IETF works.  When creating standards, researchers or engineers develop experimental protocols for specific use cases.  At various levels, they experiment with public or private protocols.  The information obtained allows you to identify problems or improve the protocol.  The publication of the work helps to explain the experiment, the collection of the opinion of a wider range of specialists or to find the help of other performers.  If other participants accept this work at an early stage, then it will become a de facto standard, and eventually there will be enough momentum for official standardization. <br><br>  The official status of the protocol is an important factor for organizations that are thinking about using it.  The formal standardization process increases the attractiveness of the standard de facto, because it usually provides stability.  The management and leadership is undertaken by a reputable organization, such as the IETF, which reflects the interests and experience of many participants.  But it should be noted that not all formal standards become successful. <br><br>  The process of creating a standard is almost as important as the standard itself.  Processing the initial idea, inviting people to discuss with broader knowledge, experience and use cases - all this helps to create something more useful for a wide audience.  However, the standardization process is not always easy.  There are pitfalls and obstacles.  Sometimes the process takes so much time that the result is no longer relevant. <br><br>  Each organization that defines the standards usually has its own process, focused on its field of activity and participants.  Explaining all the details of how the IETF works is well beyond the scope of this article.  If you're interested, a great starting point would be the <a href="https://www.ietf.org/how/">“How we work”</a> page on the IETF website.  As usual, the best way to figure it out is to take part yourself.  Simply join the mailing list or the discussion in the corresponding GitHub repository. <br><br><h1>  Cloudflare Work Code </h1><br>  Cloudflare is proud to be one of the first to introduce new protocols, as was the case with <a href="http2/">HTTP / 2</a> and other technologies.  We also test experimental and not yet approved features, such as <a href="https://blog.cloudflare.com/introducing-tls-1-3/">TLS 1.3</a> and <a href="https://blog.cloudflare.com/introducing-spdy/">SPDY</a> . <br><br>  Running a real code helps to understand how well the protocol will work in practice.  We combine expert knowledge with experimental information to help improve the code and, where it makes sense, report problems or improvements to a working group that standardizes the protocol. <br><br>  Testing innovations is not the only priority.  A true innovator always knows when to postpone innovation until better times.  Sometimes this refers to security-oriented protocols: for example, Cloudflare has <a href="https://blog.cloudflare.com/sslv3-support-disabled-by-default-due-to-vulnerability/">disabled SSLv3 by default</a> due to the POODLE vulnerability.  In other cases, the protocols are replaced by more technologically advanced ones: for example, we <a href="https://blog.cloudflare.com/deprecating-spdy/">replaced SPDY with HTTP / 2</a> . <br><br>  The introduction and deactivation of protocols on Cloudflare is represented by <b>orange lines</b> .  Vertical landmarks help align Cloudflare events with relevant IETF documents.  For example, Cloudflare introduced support for TLS 1.3 in September 2016, and the final <a href="https://tools.ietf.org/html/rfc8446">RFC 8446</a> document was published almost two years later, in August 2018. <br><br><img src="https://habrastorage.org/getpro/habr/post_images/78a/699/924/78a699924a011dbbf00d9adb4e3bdf67.png"><br><br><h1>  Refactoring: HTTPbis </h1><br>  HTTP / 1.1 is a very successful protocol.  The chart does not show much IETF activity after 1999.  But in reality, years of active use of the protocol gave experience and revealed hidden problems of RFC 2616, including some compatibility issues.  In addition, the protocol has been extended by other RFCs, such as 2817 and 2818. As a result, in 2007 it was decided to begin activities to improve the HTTP specification.  It is called HTTPbis (where “bis” is derived from the Latin word for “two,” “twice,” or “repetition”).  The initial <a href="httpbis-2007-10-23.txt">charter of the</a> new working group well describes the problems that it tried to solve. <br><br>  In general, <a href="https://tools.ietf.org/html/rfc2616">RFC 2616</a> began refactoring on HTTPbis.  It includes bug fixes and the introduction of some aspects from other specifications that are published at the same time.  It was decided to divide the document into parts.  As a result, in December 2007, six drafts were published: <br><br><ul><li>  draft-ietf-httpbis-p1-messaging </li><li>  draft-ietf-httpbis-p2-semantics </li><li>  draft-ietf-httpbis-p4-conditional </li><li>  draft-ietf-httpbis-p5-range </li><li>  draft-ietf-httpbis-p6-cache </li><li>  draft-ietf-httpbis-p7-auth </li></ul><br><img src="https://habrastorage.org/getpro/habr/post_images/bd3/d56/984/bd3d5698449ecb1d26c6df428c4ac9c2.png"><br><br>  The diagram shows how the work progressed during the long seven-year development process.  Before the final standardization, 27 drafts were accepted.  In June 2014, the so-called RFC 723x series came out (where x ranges from 0 to 5).  The chairman of the HTTPbis working group noted this achievement with the phrase <a href="https://www.mnot.net/blog/2014/06/07/rfc2616_is_dead">“RFC2616 is dead”</a> .  If someone did not understand, the new documents sent to the archive the old <a href="https://tools.ietf.org/html/rfc2616">RFC 2616</a> . <br><br><h1>  What does this have to do with HTTP / 3? </h1><br>  While the IETF was refining RFC 723x, the world was not in place.  People continued to expand and complement HTTP.  Among them are Google engineers who have begun to experiment with their own protocol called SPDY (pronounced “speedy”).  They said that this protocol speeds up the loading of web pages, which is an essential function of HTTP.  At the end of 2009, the first version was announced, and in 2010 SPDY v2 quickly appeared. <br><br>  I do not want to go into the technical details of SPDY, but it is important to understand that SPDY took the main HTTP paradigms and slightly changed the exchange format for optimization.  Looking back, we see that HTTP has clearly defined semantics and syntax.  Semantics describes the concept of exchanging requests and responses, including methods, status codes, header fields (metadata) and bodies (useful data).  The syntax describes how to map semantics to bytes on a network. <br><br>  HTTP / 0.9, 1.0 and 1.1 have a lot of common semantics.  They also use a common syntax in the form of character strings sent via TCP connections.  SPDY took the HTTP / 1.1 semantics and changed the syntax to binary.  This is a really interesting topic, but today we will not go deep into this rabbit hole. <br><br>  Experiments with SPDY have shown that changing the syntax of HTTP really brings effect.  At the same time, it is important to preserve the existing semantics.  For example, saving the URL format for using <code>https://</code> allowed us to avoid many problems that could affect the implementation of HTTPS. <br><br>  After seeing some positive results, the IETF decided it was time to consider the options for HTTP / 2.0.  The <a href="httpwg/wg-materials/blob/gh-pages/ietf83/HTTP2.pdf">slides</a> from the HTTPbis session, held during the IETF 83 meeting in March 2012, outlined the requirements and goals that the developers had set for themselves.  It is also clearly stated: "HTTP / 2.0 only means that the transport protocol (wire format) is not compatible with HTTP / 1.x" <br><br><img src="https://habrastorage.org/getpro/habr/post_images/3ef/97d/7cd/3ef97d7cd4e2637b3b44ba03696917bd.png"><br><br>  During this meeting, the community was invited to express their ideas.  Among the drafts submitted for review were <a href="httpbis-spdy-00">draft-mbelshe-httpbis-spdy-00</a> , <a href="httpbis-speed-mobility-00">draft-montenegro-httpbis-speed-mobility-00</a> and <a href="httpbis-network-friendly-00">draft-tarreau-httpbis-network-friendly-00</a> .  In the end, the draft SPDY was adopted, and in November 2012 work began on <a href="http2-00">draft-ietf-httpbis-http2-00</a> .  After 18 drafts for a little over two years, <a href="https://tools.ietf.org/html/rfc7540">RFC 7540</a> appeared - HTTP / 2.  By 2015, the HTTP / 2 syntax has gone just enough to make HTTP / 2 and SPDY incompatible. <br><br>  These years have become a very stressful period for working groups, which in parallel carried out HTTP / 1.1 refactoring and accepted HTTP / 2.  This contrasts sharply with the many years of calm in the early 2000s.  Be sure to check out the full cladogram to truly appreciate the amount of work done. <br><br>  Despite the standardization of HTTP / 2, experiments with SPDY are still beneficial.  Cloudflare introduced support for SPDY in August 2012 and removed it only in February 2018, when our statistics showed that less than 4% of web clients request it.  Meanwhile, shortly after the publication of the RFC in December 2015, we introduced HTTP / 2 support, when the analysis showed significant support for web clients. <br><br>  The SPDY and HTTP / 2 protocols use TLS by default.  The introduction of <a href="https://blog.cloudflare.com/introducing-universal-ssl/">universal SSL</a> in September 2014 made it possible to ensure that all Cloudflare users will take advantage of new protocols as they are implemented. <br><br><h1>  gQUIC </h1><br>  Google continued to experiment and until 2015 released another version of SPDY v3 and v3.1.  They also began working on the gQUIC protocol, the first draft of which was published in early 2012. <br><br>  Earlier versions of gQUIC used HTTP SPDY v3 syntax.  This choice made sense, because HTTP / 2 is not yet approved.  SPDY's binary syntax is packaged in QUIC packets, which are sent in UDP datagrams.  This is a departure from the TCP transport that HTTP traditionally relied on.  The entire system assembly looked like this: <br><br><img src="https://habrastorage.org/getpro/habr/post_images/a04/510/139/a045101397b293777a61ad1986dd89bc.png"><br>  <i><font color="gray">SPDY puff pie by gQUIC</font></i> <br><br>  To improve the performance of gQUIC used clever tricks.  One of them - to blur the clear boundary between the application and transport.  In practice, this meant that gQUIC only supports HTTP.  This connection was so strong that gQUIC, which at the time was called QUIC, was considered as a candidate for the next version of HTTP.  Although many changes were made to QUIC later, many still believe that it supports HTTP only.  Unfortunately, this leads to constant confusion when discussing the protocol. <br><br>  gQUIC continued to evolve and eventually switched to syntax much closer to HTTP / 2.  So close that most people began to call it "HTTP / 2 by QUIC".  But due to technical limitations, some very subtle differences emerged.  One example is serialization and the exchange of HTTP headers.  This is a minor difference, but in practice it means that HTTP / 2 by gQUIC is incompatible with HTTP / 2 from IETF. <br><br>  Last but not least, you should always consider the security aspects of Internet protocols.  And the gQUIC developers decided to abandon TLS in favor of a different approach called QUIC Crypto.  One of the interesting innovations there is a new method of speeding up handshakes.  After establishing a secure session with the server, the client can reuse the information and fix the “zero” time of a handshake, that is, 0-RTT.  This trick was later included in the TLS 1.3 protocol. <br><br><h1>  Can you finally find out what HTTP / 3 is? </h1><br>  Nearly. <br><br>  Now we understand how standardization works.  So, consideration gQUIC went on the same scenario.  In June 2015, the first draft of the <a href="https://tools.ietf.org/html/draft-tsvwg-quic-protocol-00">draft-tsvwg-quic-protocol-00</a> , entitled “QUIC: secure and reliable UDP-based transport for HTTP / 2”, was submitted.  But do not forget that in the end, the syntax of the protocol is almost brought to compatibility with HTTP / 2. <br><br>  Google has <a href="https://groups.google.com/a/chromium.org/forum/">announced</a> that "BoF will be held at the IETF 93 meeting in Prague."  If you are interested in what BoF is, please refer to <a href="https://tools.ietf.org/html/rfc6771">RFC 6771</a> .  In short, BoF ( <a href="https://en.wikipedia.org/wiki/Birds_of_a_feather_(computing)">Birds of a Feather</a> ) is an informal meeting at the conference. <br><br><img src="https://habrastorage.org/getpro/habr/post_images/1e3/70a/7f0/1e370a7f0ab85f7d274498c658f833d9.png"><br><br>  Following the discussion with the IETF, it was decided that QUIC has many advantages at the transport level, this protocol should be separated from HTTP and a clear separation between layers should be reintroduced.  In addition, for this protocol they decided to return the handshake on the basis of TLS (which is not so bad, because by this time they have already developed TLS 1.3 with the 0-RTT scheme). <br><br>  About a year later, in 2016, a new set of drafts was released: <br><br><ul><li>  <a href="https://tools.ietf.org/html/draft-hamilton-quic-transport-protocol-00">draft-hamilton-quic-transport-protocol-00</a> </li><li>  <a href="https://tools.ietf.org/html/draft-thomson-quic-tls-00">draft-thomson-quic-tls-00</a> </li><li>  <a href="https://tools.ietf.org/html/draft-iyengar-quic-loss-recovery-00">draft-iyengar-quic-loss-recovery-00</a> </li><li>  <a href="http2-mapping-00">draft-shade-quic-http2-mapping-00</a> </li></ul><br>  This is where the confusion reappeared: <a href="http2-mapping-00">draft-shade-quic-http2-mapping-00</a> is called "HTTP / 2 semantics using the QUIC transport protocol" and describes the "display of HTTP / 2 semantics by QUIC".  However, this is the wrong name.  The essence of HTTP / 2 is in changing syntax while maintaining semantics.  In addition, “HTTP / 2 by gQUIC” has never been an accurate syntax description, for the reasons I stated earlier.  Keep this in mind when meeting further events. <br><br>  This IETF version of QUIC should be a completely new transport protocol.  This is a serious undertaking, so the IETF tried to assess the interest in the project from its members.  To this end, a BoF session ( <a href="https://datatracker.ietf.org/meeting/96/materials/slides-96-quic-0">slides</a> ) was held at the IETF 96 meeting in Berlin in 2016.  I was fortunate to be present in person at that meeting, which attracted hundreds of participants, as evidenced by the <a href="https://www.flickr.com/photos/adam-roach/28343796722/in/photostream/">photograph of Adam Roach</a> .  As a result, consensus was reached: QUIC will be adopted and standardized in the IETF. <br><br>  The first IETF QUIC <a href="http-00">draft draft-ietf-quic-http-00</a> for translating HTTP to the QUIC transport logically simplified the name of the protocol to “HTTP by QUIC” (HTTP over QUIC).  Unfortunately, the work was not completed, therefore, throughout the organization, various HTTP / 2 terms were used.  The new standards editor repository store, Mike Bishop, saw the problem and began correcting the incorrect HTTP / 2 mentions.  In the next protocol version, the description has changed to “mapping HTTP semantics over QUIC” (mapping of HTTP semantics over QUIC). <br><br>  Gradually, over time and with newer versions, the term “HTTP / 2” was used less frequently, if necessary, simply by pointing to <a href="https://tools.ietf.org/html/rfc7540">RFC 7540</a> .  Two years later, in October 2018, the seventeenth version of the draft (number 16) was published.  Although the HTTP over QUIC protocol has similarities with HTTP / 2, in fact it is an independent and incompatible HTTP syntax.  However, for people who are not closely following the work of the IETF (and this is a very large percentage of the world's population), the title of the document does not reflect this difference.  One of the main objectives of standardization is the promotion of communication and interoperability.  And such a simple thing as naming has become the main cause of confusion in the community. <br><br>  Recall what was said in 2012: “HTTP / 2.0 means only that the format is incompatible with HTTP / 1.x for transport”.  The IETF followed this precedent.  After much discussion before and during the IETF 103 conference, there was still a consensus about renaming “HTTP over QUIC” to HTTP / 3. <br><br>  The world has become better, and we can move on to more important discussions. <br><br><h1>  But RFC 7230 and 7231 do not agree with your definition of semantics and syntax! </h1><br>  Sometimes the names of the documents can be confusing.  Here are the HTTP documents describing syntax and semantics: <br><br><ul><li>  <a href="https://tools.ietf.org/html/rfc7230">RFC 7230</a> - Hypertext Transfer Protocol (HTTP / 1.1): Message Syntax and Routing </li><li>  <a href="https://tools.ietf.org/html/rfc7231">RFC 7231</a> - Hypertext Transfer Protocol (HTTP / 1.1): Semantics and Content </li></ul><br>  For such names, it can be assumed that the fundamental semantics of HTTP is specific to a specific version of HTTP, that is, HTTP / 1.1.  But this is a random side effect of the HTTP family tree.  The good news is that the HTTPbis working group is trying to solve the problem.  Some brave WG members have begun another round of document revision.  This work is being done right now and is known as the work of HTTP Core (you may have heard about this working group under the name HTTPtre or HTTPter: everything is also ambiguous here) Their efforts will allow you to compress six drafts to three: <br><br><ul><li>  HTTP Semantics (draft-ietf-httpbis-semantics) </li><li>  HTTP Caching (draft-ietf-httpbis-caching) </li><li>  HTTP / 1.1 Message Syntax and Routing (draft-ietf-httpbis-messaging) </li></ul><br>  Within this new structure, it becomes more obvious that HTTP / 2 and HTTP / 3 are syntactic definitions for the general HTTP semantics.  This does not mean that they do not have their own functions outside of syntax, but this should help in further discussion. <br><br><h1>  Putting it all together </h1><br>  This article has superficially described the HTTP standardization process in the IETF over the past three decades.  Without really touching on the technical details, I tried to explain how we now came to HTTP / 3.  If you missed the middle and are looking for the essence in one phrase, here it is: <b>HTTP / 3 is just a new HTTP syntax that works on IETF QUIC, a multiplexed and secure UDP-based transport</b> .  There are many interesting technical nuances, but you have to postpone them for another time. <br><br>  We looked at the important steps in developing HTTP and TLS, but separately from each other.  Now at the end of the article once again publish the full cladogram.  You can calmly and carefully study it in a comfortable environment.  And for super funders: here is <a href="">an absolutely full version, including drafts</a> . <br><br> <a href=""><img src="https://habrastorage.org/webt/j_/uv/ww/j_uvww5d_hmiykedtaritata8ja.png"></a> </div><p>Source: <a href="https://habr.com/ru/post/438810/">https://habr.com/ru/post/438810/</a></p>
+<section class="navigation-panel">
+<h4>More articles:</h4>
+<nav><ul class="list-of-pages">
+<li><a href="../438748/index.html">Infrastructure as a code, we win on a scale (Kirill Vetchinkin, TYME)</a></li>
+<li><a href="../438750/index.html">Civilization Springs, 4/5</a></li>
+<li><a href="../438752/index.html">Accounting directly in the bank: how to make PI happy</a></li>
+<li><a href="../438754/index.html">How we did network monitoring for 14,000 objects</a></li>
+<li><a href="../438758/index.html">Why Google is changing the standard interface URL in the browser</a></li>
+<li><a href="../438762/index.html">DBX: an attempt to get rid of MySQL queries</a></li>
+<li><a href="../438764/index.html">Chromium Sixth Check, Afterword</a></li>
+<li><a href="../438766/index.html">Extracellular DNA, as a biomarker of aging and various pathologies</a></li>
+<li><a href="../438768/index.html">As I helped Alice not to respond to other names. Internship in Yandex</a></li>
+<li><a href="../438770/index.html">Handling keystrokes aka shortcuts and debugging</a></li>
+<li><a href="../438772/index.html">HX711 ADC from 3.3V - do not trust the Chinese documentation and not only</a></li>
+<li><a href="../438774/index.html">All the best at once. The brightest blog articles LANIT on Habré - 2018</a></li>
+<li><a href="../438778/index.html">Compilation @pythonetc, January 2019</a></li>
+<li><a href="../438782/index.html">FSB proposed to release Russian SIM-cards and use domestic cryptography for 5G</a></li>
+<li><a href="../438784/index.html">Problems using the service Yandex.Metrika</a></li>
+<li><a href="../438788/index.html">Environmental monitoring in the server room (Bolid + Zabbix)</a></li>
+<li><a href="../438790/index.html">QuadrigaCX cryptobirds will not give away $ 137 million. Only the director knew the password from the storage, and he died.</a></li>
+<li><a href="../438792/index.html">Using All Flash AccelStor arrays in VDI projects</a></li>
+<li><a href="../438794/index.html">Details about javascript objects</a></li>
+<li><a href="../438796/index.html">Learn Docker Part 1: Basics</a></li>
+<li><a href="../438798/index.html">How to work with cyber prospecting data: learn to collect and identify indicators of system compromise</a></li>
+<li><a href="../438800/index.html">PHP Pear hacked and unavailable</a></li>
+<li><a href="../438802/index.html">Summer programs for 2019 for teaching teenagers to programming abroad</a></li>
+<li><a href="../438804/index.html">We are waiting for everyone at the next CocoaHeads Meetup</a></li>
+<li><a href="../438806/index.html">Problems of artistic translation</a></li>
+<li><a href="../438808/index.html">ModelMapper: round trip</a></li>
+<li><a href="../438810/index.html">HTTP / 3: from root to tip</a></li>
+<li><a href="../438812/index.html">Quality frontend code in HH</a></li>
+<li><a href="../438814/index.html">A sober look at Helm 2: “This is what it is ...”</a></li>
+<li><a href="../438818/index.html">UDB. What is it? Part 5. Datapath. Useful stuff</a></li>
+<li><a href="../438824/index.html">Short course on managing remote teams</a></li>
+<li><a href="../438828/index.html">Lazarus - write component for sprite animation</a></li>
+<li><a href="../438832/index.html">How not to miss the budget for the mass production of buildings: 20 examples from the practice of the Bureau of Engineering Design</a></li>
+<li><a href="../438834/index.html">Does the designer have a new idea? What could be easier</a></li>
+<li><a href="../438836/index.html">Monitoring the temperature of the server itself</a></li>
+<li><a href="../438838/index.html">Digital events in Moscow from 4 to 10 February</a></li>
+<li><a href="../438840/index.html">Pride and Passion, the story of turning a dream into a space project</a></li>
+<li><a href="../438842/index.html">Putting in order playlist Torrent-TV ("Superwash")</a></li>
+<li><a href="../438850/index.html">Moscow JS 44 - Announcement</a></li>
+<li><a href="../438852/index.html">New GSM Gateways from OpenVox</a></li>
+<li><a href="../438854/index.html">Explaining the physical essence of the Wing Lift phenomenon without using the Bernoulli equation</a></li>
+<li><a href="../438856/index.html">Sagi from life</a></li>
+<li><a href="../438858/index.html">How to use segmentation, targeting and positioning (STP) in developing a marketing strategy</a></li>
+<li><a href="../438862/index.html">Deploim isomorphic web application on the example of Nuxt.js</a></li>
+<li><a href="../438866/index.html">Builders against Java syntax</a></li>
+<li><a href="../438868/index.html">Security Week 06: Live on FaceTime</a></li>
+<li><a href="../438870/index.html">Lombok returns greatness to java</a></li>
+<li><a href="../438874/index.html">Start friendship with VkNet</a></li>
+<li><a href="../438876/index.html">How to shorten the time-to-market: a story about test automation in M.Video</a></li>
+<li><a href="../438878/index.html">The appearance of the film in the torrent after the premiere increases the box office by 3%</a></li>
+<li><a href="../438880/index.html">When to use var, let and const in Javascript [translation of the article by Tyler McGinnis]</a></li>
+<li><a href="../438882/index.html">The probability of winning the match with a certain probability of winning points</a></li>
+<li><a href="../438884/index.html">True story advertising agency from the provinces: ups, downs and the introduction of CRM</a></li>
+<li><a href="../438886/index.html">Morty, we're at UltraHD! How to watch any movie in 4K by drawing it through a little-known neural network</a></li>
+<li><a href="../438888/index.html">Why Windows in 2019 does not steer, or ChYDNT?</a></li>
+<li><a href="../438890/index.html">Postgres in retrospect</a></li>
+<li><a href="../438892/index.html">What is a corporate blockchain?</a></li>
+<li><a href="../438896/index.html">Business do not worry</a></li>
+<li><a href="../438898/index.html">Chrome reverse and installation of extensions</a></li>
+<li><a href="../438900/index.html">On the way to the physical principles of biological evolution. Finish + full translation</a></li>
+<li><a href="../438902/index.html">Using DBREPLICATION when rolling out databases on Microsoft SQL Server</a></li>
+<li><a href="../438908/index.html">Training Cisco 200-125 CCNA v3.0. Cisco Certified Network Specialist (CCNA). Day 1. Network Basics</a></li>
+<li><a href="../438910/index.html">Samba as an ADDC on Solaris 11.4</a></li>
+<li><a href="../438916/index.html">Notes phytochemist. Potatoes. Part Three Bulba Fugu or SOLANIN</a></li>
+<li><a href="../438920/index.html">Avalonia first meeting</a></li>
+<li><a href="../438922/index.html">Encryption of traffic in Direct Connect, Part 2</a></li>
+<li><a href="../438924/index.html">Notes IoT-provider: nine problems of the Internet of Things, or why it is not good in Russia</a></li>
+<li><a href="../438926/index.html">Telegram again distributes money for developing simple CSS templates.</a></li>
+<li><a href="../438928/index.html">AI party in Silicon Valley: mayor, billionaire, presidents, geniuses, processor developers and a girl with bright hair</a></li>
+<li><a href="../438930/index.html">The authorities fundamentally change the strategy of control over the Internet</a></li>
+<li><a href="../438932/index.html">Pattern Recognition in Eidetic Artificial Intelligence</a></li>
+<li><a href="../438934/index.html">Creating and configuring a portable assembly Jupyter Notebook and Lab on Windows. Part 1</a></li>
+<li><a href="../438936/index.html">BotMan acquaintance</a></li>
+<li><a href="../438940/index.html">Open course "Deep Learning on the fingers"</a></li>
+<li><a href="../438946/index.html">DateTimeOffset (Strict)</a></li>
+<li><a href="../438948/index.html">Why do you need low-level optimization on Elbrus or how to speed up the recognition system by one and a half times</a></li>
+<li><a href="../438950/index.html">The Central Bank launched a robot to search for earnings schemes on the Internet</a></li>
+<li><a href="../438952/index.html">What can you learn when developing an audio player for different browsers?</a></li>
+<li><a href="../438954/index.html">Combining Signed Distance Fields in 2D</a></li>
+<li><a href="../438956/index.html">Magnetite in the teeth: sequencing of transcriptomes of the tissues of the radula of the shell of mollusc shell</a></li>
+<li><a href="../438958/index.html">ILV confirmed the existence of its "space station"</a></li>
+<li><a href="../438960/index.html">How I abandoned Ruby in favor of Python, working on a backend</a></li>
+<li><a href="../438962/index.html">For the most part, a positive outlook for the future of chips.</a></li>
+<li><a href="../438964/index.html">Who really stands behind popular free VPNs?</a></li>
+<li><a href="../438966/index.html">The history of wandering documentation Haproxy, or what you should pay attention to when it is configured</a></li>
+<li><a href="../438968/index.html">Marking shoes in Russia: The market is not ready, but will have to work</a></li>
+<li><a href="../438970/index.html">It is said that Haskell is a language for geniuses and academics. True?</a></li>
+<li><a href="../438972/index.html">The brain from the inside (Visualization of the passage of the pattern through the model of an artificial neural network)</a></li>
+<li><a href="../438974/index.html">Virtual reality helps to cope with mental disorders</a></li>
+<li><a href="../438976/index.html">The book "Spring. All design patterns »</a></li>
+<li><a href="../438980/index.html">Spring Boot 2: what's new?</a></li>
+<li><a href="../438982/index.html">Kubernetes tutorial, part 1: applications, microservices and containers</a></li>
+<li><a href="../438984/index.html">Kubernetes Handbook Part 2: Creating and Working With a Cluster</a></li>
+<li><a href="../438986/index.html">React Training Course Part 14: Workshop on Class Based Components, Component State</a></li>
+<li><a href="../438988/index.html">React Training Course, Part 15: Workshop on Working with Component State</a></li>
+<li><a href="../438992/index.html">Developer Diary or Bad Decisions</a></li>
+<li><a href="../438994/index.html">Intel Xeon W-3175X, hot drummer. Testing</a></li>
+<li><a href="../438996/index.html">Company network and MitM. Part 1</a></li>
+<li><a href="../438998/index.html">CGDevs Moscow Meetup # 2</a></li>
+<li><a href="../439000/index.html">Spatial manipulation in 2D using Signed Distance Fields</a></li>
+<li><a href="../439002/index.html">How to stop "writing TK" and start working?</a></li>
+<li><a href="../439006/index.html">How AI helps to master sign language</a></li>
+<li><a href="../439008/index.html">Mail.ru has released a new Atom browser with an emphasis on "security and privacy"</a></li>
+<li><a href="../439010/index.html">How is the consolidation of archives in DeviceLock DLP</a></li>
+<li><a href="../439012/index.html">Telephone directory of the organization - print version</a></li>
+<li><a href="../439016/index.html">Static Generic Tables</a></li>
+<li><a href="../439018/index.html">Setting up Sphinx search for an online store</a></li>
+<li><a href="../439020/index.html">Ticket to Ride. Europe - arithmetic, part two</a></li>
+<li><a href="../439022/index.html">CNC in the hobby workshop (part 3)</a></li>
+<li><a href="../439024/index.html">Results Slurm-3</a></li>
+<li><a href="../439028/index.html">How to improve network perimeter protection? Practical recommendations for Check Point and not only</a></li>
+<li><a href="../439030/index.html">A lot of managers</a></li>
+<li><a href="../439032/index.html">Amazon and Google are planning to enter the energy market</a></li>
+<li><a href="../439034/index.html">Group-IB Webinar: Red Team or Pentest 12.02.2019</a></li>
+<li><a href="../439036/index.html">The main thing is not to get into the mall under the reconciliation of hours</a></li>
+<li><a href="../439038/index.html">Making a neural network: how not to break the brain</a></li>
+<li><a href="../439040/index.html">To isolate the Runet need budget funds</a></li>
+<li><a href="../439042/index.html">Puma is looking for beta testers for self-tapping sneakers Fi</a></li>
+<li><a href="../439046/index.html">How to safely combine the network segments of the three major banks: share tricks</a></li>
+<li><a href="../439050/index.html">Training Cisco 200-125 CCNA v3.0. Cisco Certified Network Specialist (CCNA). Day 2. OSI and TCP-IP models</a></li>
+<li><a href="../439056/index.html">Cement Brand Integration</a></li>
+<li><a href="../439060/index.html">7 types of customers</a></li>
+<li><a href="../439062/index.html">Anisoprint Composer: 3D printing of high strength</a></li>
+<li><a href="../439064/index.html">Typical mesh error (Bootstrap Grid), or why the designer and layout designer do not understand each other</a></li>
+<li><a href="../439066/index.html">Operating system on Rust. Page memory: advanced level</a></li>
+<li><a href="../439068/index.html">Spam campaign “Love you” redirected to Japan</a></li>
+<li><a href="../439070/index.html">China refuses anti-corruption system Zero Trust AI because of its high efficiency</a></li>
+<li><a href="../439074/index.html">Password Checkup extension checks passwords with a base of 4 billion compromised accounts</a></li>
+<li><a href="../439076/index.html">In which applications to wait for an unknown malicious code?</a></li>
+<li><a href="../439078/index.html">Perm programmer arrested for creating a mobile application through which the pedophile acted</a></li>
+<li><a href="../439080/index.html">Unobvious RabbitMQ in Yii2 or why RabbitMQ writes to all queues at once</a></li>
+<li><a href="../439082/index.html">Walk through the plant of desires</a></li>
+<li><a href="../439086/index.html">Causes of ANR and how to avoid it</a></li>
+<li><a href="../439094/index.html">Scientists have found the oldest living vertebrate on Earth</a></li>
+<li><a href="../439096/index.html">Buildbot: a tale with examples of one more continuous integration system</a></li>
+<li><a href="../439098/index.html">Sasha Memus, Chatfuel: How to build a career in products after consulting, is it dangerous to meditate and how to change behavior</a></li>
+<li><a href="../439100/index.html">How to adapt UX / UI for permissions</a></li>
+<li><a href="../439102/index.html">Russians are 20% more likely to face insults on the Internet</a></li>
+<li><a href="../439104/index.html">Redux Simple as a rake</a></li>
+<li><a href="../439106/index.html">Programming in Russia will be introduced from primary school</a></li>
+<li><a href="../439108/index.html">Amateur radio measurements: when there is no frequency meter</a></li>
+<li><a href="../439112/index.html">Creator Kate Mobile arrested for using a pedophile for his service</a></li>
+<li><a href="../439118/index.html">New in browsers: Firefox 66 blocks video and sound by default, Chromium limits page budget</a></li>
+<li><a href="../439122/index.html">Simplicity and complexity of primitives or how to determine unnecessary preprocessing for a neural network</a></li>
+<li><a href="../439124/index.html">If software is created with public money, the code should be open.</a></li>
+<li><a href="../439126/index.html">Requests from users and product requirements</a></li>
+<li><a href="../439128/index.html">How to organize the work of QA. One practically applied method</a></li>
+<li><a href="../439130/index.html">13 trends in the cybersecurity and information security market 2019-2020</a></li>
+<li><a href="../439132/index.html">Unforgettable old age</a></li>
+<li><a href="../439134/index.html">Russian scientists are developing sitall (unbreakable glass) for LG smartphones</a></li>
+<li><a href="../439136/index.html">What is the difference between 4G and 5G?</a></li>
+<li><a href="../439138/index.html">Working with callbacks in React</a></li>
+<li><a href="../439140/index.html">Important message about invites in profile</a></li>
+<li><a href="../439142/index.html">Design maturity models</a></li>
+<li><a href="../439148/index.html">Working with nRF51822 using ST-Link and Clion + OpenOCD</a></li>
+<li><a href="../439150/index.html">Who should pay transaction costs</a></li>
+<li><a href="../439152/index.html">Salaries in IT in the second half of 2018: according to the “My Circle” salary calculator</a></li>
+<li><a href="../439154/index.html">How do freelancers live: book cover design, own production of backpacks and travel work</a></li>
+<li><a href="../439158/index.html">DataArt Launches Free CV Duck Resume Improvement Service</a></li>
+<li><a href="../439160/index.html">Algorithm state: what happens to indie developers on Steam?</a></li>
+<li><a href="../439162/index.html">How to debug front-end and backend: step-by-step instructions</a></li>
+<li><a href="../439166/index.html">mmWave on the road to commercialization in the form factor of a smartphone</a></li>
+<li><a href="../439170/index.html">Cellular operators will help banks verify the accuracy of customer data</a></li>
+<li><a href="../439172/index.html">Extending the assert () macro to implement minimal error handling</a></li>
+<li><a href="../439174/index.html">Safe Internet Day: what threats to pay attention to in 2019</a></li>
+<li><a href="../439182/index.html">How do we distribute orders between drivers in Yandex.Taxi</a></li>
+<li><a href="../439186/index.html">UX Editor: True Story, Rial Life</a></li>
+<li><a href="../439194/index.html">Controlling a character with SharedEvents</a></li>
+<li><a href="../439196/index.html">JPMorgan analysts: Apple should buy Blizzard, Netflix or Sonos to reassure investors</a></li>
+<li><a href="../439198/index.html">Generation of barrier islands</a></li>
+<li><a href="../439200/index.html">Composer for the smallest</a></li>
+<li><a href="../439202/index.html">Detection of web attacks using autoencoder Seq2Seq</a></li>
+<li><a href="../439204/index.html">Increasing the efficiency of photosynthesis by genetic modification of plants</a></li>
+<li><a href="../439210/index.html">Java after volcanic eruption</a></li>
+<li><a href="../439216/index.html">pudge embedded database in 500 lines on golang</a></li>
+<li><a href="../439218/index.html">VC bot on the knee, or how to please people February 14</a></li>
+<li><a href="../439222/index.html">What is API management?</a></li>
+<li><a href="../439224/index.html">Again about the Voronoi diagrams</a></li>
+<li><a href="../439232/index.html">JAMstack: How to create your blog using Gatsby + Contentful + Netlify</a></li>
+<li><a href="../439236/index.html">xenvman: Flexible environments for testing microservices (and not only)</a></li>
+<li><a href="../439238/index.html">Play Store now accepts progressive web applications (PWA)</a></li>
+<li><a href="../439240/index.html">Joomla Digest for January 2019</a></li>
+<li><a href="../439244/index.html">FAS strongly recommends to pre-install Russian software on smartphones and laptops sold in Russia</a></li>
+<li><a href="../439248/index.html">Alan Kay: “Could the ancient Romans build a computer?”</a></li>
+<li><a href="../439252/index.html">6 reasons to develop IT career in Armenia</a></li>
+<li><a href="../439254/index.html">Our all</a></li>
+<li><a href="../439260/index.html">The author of the book "The Witcher" will still receive compensation from CD Projekt Red</a></li>
+<li><a href="../439262/index.html">Deploy the code directly to the docker container. Or how not to prokrasinirovat after each commit</a></li>
+<li><a href="../439264/index.html">How to lead complex technical projects without hiring PMs: DataLine experience</a></li>
+<li><a href="../439266/index.html">The experience of creating an Android game alone from scratch and how it was captured on Google Play</a></li>
+<li><a href="../439268/index.html">How VR, AR and 3D printing work together: the VR Concept experience</a></li>
+<li><a href="../439270/index.html">An example of parsing C ++ code using libclang in Python</a></li>
+<li><a href="../439278/index.html">ACS my LCD - security on two bolts</a></li>
+<li><a href="../439280/index.html">Trautonium: the German wave in the history of synthesizers</a></li>
+<li><a href="../439282/index.html">Effects of filtering SVG. Part 1. SVG filters 101</a></li>
+<li><a href="../439288/index.html">SciPy Optimization</a></li>
+<li><a href="../439290/index.html">Accelerate compilation in Xcode to swift</a></li>
+<li><a href="../439292/index.html">Google has agreed to remove from the search banned sites in the Russian Federation</a></li>
+<li><a href="../439294/index.html">Translation review "If software is created with public money, the code must be open"</a></li>
+<li><a href="../439296/index.html">Soviet license plate and Kolmogorov complexity</a></li>
+<li><a href="../439298/index.html">What would the Internet system look like in the game EvE Online</a></li>
+<li><a href="../439300/index.html">Statistics for file types in the Wildfire cloud sandbox</a></li>
+<li><a href="../439302/index.html">Product Design Digest, January 2019</a></li>
+<li><a href="../439304/index.html">[Ekaterinburg, announcement] Mitap for Java-developers</a></li>
+<li><a href="../439308/index.html">Kill cancer: iridium, human serum albumin and some blue light</a></li>
+<li><a href="../439310/index.html">Why not take off the real estate portal. Part 2</a></li>
+<li><a href="../439312/index.html">Speed ​​up complex calculations with minimal RAM</a></li>
+<li><a href="../439314/index.html">Seven strange ways of dealing with recluse in remote work</a></li>
+<li><a href="../439316/index.html">“I stopped doing what I see no point in”: project managers about their work and training</a></li>
+<li><a href="../439318/index.html">Win procrastination gaming addiction</a></li>
+<li><a href="../439320/index.html">How to diversify programming lessons for children of different ages</a></li>
+<li><a href="../439322/index.html">OS Sailfish renamed OS "Aurora"</a></li>
+<li><a href="../439324/index.html">Using a binary tree in swift using enum using OCR as an example</a></li>
+<li><a href="../439326/index.html">Electric Ford F-150 EV - in the prototype and tested on the road</a></li>
+<li><a href="../439328/index.html">Okay, google! Are you good or evil?</a></li>
+<li><a href="../439332/index.html">How PageRank works: implementation in the R language through linear algebra and power-method</a></li>
+<li><a href="../439334/index.html">About 2 billion rubles allocated for the implementation of the draft law on sustainable runet</a></li>
+<li><a href="../439336/index.html">We are looking for a needle in a stack without using well-known algorithms.</a></li>
+<li><a href="../439338/index.html">Forget about privacy: you still have terrible targeting</a></li>
+<li><a href="../439340/index.html">GDPR backup — what a new tool will do</a></li>
+<li><a href="../439342/index.html">Winter DIYorDIE Meetup February 17</a></li>
+<li><a href="../439344/index.html">To be like a troll: how monopolists rule patents</a></li>
+<li><a href="../439346/index.html">Laravel + Docker: Our Successful Experience</a></li>
+<li><a href="../439348/index.html">Vision falls after laser vision correction - what to do? Or, doctor, make me an "enhancement"</a></li>
+<li><a href="../439350/index.html">Artificial intelligence as a machine of inventions</a></li>
+<li><a href="../439352/index.html">Making a bot prototype for fighting in Clash Royale</a></li>
+<li><a href="../439354/index.html">Rust news # 5 (January 2019)</a></li>
+<li><a href="../439356/index.html">Nontrivial metrics of the effectiveness of advertising campaigns</a></li>
+<li><a href="../439358/index.html">Excel metadata files</a></li>
+<li><a href="../439360/index.html">Training Cisco 200-125 CCNA v3.0. Cisco Certified Network Specialist (CCNA). Day 3. Subnets</a></li>
+<li><a href="../439362/index.html">How we teach Software Engineering at St. Petersburg HSE</a></li>
+<li><a href="../439364/index.html">Oculus Go glasses with “strawberry” content set up for sale</a></li>
+<li><a href="../439366/index.html">Automation of three nails</a></li>
+<li><a href="../439368/index.html">Animations in iOS applications born on the server</a></li>
+<li><a href="../439374/index.html">For those who want to play detective: find a bug in the function from Midnight Commander</a></li>
+<li><a href="../439376/index.html">"Interest club"</a></li>
+<li><a href="../439378/index.html">The Book of Genesis?). Reflections on the nature of mind. Part I</a></li>
+<li><a href="../439380/index.html">How I created an extension for Atom and VS Code: personal experience and source codes</a></li>
+<li><a href="../439382/index.html">Using Ansible, Terraform, Docker, Consul, Nomad in the Clouds (Alexey Vakhov, Uchi.ru)</a></li>
+<li><a href="../439390/index.html">The best innovations of social networks in 2018</a></li>
+<li><a href="../439392/index.html">The 2019 championship season is open! SNA Hackathon Launches ala ML Boot Camp 8</a></li>
+<li><a href="../439394/index.html">As a programmer dataseativistam wrote</a></li>
+<li><a href="../439396/index.html">UniFi Controller Password Reset</a></li>
+<li><a href="../439404/index.html">A brief history of electronic public procurement in Russia</a></li>
+<li><a href="../439408/index.html">Pseudo Lens Flare</a></li>
+<li><a href="../439410/index.html">Jeff Hawkins is finally ready to explain his brain research.</a></li>
+<li><a href="../439414/index.html">Client for "server push messages"</a></li>
+<li><a href="../439416/index.html">A-Frame Review</a></li>
+<li><a href="../439418/index.html">Pentaho Data Integration (PDI), Python and Deep Learning</a></li>
+<li><a href="../439420/index.html">Building the transport package without installing MODX</a></li>
+<li><a href="../439422/index.html">What does a programmer need to develop games and who really is a game developer on the part of a programmer</a></li>
+<li><a href="../439424/index.html">How I Fought Free Hosting and Composer</a></li>
+<li><a href="../439426/index.html">Situation: a new wave of attacks with the interception of DNS queries - we analyze the basic methods of protection</a></li>
+<li><a href="../439430/index.html">Believe me if you can. Water meters. part 1</a></li>
+<li><a href="../439432/index.html">How to become a Java developer in 1.5 years</a></li>
+<li><a href="../439434/index.html">NestJS - the very real nodejs backend</a></li>
+<li><a href="../439436/index.html">Cheaper price of small series of electronics in Russia. Case Internet radio WOLNA</a></li>
+<li><a href="../439440/index.html">Implementation of Zimbra Collaboration Open Source, authorization through AD and automatic creation of mailboxes</a></li>
+<li><a href="../439442/index.html">Julia. Report Generators and Documentation</a></li>
+<li><a href="../439446/index.html">What you need to know about JavaScript Engine Switcher 3.0</a></li>
+<li><a href="../439448/index.html">What virtualization questions do you expect from a graduate?</a></li>
+<li><a href="../439450/index.html">RS-485 on domestic microcontrollers from the company Milandr</a></li>
+<li><a href="../439454/index.html">Program as Art - a new software management paradigm</a></li>
+<li><a href="../439456/index.html">Hipster podcasts # 2</a></li>
+<li><a href="../439458/index.html">As we Republic website on Kubernetes translated</a></li>
+<li><a href="../439460/index.html">How marketers of Maxidom lose millions flirting in groz marketing: independent usability auditing</a></li>
+<li><a href="../439462/index.html">Civilization Springs, 5/5</a></li>
+<li><a href="../439464/index.html">VXinspect: part quality control in 10 minutes</a></li>
+<li><a href="../439466/index.html">NASA lunar orbital probe made the first pictures of the China Chang'e-4 station - two pixels of light</a></li>
+<li><a href="../439468/index.html">Where to lead the search for the perfect SCADA</a></li>
+<li><a href="../439470/index.html">Germany plans to abandon coal in the near future.</a></li>
+<li><a href="../439472/index.html">Automation of border control within the company</a></li>
+<li><a href="../439476/index.html">Cockney Slang: Modern History and Position</a></li>
+<li><a href="../439478/index.html">Entertaining C #. Five examples for a coffee break</a></li>
+<li><a href="../439480/index.html">Give way, or Why does your CRM (and CRM) slow down?</a></li>
+<li><a href="../439482/index.html">devleads - (not) financial motivation</a></li>
+<li><a href="../439484/index.html">Get the enum data in the Automapper projection</a></li>
+<li><a href="../439496/index.html">How is billing done there: when a customer and a developer speak different languages</a></li>
+<li><a href="../439498/index.html">What hardware to analyze a huge shaft of information?</a></li>
+<li><a href="../439500/index.html">Why are captcha so complicated</a></li>
+<li><a href="../439502/index.html">Undefined behavior and truth undefined</a></li>
+<li><a href="../439504/index.html">Does your Data Engineer team need it?</a></li>
+<li><a href="../439506/index.html">9 alternatives to a bad team (design pattern)</a></li>
+<li><a href="../439510/index.html">High-load distributed control system of a modern NPP</a></li>
+<li><a href="../439512/index.html">The era of dinosaurs or legally verified reinsurance?</a></li>
+<li><a href="../439516/index.html">00110001 00110100 00101110 00110000 00110010</a></li>
+<li><a href="../439524/index.html">Fortnite is the future, but for rather unexpected reasons.</a></li>
+<li><a href="../439526/index.html">Telecom operators will conduct a "field test" of the law on the stability of the Runet</a></li>
+<li><a href="../439532/index.html">What's new in javascript ES2019</a></li>
+<li><a href="../439534/index.html">Yield programming and the use of drones in oil production - 10 lectures from the conference GIS Tech Russia</a></li>
+<li><a href="../439538/index.html">Community programming</a></li>
+<li><a href="../439540/index.html">Etherblade.net - opensource project to create an ethernet traffic encapsulator on FPGA (part one)</a></li>
+<li><a href="../439542/index.html">Nintendo makes it clear that only piracy can save the history of video games</a></li>
+<li><a href="../439544/index.html">The colony. Chapter 24: Departure</a></li>
+<li><a href="../439556/index.html">TDMS Fairway. Methods PMBOK and Russian design organizations</a></li>
+<li><a href="../439558/index.html">New old phone. Reinvent the PSTN phone</a></li>
+<li><a href="../439560/index.html">The adapter for working with the blockchain Ethereum for the InterSystems IRIS data platform</a></li>
+<li><a href="../439562/index.html">Configure the Kubernetes HA cluster on bare metal with kubeadm. Part 1/3</a></li>
+<li><a href="../439564/index.html">Practical application of transformation of AST-trees on the example of Putout</a></li>
+<li><a href="../439566/index.html">Why SRE is important documentation. Part 3</a></li>
+<li><a href="../439568/index.html">QLC based SSD - hard drive killer? Not really</a></li>
+<li><a href="../439572/index.html">Automated design of electronic equipment</a></li>
+<li><a href="../439576/index.html">Extensive review of Python interviews. Hints and Tips</a></li>
+<li><a href="../439578/index.html">On the issue of transformations and other operations</a></li>
+<li><a href="../439584/index.html">Project Lenergy, how to rethink portable power sources</a></li>
+<li><a href="../439586/index.html">SPBm protocol as the basis of Extreme Automated Campus</a></li>
+<li><a href="../439588/index.html">ESET has discovered new versions of the DanaBot Trojan.</a></li>
+<li><a href="../439590/index.html">Quals: Saudi and Oman National Cyber ​​Security CTF 2019. WriteUp</a></li>
+<li><a href="../439592/index.html">Ethical Activity Automation</a></li>
+<li><a href="../439596/index.html">How I accelerated image processing on Android 15 times</a></li>
+<li><a href="../439598/index.html">Microsoft told about the cost of paid support for Windows 7</a></li>
+<li><a href="../439600/index.html">Finland summed up the preliminary results of the experiment with a guaranteed basic income</a></li>
+<li><a href="../439604/index.html">How does the barcode work?</a></li>
+<li><a href="../439606/index.html">Experimental production of electronics for the minimum price</a></li>
+<li><a href="../439608/index.html">Modern religion: what do people give to Google, Facebook, Amazon and Apple?</a></li>
+<li><a href="../439610/index.html">As in my Chevrolet Bolt electric car, under warranty, two battery modules were replaced, and the third was monitored</a></li>
+<li><a href="../439616/index.html">The digest of interesting IT projects on Kickstarter №7</a></li>
+<li><a href="../439618/index.html">PHP for beginners. File attachment</a></li>
+<li><a href="../439620/index.html">Understanding asynchronous JavaScript [Translated by Sukhjinder Arora]</a></li>
+<li><a href="../439624/index.html">Why keep data in orbit</a></li>
+<li><a href="../439626/index.html">Experience developing a free application for collectors OpenNumismat</a></li>
+<li><a href="../439628/index.html">Parallel data update in ASP.NET Web API</a></li>
+<li><a href="../439632/index.html">How to set up Continuous Deployment for your project: personal experience</a></li>
+<li><a href="../439636/index.html">The crisis of the concepts of improving road safety and a new concept of its solution</a></li>
+<li><a href="../439638/index.html">Getting FPGA to Python</a></li>
+<li><a href="../439640/index.html">Vinyl is back and it's different</a></li>
+<li><a href="../439642/index.html">Java pitfalls. Part 1</a></li>
+<li><a href="../439644/index.html">Anti-Aging: Senolithics and Stem Cell Therapy</a></li>
+<li><a href="../439646/index.html">Holding SoftBank sold a stake in Nvidia due to the fall in their prices, but still earned $ 3.3 billion</a></li>
+<li><a href="../439648/index.html">Internal and nested java classes. Part 1</a></li>
+<li><a href="../439652/index.html">How to transport your startup to the USA: 4 important steps</a></li>
+<li><a href="../439654/index.html">Full immersion: how do we cool ASIC chips in Bitfury</a></li>
+<li><a href="../439656/index.html">C # character calculator</a></li>
+<li><a href="../439676/index.html">Integration of React Native and C ++ for iOS and Android</a></li>
+<li><a href="../439680/index.html">About 50% of Russians are ready to sell their personal data</a></li>
+<li><a href="../439682/index.html">Training Cisco 200-125 CCNA v3.0. Cisco Certified Network Specialist (CCNA). Day 4. Gateway devices</a></li>
+<li><a href="../439686/index.html">Flickr introduces new rules regarding the number of photos and videos users.</a></li>
+<li><a href="../439688/index.html">Overview of AI & ML solutions in 2018 and forecasts for 2019: Part 1 - NLP, Computer Vision</a></li>
+<li><a href="../439690/index.html">Virtual machine performance comparison of 6 cloud platforms: Selectel, MCS, Ya.Oblako, Google Cloud, AWS and Azure</a></li>
+<li><a href="../439692/index.html">AT & T sued for changing the network icon from 4G to 5G E</a></li>
+<li><a href="../439694/index.html">Developed smart tissue that reacts to changes in body temperature</a></li>
+<li><a href="../439696/index.html">On the crest of a wave, or “I want to go to the mainstream” - is it worth it?</a></li>
+<li><a href="../439698/index.html">Introduction to programming: a simple 3D shooter from scratch over the weekend, part 1</a></li>
+<li><a href="../439700/index.html">Patent for a board game in Russia</a></li>
+<li><a href="../439704/index.html">From pool request to release. Report Yandex.Taxi</a></li>
+<li><a href="../439706/index.html">BLACK HAT conference. Survival lessons in a 300 Gbps DDOS attack. Part 1</a></li>
+<li><a href="../439710/index.html">Features of creating products for the US market</a></li>
+<li><a href="../439712/index.html">Government procurement: a balance between the Italian strike and the Russian criminal</a></li>
+<li><a href="../439716/index.html">Tails OS or how to protect yourself online</a></li>
+<li><a href="../439718/index.html">Developing Elixir / Phoenix Applications with Docker</a></li>
+<li><a href="../439720/index.html">Introduction to programming: a simple 3D shooter from scratch over the weekend, part 2</a></li>
+<li><a href="../439722/index.html">Effects of SVG filters. Part 2. Outline text with feMorphology</a></li>
+<li><a href="../439724/index.html">Overview of AI & ML solutions in 2018 and forecasts for 2019: Part 2 - Tools and Libraries, AutoML, RL, Ethics in AI</a></li>
+<li><a href="../439726/index.html">Lock-in: truth or fiction?</a></li>
+<li><a href="../439728/index.html">Setting up backup and recovery of Zimbra OSE entirely and in separate boxes without using Zextras</a></li>
+<li><a href="../439730/index.html">Organizing reducer through standard class</a></li>
+<li><a href="../439732/index.html">Lazarus - simple animation using the TImageFragment component</a></li>
+<li><a href="../439734/index.html">We deploy Kubernetes on the desktop in minutes with MicroK8s</a></li>
+<li><a href="../439736/index.html">IPSec VPN connection between MikroTik and Kerio Control</a></li>
+<li><a href="../439746/index.html">Understand the promises in javascript</a></li>
+<li><a href="../439748/index.html">The digest of interesting materials for the mobile developer # 285 (February 4 - 10)</a></li>
+<li><a href="../439750/index.html">Learn product management - where?</a></li>
+<li><a href="../439752/index.html">Multicore MRI Method</a></li>
+<li><a href="../439754/index.html">Google is going to be engaged in the development of smart watches</a></li>
+<li><a href="../439756/index.html">Why do I need a thermo-acoustic generator?</a></li>
+<li><a href="../439760/index.html">Engineers "twisted" the light in the fiber - a new technology will speed up the transfer of data a hundred times</a></li>
+<li><a href="../439764/index.html">Corporate fruit</a></li>
+<li><a href="../439772/index.html">Writing Unit Tests on Swift for Verifying Asynchronous Tasks</a></li>
+<li><a href="../439778/index.html">The digest of fresh materials from the world of the frontend for the last week No. 351 (February 4 - 10, 2019)</a></li>
+<li><a href="../439780/index.html">PHP Digest number 149 (January 28 - February 11, 2019)</a></li>
+<li><a href="../439782/index.html">Headless CMS - the future of content management</a></li>
+<li><a href="../439784/index.html">Methane engine "Raptor" broke the record RD-180</a></li>
+<li><a href="../439788/index.html">Regular oddities in the GOST Grasshopper and Stribog algorithms</a></li>
+<li><a href="../439790/index.html">Test JaCarta WebClient or store tokens in a safe</a></li>
+<li><a href="../439792/index.html">NASA is looking for partners in the American industry to create a partially reusable manned lender</a></li>
+<li><a href="../439794/index.html">Back pain - understanding from the perspective of modern medicine</a></li>
+<li><a href="../439796/index.html">Spring Boot 2: what is not written in release notes</a></li>
+<li><a href="../439800/index.html">RISEX and Julia. 5 stages of love customer and designer</a></li>
+<li><a href="../439806/index.html">Valid SSL domain names for local Docker containers</a></li>
+<li><a href="../439808/index.html">The biggest telescopes. From a notebook and eyes to 340 megapixel cameras and data centers. Part 1</a></li>
+<li><a href="../439810/index.html">Get acquainted with the Moleculer microservice framework</a></li>
+<li><a href="../439816/index.html">Practical blockchain in business</a></li>
+<li><a href="../439818/index.html">Features of approaches to design in the real manufacturing sector</a></li>
+<li><a href="../439820/index.html">We are trying to write a project alone. Introduction</a></li>
+<li><a href="../439822/index.html">Creating an alternative display for the Ensoniq EPS16 + and ASR10 synthesizer / sampler</a></li>
+<li><a href="../439824/index.html">When will the JavaScript frameworks disappear?</a></li>
+<li><a href="../439826/index.html">Disable analog. What will happen to the TV?</a></li>
+<li><a href="../439828/index.html">The network appeared "analog" Findface</a></li>
+<li><a href="../439840/index.html">Conference DUMP-2019: we invite you to speak in the sections Design, Management and Testing</a></li>
+<li><a href="../439852/index.html">Remote control application release: Aspia 1.1.0</a></li>
+<li><a href="../439858/index.html">Prometheus + Grafana + Node Exporter + Docker in Azure with notifications in Telegram</a></li>
+<li><a href="../439862/index.html">Digital events in Moscow from February 11 to 17</a></li>
+<li><a href="../439866/index.html">Principles of design reference books in 1C Enterprise Management 2 (ERP 2.4.6)</a></li>
+<li><a href="../439868/index.html">Life without Facebook: less radical views, good mood, more time for loved ones. Now proven by science</a></li>
+<li><a href="../439878/index.html">Creation of architecture for a new high-load startup in 2019</a></li>
+<li><a href="../439880/index.html">Security Week 07: Local IoT Device Vulnerabilities</a></li>
+<li><a href="../439886/index.html">How I trained the neural network to implement the position estimation function on the Russian AI Cup CodeBall 2018</a></li>
+<li><a href="../439894/index.html">How easy it is to monitor the site</a></li>
+<li><a href="../439900/index.html">Julia and the method of coordinate descent</a></li>
+<li><a href="../439902/index.html">Explaining the physical essence of the Wing Lift phenomenon without using the Bernouli equation. Part 2</a></li>
+<li><a href="../439906/index.html">Critical vulnerability in Zemana products and not only</a></li>
+<li><a href="../439908/index.html">Kohl, piss off ... Coax</a></li>
+<li><a href="../439912/index.html">Unsolved mystery of view</a></li>
+<li><a href="../439916/index.html">Unpacking: Dridex bootloader</a></li>
+<li><a href="../439922/index.html">Taxation of IP in Kazakhstan how to be a freelancer?</a></li>
+<li><a href="../439924/index.html">The volume of parcels from foreign online stores grew by 25%</a></li>
+<li><a href="../439926/index.html">Retain inside and outside ViewModel</a></li>
+<li><a href="../439928/index.html">Autonomous driving on the sidewalk through OpenCV and Tensorflow</a></li>
+<li><a href="../439932/index.html">How we opened development offices</a></li>
+<li><a href="../439934/index.html">Business processes. Extract BPMN model from document. Part 1</a></li>
+<li><a href="../439936/index.html">3D technology for foundry: how to create a mold for casting in a week</a></li>
+<li><a href="../439938/index.html">How to name: privacy policy and privacy policy</a></li>
+<li><a href="../439940/index.html">Teamlead Conf Msk 2019: Results of the Bid Campaign, Reports, Considerations</a></li>
+<li><a href="../439942/index.html">Docker'ization: what every .Net developer needs to know</a></li>
+<li><a href="../439946/index.html">Why did we choose Electron</a></li>
+<li><a href="../439950/index.html">3rd Turing Test: conditions of participation and prizes to the winners</a></li>
+<li><a href="../439952/index.html">Hosting Node.js https server with auto-updated SSL in the cloud and how I set up the development cycle (+ git, react)</a></li>
+<li><a href="../439958/index.html">CodeFest X March 30-31. Future section</a></li>
+<li><a href="../439964/index.html">Vulnerability CVE-2019-5736 in runc, allowing to get root privileges on the host</a></li>
+<li><a href="../439966/index.html">Simple parser for arithmetic operations</a></li>
+<li><a href="../439970/index.html">Report on problems and accessibility of the Internet in 2018-2019</a></li>
+<li><a href="../439974/index.html">Personal Agile Transformation: A Flexible Journey to Productivity</a></li>
+<li><a href="../439976/index.html">Will Node.js always be slower than Golang?</a></li>
+<li><a href="../439986/index.html">Chips VS Threats of Containerization Technology</a></li>
+<li><a href="../439994/index.html">XAMPP - virtual server setup</a></li>
+<li><a href="../439996/index.html">Analysis of Minor Violations Java code on the Duerank.com platform (part 1)</a></li>
+<li><a href="../440000/index.html">On "Vkontakte" sued for issuing personal data of the user of the Ministry of Internal Affairs</a></li>
+<li><a href="../440006/index.html">The draft law on sustainable work of the Runet was adopted in the first reading.</a></li>
+<li><a href="../440008/index.html">Increasing the informational content of errors in Go - github.com/ztrue/tracerr</a></li>
+<li><a href="../440012/index.html">Cases and growings practices in a product at Epic Growth Conference</a></li>
+<li><a href="../440014/index.html">Skills, self-education and programming languages ​​for novice developers: HackerRank research</a></li>
+<li><a href="../440016/index.html">When reading can be touched: a review of ONYX BOOX Monte Cristo 4</a></li>
+<li><a href="../440018/index.html">Dynamic local exposure</a></li>
+<li><a href="../440020/index.html">Regression or regression in testing</a></li>
+<li><a href="../440022/index.html">A bit of Ferrari: Fintech-startup Rally Rd will allow you to buy "shares" of rare cars</a></li>
+<li><a href="../440024/index.html">Redirecting printf () from STM32 to Qt Creator console</a></li>
+<li><a href="../440030/index.html">Point-by-round PKH locks on an OpenWrt router using WireGuard and DNSCrypt</a></li>
+<li><a href="../440040/index.html">In development - every man for himself. But sometimes it leads to a dead end.</a></li>
+<li><a href="../440046/index.html">Open lesson "Creating REST-clients on Spring"</a></li>
+<li><a href="../440048/index.html">Favorite metrics: 5 indicators that each sales team must follow</a></li>
+<li><a href="../440050/index.html">DNS proxy on Node.JS do it yourself</a></li>
+<li><a href="../440052/index.html">Static analysis "BIOS / UEFI" or how to get Dependency Graph</a></li>
+<li><a href="../440066/index.html">VSCode Extensions That Ease JavaScript and Vue Development</a></li>
+<li><a href="../440070/index.html">Julia, Gradient descent and simplex method</a></li>
+<li><a href="../440072/index.html">AresDB Demo: Uber's GPU-based, real-time open source analysis tool</a></li>
+<li><a href="../440074/index.html">"Roskomos" considers incorrect to compare the engines Raptor Ilona Mask and RD-180</a></li>
+<li><a href="../440084/index.html">10 billion software exports are negligible</a></li>
+<li><a href="../440094/index.html">Blooming gardens on Mars remain a dream: the Mars One project went bankrupt</a></li>
+</ul></nav>
+</section>
+<script src="../../js/main.js"></script>
+
+<!-- Yandex.Metrika counter -->
+<script type="text/javascript" >
+  (function (d, w, c) {
+      (w[c] = w[c] || []).push(function() {
+          try {
+              w.yaCounter52319614 = new Ya.Metrika({
+                  id:52319614,
+                  clickmap:true,
+                  trackLinks:true,
+                  accurateTrackBounce:true,
+                  webvisor:true
+              });
+          } catch(e) { }
+      });
+
+      var n = d.getElementsByTagName("script")[0],
+          s = d.createElement("script"),
+          f = function () { n.parentNode.insertBefore(s, n); };
+      s.type = "text/javascript";
+      s.async = true;
+      s.src = "https://mc.yandex.ru/metrika/watch.js";
+
+      if (w.opera == "[object Opera]") {
+          d.addEventListener("DOMContentLoaded", f, false);
+      } else { f(); }
+  })(document, window, "yandex_metrika_callbacks");
+</script>
+<noscript><div><img src="https://mc.yandex.ru/watch/52319614" style="position:absolute; left:-9999px;" alt="" /></div></noscript>
+
+<!-- Google Analytics -->
+  <script>
+    window.ga = function () { ga.q.push(arguments) }; ga.q = []; ga.l = +new Date;
+    ga('create', 'UA-134228602-1', 'auto'); ga('send', 'pageview')
+  </script>
+  <script src="https://www.google-analytics.com/analytics.js" async defer></script>
+
+</section>
+</body>
+
+</html>

@@ -1,0 +1,1 @@
+HX711 ADC from 3.3V - do not trust the Chinese documentation and not only
