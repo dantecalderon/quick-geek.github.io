@@ -1,0 +1,1 @@
+Increasing the informational content of errors in Go - github.com/ztrue/tracerr

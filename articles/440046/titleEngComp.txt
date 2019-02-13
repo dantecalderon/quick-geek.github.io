@@ -1,0 +1,1 @@
+Open lesson "Creating REST-clients on Spring"

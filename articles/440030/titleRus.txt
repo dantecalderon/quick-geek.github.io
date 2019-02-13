@@ -1,0 +1,1 @@
+Точечный обход блокировок PKH на роутере с OpenWrt с помощью WireGuard и DNSCrypt

@@ -1,0 +1,1 @@
+Will Node.js always be slower than Golang?

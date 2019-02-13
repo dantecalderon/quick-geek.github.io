@@ -1,0 +1,1 @@
+Анализ Minor Violations Java кода на платформе Duerank.com (часть 1)

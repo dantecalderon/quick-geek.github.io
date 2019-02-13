@@ -1,0 +1,1 @@
+UEFI, BIOS, PEI, UEFITool, реверс-инжиниринг, reverse engineering

@@ -1,0 +1,1 @@
+Redirecting printf () from STM32 to Qt Creator console

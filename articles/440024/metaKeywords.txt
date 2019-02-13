@@ -1,0 +1,1 @@
+qt creator, stm32, printf, debug, uart, itm, swo, retarget
