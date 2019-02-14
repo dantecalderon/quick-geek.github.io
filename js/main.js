@@ -66,13 +66,14 @@ $(function() {
 
 
 	//Generate the list of all articles
-	$.getJSON('../allArticles.json', function(data) {
-		const $listOfAllArticles = $('.js-list-of-pages').detach();
+	// $.getJSON('https://quick-geek.github.io/allArticles.json', function(data) {
+	// 	const $listOfAllArticles = $('.js-list-of-pages').detach();
+	// 	console.log(data);
 
-		data.forEach(article => {
-			$listOfAllArticles.append('<li><a href="../articles/' + article.id + '/index.html">' + article.title + '</a></li>\n');
-		});
+	// 	data.forEach(article => {
+	// 		$listOfAllArticles.append('<li><a href="../articles/' + article.id + '/index.html">' + article.title + '</a></li>\n');
+	// 	});
 		
-		$('.js-list-of-articles-container').append($listOfAllArticles);
-	});
+	// 	$('.js-list-of-articles-container').append($listOfAllArticles);
+	// });
 });

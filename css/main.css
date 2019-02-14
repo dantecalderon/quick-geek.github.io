@@ -87,6 +87,7 @@ a[href*="http"]:not(.tools-bar a) {
 	text-align: left;
 }
 
+
 /*For code hosted on GitHub*/
 @media (min-width: 1000px) {
 	.gist {
@@ -98,3 +99,11 @@ a[href*="http"]:not(.tools-bar a) {
 .gist-meta {
 	display: none;
 }
+
+
+/*.list-of-articles-container {
+  max-height: 300px;
+  max-width: 90%;
+  overflow-y: scroll;
+  border-top: 2px solid;
+}*/
