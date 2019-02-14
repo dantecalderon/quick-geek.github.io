@@ -1,0 +1,1 @@
+java, spring, spring framework, spring boot, spring-boot, maven-compiler-plugin, dry, jdk8, jdk 8

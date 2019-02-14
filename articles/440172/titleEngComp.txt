@@ -1,0 +1,1 @@
+CQRS: divide and conquer principle in the service of a programmer

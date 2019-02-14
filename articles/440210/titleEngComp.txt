@@ -1,0 +1,1 @@
+Machine-synaesthetic approach to detecting network DDoS attacks. Part 1

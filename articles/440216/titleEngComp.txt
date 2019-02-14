@@ -1,0 +1,1 @@
+As I taught Zabbix to look after my node and report problems

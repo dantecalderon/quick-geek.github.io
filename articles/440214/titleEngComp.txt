@@ -1,0 +1,1 @@
+Spring Boot 2 and JDK 8: Are you still using @Param, @RequestParam and @PathVariable annotations? Then the article is for you.
