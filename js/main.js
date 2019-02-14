@@ -63,4 +63,16 @@ $(function() {
 		e.preventDefault();
 		$('html, body').animate({scrollTop: document.body.scrollHeight}, 800);
 	});
+
+
+	//Generate the list of all articles
+	$.getJSON('../allArticles.json', function(data) {
+		const $listOfAllArticles = $('.js-list-of-pages').detach();
+
+		data.forEach(article => {
+			$listOfAllArticles.append('<li><a href="../articles/' + article.id + '/index.html">' + article.title + '</a></li>\n');
+		});
+		
+		$('.js-list-of-articles-container').append($listOfAllArticles);
+	});
 });
