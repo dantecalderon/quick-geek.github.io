@@ -1,0 +1,1 @@
+bios, irq, interrupts, apic, pic, pci, coreboot

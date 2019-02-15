@@ -1,0 +1,1 @@
+Interrupts from external devices in the x86 system. Part 3. Setting up interrupt routing in the chipset using the example of coreboot
