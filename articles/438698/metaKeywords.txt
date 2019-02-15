@@ -1,0 +1,1 @@
+systemd, init, cron, update, 4BSD, Upstart, launchd, Леннарт Пёттеринг, Unix мёртв, D-Bus, культура презрения

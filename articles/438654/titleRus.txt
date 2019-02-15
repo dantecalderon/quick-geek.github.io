@@ -1,0 +1,1 @@
+OpenSceneGraph: Интеграция с фреймворком Qt

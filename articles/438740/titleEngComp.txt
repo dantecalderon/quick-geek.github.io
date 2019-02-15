@@ -1,0 +1,1 @@
+Manage secrets with HashiCorp Vault
