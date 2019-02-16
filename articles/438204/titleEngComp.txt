@@ -1,0 +1,1 @@
+Swift compiler device. Part 1

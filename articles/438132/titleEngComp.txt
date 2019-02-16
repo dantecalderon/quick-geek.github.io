@@ -1,0 +1,1 @@
+GOSINT - open source solution for managing indicators of compromise (IoC)

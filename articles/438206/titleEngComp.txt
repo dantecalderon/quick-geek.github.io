@@ -1,0 +1,1 @@
+26 recommendations for using the var type in Java

@@ -1,0 +1,1210 @@
+<div class="post__text post__text-html js-mediator-article"><i>Дисклеймер: исследование началось в 2013 году, так что если считаете некоторые методы глупыми и опасными — вы правы, так и было. Тем не менее, я многому научился в процессе.</i> <br>
+<br>
+<b>Вступление</b><br>
+Всё началось за несколько месяцев до рождения моего первого ребёнка. Мы с женой всегда хотели купить крутой фотоаппарат Leica и вдруг поняли, что если не купим сейчас, то уже долго не сможем это сделать. Поэтому мы заказали камеру M240 и… бум, нас поставили в очередь на полгода. Вскоре мне надоело ждать, и я начал изучать их сайт. Моё внимание сразу привлёк раздел с файлами. Ну, вы можете догадаться, почему… Прошивки!<br>
+<br>
+Я увидел незашифрованный и несжатый файл (<code>m8-2_005.upd</code>), который начинается с <a href="https://github.com/alexhude/LeicaHacks/tree/master/Tools/pwadsplit">магии PWAD</a>. Узнаёте? Да, всё правильно, это формат Doom Patch WAD. Кажется, ребята любят классику. Формат <a href="http://doom.wikia.com/wiki/WAD">очень хорошо документирован</a>, так что распарсить его оказалось совсем несложно.<br>
+<a name="habracut"></a><br>
+<h1>Файлы прошивки Leica</h1><br>
+<h3>Прошивка Leica M8</h3><br>
+На самом деле это очень смешно, потому что когда позже я изучал сжатый файл прошивки Leica T&nbsp;— то первым делом решил проверить методы сжатия, которые в прошлом использовала id Software.<br>
+<br>
+Википедия говорит, что они использовали <a href="https://en.wikipedia.org/wiki/LHA_(file_format)">формат LHA</a>, который по сути представляет собой LZW. Но распространённые декомпрессоры LZW не подошли, поэтому я начал искать конкретную реализацию программного обеспечения id&nbsp;— и вуаля, нашёл в <a href="">исходниках Catacomb Armageddon</a>. Должен признать, повезло.<br>
+<br>
+В любом случае, вернёмся к M8. Вот структура прошивки:<br>
+<br>
+<pre>RULES:      0x0000008C (    3036:0x00000BDC) - описание XML
+LUTS:       0x00000C68 (  183274:0x0002CBEA)
+ GAMMA:     0x0000007C (   31760:0x00007C10)
+ GAIN:      0x00007C8C (   50344:0x0000C4A8)
+ LEICA:     0x00014134 (    7000:0x00001B58)
+ BLEMISH:   0x00015C8C (     250:0x000000FA)
+ WREF:      0x00015D88 (   82480:0x00014230)
+ OBJ:       0x00029FB8 (   11268:0x00002C04)
+ VERSION:   0x0002CBBC (      46:0x0000002E)
+PXA:        0x0002D854 (  858384:0x000D1910)
+BF:         0x000FF164 (  134522:0x00020D7A) - семейство процессоров Analog Devices Blackfin
+GUI:        0x0011FEE0 ( 3574180:0x003689A4)
+ TRANS:     0x0000005C (   59988:0x0000EA54) - локализация
+ IMAGES:    0x0000EAB0 (  267433:0x000414A9)
+  21_1PRT:  0x000000CC (   18411:0x000047EB) - изображение JFIF
+  21_2GRP:  0x000048B8 (   23172:0x00005A84) - изображение JFIF
+  21_3PAN:  0x0000A33C (   23034:0x000059FA) - изображение JFIF
+  24_1PRT:  0x0000FD38 (   18489:0x00004839) - изображение JFIF
+  24_2GRP:  0x00014574 (   23230:0x00005ABE) - изображение JFIF
+  24_3PAN:  0x0001A034 (   22998:0x000059D6) - изображение JFIF
+  28_1PRT:  0x0001FA0C (   22605:0x0000584D) - изображение JFIF
+  28_2GRP:  0x0002525C (   23081:0x00005A29) - изображение JFIF
+  28_3PAN:  0x0002AC88 (   23282:0x00005AF2) - изображение JFIF
+  35_1PRT:  0x0003077C (   22496:0x000057E0) - изображение JFIF
+  35_2GRP:  0x00035F5C (   23532:0x00005BEC) - изображение JFIF
+  35_3PAN:  0x0003BB48 (   22881:0x00005961) - изображение JFIF
+ FONT1:     0x0004FF5C ( 1522988:0x00173D2C)
+ FONT2:     0x001C3C88 ( 1723676:0x001A4D1C)
+ VERSION:   0x003689A4 (       0:0x00000000)
+M16C:       0x00488884 (  130406:0x0001FD66) - семейство Renesas M16C (Motorola S-record)
+FPGA:       0x004A85EC (  131604:0x00020214) - Xilinx Spartan 3
+FSL:        0x004C8800 (     814:0x0000032E) - загрузчик первой стадии</pre> <br>
+IDA из коробки не поддерживает процессоры Blackfin, но есть <a href="https://github.com/krater/Blackfin-IDA-Pro-Plugin">сторонний плагин</a>.<br>
+<br>
+<h3>Прошивка Leica M9</h3><br>
+Файл прошивки Leica M9 (<code>m9-1_196.upd</code>) выглядит зашифрованным: гистограмма показывает распределение около 0,45%.<br>
+<br>
+<img src="https://habrastorage.org/getpro/habr/post_images/ac1/6fc/17d/ac16fc17df9bfb0c9c63bdefaecc83d9.png"><br>
+<br>
+Конец истории? Может и нет. Дело в том, что Leica использовала довольно слабые процессоры в камерах, а в то время в бытовой электронике часто применялось шифрование XOR, поэтому я решил написать простой инструмент для операции XOR, чтобы сравнить прошивку с собой и посчитать некоторую статистику.<br>
+<br>
+Длина ключа определялась путём поиска самого длинного повторяющегося шаблона. Это имеет смысл, так как любая прошивка обычно включает в себя большие блоки повторяющихся данных, таких как набивка 0x00/0xFF или графика с пикселями LUT. Сам ключ вычисляется по частотности байтов в пределах длины ключа, где наиболее часто встречающийся байт идёт в буфер ключа. Результат работы программы явно указывал на шифрование XOR. Затем пришлось немного <a href="https://github.com/alexhude/LeicaHacks/tree/master/Tools/xortool">модифицировать инструмент</a>, чтобы получить потенциальный ключ и расшифровать код. Это опять оказался файл PWAD.<br>
+<br>
+Содержание PWAD выявило следующую структуру:<br>
+<br>
+<pre>RULES:      0x0000007C (    2788:0x00000AE4) - описание XML
+LUTS:       0x00000B60 ( 4060616:0x003DF5C8)
+ PROCESS:   0x0000004C ( 3900572:0x003B849C)
+  CREATE:   0x0000004C (      20:0x00000014) - метка времени
+  LUTS:     0x00000060 (  427744:0x000686E0)
+  GAINMAP:  0x00068740 (   20008:0x00004E28)
+  LENS:     0x0006D568 ( 3452724:0x0034AF34)
+ CCD:       0x003B84E8 (  148662:0x000244B6)
+  CREATE:   0x0000004C (      20:0x00000014) - метка времени
+  BLEMISH:  0x00000060 (    1092:0x00000444)
+  WREF:     0x000004A4 (  147452:0x00023FFC)
+  LIN:      0x000244A0 (      22:0x00000016)
+ ICCPROF:   0x003DC9A0 (    4304:0x000010D0)
+  ECI-RGB:  0x0000003C (     540:0x0000021C)
+  sRGB:     0x00000258 (    3144:0x00000C48)
+  A-RGB:    0x00000EA0 (     560:0x00000230)
+ WBPARAM:   0x003DDA70 (    7000:0x00001B58)
+BF561:      0x003E0128 (  289128:0x00046968) - Analog Devices Blackfin Processor family
+ bf0:       0x0000004C (  117846:0x0001CC56) - основной процессор
+ bf1:       0x0001CCA4 (  117826:0x0001CC42) - прошивка подпроцессора
+ bf0.map:   0x000398E8 (   27072:0x000069C0) - карта прошивки основного процессора с символами :D
+ bf1.map:   0x000402A8 (   26304:0x000066C0) - карта прошивки подпроцессора с символами :D
+BODY:       0x00426A90 (  143280:0x00022FB0) - семейство Renesas M16C (Motorola S-record)
+GUI:        0x00449A40 ( 3647624:0x0037A888)
+ TRANS:     0x0000005C (  131656:0x00020248) - локализация
+ IMAGES:    0x000202A4 (  267433:0x000414A9)
+  21_1PRT:  0x000000CC (   18411:0x000047EB) - изображение JFIF
+  21_2GRP:  0x000048B8 (   23172:0x00005A84) - изображение JFIF
+  21_3PAN:  0x0000A33C (   23034:0x000059FA) - изображение JFIF
+  24_1PRT:  0x0000FD38 (   18489:0x00004839) - изображение JFIF
+  24_2GRP:  0x00014574 (   23230:0x00005ABE) - изображение JFIF
+  24_3PAN:  0x0001A034 (   22998:0x000059D6) - изображение JFIF
+  28_1PRT:  0x0001FA0C (   22605:0x0000584D) - изображение JFIF
+  28_2GRP:  0x0002525C (   23081:0x00005A29) - изображение JFIF
+  28_3PAN:  0x0002AC88 (   23282:0x00005AF2) - изображение JFIF
+  35_1PRT:  0x0003077C (   22496:0x000057E0) - изображение JFIF
+  35_2GRP:  0x00035F5C (   23532:0x00005BEC) - изображение JFIF
+  35_3PAN:  0x0003BB48 (   22881:0x00005961) - изображение JFIF
+ FONT1:     0x00061750 ( 1522988:0x00173D2C)
+ USBLOGO:   0x001D547C (    1775:0x000006EF) - изображение JFIF
+ FONT2:     0x001D5B6C ( 1723676:0x001A4D1C)
+FPGA:       0x007C42C8 (  150176:0x00024AA0) - Xilinx Spartan 3A
+BF547:      0x007E8D68 (  937576:0x000E4E68) - семейство процессоров Analog Devices Blackfin (FSL?)</pre> <br>
+<br>
+<h3>Прошивка Leica M240</h3><br>
+У меня вошло в привычку каждое утро проверять страницу загрузки с прошивками Leica. Скоро там появился новый файл: <b>FW_M240_1_1_0_2.FW</b>.<br>
+<br>
+Он не выглядел зашифрованным, но был сжат…<br>
+<br>
+<h4>Сжатие</h4><br>
+Гистограмма показывает огромный всплеск на 0x9D.<br>
+<br>
+<img src="https://habrastorage.org/getpro/habr/post_images/6cb/025/ef7/6cb025ef734f60b1d4104b7301798cad.png"><br>
+<br>
+Возможно, это какая-то магия сжатия. Поиск в интернете [9D+compression] ничего не дал, кроме того, что 0x1F9D <a href="https://en.wikipedia.org/wiki/List_of_file_signatures">используется в качестве подписи сжатия LZW</a>. Если что, я разбираюсь в типах сжатия LZ и решил посмотреть на байты после 0x9D. И увидел четыре варианта:<br>
+<br>
+<ol>
+<li><code>9D 70 C4</code> <br>
+</li>
+<li><code>9D 00</code> <br>
+</li>
+<li><code>9D XX YY</code> <br>
+</li>
+<li><code>9D XX 8Y YY</code></li>
+</ol><br>
+Что ещё удалось подметить:<br>
+<br>
+<ul>
+<li>первый вариант всплывает лишь однажды по адресу 0x30: вероятно, используется в качестве индикатора сжатых данных;<br>
+</li>
+<li>XX никогда не превышает 0x7F;<br>
+</li>
+<li>последний байт YY в третьем и четвёртом случаях никогда не превышает 0x7F</li>
+</ul><br>
+Из того, что я знаю о LZ, это очень похоже на LZ77 или LZSS, где YY&nbsp;— шаг отступа, а XX&nbsp;— количество байтов для копирования. И второй вариант&nbsp;— частный случай выдачи 0x9D. Я написал простую функцию на C, которая реализует эту логику. Она подтвердила, что мы движемся в правильном направлении, но четвёртый вариант всё равно не вписывается в схему.<br>
+<br>
+Я всячески пытался его интерпретировать, но ничего не получилось. Поэтому я обратился за советом к товарищам. Один парень заметил, что согласно моим собственным наблюдениям, четвёртый байт YY появляется только тогда, когда установлен самый высокий бит 0x8Y: это просто дополнительное расстояние для шага отступа. Мне было стыдно, всё оказалось настолько очевидно… <br>
+<br>
+Наконец, декомпрессор начал выдавать валидный поток… пока не застрял посередине файла. Это произошло из-за неизвестной длины скользящего окна. Дополнительная отладка и тесты исправили ситуацию.<br>
+<br>
+Так появился <a href="https://github.com/alexhude/LeicaHacks/tree/master/Tools/M240FwTool">инструмент для парсинга прошивки M240</a>.<br>
+<br>
+<h4>Структура прошивки</h4><br>
+Для работы с неизвестным форматом я не придумал ничего лучше, чем измерить некоторые смещения и размеры участков кода&nbsp;— и попытаться найти самые близкие значения в заголовке файла. Например, этот блок:<br>
+<br>
+<code>0x00: 1E 1C AF 2E 01 01 00 02 07 E1 EA 5E 00 5C 1A B1<br>
+0x10: 01 29 1A 7E AE 38 73 65 9C 3D 75 B4 34 2F 44 6E<br>
+0x20: 13 17 8E 6B 00 00 00 01 00 00 00 30 E1 E3 50 D1</code> <br>
+<br>
+в итоге превратился в:<br>
+<br>
+<code>1E1CAF2E — выглядит как "LEICA FILE"<br>
+01010002 - 1.1.0.2<br>
+005C1AB1 — размер сжатого файла (big endian)<br>
+01291A7E — размер несжатого файла (big endian)<br>
+AE3873659C3D75B4342F446E13178E6B — хэш MD5<br>
+00000001 — количество полезных нагрузок<br>
+00000030 — смещение первой полезной нагрузки</code> <br>
+<br>
+По мере понимания структур прошивки я улучшал свой инструмент, и в конечном итоге он выдавал такое:<br>
+<br>
+<code>Running with options:<br>
+ + firmware folder: M240_FIRMWARE<br>
+ + verbose enabled<br>
+<br>
+Open firmware file: FW_M240_1_1_0_2.FW<br>
+ File size: 6036193 | 0x005C1AE1<br>
+<br>
+Parse container header:<br>
+ version: 1.1.0.2<br>
+ packed size: 6036145 | 0x005C1AB1<br>
+ unpacked size: 19470974 | 0x01291A7E<br>
+ body blocks: 1 | 0x00000001<br>
+ body offset: 48 | 0x00000030<br>
+ MD5: AE387365 9C3D75B4 342F446E 13178E6B<br>
+ MD5 check: PASSED<br>
+<br>
+Uncompress container body: <br>
+ 6036145 -&gt; 19470974<br>
+ Uncompression: DONE<br>
+<br>
+Split container:<br>
+ Number of sections: 9 | 0x00000009<br>
+ Section table size: 612 | 0x00000264<br>
+ Section table offset: 36 | 0x00000024<br>
+ Section 1<br>
+ Section Name: "[A]IMG_LOKI-212"<br>
+ Section offset: 0 | 0x00000000<br>
+ Section size: 7340032 | 0x00700000<br>
+ Section base: 1048576 | 0x00100000<br>
+ MD5: A8D55AA2 B0ACDB14 0673AD79 707674F3<br>
+ MD5 check: PASSED<br>
+ Create file: M240_FIRMWARE/IMG_LOKI-212.bin<br>
+<br>
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~<br>
+<br>
+Section 9<br>
+ Section Name: "[A]IMG-LENSDATA-213"<br>
+ Section offset: 19214844 | 0x012531FC<br>
+ Section size: 255478 | 0x0003E5F6<br>
+ Section base: 16252928 | 0x00F80000<br>
+ MD5: 39C2BEC0 27ED23F6 2C1C8513 EEE697B9<br>
+ MD5 check: PASSED<br>
+ Create file: M240_FIRMWARE/IMG-LENSDATA-213.bin<br>
+ Splitting container: DONE<br>
+Extraction COMPLETE!</code> <br>
+<br>
+Прошивка М240 включает один контейнер с девятью элементами:<br>
+<br>
+<code>IMG_LOKI-212.bin - прошивка прикладного процессора<br>
+IMG_LOKI-213.bin - прошивка прикладного процессора<br>
+CTRL_SYS-11.bin - прошивка процессора ввода-вывода<br>
+IMG-FPGA-212.bin - прошивка для обработки изображений (сенсор)<br>
+IMG-FPGA-213.bin - прошивка для обработки изображений (сенсор)<br>
+IMG-DSP-212.bin - прошивка DSP<br>
+IMG-DSP-213.bin - прошивка DSP<br>
+IMG-LENSDATA-212.bin - данные по оптике<br>
+IMG-LENSDATA-213.bin - данные по оптике</code> <br>
+<br>
+Как видим, в одной прошивке два набора файлов. Позже я узнал, что 212 — это версия микрсхемы для обработки изображений, а в производство пошло два варианта Leica M240. Данное исследование основано на версии 212.<br>
+<br>
+<h1>Управление системой: CTRL_SYS-11.bin</h1><br>
+Единственная общая часть&nbsp;— прошивка для чипа управления системой. Это реально большой бинарник, и по коду нетрудно догадаться, для чего он предназначен.<br>
+<br>
+<code>$ strings CTRL_SYS-11.bin | rg SH<br>
+-&gt; Test SH7216 data flash driver<br>
+-&gt; Test SH7216 SCI driver<br>
+-&gt; Test SH7216 I2C driver<br>
+-&gt; Test SH7216 MTU2 driver<br>
+-&gt; Test SH7216 ADC functions<br>
+-&gt; Test SH7216 CMT driver</code><br>
+<br>
+Таким образом, перед нами процессор Renesas SH7216 (SH-2A), который отвечает за раннюю стадию загрузки, тесты ввода-вывода и обновление прошивки. IDA из коробки поддерживает этот тип процессора. Оставалось лишь найти правильный адрес базовой загрузки, известный по описанию разделов прошивки: это <code>0x0</code>.<br>
+<br>
+<code>Section Name: "[A]CTRL_SYS-11"<br>
+Section offset: 14680064 | 0x00E00000<br>
+Section size: 917277 | 0x000DFF1D<br>
+Section base: 0 | 0x00000000</code><br>
+<br>
+Я загрузил его в IDA и распознал все функции, но не особенно в нём не копался, потому что намного интереснее прошивка основного процессора.<br>
+<br>
+Здесь можно ещё отметить, что UART этого чипа открывается на сервисный порт, куда выдаёт журнал загрузки. Мы вернёмся к этому позже.<br>
+<br>
+<h1>Основной чип: IMG_LOKI-212.bin</h1><br>
+Чтобы начать реверс-инжиниринг данной прошивки, необходимо сначала ответить на несколько вопросов:<br>
+<br>
+<ol>
+<li>какой тип процессора<br>
+</li>
+<li>каков адрес базовой загрузки<br>
+</li>
+<li>на какой ОС он основан, если таковая имеется</li>
+</ol><br>
+Благодаря нашему инструменту мы уже знаем адрес базовой загрузки: это <code>0x100000</code>.<br>
+<br>
+<code>Section Name: "[A]IMG_LOKI-212"<br>
+Section offset: 0 | 0x00000000<br>
+Section size: 7340032 | 0x00700000<br>
+Section base: 1048576 | 0x00100000</code><br>
+<br>
+Остальные ответы прошивка хранит в удобочитаемом виде. Например, эта строка:<br>
+<br>
+<code>$ strings ./IMG_LOKI-212.bin | rg Softune<br>
+6Softune REALOS/FR is Realtime OS for FR Family, based on micro-ITRON COPYRIGHT(C) FUJITSU LIMITED 1994-1999<br>
+...</code><br>
+<br>
+Таким образом, мы имеем дело с кастомным процессором <b>Fujitsu FR</b> (Leica называет его <b>Maestro</b>) и операционкой <b>Softune REALOS</b>. На самом деле, это намного лучше, чем Blackfin, потому что IDA из коробки поддерживает FR.<br>
+<br>
+<h2>Модуль процессора FR</h2><br>
+Реальность оказалась не такой яркой, потому что после загрузки файла прошивки программа IDA не показала никаких инструкций, внешних ссылок и т.&nbsp;д.<br>
+<br>
+Я решил исправить это, но в итоге пришлось <a href="https://github.com/alexhude/LeicaHacks/tree/master/Tools/fr">полностью переписать некоторые части прошивки</a>. Вот результат:<br>
+<br>
+<img src="https://habrastorage.org/getpro/habr/post_images/9f3/728/c76/9f3728c769d29aa02e2f405c08d8bb9a.png"><br>
+<br>
+<img src="https://habrastorage.org/getpro/habr/post_images/a08/2ea/81d/a082ea81d9056b07935398a19d4df294.png"><br>
+<br>
+Кроме исправлений в <code>ana</code>, <code>ins</code> и <code>out</code>, совершенно новый код <code>emu</code> умеет:<br>
+<br>
+<ul>
+<li>распознавать различные типы кода и внешние ссылки на данные;<br>
+</li>
+<li>распознавать операторы switch;<br>
+</li>
+<li>выполнять трассировку стека;<br>
+</li>
+<li>разделять аргументы стека и локальные переменные;<br>
+</li>
+<li>правильно распознавать функции.</li>
+</ul><br>
+Но самое большое изменение, как вы заметили, — это прописные буквы для инструкций :)<br>
+<br>
+Хотите увидеть полный набор инструкций? Вот он:<br>
+<br>
+<pre>ADD      OR       BTSTH    LSR     MOV     BN       LDRES     EXTSH   
+ADD2     ORH      MUL      LSR2    JMP     BP       STRES     EXTUH   
+ADDC     ORB      MULU     ASR     CALL    BV       COPOP     SRCH0   
+ADDN     EOR      MULH     ASR2    RET     BNV      COPLD     SRCH1   
+ADDN2    EORH     MULUH    LDI     INT     BLT      COPST     SRCHC   
+SUB      EORB     DIV0S    LDI     INTE    BGE      COPSV     LDM0    
+SUBC     BANDL    DIV0U    LDI     RETI    BLE      NOP       LDM1    
+SUBN     BANDH    DIV1     LD      BRA     BGT      ANDCCR    STM0    
+CMP      BORL     DIV2     LDUH    BNO     BLS      ORCCR     STM1    
+CMP2     BORH     DIV3     LDUB    BEQ     BHI      STILM     ENTER   
+AND      BEORL    DIV4S    ST      BNE     DMOV     ADDSP     LEAVE   
+ANDH     BEORH    LSL      STH     BC      DMOVH    EXTSB     XCHB    
+ANDB     BTSTL    LSL2     STB     BNC     DMOVB    EXTUB      </pre> <br>
+Вот так, просто и красиво.<br>
+<br>
+Кстати, вы могли заметить, что некоторые инструкции не выровнены:<br>
+<br>
+<pre>   BRA:D    loc_xxx
+    LDI:8   #0x64, R5</pre><br>
+Это не ошибка в процессорном модуле, а фактически особенность семейства Fujitsu FR. Она называется <a href="https://en.wikipedia.org/wiki/Delay_slot">слот задержки</a> и довольно типична для RISC-процессоров.<br>
+<br>
+Из <a href="https://edevice.fujitsu.com/fj/MANUAL/MANUALp/en-pdf/CM71-10158-1E.pdf">руководства по процессору FR80</a> (примечание: ссылка больше не работает):<br>
+<br>
+<blockquote>Инструкция, которая находится сразу после инструкции ветвления (её расположение называется «слотом задержки»), выполняется перед ветвлением, а инструкция по целевому адресу выполняется после ветвления. Поскольку инструкция в слоте задержки выполняется перед операцией ветвления, видимая скорость выполнения составляет 1 цикл.</blockquote><br>
+Таким образом, это, по сути, оптимизация конвейера, и лучше помнить о ней, потому что она применяется повсюду в прошивке Leica.<br>
+<br>
+<h2>Softune REALOS</h2><br>
+<a href="https://en.wikipedia.org/wiki/Softune">Из вики</a>:<br>
+<br>
+<blockquote>Softune — это интегрированная среда разработки Fujitsu для семейств процессоров Fujitsu FR, FR-V и F2MC. Работает на ядре реального времени REALOS µITRON. Например, используется в цифровых зеркальных камерах Nikon (см. Nikon EXPEED) и некоторых камерах Pentax с байонетом K.</blockquote><br>
+Так что это довольно популярная приличная RTOS с задачами, семафорами и другими вкусностями. Мне было интересно, можно ли распознать в прошивке Leica некоторые стандартные функции библиотеки.<br>
+<br>
+Должен назвать первую часть исследования большой напрасной тратой времени, и вот почему.<br>
+<br>
+Softune IDE оказалось очень трудно найти, но в конце концов мне удалось кое-что достать. Как и ожидалось, IDE включала в себя библиотеки. Там было четыре двоичных файла:<br>
+<br>
+<ul>
+<li>lib911.lib<br>
+</li>
+<li>lib911e.lib<br>
+</li>
+<li>lib911if.lib<br>
+</li>
+<li>lib911p.lib</li>
+</ul><br>
+Не знаю почему, может по инерции, как я взламывал всё связанное с Leica, я опять начал реверс-инжиниринг формата. Да, очень хорошо документированного формата <a href="https://en.wikipedia.org/wiki/Relocatable_Object_Module_Format">Object Module Format</a>. И да, конечно, я <a href="https://github.com/alexhude/LeicaHacks/tree/master/Tools/FRLibTool">написал для этого специальный инструмент</a>:<br>
+<br>
+<code>Fujitsu RISC Library Tool v1.0<br>
+Usage: FRLibTool [-s start] [-i imagebase] [-o output] [-f index] [-dv] FIRMWARE.BIN LIBRARY.LIB<br>
+<br>
+This tool will help you to find Softune REALOS library functions in FR (Fujitsu RISC) firmware.<br>
+Use following arguments:<br>
+ -f Specify firmware image file<br>
+ -s Specify firmware image scan offset<br>
+ -b Specify firmware imagebase<br>
+ -o Specify output type (exclusively)<br>
+ list - list of functions<br>
+ idc - IDC script<br>
+ py - IDA python script<br>
+ pat - FLAIR pattern file<br>
+ -i xxx Specify index of particular function<br>
+ -d Dump library<br>
+ -v Be verbose</code><br>
+<br>
+С его помощью можно создавать файлы <code>*.pat</code> и использовать их в качестве входных данных в <b>IDA FLAIR</b> для генерации <a href="https://github.com/alexhude/LeicaHacks/tree/master/IDA/signatures/">файлов сигнатур</a>.<br>
+<br>
+<code>$ FRLibTool -o pat lib911.lib<br>
+$ FRLibTool -o pat lib911e.lib<br>
+$ FRLibTool -o pat lib911if.lib<br>
+$ FRLibTool -o pat lib911p.lib<br>
+...<br>
+$ sigmake -n "SOFTUNE C/C++ Library" lib911.pat lib911e.pat lib911if.pat lib911p.pat softune.sig</code><br>
+<br>
+После применения этой сигнатуры я наконец-то с радостью увидел соответствия в <b>IMG_LOKI-212.idb</b>. <br>
+<br>
+<img src="https://habrastorage.org/getpro/habr/post_images/189/618/145/189618145ab302edfff51fa222ed89b3.png"><br>
+<br>
+<h4>Макет</h4><br>
+Сразу обращает на себя внимание количество строк в прошивке. Многие функции именуются по своей функциональности. Это очень полезно в процессе обратной разработки, чтобы понять общий шаблон.<br>
+<br>
+Также важно отметить, что некоторые части файла прошивки копируются на другой адрес в обработчике сброса (reset handler). Например, встроенный загрузчик во время выполнения перемещается выше по оперативной памяти.<br>
+<br>
+Пришлось вручную создавать дополнительные разделы, в итоге получился такой макет:<br>
+<br>
+<img src="https://habrastorage.org/getpro/habr/post_images/70f/d9d/ca3/70fd9dca36e610c7dea2e1c2fd29090c.png"><br>
+<br>
+<h4>Прерывания</h4><br>
+Таблицу векторов прерываний можно найти по доступу к TBR (Table Base Register):<br>
+<br>
+<code> LDI:32 #int_table, R0<br>
+ MOV R0, TBR</code><br>
+<br>
+Обычно он происходит в обработчике сброса вектора в самом начале прошивки.<br>
+<br>
+Адреса обработчиков в таблице хранятся в обратном порядке по формуле <code>TBR + (0x3FC - 4 × inum)</code>, так что вектор сброса в конце таблицы со смещением <code>0x3FC</code>.<br>
+<br>
+Я нашёл большинство прерываний из руководства по FR и предположил, что у Leica Maestro аналогичная компоновка. Затем взял каждый обработчик и попытался найти строку или любой другой намёк, раскрывающий цель прерывания.<br>
+<br>
+В итоге составил такой список:<br>
+<br>
+<img src="https://habrastorage.org/getpro/habr/post_images/bd7/eb8/c29/bd7eb8c291d5368d44576466400cb34b.png"><br>
+<br>
+Многие прерывания вполне ожидаемы, такие как AUDIO/SDIO/VIDEO/JPEG/RAW, но попробуйте определить самое загадочное из них? Я говорю о прерывании <code>int_uart_in</code>. Похоже, что камера поддерживает какой-то консольный режим UART CLI.<br>
+<br>
+<h4>Системные вызовы</h4><br>
+Как почти любая ОС, Softline REALOS использует системные вызовы. В ассемблере они выглядят так:<br>
+<br>
+<img src="https://habrastorage.org/getpro/habr/post_images/22f/a92/9e3/22fa929e311af81f43be57bf0bbbbc74.png"><br>
+<br>
+Фактический адрес обработчика системных вызовов вычисляется следующим образом. Начнём с поиска обработчика прерывания <code>INT #0x40</code>. В соответствии с описанием выше это<br>
+<br>
+<code>(0x3FC - 4 × inum) = (0x3FC - 4 × 0x40) = 0x2FC = int_realos_syscall</code> <br>
+<br>
+В обработчике легко найти ссылку на нижнюю часть таблицы системных вызовов с 16-битными словами. Конкретная запись в этой таблице вычисляется по формуле <code>syscall_table_bottom + (num * 2)</code>:<br>
+<br>
+<code>[syscall_table_bottom + (-23 * 2)] = [syscall_table_bottom - 0x2E] = [0x1012EA] = 0xE68</code> <br>
+<br>
+Это не похоже на адрес, потому что фактический адрес обработчика системных вызовов вычисляется как <code>syscall_table_bottom + offset</code>. Весь процесс показан на диаграмме.<br>
+<br>
+<img src="https://habrastorage.org/getpro/habr/post_images/c5a/240/2bb/c5a2402bb00a171532dabf9ef9aa45ea.png"><br>
+<br>
+Все системные вызовы и их функциональность указаны в <a href="https://www.fujitsu.com/downloads/MICRO/fma/pdfmcu/resofrke-cm71-00321-3e.pdf">Руководстве по ядру Softline REALOS/FR</a>, поэтому мне удалось восстановить все реализованные обработчики в таблице и ещё немного улучшить IDB.<br>
+<br>
+<img src="https://habrastorage.org/getpro/habr/post_images/c6a/b81/57a/c6ab8157a83a3e00613b4a000de45e54.png"><br>
+<br>
+Конечно, можно сделать код ещё красивее, определив типы системных вызовов в IDA.<br>
+<br>
+<img src="https://habrastorage.org/getpro/habr/post_images/1e0/75c/099/1e075c099f1bdcb70388427705dd25c0.png"><br>
+<br>
+Я написал <a href="https://github.com/alexhude/LeicaHacks/tree/master/IDA/scripts/softune.py">скрипт на Python</a> для автоматического поиска этих системных вызовов и прочего.<br>
+<br>
+<h4>Задачи</h4><br>
+В системном вызове <code>sta_tsk</code> я заметил, что в качестве параметра передаётся не основная функция, а pid. Это означает, что пришло время искать большой массив дескрипторов задач. И имеет смысл начать с самого <code>sta_tsk</code>.<br>
+<br>
+<pre>ROM:102180 sys_sta_tsk:
+ROM:102180                 ST      RP, @-R15
+ROM:102182                 LDUB    @(R14, 0x4F), R3
+ROM:102184                 LDI:32  #word_100B80, R14</pre><br>
+В самом начале мы видим какие-то ссылки. Пришлось немного повозиться с типами данных, но в итоге части собрались вместе:<br>
+<br>
+<pre>ROM:100B80 word_100B80:    .word 0xF           ; number of tasks
+ROM:100B82                 .word 0x1C          ; task descriptor size
+
+ROM:100B84                 .long 0x82A09F5C    ; task 1 descriptor
+ROM:100B88                 .long 0x1000D
+ROM:100B8C                 .long 0
+ROM:100B90                 .long 0x40000000
+ROM:100B94                 .long sub_1A7DB2    ; task main
+ROM:100B98                 .long 0x8286EEC0
+ROM:100B9C                 .long 0
+
+ROM:100BA0                 .long 0x82A09F88    ; task 2 descriptor
+ROM:100BA4                 .long 0x20010
+ROM:100BA8                 .long 0
+ROM:100BAC                 .long 0x40000000
+ROM:100BB0                 .long sub_1A6BD2    ; task main
+ROM:100BB4                 .long 0x8287EEC0
+ROM:100BB8                 .long 0
+...</pre><br>
+и так далее. Всего 15 задач. Было вопросом времени заглянуть в каждую основную функцию, определить имя и цель задачи (кроме последней). Вот полный список:<br>
+<br>
+<ol>
+<li><b>SubCPU</b><br>
+Эта задача, по-видимому, отвечает за операции захвата, такие как экспозиция, визирование по экрану и т.&nbsp;д.<br>
+</li>
+<li><b>KeyManager</b><br>
+Скорее всего, эта задача связана с аппаратными кнопками.<br>
+</li>
+<li><b>GuiManager</b><br>
+Довольно большая задача, в которой реализована машина состояний UI и отрисовка интерфейса.<br>
+</li>
+<li><b>DebugManager</b><br>
+Да, есть кое-что для отладки. Ням-ням.<br>
+</li>
+<li><b>FileManager</b><br>
+Эта задача — всё о файловых операциях.<br>
+</li>
+<li><b>FamManager</b><br>
+Я бы сказал, что задача отвечает за файлы и память, потому что она зависит от задач файлового менеджера и менеджера памяти.<br>
+</li>
+<li><b>MemoryManager</b><br>
+Никаких сюрпризов: операции с памятью, управление пулом и т.&nbsp;д.<br>
+</li>
+<li><b>ImageManager</b><br>
+Эта задача управляет процессами кодирования/декодирования и другими процессами обработки изображений.<br>
+</li>
+<li><b>UsbManager</b><br>
+Текущая задача&nbsp;— обработка коммуникаций по USB, которая включает в себя MassStorage, PTP и собственный протокол Leica.<br>
+</li>
+<li><b>IOManager</b><br>
+Похоже, эта задача управляет устройствами хранения данных, такими как SD и CF-карты (что? какие ещё CF? может, это из модели 213).<br>
+</li>
+<li><b>Systemmanager</b><br>
+Разные задачи вроде общих системных операций, управления питанием и т.&nbsp;д.<br>
+</li>
+<li><b>SettingsManager</b><br>
+Обрабатывает состояние камеры и настройки.<br>
+</li>
+<li><b>MonitorManager</b><br>
+Отслеживает изменения состояния камеры и информирует другие задачи.<br>
+</li>
+<li><b>PeripheralManager</b><br>
+Эта задача контролирует GPS, яркость и некоторые другие сенсоры.<br>
+</li>
+<li><b>Неизвестно</b><br>
+К сожалению, для неё я не нашел ничего существенного.</li>
+</ol><br>
+Интересно отметить, что после основного массива есть ещё один выдающийся дескриптор.<br>
+<br>
+<code>ROM:100D28 dword_100D28: .long 0x82A0A1F0<br>
+ROM:100D2C .long 0x21<br>
+ROM:100D30 .long 0<br>
+ROM:100D34 .long 0x80000000<br>
+ROM:100D38 .long tid16_task<br>
+ROM:100D3C .long 0x8285EEC0<br>
+ROM:100D40 .long 0</code><br>
+<br>
+А функция задачи — просто ветвление самой себя.<br>
+<br>
+<code>ROM:101494 sub_101494:<br>
+ROM:101494 BRA sub_101494 ; CODE XREF: sub_101494</code><br>
+<br>
+На этот дескриптор стоит ссылка в конце функции <code>start</code>, которая отвечает за создание других задач и настройку встроенного ПО. Так что это, скорее всего, задача бездействия системы.<br>
+<br>
+<h4>Модули и сообщения</h4><br>
+Помимо задач, можно определить некоторые логические объекты, такие как IO и периферийные модули. Модули представлены в виде группы обработчиков сообщений в рамках одной из задач.<br>
+<br>
+Группа IO, кажется, включает:<br>
+<br>
+<ul>
+<li>Менеджер IO</li>
+<li>Подпроцессор</li>
+<li>Менеджер USB</li>
+<li>USB PTP</li>
+<li>Протокол USB Leica</li>
+<li>USB Mass Storage</li>
+<li>Менеджер управления кнопками</li>
+<li>Менеджер отладки</li>
+<li>Менеджер объектива</li>
+</ul><br>
+А в периферийной группе:<br>
+<br>
+<ul>
+<li>Менеджер периферии</li>
+<li>Датчик освещённости</li>
+<li>Светодиоды</li>
+<li>Динамик</li>
+<li>Датчик угла наклона</li>
+<li>Распознавание закрытия крышки</li>
+<li>Модуль GPS</li>
+<li>Модуль 3DAxis</li>
+</ul><br>
+Сама система обмена сообщениями использует стандартные структуры SOFTUNE:<br>
+<br>
+<pre><code class="plaintext hljs">struct RealOS_MsgPayload
+{
+  uint32_t msgID;   // +0x0
+  uint32_t data[];  // +0x4
+}
+
+struct RealOS_Message
+{
+  uint32_t            os_reserved1; // +0x0
+  uint32_t            os_reserved2; // +0x4
+  
+  uint32_t            to;           // +0x8
+  uint32_t            from;         // +0xC
+  RealOS_MsgPayload*  payload;      // +0x10
+}</code></pre><br>
+Как и ожидалось, в IPC тоже есть несколько групп сообщений. Поскольку много сообщений обрабатывается в задачах и модулях, я смог восстановить только некоторые из этих групп:<br>
+<br>
+<pre>0x1101xxxx - глобальные системные сообщения:
+             0x11010002 = SYS_UPDATE_BOOTLOADER или
+             0x11010005 = SYS_ERASE_SETTINGS
+0x1102xxxx - сообщения, связанные с захватом изображения:
+             0x11020001 = CMD_CAP_CAPTURE или
+             0x11020008 = IMAGE_STATUS_CHANGED  
+0x1104xxxx - сообщения о событиях, связанных с воспроизведением:  
+             0x11040002 = PLY_DISABLE_PLAY_MODE или
+             0x11040004 = PLY_IMAGE_READY  
+0x1108xxxx - различные сообщения для отладки PTP и др.:
+             0x11080002 = DBG_CHANGE_LEVEL или
+             0x11080012 = DBG_WRITE_ROM_DUMP_SD  
+0x2201xxxx - сообщения USB PTP
+             0x22010108 = изменение настроек камеры или
+             0x22010118 = запрос DebugObject  
+0x2202xxxx - довольно большая группа сообщений SUBCPU:
+             0x22020002 = E_SUBCPU_REQUEST_M_EXPOSURE_REQUEST  
+             0x22020015 = E_IO_SUBCPU_COMMAND_CLEANING_SENSOR  
+0x2203xxxx - некоторые другие сообщения отладки:
+             0x22030001 = команда отладочной строки
+0x2204xxxx - различные сообщения IO:
+             0x2204000C = включение/отключение Mass Storage или
+             0x22040012 = перезагрузка устройства  
+0x330000xx - другая группа сообщений для UI:
+             0x33000001 = нажатие клавиш
+             0x33000007 = подключение объектива
+0x440000xx - здесь мало информации, но похоже на обработку изображений
+             0x44000013 = E_IMG_CMD_CHANGE_PINFO  
+0x55xxxxxx — группы сообщений FAM:  
+             0x558800xx = файл-менеджер FAM или
+             0x558888xx = первая группа настройки меню FAM
+0x6602xxxx — похоже на управляющие сообщения LED, например:
+             0x66020001 - переключение LED с X Гц
+             0x66020002 = включение непрерывного LED  
+0x6604xxxx - управление бипером:
+             0x66040001 = установка бипера
+             0x66040007 = писк о заполненной карте
+0x6611xxxx - сообщения отладки, связанные с памятью
+0x6622xxxx - сообщения обработки сообщений, связанные с памятью
+0x6660xxxx - некоторые другие сообщения, связанные с памяьтю:
+             0x66600006 = HISTOGRAM  
+             0x66600011 = RAWCOMP  
+0x771100xx and 0x77AA00xx - сообщения, связанные с переключением режимов камеры</pre><br>
+К сожалению, много других сообщений остаются неизвестными.<br>
+<br>
+<h4>GUI</h4><br>
+В файле прошивки посмотрим ещё на следующие разделы: <b>CTRL_SYS-11</b>, <b>IMG-LOKI-212</b>, <b>IMG-DSP-212</b>, <b>IMG-FPGA-212</b> и <b>IMG-LENSDATA-212</b>.<br>
+<br>
+Что меня удивило, так это полное отсутствие ресурсов GUI. Но они где-то должны быть и, скорее всего, встроены в <b>IMG-LOKI-212</b>.<br>
+<br>
+Один из моих обычных подходов к обратной разработке прошивки&nbsp;— восстановить все возможные перекрёстные ссылки. Не только в коде, но и в разделе данных. Затем я просматриваю их, пытаясь найти некоторые шаблоны или ссылки на известные части кода.<br>
+<br>
+Прошивка Leica не стала исключением. Там много похожих последовательностей данных с адресами на другие последовательности данных, которые обращаются дальше и т.&nbsp;д. Поднимаясь по иерархии ссылок, я в конце концов увидел знакомую функцию.<br>
+<br>
+Например, я нашёл структуру данных без каких-либо ссылок:<br>
+<br>
+<pre><code class="plaintext hljs">g_data = { ... }</code></pre><br>
+К ней обращалась другая структуры:<br>
+<br>
+<pre><code class="plaintext hljs">g_data_struct1 = { ... , &amp;g_data }</code></pre><br>
+К которой в свою очередь обращается ещё одна структура:<br>
+<br>
+<pre><code class="plaintext hljs">g_data_struct2 = { &amp;g_data, ... }</code></pre><br>
+На эту структуру данных есть ссылка из кода, и её передают в качестве параметра другой функции:<br>
+<br>
+<pre><code class="plaintext hljs">func1()
+╰ func2(..., &amp;g_data_struct2, ...)</code></pre><br>
+Однако <code>func1()</code> не вызывается напрямую из другой функции, а хранится в некотором массиве:<br>
+<br>
+<pre><code class="plaintext hljs">g_func_list1[] = { ..., func1(), ... }</code></pre><br>
+Посмотрев выше, я нашел в коде вызов <code>g_func_list1</code>:<br>
+<br>
+<pre><code class="plaintext hljs">func3() {
+    g_func_list1[x]
+}</code></pre><br>
+И снова эта функция сохранена в массиве:<br>
+<br>
+<pre><code class="plaintext hljs">g_func_list2[] = { ..., func3(), ... }</code></pre><br>
+К самому массиву обращается какой-то другой код:<br>
+<br>
+<pre><code class="plaintext hljs">func4() {
+    g_func_list2[x]
+}</code></pre><br>
+К счастью, на этот раз функция вызвана из другой функции, и так до <code>gui_MADE_ApplicationRun</code>.<br>
+<br>
+<pre><code class="plaintext hljs">gui_Statemachine_DoStateChange()
+╰ gui_MADE_ApplicationRun()
+  ╰ func5()
+    ╰ func4()</code></pre><br>
+В некоторых строках указано, что подсистема GUI называется “MADE”, а переходы страниц обрабатываются с помощью <code>MADE_GetSysTri</code>, что бы это ни значило. Машина состояний GUI, в основном, реализована в функции <code>gui_Statemachine_DoStateChange</code>. После сбора информации о GUI сложилась общая картина:<br>
+<br>
+<img src="https://habrastorage.org/getpro/habr/post_images/4d4/33e/3cf/4d433e3cf679dba11141d58d080daf5b.png"><br>
+<br>
+Как видите, основная функция для ресурсов GUI&nbsp;— <code>gui_CopyImageDesc</code> (хотя это не настоящее имя). У неё следующие аргументы:<br>
+<br>
+<pre><code class="plaintext hljs">gui_CopyImageDesc(
+    uint32_t			dstAddress;		// R4 - destination address
+    UIDescType			type;			// R5 - description type
+    UITarget			target;			// R6 - rendering target
+    uint32_t			descAddress;	    	// R7 - description address
+    uint8_t			always0;        	// (SP + 0x0) - always 0
+    uint8_t			index1;			// (SP + 0x4) - index 1
+    uint8_t			index2;			// (SP + 0x8) - index 2
+    uint16_t			x_offset;		// (SP + 0xC) - x offset
+    uint16_t			y_offset;		// (SP + 0x10) - y offset
+    uint16_t			unknown2;		// (SP + 0x14) -
+    uint32_t			language1;		// (SP + 0x18) - language id 1
+    uint32_t			language2;		// (SP + 0x1C) - language id 2
+    uint32_t			funcAddress;		// (SP + 0x20) - function address
+)</code></pre><br>
+Есть четыре типа описаний ресурсов:<br>
+<br>
+<pre><code class="plaintext hljs">struct UIDescType0Header         struct UIDescType1Header         struct UIDescType2                struct UIDescType3       
+{                                {                                {                                 {                        
+    uint32_t    address;             uint32_t    address;             uint32_t    reg;                  uint16_t    x_offset;
+    uint16_t    entries;             uint16_t    entries;             uint32_t    address;              uint16_t    y_offset;
+    uint16_t    unknown;             uint16_t    unknown;             uint16_t    unknown1;             uint32_t    address; 
+}                                }                                    uint16_t    unknown2;         }                        
+                                                                      uint16_t    unknown3;                                        
+struct UIDescType0Entry          struct UIDescType1Entry              uint16_t    tableoff;                                        
+{                                {                                }                                                                
+    uint16_t    x_offset;            uint16_t    x_offset;                   
+    uint16_t    y_offset;            uint16_t    y_offset;                   
+    uint32_t    address;             uint32_t    address;                    
+}                                    uint16_t    objects;                    
+                                     uint16_t    total_w; 
+                                     uint16_t    total_h;                    
+                                     uint16_t    unknown;                    
+                                 }    </code></pre><br>
+У первого типа заголовок со ссылкой на массив записей. Каждая запись имеет координаты и адрес пиксельных данных. Текущий тип, похоже, описывает зависимые от состояния элементы, такие как значки, которые могут быть серыми или исчезать из UI.<br>
+<br>
+Второй тип тоже начинается с заголовка и используется для локализации, описания строк или блоков текста.<br>
+<br>
+Третий тип описывает карты символов для разных языков.<br>
+<br>
+Последний тип отвечает за все другие статические ресурсы, такие как изображения, фоны и т.&nbsp;д.<br>
+<br>
+Теперь взглянем на сами данные для изображений.<br>
+<br>
+<code>+0x00: 00 08 00 14 00 01 A2 FF 0A 04 05 FF 0C 04 03 FF<br>
++0x10: 0D 04 03 FF 0E 04 02 FF 0E 04 02 FF 04 04 06 FF<br>
++0x20: 04 04 02 FF 04 04 06 FF 04 04 02 FF 04 04 06 FF<br>
++0x30: 04 04 02 FF 04 04 06 FF 04 04 02 FF 04 04 06 FF<br>
++0x40: 04 04 02 FF 04 04 06 FF 04 04 02 FF 04 04 06 FF<br>
++0x50: 04 04 02 FF 04 04 06 FF 04 04 02 FF 0E 04 02 FF<br>
++0x60: 0E 04 02 FF 0D 04 03 FF 0D 04 03 FF 0C 04 04 FF<br>
++0x70: 04 04 0C FF 04 04 0C FF 04 04 0C FF 04 04 0C FF<br>
++0x80: 04 04 0C FF 04 04 0C FF 04 04 0C FF 04 04 0C FF<br>
++0x90: 04 04 0D FF 02 04 2D FF 00 06 00 14 00 01 79 FF</code><br>
+<br>
+Первые шесть байт выглядят как маленький заголовок, за которым следует какой-то повторяющийся шаблон, где каждый второй байт является либо <code>0xFF</code>, либо <code>0x04</code>. Логично предположить, что <code>0x0008</code> и <code>0x0014</code>&nbsp;— ширина и высота в представлении с прямым порядком байтов (big endian). В конце этого дампа мы видим начало другой последовательности <code>00 06 00 14 00 01</code>. Скорее всего, это следующий ресурс (что подтверждается ссылкой на него). Таким образом, размер фактических данных изображения составляет 146 байт. Но размер изображения должен быть 0x8 * 0x14 = 0xA0 = 160. Ясно, что в данных не чисто пиксели и даже не 8-битная LUT, потому что она на 14 байт меньше. Тогда что? Вероятно, какое-то сжатие.<br>
+<br>
+Глядя на этот шестнадцатеричный дамп, трудно поверить, что используется какая-то сложная схема. GUI у Leica не очень красочный, так что по моему опыту здесь лучше всего использовать таблицу LUT. В этом случае ресурсы UI будут полностью повторять индексы LUT вроде <code>03 03 03</code> или <code>А1 А1 А1</code>. Обычно компрессор пытается избавиться от дублирования данных, заменяя их ссылкой. Эти массивы индексов идеальны для сжатия даже простым методом вроде RLE <code>[data][number]</code>. Простая команда записать <code>data</code> (значение) <code>number</code> раз.<br>
+<br>
+С учётом всего этого я предположил, что перед нами, скорее всего, простое изображение с двумя цветами LUT (<code>0xFF</code> и <code>0x04</code>), а байт перед цветом — количество пикселей для рисования.<br>
+<br>
+«А потом ты написал ещё один инструмент», — подумаете вы. Но нет, я взял ручку и бумагу и начал заполнять клетки. Забавно, что у меня до сих пор сохранился тот рисунок.<br>
+<br>
+<img src="https://habrastorage.org/getpro/habr/post_images/743/b4a/1f3/743b4a1f3a65f485760e8a4f0584d2e6.png"><br>
+<br>
+Где-то по пути я понял, что для этого изображения недостаточно 160 пикселей, так что 0x8 и 0x14 нужно умножить на два. Третье слово 0x0001 указывает, является ли изображение символом ASCII, так что окончательная структура ImageAsset выглядит следующим образом:<br>
+<br>
+<pre><code class="plaintext hljs">struct ImageAsset
+{
+    uint16_t    width;        // ширина/2 (big endian)
+    uint16_t    height;       // высота/2 (big endian)
+    uint16_t    ascii;        // 1, если символ ASCII
+    struct      image_data {
+        uint8_t number;       // количество пикселей для рендеринга
+        uint8_t color;        // индекс цвета пикселя в LUT
+    } data[];
+}</code></pre><br>
+Но одна часть всё ещё отсутствует: LUT.<br>
+<br>
+Её было не так сложно найти, потому что многие ссылки и структуры уже восстановлены вручную, так что я медленно прокручивал разделы данных, ища массив на 256 элементов из 16-битных или 32-битных значений, пока не натолкнулся на это:<br>
+<br>
+<code> .long 0x7008080, 0x72D8080, 0x73C8080, 0x75A8080, 0x79B8080, 0x71DFF6B, 0x7BE8080, 0x7FF8080<br>
+ .long 0x77BBD27, 0x75B60E7, 0x7835F4A, 0x7D3089F, 0x7018080, 0x7028080, 0x7038080, 0x7048080<br>
+ .long 0x7058080, 0x7068080, 0x7078080, 0x7088080, 0x7098080, 0x70A8080, 0x70B8080, 0x70C8080<br>
+ .long 0x70D8080, 0x70E8080, 0x70F8080, 0x7108080, 0x7118080, 0x7128080, 0x7952B15, 0x7138080<br>
+ .long 0x7148080, 0x7158080, 0x7168080, 0x7178080, 0x7188080, 0x7198080, 0x71A8080, 0x71C8080<br>
+ .long 0x71D8080, 0x71E8080, 0x71F8080, 0x7338080, 0x7208080, 0x7218080, 0x7228080, 0x7238080<br>
+ .long 0x7248080, 0x7248080, 0x7268080, 0x7278080, 0x7288080, 0x7298080, 0x72A8080, 0x72B8080<br>
+ .long 0x72C8080, 0x75E8080, 0x7608080, 0x7628080, 0x7648080, 0x7678080, 0x7688080, 0x7698080<br>
+ .long 0x76B8080, 0x76E8080, 0x7708080, 0x7728080, 0x7758080, 0x7778080, 0x7798080, 0x77C8080<br>
+ .long 0x77E8080, 0x7818080, 0x7838080, 0x7868080, 0x7888080, 0x78B8080, 0x78D8080, 0x7908080<br>
+ .long 0x7928080, 0x7958080, 0x7978080, 0x7998080, 0x79C8080, 0x79D8080, 0x7668080, 0x79E8080<br>
+ .long 0x7A18080, 0x7A28080, 0x7A38080, 0x7A68080, 0x7A78080, 0x7A88080, 0x7AB8080, 0x7AC8080<br>
+ .long 0x7AD8080, 0x7B08080, 0x7B28080, 0x7B58080, 0x7B88080, 0x7B98080, 0x7BC8080, 0x7CC8080<br>
+ .long 0x7AB3BBB, 0x7E10094, 0x7E4556E, 0x4008080, 0x2922D17, 0x7B2AB00, 0x7C2A262, 0x71DFF6B<br>
+ .long 0x768D4A2, 0x769D4EA, 0x7BD88AE, 0x705997B, 0x70BB377, 0x711CC73, 0x717E66F, 0x7238866<br>
+ .long 0x729A262, 0x72FBB5E, 0x735D55A, 0x7417751, 0x747914D, 0x74DAA48, 0x753C444, 0x75F663B<br>
+ .long 0x76B9933, 0x7998080, 0x771B32F, 0x77D5526, 0x7836F22, 0x789881E, 0x78FA21A, 0x7159095<br>
+ .long 0x71AAA91, 0x720C38D, 0x726DD88, 0x7506F6A, 0x7568866, 0x75CA262, 0x762BB5E, 0x76E5E55<br>
+ .long 0x7747751, 0x77A914D, 0x780AA48, 0x78C4D3F, 0x792663B, 0x7988037, 0x79E9933, 0x7AA3C2A<br>
+ .long 0x7B05526, 0x7B66F22, 0x7BC881E, 0x72488AE, 0x72AA1AA, 0x72FBBA6, 0x735D4A2, 0x7427799<br>
+ .long 0x7489095, 0x74DAA91, 0x753C38D, 0x77E556E, 0x7836F6A, 0x7898866, 0x78FA262, 0x79C4459<br>
+ .long 0x7A15E55, 0x7A77751, 0x7AD914D, 0x7BF4D3F, 0x7CC8080, 0x7C5663B, 0x7CB8037, 0x7337FC8<br>
+ .long 0x73999C4, 0x73FB2C0, 0x745CCBB, 0x7757799, 0x74C54FF, 0x77B9095, 0x780AA91, 0x7AB3C72<br>
+ .long 0x7B1556E, 0x7B66F6A, 0x7BC8866, 0x74277E1, 0x74890DD, 0x74EAAD9, 0x754C3D5, 0x76066CC<br>
+ .long 0x7667FC8, 0x76C99C4, 0x772B2C0, 0x77E55B7, 0x7846EB3, 0x78A88AE, 0x790A1AA, 0x7526EFB<br>
+ .long 0x75787F7, 0x75DA1F3, 0x763BAEE, 0x76F5DE6, 0x77577E1, 0x77B90DD, 0x781AAD9, 0x78D4CD0<br>
+ .long 0x79366CC, 0x79F99C4, 0x7E10094, 0x7CF44A1, 0x7DB7799, 0x7E71A90, 0x7ED338C, 0x7FF8080<br>
+ .long 0x7328080, 0x7DC8080, 0x7C88080, 0x7508080, 0x775CD2C, 0x76944EA, 0x7808080, 0x71A61FF<br>
+ .long 0x7244D40, 0x7242C15, 0xFFF8080, 0xF338080, 0xF668080, 0xF998080, 0xFCC8080, 0xF008080<br>
+ .long 0xF4C54FF, 0xFAB3BBB, 0xFE10094, 0xFE4556E, 0xF952B15, 0xFDA7751, 0xFB2AB00, 0xFC2A262<br>
+ .long 0xF1DFF6B, 0xF68D4A2, 0xF69D4EA, 0xFBD88AE, 0xA922D17, 0xC6E4130, 0xE286963, 0x74C55FF<br>
+ .long 0x768D536, 0x7FF8080, 0x7FF8080, 0x7FF8080, 0x2922D17, 0x46E4130, 0x6286963, 0x8080</code><br>
+<br>
+Опять же, благодаря моей работе с Blackmagic Design я сразу распознал пиксели YUV (например, все значения с цифрами 8080).<br>
+<br>
+Я не дурак, чтобы опять рисовать весь пользовательский интерфейс вручную на бумаге, так что да, я написал ещё один инструмент — <a href="https://github.com/alexhude/LeicaHacks/tree/master/Tools/M240UITool">M240UITool</a>.<br>
+<br>
+<code>Leica M (typ 240) UI Tool v1.0<br>
+Usage: ./M240UITool [-a address] [-i imagebase] [-s script] [-d dump] [-f folder] [-l LUT] [-rbv] FIRMWARE.BIN<br>
+<br>
+This tool will help you to find UI resources in firmware.<br>
+Use following arguments:<br>
+ -a Specify address of the gui_CopyImageDesc function (ex. 0x2F95E0)<br>
+ -i Specify firmware imagebase<br>
+ -s Specify IDC file name<br>
+ -c Specify container file name<br>
+ -d Specify dump image format<br>
+ png - PNG format<br>
+ bmp - BMP (ARGB) format<br>
+ -f Specify folder for dumped images<br>
+ -l Specify LUT for images (filename of address)<br>
+ -b Specify number of bytes to display in verbose mode<br>
+ -r Try to recover string characters<br>
+ -v Be verbose</code><br>
+<br>
+Кроме сброса всех ресурсов изображений из файла микропрограммы в BMP/PNG, этот инструмент умеет создавать IDC-скрипты в IDA для определения всех ресурсов UI.<br>
+<br>
+Мы уже знаем, что из функции, которую создаёт одну страницу UI, несколько раз вызывается <code>gui_CopyImageDesc</code>. Я подумал, что будет здорово сделать браузер ресурсов UI и определить все функции рендеринга страниц. Для этого предназначена опция <code>-c</code>&nbsp;— она сооздаёт специальный контейнер для просмотра ресурсов.<br>
+<br>
+И кто сказал, что браузер ресурсов пользовательского интерфейса не может выглядеть необычно?<br>
+<br>
+<img src="https://habrastorage.org/getpro/habr/post_images/8b6/5f7/6c3/8b65f76c30a4d4a037719e805141573a.png"><br>
+<br>
+Будучи интерактивным (полупрозрачные кнопки на скриншоте), этот инструмент позволяет не только прокручивать страницы меню EVF/LCD, но просматривать этапы рендеринга в пределах одной страницы.<br>
+<br>
+К сожалению, исходники этого шедевра где-то потерялись, но заголовочные файлы всё ещё в коде M240UITool, поэтому технически можно воссоздать его с нуля.<br>
+<br>
+<h4>Меню отладки</h4><br>
+Какую строку мы ищем в первую очередь при реверс-инжиниринге? По-моему, это слово <code>debug</code> и производные от него.<br>
+<br>
+В прошивке было много интересных строк, но эти особенные:<br>
+<br>
+<code>$ strings ./IMG_LOKI-212_1.1.0.2.bin | grep "Debug Mode"<br>
+GUI: State: %d! Scanning for Debug Mode successful<br>
+GUI: Scanning for Debug Mode: State: %d, Ignore long DEL<br>
+GUI: Scanning for Debug Mode: State: %d<br>
+GUI: Scanning for Debug Mode: State: %d, Ignore long DEL<br>
+GUI: Scanning for Debug Mode: State: %d<br>
+GUI: Scanning for Debug Mode: State: %d, Ignore long DEL<br>
+GUI: Scanning for Debug Mode: State: %d<br>
+GUI: Scanning for Debug Mode: State: %d, Ignore long DEL<br>
+GUI: Scanning for Debug Mode: State: %d<br>
+GUI: Scanning for Debug Mode: State: %d, Ignore long DEL<br>
+GUI: Scanning for Debug Mode: State: %d<br>
+...<br>
+GUI: ScanningForDebugWithKeyAndJoyStick(): g_GUI_CheckForDebugWithKeyAndJoyStick = %d</code><br>
+<br>
+Похоже, что в режим отладки можно войти с помощью какой-то комбинации клавиш. Все эти строки вызываются из одной гигантской функции <code>ScanningForDebugWithKeyAndJoyStick</code>, которая реализует машину состояний сканирования кнопок. Вот как это выглядит в IDA:<br>
+<br>
+<img src="https://habrastorage.org/getpro/habr/post_images/e9e/525/cd2/e9e525cd2bc493e7bb8cc4b3710b1334.png"><br>
+<br>
+Не буду врать, потребовалось некоторое время, чтобы понять, как в прошивке обрабатываются аппаратные кнопки, а затем восстановить перечисляемые типы для кнопок и джойстика. Но когда я получил комбинацию, то с огорчением выяснил, что она ничего не делает. Вероятно, она работает только с какой-то конкретной страницы GUI. Еще пара вечеров ручной трассировки машины состояний GUI&nbsp;— и проблема решена, а также удалось найти страницу меню Reset.<br>
+<br>
+Наконец, добро пожаловать в режим отладки.<br>
+<br>
+<img src="https://habrastorage.org/getpro/habr/post_images/526/74d/068/52674d068ae127cc7b90b5b1172de325.png"><br>
+<br>
+Я много думал, огласить ли эту комбинацию, но решил воздержаться. Я уважаю тяжёлую работу, которую делает Leica, выпуская свои уникальные аппараты, и не хочу отвечать за то, что их сервисные центры заполнят сломанные тушки камер в результате некоторого бездумного любопытства.<br>
+<br>
+Но всё-таки предоставлю некоторые перечисляемые типы, чтобы упростить обратную разработку для тех, кто готов идти по этому пути.<br>
+<br>
+<pre><code class="plaintext hljs">enum ControlActionType {
+    kControlAction_Idle,        // 0
+    kControlAction_Push,        // 1
+    kControlAction_Release,     // 2
+    kControlAction_LongPush     // 3
+};
+
+enum ControlBtnType {
+    kControlBtn_LV,             // 0
+    kControlBtn_PLAY,           // 1
+    kControlBtn_DEL,            // 2
+    kControlBtn_ISO,            // 3
+    kControlBtn_MENU,           // 4
+    kControlBtn_SET             // 5
+};
+
+enum ControlJoystickType {
+    kControlJoy_INFO,           // 0
+    kControlJoy_Up,             // 1
+    kControlJoy_Down,           // 2
+    kControlJoy_Left,           // 3
+    kControlJoy_Right           // 4
+};</code></pre><br>
+<h4>PTP</h4><br>
+Думая над задачей USB, я определил три режима (что также подтверждается в меню отладки):<br>
+<br>
+<ul>
+<li>PTP<br>
+</li>
+<li>MSC (Mass Storage Class)<br>
+</li>
+<li>Leica Custom</li>
+</ul><br>
+PTP наиболее интересен, потому что он хорошо документирован и позволяет управлять камерой.<br>
+<br>
+В прошивке довольно легко найти обработчики PTP, потому что из этого кода много вызовов. Все вызовы PTP делятся на три группы: <b>Legacy</b>, <b>Leica Extended (LE)</b> и <b>Production</b>.<br>
+<br>
+Отладочные сообщения помогли установить названия почти для всего кода.<br>
+<br>
+<pre>Legacy:                            Leica Extented:                          Production:                           
+0x1001 - GetDeviceInfo             0x9001 - Set Camera Settings             0x9100 - Open Production Session      
+0x1002 - OpenSession               0x9002 - Get Camera Settings             0x9101 - Close Production Session     
+0x1003 - CloseSession              0x9003 - Get Lens Parameter              0x9102 - UpdateFirmware               
+0x1004 - Get Storage ID            0x9004 - Release Stage                   0x9103 - Open OSD Session             
+0x1005 - Get Storage Info          0x9005 - Open LE Session                 0x9104 - Close OSD Session            
+0x1006 - GetNumObjects             0x9006 - Close LE Session                0x9105 - Get OSD Data                 
+0x1007 - GetObjectHandles          0x9007 - RequestObjectTransferReady      0x9106 - GetFirmwareStruct            
+0x1008 - GetObjectInfo             0x9008 - GetGeoTackingData               0x910B - GetDebugMenu                 
+0x1009 - GetObject                 0x900A - Open Debug Session              0x910C - SetDebugMenu                 
+0x100A - Get Thumb                 0x900B - Close Debug Session             0x910D - ODIN Message                 
+0x100B - Delete Object             0x900C - Get Debug Buffer                0x910E - GetDebugObjectHandles        
+0x100E - Initiate Capture          0x900D - Debug Command String            0x910F - GetDebugObject               
+0x1014 - GetDevicePropDesc         0x900E - Get Debug Route                 0x9110 - DeleteDebugObject            
+0x1015 - GetDevicePropV            0x900F - SetIPTCData                     0x9111 - GetDebugObjectInfo           
+0x101C - Initiate Open Capture     0x9010 - GetIPTCData                     0x9112 - WriteDebugObject             
+                                   0x9020 - Get3DAxisData                   0x9113 - CreateDebugObject            
+                                   0x9030 - OpenLiveViewSession             0x9114 - Calibrate 3Daxis             
+                                   0x9031 - CloseLiveViewSession            0x9115 - Magnetic calibration         
+                                   0x9033 - Unknown                         0x9116 - Get Viewfinder Data          </pre><br>
+Сама реализация интерфейса PTP кажется стандартной, однако у некоторых команд есть ограничения, которые я намеренно опускаю здесь.<br>
+<br>
+В любом случае, всё вышесказанное довольно увлекательно. Вы можете подумать: «Давайте просто подключим камеру по USB и начнём зондировать с помощью libptp». Всё верно.<br>
+<br>
+Только блин…<br>
+<br>
+У Leica M240 нет USB-порта.<br>
+<br>
+<h2>Порт для рукоятки</h2><br>
+Leica предлагает немного аксессуаров для этой камеры, но есть один особенно интересный. Речь идет о <b>многофункциональной рукоятке Leica M (14495)</b>. Он заменяет нижнее металлическую часть корпуса, обеспечивает встроенный GPS и несколько разъёмов вроде USB, терминал вспышки SCA, DIN/ISO-X и гнездо для питания.<br>
+<br>
+<img src="https://habrastorage.org/getpro/habr/post_images/fab/250/1b6/fab2501b6e69cb6caf3f62528e413bdb.jpg"><br>
+<br>
+И вы опять скажете: «Здорово, теперь просто купим её, прикрепим к камере, подключим камеру по USB и начнём зондировать с помощью libptp». Всё верно.<br>
+<br>
+Только блин…<br>
+<br>
+Она стоит почти 900 долларов.<br>
+<br>
+Это почти девятьсот причин, чтобы создать собственный адаптер. Тем не менее, на всякий случай я настроил уведомления eBay для этого аксессуара.<br>
+<br>
+<h4>Разъём</h4><br>
+Разъём на камере выглядит следующим образом:<br>
+<br>
+<img src="https://habrastorage.org/getpro/habr/post_images/a29/4f0/388/a294f0388ad2c5ac3d355d0838e01586.png"><br>
+<br>
+Я попытался найти его в интернете, но серьёзно, как бы вы описали его в Google?<br>
+<br>
+Немного отчаявшись, я начал думать о некоторых сумасшедших вещах, вроде приклеить фольгу или иголки к резиновому ластику. Но однажды на работе в Blackmagic Design, глядя на печатную плату камеры, я заметил, что у одного разъёма очень знакомая форма. На следующий день я привёз свою Leica M240 на работу&nbsp;— и да, она выглядела похожей, просто намного длиннее с большим количеством контактных площадок.<br>
+<br>
+Осталось спросить номер детали у нашего менеджера по компонентам, а затем найти её в каталоге Samtec: <b><a href="https://www.samtec.com/products/erm8-013-05.0-l-dv-tr">ERM8-013-05.0-L-DV-TR</a></b>.<br>
+<br>
+<img src="https://habrastorage.org/getpro/habr/post_images/a60/dc3/d36/a60dc3d36d12216f74690577507fc6db.png"><br>
+<br>
+Мы также спросили у представителей Samtec, можно ли получить образец, и они добросердечно согласились.<br>
+<br>
+<img src="https://habrastorage.org/getpro/habr/post_images/dda/752/0d6/dda7520d6691fc48f3f1aaa026e49635.png"><br>
+<br>
+Немного работы паяльником, картона и изоленты&nbsp;— и готов мой собственный штекер (образец 2013 года).<br>
+<br>
+<img src="https://habrastorage.org/getpro/habr/post_images/ddd/243/fe5/ddd243fe596648709c3f9dccb76f15ea.png"><br>
+<br>
+Спустя пять лет, в 2018 году, я решил лично попросить Samtec прислать другой образец. Мне хотелось сделать что-то получше.<br>
+<br>
+<b><a href="http://ercd-013-05.00-ttr-ttr-1-d/">ERCD-013-05.00-TTR-TTR-1-D</a></b> <br>
+<img src="https://habrastorage.org/getpro/habr/post_images/e1a/56a/995/e1a56a9958b1dda50aca34f0ecac8863.png"><br>
+<br>
+Опять много работы паяльником, ругани, резки проволоки, ругани, снова работы паяльником, чтобы сделать новый, более симпатичный вариант:<br>
+<br>
+<img src="https://habrastorage.org/getpro/habr/post_images/1a5/b78/10d/1a5b7810d3a2ccea73bf4e2d75cad8cd.png"><br>
+<br>
+<h4>Распиновка</h4><br>
+В разъёме 26 контактов: по 13 с каждой стороны. Ещё до пайки своей детали я прозондировал разъём камеры мультиметром и логическим анализатором. Кстати, на датчик нижней крышки нужно поставить магнит, чтобы камера считала, что крышка на месте.<br>
+<br>
+<b>Земля (камера выключена, нет батареи)</b><br>
+<br>
+Я всегда начинаю с земли, потому что это безопасно и её очень легко найти.<br>
+<br>
+<img src="https://habrastorage.org/getpro/habr/post_images/ead/140/15c/ead14015c97177d6717e198616c9114b.png"><br>
+<br>
+Таким образом, у нас восемь линий заземления (тёмно-серый).<br>
+<br>
+<b>Потенциал (камера включена)</b><br>
+<br>
+Когда камера включена, можно измерить потенциал на каждом контакте и получить представление о логике и уровнях мощности.<br>
+<br>
+<a href="">alexhude.github.io/assets/2019/2019-01-24-hacking-leica-m240/probe2_potential.png</a><br>
+<br>
+Показатели на контактах 8-9 и 11-13 слишком высоки для логических контактов, поэтому я определил их как питание (красный).<br>
+<br>
+<b>Сопротивление (камера выключена, нет батареи)</b><br>
+<br>
+Полезно ещё измерить сопротивление. В некоторых случаях это помогает идентифицировать входы и сгруппировать некоторые линии.<br>
+<br>
+<img src="https://habrastorage.org/getpro/habr/post_images/fa7/fde/1a6/fa7fde1a623a5f13d264a5127a3083d2.png"><br>
+<br>
+<b>Связанные выходы (камера выключена, нет батареи)</b><br>
+<br>
+Затем я решил проверить все внешние контактные площадки на корпусе камеры, чтобы проверить, связаны ли они с сервисным портом.<br>
+<br>
+<img src="https://habrastorage.org/getpro/habr/post_images/f75/61e/c06/f7561ec060796fa8e39a15d533e3de03.png"><br>
+<br>
+Синхроконтакт вспышки оказался напрямую подключен к линии 10.<br>
+<br>
+<b>Логический анализатор (камера включена)</b><br>
+<br>
+Данные для каждой строки записывались в следующей последовательности: включаем, камера должна быть в режиме LV, делаем снимок, начинаем видеозапись.<br>
+<br>
+<img src="https://habrastorage.org/getpro/habr/post_images/494/33c/27c/49433c27cf94be5cb9430e4ba518560c.png"><br>
+<br>
+Две линии показывают передачу каких-то данных: 01 и 21.<br>
+<br>
+<b>01</b> — 115200, передача по 8 бит, 1 стоп-бит, бит чётности, LSB первый.<br>
+<br>
+<img src="https://habrastorage.org/getpro/habr/post_images/bf7/3a2/fdf/bf73a2fdfbbfeab571c354f2a6d50c9b.png"><br>
+<br>
+Каждые 500 мс, он отправляет какой-то счётчик <code>C3 3C 02 81 00 01 00 82, C3 3C 02 81 01 01 00 83, C3 3C 02 81 02 01 00 80</code>…<br>
+<br>
+<b>21</b> — 115200, передача по 8 бит, 1 стоп-бит, нет бита проверки чётности, LSB первый.<br>
+<br>
+<img src="https://habrastorage.org/getpro/habr/post_images/f00/423/2dd/f004232dd3f1b8c8f0e665fd63f3fa9b.png"><br>
+<br>
+Он отправляет лог загрузчика SH7216 (“Leica Camera AG” на скриншоте выше).<br>
+<br>
+Давайте пометим их тёмно-синим. Довольно грустно, что лог Maestro не отдаётся наружу даже с максимальными настройками отладки в меню Debug.<br>
+<br>
+<img src="https://habrastorage.org/getpro/habr/post_images/c44/541/bb9/c44541bb98c4388f151bdc3faffa1dfe.png"><br>
+<br>
+На этих контактах сопротивление около 310kOhm.<br>
+<br>
+Не знаю почему, но я предположил, что другие линии данных могут иметь аналогичное сопротивление или будут закрыты. Поэтому я определил линии ~300kOhm, ~200kOhm и ~100кОм тоже как линии данных (оттенки синего цвета на рисунке).<br>
+<br>
+В целом нарисовалась следующая картина.<br>
+<br>
+<img src="https://habrastorage.org/getpro/habr/post_images/e7e/31f/f2c/e7e31ff2cc7da6ae304652488ca9db4c.png"><br>
+<br>
+12 кандидатов на линии данных. Но как их проверить? После небольшой беседы со специалистами по железу об электрической защите интегральных схем я начал тыкать в контакты через резистор 4kOhm, уменьшающий ток до уровня, который не должен сжечь входы.<br>
+<br>
+<h4>UART</h4><br>
+Я сделал ещё одно предположение, что линия RX должна быть рядом с ТХ. Линии 02, 03 и 20 выглядят как хорошие кандидаты, потому что у обеих напряжение 3,3&nbsp;В как у TX.<br>
+<br>
+Изначально я пытался изучить эти линии с помощью Bus Pirate. К сожалению, результат оказался довольно грязным. Затем я взял кабели на основе SiLabs как более надёжные и ни с чем не конфликтующие на macOS.<br>
+<br>
+Сначала я подключил кабель TX к контакту 20 и начал набирать <code>help</code> после загрузчика. Как и ожидалось, после небольшой задержки камера повторила символы.<br>
+<br>
+<img src="https://habrastorage.org/getpro/habr/post_images/a16/445/c00/a16445c00b6a22a6b37b74c97fc97ca5.png"><br>
+<br>
+Контакты 02 и 03 были следующими кандидатами на UART. К сожалению, не оказалось никаких признаков, что эти линии прослушиваются.<br>
+<br>
+На диаграмме известные UART обозначены более тёмным оттенком зеленого.<br>
+<br>
+<img src="https://habrastorage.org/getpro/habr/post_images/733/f68/fa1/733f68fa1950518017ad2c09971ac1f8.png"><br>
+<br>
+<h4>USB</h4><br>
+Всё началось с разреза USB-кабеля пополам с хедером посередине и резисторами на 4kOhm для зондирования. Целостность сигнала дифференциальной пары? Неа, тогда меня это не очень волновало. :)<br>
+<br>
+<img src="https://habrastorage.org/getpro/habr/post_images/891/930/5d3/8919305d35cd2525d420313c2b0e7555.png"><br>
+<br>
+Затем я дома прозондировал несколько бытовых устройств с USB, чтобы получить представление, как выглядят коммуникации по этому порту.<br>
+<br>
+<b>Камера Canon</b><br>
+<img src="https://habrastorage.org/getpro/habr/post_images/c49/f85/cf8/c49f85cf89650352531c83c970eb609c.png"><br>
+<br>
+<b>Карманная видеокамера Blackmagic</b><br>
+<img src="https://habrastorage.org/getpro/habr/post_images/8b7/7e5/bc8/8b77e5bc8c2fa3387083a8e8ec12c3db.png"><br>
+<br>
+<b>Видеокамера Canon</b><br>
+<img src="https://habrastorage.org/getpro/habr/post_images/17f/dd4/67a/17fdd467a6627a4129f38d6e476d4ffc.png"><br>
+<br>
+<b>Видеокамера JVC</b><br>
+<img src="https://habrastorage.org/getpro/habr/post_images/757/80d/4c8/75780d4c8a85c55c04afe5de9209e09d.png"><br>
+<br>
+<b>Брелок</b><br>
+<img src="https://habrastorage.org/getpro/habr/post_images/ad9/3a6/382/ad93a63828797eaea1f5d906367b792f.png"><br>
+<br>
+<b>Камера KidiZoom</b><br>
+<img src="https://habrastorage.org/getpro/habr/post_images/32e/d73/13a/32ed7313a12ef1cef1444a87c22f3c77.png"><br>
+<br>
+Они все немного разные, но начальное состояние D- D+ низкое. Что ж, будем знать, а теперь проверим, что у нас есть:<br>
+<br>
+<ul>
+<li><b>22</b> — маловероятно, потому что D- D+ являются дифференциальной парой и должны быть довольно близки;<br>
+</li>
+<li><b>04/05</b> — маловероятно, потому что у них разное сопротивление;<br>
+</li>
+<li><b>14/15</b> — маловероятно, потому что у них разное сопротивление;<br>
+</li>
+<li><b>15/16</b> — возможно, потому что они близки и имеют похожее сопротивление.</li>
+</ul><br>
+Поэтому я подсоединил USB D- D+ к пинам 15/16 и подключил к iMac…<br>
+<br>
+<img src="https://habrastorage.org/getpro/habr/post_images/777/491/b7f/777491b7f4a3b4b0f8376931db78c6c8.jpg"><br>
+<br>
+На экране USB PTP, но камера не появлялась на хосте. Я пытался настроить разные варианты на макете электронной схемы, но ничего не работало. Beagle показывал много повреждённых пакетов и других ошибок. В конце концов я сдался и вернулся к обратной разработке прошивки.<br>
+<br>
+Это окончательное распиновка, USB обозначен тёмно-зелёным цветом.<br>
+<br>
+<img src="https://habrastorage.org/getpro/habr/post_images/2ad/07d/289/2ad07d289a684e6db69a02ae9e50c294.png"><br>
+<br>
+Кто бы мог подумать, что несколько лет спустя мне придёт то самое уведомление eBay и я довольно дёшево куплю желанный аксессуар.<br>
+<br>
+Наконец, я могу проверить свои предположения о PTP. Но сначала было очень любопытно, как внутри гаджета выглядит USB PHY.<br>
+<br>
+<img src="https://habrastorage.org/getpro/habr/post_images/afe/0b1/afc/afe0b1afc09953f7f9c6dbc451c47c56.png"><br>
+<br>
+Внутри оказался хаб <a href="https://www.microchip.com/wwwproducts/en/USB2512B">SMSC 2512b</a> прямо на дороге от разъёма рукоятки к коннектору Mini USB. Чип работает в дефолтном режиме, потому что нет никакого EEPROM или контактов SCL/SDA. Первый нисходящий порт маршрутизируется в гнездо корпуса камеры, но второй ни к чему не подключен.<br>
+<br>
+Вероятно, я что-то упустил, но для меня такое решение не имеет большого смысла. В техническом паспорте написано, что у чипа «полностью интегрированные USB-выводы, а также есть резисторы для повышения и понижения напряжения». Возможно, инженеры Leica решили не внедрять собственный USB PHY, а использовали тот что в хабе, который хорошо протестирован и работает из коробки. На самом деле, не могу их винить, потому что раньше я пытался сделать подобное, и это оказалось непростой задачей. Может, это фича для защиты от подделки, кто знает.<br>
+<br>
+В любом случае, если вы разбираетесь в USB PHY и готовы помочь, не стесняйтесь написать мне: должна же быть возможность работать через USB-порт без этого фирменного аксессуара :)<br>
+<br>
+<h4>Снова PTP</h4><br>
+Как я уже сказал, пришло время поиграться с расширением Leica PTP.<br>
+<br>
+К счастью, я нашёл довольно классную библиотеку C++ вместо libptp — это <a href="https://github.com/TrueJournals/libEasyPTP">libEasyPTP</a>. Также не заняло много времени написать инструмент на основе этой библиотеки: я уже знал некоторые ограничения в интерфейсе Leica PTP.<br>
+<br>
+И хотя M240PTPTool порядочно глючит, он вполне подходит на роль доказательства концепции (<a href="https://github.com/alexhude/LeicaHacks/tree/master/Tools/M240PTPTool">код программы</a>).<br>
+<br>
+По PTP идёт только два запроса: <b>GetDebugBuffer (0x900C)</b> и <b>DebugCommandString (0x900D)</b>. Кстати, чтобы модули заполняли журнал отладки, необходимо в меню установить Debug Level как “Debug” или “Debug RAW”.<br>
+<br>
+В интерфейсе M240PTPTool есть несколько опций: <br>
+<br>
+<ul>
+<li><b>exit</b> — закрыть инструмент;<br>
+</li>
+<li><b> flush</b> — слить отладочный буфер с камеры:</li>
+</ul><br>
+<code>M240&gt; flush<br>
+I:[00:11:468]|01| DATE/TIME CORRECTED by 5921 sec<br>
+D:[00:12:079]|00| Send message from TID 0 to TID 1 over MBX 3 - length: 4 - MesgID: 0x22020103<br>
+D:[00:12:179]|00| Send message from TID 0 to TID 1 over MBX 3 - length: 4 - MesgID: 0x22020103<br>
+D:[00:12:282]|11| Message received from TID 0 for TID 1 over MBX 3<br>
+D:[00:12:283]|11| Message received from TID 0 for TID 1 over MBX 3<br>
+D:[00:12:301]|00| Send message from TID 0 to TID 1 over MBX 3 - length: 4 - MesgID: 0x22020103<br>
+D:[00:12:402]|00| Send message from TID 0 to TID 1 over MBX 3 - length: 4 - MesgID: 0x22020103<br>
+D:[00:12:502]|00| Send message from TID 0 to TID 1 over MBX 3 - length: 4 - MesgID: 0x22020103<br>
+...</code><br>
+<br>
+Любой другой текст отправляется к камеру как отладочная команда. Например, <code>help</code> выводит все возможные команды с аргументами:<br>
+<br>
+<code>M240&gt; help<br>
+ ********* debug command description ********<br>
+<br>
+exposure request<br>
+ Description: requests a release from Sub CPU<br>
+ Parameter 1: Exposure Time TV<br>
+<br>
+still request<br>
+ Description: simulates the -still request- command flow of Sub CPU<br>
+ Parameter: no<br>
+ <br>
+ ...<br>
+<br>
+send Message;[Parameter1];[Parameter2];[Parameter2];...;...<br>
+ Description: Sending Message to Task<br>
+ Parameter 1: Receiver Task ID<br>
+ Parameter 2: Command ID<br>
+ Parameter 3: Command Data[0] (32 Bit)<br>
+ Parameter 4: Command Data[1] (32 Bit)<br>
+ Parameter 5: .<br>
+ Parameter 6: .<br>
+ use maximum 10 Parameter<br>
+ <br>
+ ...</code><br>
+<br>
+Полный список довольно большой, но смотрите, можно отправлять прямые сообщения Softune для любой задачи! Что бы такого интересного туда отправить…<br>
+<br>
+Ещё одна популярная строка, которую часто ищут в прошивке — <code>dump</code>. Посмотрим, есть ли у нас такая.<br>
+<br>
+<code>$ strings IMG_LOKI-212_1.1.0.2.bin | rg -i dump<br>
+GUI: HEX DUMP: Address: %x, Length: %d<br>
+HSK: DBG_WRITE_ROM_DUMP_SD: File was properly opened, but it seems to be empty.<br>
+ROM_DUMP<br>
+HSK: DBG_WRITE_ROM_DUMP_SD: Flushing Dump to ROM. Size %d<br>
+SD:\ROM_DUMP.bin<br>
+HSK: DBG_WRITE_ROM_DUMP_SD Command received!<br>
+ROM_DUMP.bin<br>
+HSK: DUMP failed, no cards inserted!<br>
+HSK: DUMP FlashROM to SD card.<br>
+HSK: DUMP FlashROM to CF card.<br>
+Dumping files to card</code><br>
+<br>
+Видимо, можно сделать дамп прошивки на SD-карту. По ссылке на строку “Dumping files to card” легко найти код, отвечающий за это. Он расположен в гигантском блоке System Task (pid 11, как мы уже знаем) и вызывается сообщением <code>0x11080006</code> без аргументов.<br>
+<br>
+Наберите <code>send Message;11;0x11080006</code> в <b>M240PTPTool</b>, нажмите Enter и смотрите на экран.<br>
+<br>
+<img src="https://habrastorage.org/getpro/habr/post_images/4de/1cc/e2e/4de1cce2e0ee47a67645df790a7e581c.jpg"><br>
+<br>
+Затем извлеките SD-карту и проверьте, что на ней.<br>
+<br>
+<img src="https://habrastorage.org/getpro/habr/post_images/209/2a8/25e/2092a825e23cb93c4845b416ea11b0e4.png"><br>
+<br>
+Вот он, полный дамп, включая прошивку.<br>
+<br>
+Это открывает бесконечные возможности. Например, можно сделать крошечное устройство с MCU, поддержкой USB-хоста и кнопками для запуска сложных последовательностей сообщений…<br>
+<br>
+А потом у нас родился второй ребенок. :)<br>
+<br>
+<h1>Эпилог</h1><br>
+Если вы не хотите ломать устройство, обычно есть способ его изучить, не открывая корпус или припаивая провода к печатной плате. Ниже мои советы, если вам интересно:<br>
+<br>
+<ul>
+<li>найдите всю публичную информацию об устройстве: технические характеристики, данные о комплектующих, фотографии внутренностей, <a href="https://youtu.be/p4t-OVIvuy8%3Ft%3D196">видео с завода</a> ;)<br>
+</li>
+<li>если у вас есть прошивка, покопайтесь в ней и поищите подсказки о внешних выходах;<br>
+</li>
+<li>всегда гуглите разные магические и странные последовательности байтов, которые найдёте в файлах прошивки;<br>
+</li>
+<li>измерьте GND/потенциал/сопротивление для всех неизвестных контактов, выставленных наружу;<br>
+</li>
+<li>прозондируйте эти контакты анализатором логики;<br>
+</li>
+<li>всегда помните о мерах безопасности, связанных с электроникой;<br>
+</li>
+<li>попробуйте исключить контакты, которые вам не нужны (земля, питание);<br>
+</li>
+<li>если не можете распознать сигнал по аналоговому виду, попробуйте поискать в Google наиболее популярные (USB/UART/SPI/I2C/1Wire);<br>
+</li>
+<li>если возникли идеи о природе сигнала, попробуйте проверить на похожей бытовой электронике;<br>
+</li>
+<li>подумайте <s>три</s> пять раз, прежде чем отправлять данные на устройство;<br>
+</li>
+<li>и конечно, не стесняйтесь спрашивать совета.</li>
+</ul><br>
+<img src="https://habrastorage.org/getpro/habr/post_images/18b/006/166/18b006166a4070202c1be3a9b946c3e9.png"><br>
+<br>
+<a href="http://github.com/alexhude">github.com/alexhude</a><br>
+<br>
+<b>Удачных вам взломов!</b></div>

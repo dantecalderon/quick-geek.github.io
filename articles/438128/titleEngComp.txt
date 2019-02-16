@@ -1,0 +1,1 @@
+Many hieroglyphs - many neural networks: how to build an effective recognition system for a large number of classes?

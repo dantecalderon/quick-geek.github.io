@@ -1,0 +1,1 @@
+abbyy, иероглифы, алфавит, нейросети, machine learning, сверточные нейронные сети, lenet, WideResNet, squeezenet, cpu, gpu, mnist, kmeans, end-to-end, искусственный интеллект

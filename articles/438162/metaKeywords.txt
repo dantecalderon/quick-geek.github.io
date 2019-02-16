@@ -1,0 +1,1 @@
+python, namedtuple, slots, dataclass, ohmypy, кортежи, дата-классы
