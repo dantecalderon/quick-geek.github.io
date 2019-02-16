@@ -1,0 +1,1 @@
+Xcode 10.2, macOS Mojave 10.14.4, iOS 12.1 and other beta versions

@@ -1,0 +1,1 @@
+We teach the computer to distinguish sounds: acquaintance with the DCASE competition and assembly of the audio classifier in 30 minutes

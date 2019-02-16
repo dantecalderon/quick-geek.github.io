@@ -1,0 +1,1 @@
+riak, redis, postgresql, postgres, database migrations, миграция базы данных, RealtimeBoard

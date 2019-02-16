@@ -1,0 +1,1 @@
+Open webinar "Order of execution of a SELECT query and query plan in MS SQL Server"

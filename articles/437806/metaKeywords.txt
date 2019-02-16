@@ -1,0 +1,1 @@
+#, javascript, json, ecmascript 10, ecmascript, tostring, ооп, BigInt, globalThis, import(dynamic), import.meta
