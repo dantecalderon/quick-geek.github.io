@@ -1,0 +1,1 @@
+Kalman filter to minimize the entropy value of random error with non-Gaussian distribution

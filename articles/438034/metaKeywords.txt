@@ -1,0 +1,1 @@
+android development, rxkotlin, rxandroid, mvp, neural networks, android, kotlin

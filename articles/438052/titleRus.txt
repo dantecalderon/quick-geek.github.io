@@ -1,0 +1,1 @@
+Паттерн Интерактор (Interactor, Operation)
