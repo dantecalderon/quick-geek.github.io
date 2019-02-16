@@ -1,0 +1,1 @@
+Splunk 7 Implementation - the first book on Splunk in Russian

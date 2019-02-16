@@ -1,0 +1,1 @@
+java, java 8, java ee, jaxb, xjc, web-services, web-service, xml, xml schema, xml web services, plugin, jaxb plugin, xjc plugin

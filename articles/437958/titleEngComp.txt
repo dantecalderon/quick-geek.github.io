@@ -1,0 +1,1 @@
+Authorization in ESIA on the terminal server with EDS according to GOST-2012

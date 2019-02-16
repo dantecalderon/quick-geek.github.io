@@ -1,0 +1,1 @@
+Intel Optane Memory H10: кэш Optane + QLC 3D NAND

@@ -1,0 +1,1 @@
+Jaxb (XJC) generates classes from XML Schema (XSD) with annotation class and field descriptions. Xjc plugin
