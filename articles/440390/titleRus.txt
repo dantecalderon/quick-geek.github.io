@@ -1,0 +1,1 @@
+Многообразный мир embedded systems и место Embox в нем

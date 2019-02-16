@@ -1,0 +1,1 @@
+Java, Oracle, Liberica, BellSoft, openjdk

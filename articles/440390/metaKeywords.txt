@@ -1,0 +1,1 @@
+embox, embedded, embedded systems, embedded linux, yocto, freertos, openembedded, микроконтроллеры, nuttx

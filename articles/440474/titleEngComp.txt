@@ -1,0 +1,1 @@
+Effects of filtering SVG. Part 4. Two-color images with feComponentTransfer

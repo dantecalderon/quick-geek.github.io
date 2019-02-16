@@ -1,0 +1,1 @@
+Выпущена 3CX v16 Beta 1 с поддержкой Raspberry Pi

@@ -1,0 +1,1 @@
+Privilege escalation in PostgreSQL - parsing CVE-2018-10915

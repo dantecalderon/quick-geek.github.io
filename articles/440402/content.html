@@ -1,0 +1,35 @@
+<div class="post__text post__text-html js-mediator-article">  Hello everyone, I am one of the developers of the <a href="http://searchface.ru/">SearchFace</a> service and <a href="http://searchface.ru/">am</a> ready to talk about it in the comments. <br><br> <a href="https://habr.com/ru/post/440402/"><img src="https://habrastorage.org/getpro/habr/post_images/6c8/c24/c0e/6c8c24c0e24327931cb705f8cf52e013.png"></a> <br><br>  Because of the <a href="https://habr.com/post/440160/">hype with the suit of VC</a> , the important thing for which we launched the service has receded into the background - to test the search capabilities.  And since now the service is available to the general public, I want to show everyone what our recognition algorithms are capable of. <br><a name="habracut"></a><br>  At the moment, SearchFace is a small demo of algorithms.  Each search is carried out in our database of half a billion alternatives.  That is, each person must be distinguished from hundreds of millions of others, among whom there may be (and probably will be) people very similar to the desired person.  Yes, this task has already been solved by the closed FindFace (if it doesn’t change my memory, the base volume was about the same), so we wanted to not just repeat, but wanted to surpass.  The main task that we set for ourselves was to try to make it possible to search, including by highly “distorted” pictures.  A few examples below, but you can play around yourself. <br><br>  <b>Example 1.</b> Maxim Cherkasov, trashbox.ru. <br><br>  Maxim was one of those who, while reviewing our algorithm, did not hesitate to upload photos in mirrored sunglasses.  Still, the first three places in the search results were extremely correct results.  Moreover, in one of them the photograph was of low resolution, with an unusual facial expression and everything else taken six years ago.  Combo! <br><br><div style="text-align:center;"><img src="https://habrastorage.org/getpro/habr/post_images/5ac/274/551/5ac274551aad8fbeecd666d8807f9a07.jpg" width="500"></div><br>  Result: <br><br><img src="https://habrastorage.org/getpro/habr/post_images/817/760/1a9/8177601a9573620a629bd1a8b3b63af6.png"><br><br>  <b>Example 2.</b> Ilya Dyer and Sultan Suleymanov from Meduza.io.  Ilya uploaded his photo, in which he looks away, and Sultan - a photo in a scarf (where only part of the face is visible).  According to him, which we naturally didn’t check, he couldn’t identify him on this photo, while we have a very high score on both of the results, which means that the algorithm didn’t just choose the most similar person, but was sure that found the right one.  The verge of "confidence" is somewhere around 0.65–0.67. <br><br><img src="https://habrastorage.org/getpro/habr/post_images/5a6/12a/bd3/5a612abd352f28b85c8e75a0e2cef751.jpg"><br><br>  <b>Example 3.</b> Nikita Likhachev, tj.  Revision TJ tested the engine on its employees, but unlike Maxim Cherkasov, she didn’t try to cheat our algorithm.  Therefore, for the purposes of this article, we deliberately blurred a photo of Nikita with imagemagick using a gaussian-blur with different sigma values. <br><br><pre><code class="plaintext hljs">convert Nikita_00.png -gaussian-blur 12x4 Nikita_04.png</code></pre><br>
+<div class="spoiler"><b class="spoiler_title">Оригинал фотографии и с размытием</b><div class="spoiler_text"><img src="https://habrastorage.org/getpro/habr/post_images/4b3/474/296/4b3474296dd7de2889a3ba6af16821dc.png" width="370"> <img src="https://habrastorage.org/getpro/habr/post_images/4ca/fea/aae/4cafeaaae92be0b1ecc7feef51b3b8b2.png" width="370"></div></div><br>
+И вплоть до сигма=16 в на первом месте была реальная фотография Никиты, при сигма=18 фото Никиты еще попадались в «топ-16», и только начиная с сигма=20 «топ-16» перестал содержать хоть что-то релевантное запросу.<br>
+<br>
+<img src="https://habrastorage.org/webt/el/vq/my/elvqmy-ezi0iupmdbhaeltww8v8.jpeg"><br>
+<br>
+А вот пример поиска по фото с необычной мимикой и нестандартным ракурсом — фотографии ставшей скандально известной этим летом фотомодели Натальи:<br>
+<br>
+<img src="https://habrastorage.org/getpro/habr/post_images/b96/7a4/faf/b967a4faf505584a40197caf59168d1b.jpg"><br>
+<i>Фото с сайта vklybe.tv</i> <br>
+<br>
+Поисковая выдача:<br>
+<br>
+<img src="https://habrastorage.org/getpro/habr/post_images/42e/9f0/d8c/42e9f0d8ce8d51f263f3dd9919e78ffd.jpg"><br>
+<br>
+Вот результат работы по фотографии 8-летней Эми Уайнхаус:<br>
+<br>
+<div style="text-align:center;"><img src="https://habrastorage.org/getpro/habr/post_images/afa/358/b43/afa358b431c75cc6b14d73890b1996cc.jpg" width="500"></div><br>
+В «топ-16» есть много её уже взрослых фото:<br>
+<br>
+<img src="https://habrastorage.org/getpro/habr/post_images/97e/6f4/8fb/97e6f48fbec10820109ea37d9811cc78.png"><br>
+<br>
+С 7-летней Мадонной оказалось сложнее, но тем не менее выдача содержит и её взрослые фото, причем с ярким макияжем. <br>
+<br>
+<div style="text-align:center;"><img src="https://habrastorage.org/getpro/habr/post_images/59a/acd/fc9/59aacdfc979259c2d7e30f1e1cf97d39.jpg" width="500"></div><br>
+Результат:<br>
+<br>
+<img src="https://habrastorage.org/getpro/habr/post_images/ffa/090/683/ffa0906834d1eaddd5eca602238e39ae.png"><br>
+<br>
+И тут нужно понимать, что семь лет ей было в далеком 1965 году, а фотографии тех времён не всегда высокого качества.<br>
+<br>
+<hr><br>
+Может показаться, что фотографии в примерах как-то специально подобраны, но вы можете сами попробовать на любых фото. Про сами алгоритмы расскажем чуть позже, а пока просто хочется, чтобы коллективный разум потестировал — фидбек очень важен для нас.<br>
+<br>
+Пишите вопросы в комментариях.</div>

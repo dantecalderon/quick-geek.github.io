@@ -1,0 +1,1 @@
+About linters, code quality, quality in general and quality management
