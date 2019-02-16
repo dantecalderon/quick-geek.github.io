@@ -1,0 +1,1 @@
+ReactJS + MobX - experience using DI

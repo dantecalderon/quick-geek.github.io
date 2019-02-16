@@ -1,0 +1,1 @@
+Мужчина, pause on caught exceptions

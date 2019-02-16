@@ -1,0 +1,1 @@
+scipy, графы, text, sparse matrix, dijkstra's algorithm, word ladder

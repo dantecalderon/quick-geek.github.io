@@ -1,0 +1,1 @@
+Organization of search in a web page in JavaScript (without jQuery)

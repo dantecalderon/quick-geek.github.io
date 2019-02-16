@@ -1,0 +1,1 @@
+Why you should think about functional programming.

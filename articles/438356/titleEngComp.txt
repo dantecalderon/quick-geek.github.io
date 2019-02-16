@@ -1,0 +1,1 @@
+SQL Server Data Warehouse Fast Track (DWFT) certified architecture: what it means and how it works

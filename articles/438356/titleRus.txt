@@ -1,0 +1,1 @@
+Архитектура, сертифицированная по SQL Server Data Warehouse Fast Track (DWFT): что это значит и как устроено
