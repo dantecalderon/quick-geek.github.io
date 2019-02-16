@@ -1,0 +1,1 @@
+Custom googleTranslate widget for the site

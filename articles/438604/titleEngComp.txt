@@ -1,0 +1,1 @@
+Bitrix in conjunction Nginx + PHP-FPM, CNC setting, as well as a composite cache with feedback via nginx. Modified configuration

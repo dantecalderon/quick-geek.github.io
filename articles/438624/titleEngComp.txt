@@ -1,0 +1,1 @@
+We program the switch through passage. MicroPython on esp8266 (sonoff) with OTA. Part 1

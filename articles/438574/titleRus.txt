@@ -1,0 +1,1 @@
+Основы архитектуры приложений на Flutter: Vanilla, Scoped Model, BLoC
