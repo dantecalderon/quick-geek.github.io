@@ -1,0 +1,1 @@
+java, java core, maven, gradle, lombok, сбербанк

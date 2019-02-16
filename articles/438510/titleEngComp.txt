@@ -1,0 +1,1 @@
+Composition against inheritance, the team pattern and game development in general

@@ -1,0 +1,1 @@
+Python + Raspberry Pi + Pixhawk and quadrocopter. Or how not to do robots

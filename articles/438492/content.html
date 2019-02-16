@@ -1,0 +1,486 @@
+<div class="post__text post__text-html js-mediator-article">  Recently <a href="http://ericniebler.com/2018/12/05/standard-ranges/">I was</a> <a href="https://twitter.com/aras_p/status/1076947443823136768">reminded</a> why I <a href="http://aras-p.info/blog/2018/12/28/Modern-C-Lamentations/">consider it a</a> <a href="https://sean-parent.stlab.cc/2018/12/30/cpp-ruminations.html">bad idea</a> to give C ++ to newbies.  This is a <a href="http://www.elbeno.com/blog/%3Fp%3D1598">bad</a> <a href="https://medium.com/%40pat_wilson/get-your-shit-together-6ccbfd6bb755">idea</a> , because in C ++ a real mess is a beautiful, though perverse, tragic and amazing mess.  Despite the current state of the community, this article is not directed against <i>modern</i> C ++.  Rather, it partially continues the <a href="https://blog.tartanllama.xyz/">article</a> <a href="https://blog.tartanllama.xyz/initialization-is-bonkers/">“Initialization in C ++ is insane” by</a> Simon Brand, and in part it is a message to every student who wants to start his education looking into the abyss. <br><br>  Typical objections from students when they are told about studying C: <br><br><ul><li>  “Someone else uses it?” <br></li><li>  "This is stupid" <br></li><li>  "Why do we study C?" <br></li><li>  “We have to learn something better, for example, C ++” ( <b>laughter</b> ) </li></ul><a name="habracut"></a><br>  It seems that many students think that learning C doesn’t matter much (from the author: it’s not), and instead you should start with C ++.  Let's look at just one of the reasons why this is an absurd proposition: <b>creating a fucking variable</b> .  In the original article, Simon Brand suggested that the reader is already familiar with the weirdness of initialization in versions prior to C ++ 11.  We will look at some of them here and go a little further. <br><br>  Let me first explain that in this article my personal opinion, and <b>not the</b> official position of the University of Drexel, where I teach at the Department of Electrical Engineering and Computer Engineering.  My lectures are usually included in the course of the engineering program, rather than computer science, that is, they relate more to system programming and embedded systems. <br><br><h1>  Summary in one gifka </h1><br>  <a href="https://www.reddit.com/r/cpp/comments/ad07zw/initialization_in_c_is_seriously_bonkers/edcjuxi/">u / AlexAlabuzhev on Reddit</a> managed to retell the whole article in one gif.  (I think this is the original work of <a href="https://mobile.twitter.com/timur_audio/status/1004017362381795329">Timur Dumler</a> ) <br><br><iframe width="560" height="315" src="https://www.youtube.com/embed/https://translate" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen=""></iframe><br>  I have nothing against C ++, but there is a lot that you don’t need at an early stage. <br><br>  That's all.  Go home.  Walk the dog.  Wash your laundry.  Call your mom and tell me you love her.  Try a new recipe.  There is nothing to read, guys.  In fact, think about how badly the engineers (that is, me) know how to communicate their thoughts ... <br><br>  Everything, I persuaded as I could! <br><br>  So are you still here?  This soldier.  If I could, I would give you a medal!  And tasty chocolate milk! <br><br>  <b>Now back to our usual ... programming.</b> <br><br><h1>  Initialization in C </h1><br><h3>  Introduction </h3><br>  First, consider <a href="https://en.cppreference.com/w/c/language/initialization">initialization in C</a> , because it is similar to C ++ for compatibility reasons.  It will be pretty quick, because C is so boring and simple ( <i>ahem</i> ).  Every newcomer learns this initialization by heart, because in C it works differently than in many new statically typed languages.  There is either a default initialization for acceptable values ​​or a compilation error. <br><br><pre><code class="cpp hljs"><span class="hljs-function"><span class="hljs-keyword"><span class="hljs-function"><span class="hljs-keyword">int</span></span></span><span class="hljs-function"> </span><span class="hljs-title"><span class="hljs-function"><span class="hljs-title">main</span></span></span><span class="hljs-params"><span class="hljs-function"><span class="hljs-params">()</span></span></span><span class="hljs-function"> </span></span>{
+    <span class="hljs-keyword"><span class="hljs-keyword">int</span></span> i;
+    <span class="hljs-built_in"><span class="hljs-built_in">printf</span></span>(<span class="hljs-string"><span class="hljs-string">"%d"</span></span>, i);
+}</code></pre><br>
+Любой нормальный программист на C знает, что это инициализирует <code>i</code> как неопределённое значение (для всех намерений и целей <code>i</code> не инициализирована). Обычно рекомендуется инициализировать переменные, когда они определены, например <code>int i = 0</code>;, и переменные всегда следует инициализировать перед использованием. Независимо от того, сколько раз <s>повторять, кричать, орать</s> мягко напоминать студентам об этом, остаются те, кто считает, что переменная по умолчанию инициализируется в <code>0</code>.<br>
+<br>
+Отлично, попробуем ещё один простой пример.<br>
+<br>
+<pre><code class="cpp hljs"><span class="hljs-keyword"><span class="hljs-keyword">int</span></span> i;
+
+<span class="hljs-function"><span class="hljs-keyword"><span class="hljs-function"><span class="hljs-keyword">int</span></span></span><span class="hljs-function"> </span><span class="hljs-title"><span class="hljs-function"><span class="hljs-title">main</span></span></span><span class="hljs-params"><span class="hljs-function"><span class="hljs-params">()</span></span></span><span class="hljs-function"> </span></span>{
+    <span class="hljs-built_in"><span class="hljs-built_in">printf</span></span>(<span class="hljs-string"><span class="hljs-string">"%d"</span></span>, i);
+}</code></pre><br>
+Очевидно, это одно и то же? Мы понятия не имеем о значении <code>i</code>&nbsp;— она может быть любой.<br>
+<br>
+Нет.<br>
+<br>
+Поскольку у переменной есть статическая продолжительность хранения, она инициализируется в беззнаковый ноль. Вы спросите, почему? Потому что так сказано в стандарте. Аналогичное поведение у типов указателей, которые я даже не собираюсь рассматривать в этой статье.<br>
+<br>
+Окей, посмотрим на структуры.<br>
+<br>
+<pre><code class="cpp hljs"><span class="hljs-class"><span class="hljs-keyword"><span class="hljs-class"><span class="hljs-keyword">struct</span></span></span><span class="hljs-class"> </span><span class="hljs-title"><span class="hljs-class"><span class="hljs-title">A</span></span></span><span class="hljs-class"> {</span></span>
+    <span class="hljs-keyword"><span class="hljs-keyword">int</span></span> i;
+};
+
+<span class="hljs-function"><span class="hljs-keyword"><span class="hljs-function"><span class="hljs-keyword">int</span></span></span><span class="hljs-function"> </span><span class="hljs-title"><span class="hljs-function"><span class="hljs-title">main</span></span></span><span class="hljs-params"><span class="hljs-function"><span class="hljs-params">()</span></span></span><span class="hljs-function"> </span></span>{
+    <span class="hljs-class"><span class="hljs-keyword"><span class="hljs-class"><span class="hljs-keyword">struct</span></span></span><span class="hljs-class"> </span><span class="hljs-title"><span class="hljs-class"><span class="hljs-title">A</span></span></span><span class="hljs-class"> </span><span class="hljs-title"><span class="hljs-class"><span class="hljs-title">a</span></span></span><span class="hljs-class">;</span></span>
+    <span class="hljs-built_in"><span class="hljs-built_in">printf</span></span>(<span class="hljs-string"><span class="hljs-string">"%d"</span></span>, a.i);
+}</code></pre><br>
+То же самое. <code>a</code> не инициализирована. Мы увидим предупреждение при компиляции.<br>
+<br>
+<pre><code class="bash hljs">$ gcc -Wuninitalized a.c
+a.c: In <span class="hljs-keyword"><span class="hljs-keyword">function</span></span> ‘main’:
+a.c:9:5: warning: ‘a.i’ is used uninitialized <span class="hljs-keyword"><span class="hljs-keyword">in</span></span> this <span class="hljs-keyword"><span class="hljs-keyword">function</span></span> [-Wuninitialized]
+     <span class="hljs-built_in"><span class="hljs-built_in">printf</span></span>(<span class="hljs-string"><span class="hljs-string">"%d\n"</span></span>, a.i);</code></pre><br>
+В C можно инициализировать объект несколькими простыми способами. Например: 1)&nbsp;с помощью вспомогательной функции, 2)&nbsp;во время определения или 3)&nbsp;присвоить некое глобальное значение по умолчанию.<br>
+<br>
+<pre><code class="cpp hljs"><span class="hljs-class"><span class="hljs-keyword"><span class="hljs-class"><span class="hljs-keyword">struct</span></span></span><span class="hljs-class"> </span><span class="hljs-title"><span class="hljs-class"><span class="hljs-title">A</span></span></span><span class="hljs-class"> {</span></span>
+    <span class="hljs-keyword"><span class="hljs-keyword">int</span></span> i;
+} <span class="hljs-keyword"><span class="hljs-keyword">const</span></span> default_A = {<span class="hljs-number"><span class="hljs-number">0</span></span>};
+
+<span class="hljs-function"><span class="hljs-keyword"><span class="hljs-function"><span class="hljs-keyword">void</span></span></span><span class="hljs-function"> </span><span class="hljs-title"><span class="hljs-function"><span class="hljs-title">init_A</span></span></span><span class="hljs-params"><span class="hljs-function"><span class="hljs-params">(struct A *ptr)</span></span></span><span class="hljs-function"> </span></span>{
+    ptr-&gt;i = <span class="hljs-number"><span class="hljs-number">0</span></span>;
+}
+
+<span class="hljs-function"><span class="hljs-keyword"><span class="hljs-function"><span class="hljs-keyword">int</span></span></span><span class="hljs-function"> </span><span class="hljs-title"><span class="hljs-function"><span class="hljs-title">main</span></span></span><span class="hljs-params"><span class="hljs-function"><span class="hljs-params">()</span></span></span><span class="hljs-function"> </span></span>{
+    <span class="hljs-comment"><span class="hljs-comment">/* helper function */</span></span>
+    <span class="hljs-class"><span class="hljs-keyword"><span class="hljs-class"><span class="hljs-keyword">struct</span></span></span><span class="hljs-class"> </span><span class="hljs-title"><span class="hljs-class"><span class="hljs-title">A</span></span></span><span class="hljs-class"> </span><span class="hljs-title"><span class="hljs-class"><span class="hljs-title">a1</span></span></span><span class="hljs-class">;</span></span>
+    init_A(&amp;a1);
+
+    <span class="hljs-comment"><span class="hljs-comment">/* during definition;
+     * Initialize each member, in order. 
+     * Any other uninitialized members are implicitly
+     * initialized as if they had static storage duration. */</span></span>
+    <span class="hljs-class"><span class="hljs-keyword"><span class="hljs-class"><span class="hljs-keyword">struct</span></span></span><span class="hljs-class"> </span><span class="hljs-title"><span class="hljs-class"><span class="hljs-title">A</span></span></span><span class="hljs-class"> </span><span class="hljs-title"><span class="hljs-class"><span class="hljs-title">a2</span></span></span><span class="hljs-class"> = {</span></span><span class="hljs-number"><span class="hljs-number">0</span></span>};
+
+    <span class="hljs-comment"><span class="hljs-comment">/* Error! (Well, technically) Initializer lists are 'non-empty' */</span></span>
+    <span class="hljs-comment"><span class="hljs-comment">/* struct A a3 = {}; */</span></span>
+
+    <span class="hljs-comment"><span class="hljs-comment">/* ...or use designated initializers if C99 or later */</span></span>
+    <span class="hljs-class"><span class="hljs-keyword"><span class="hljs-class"><span class="hljs-keyword">struct</span></span></span><span class="hljs-class"> </span><span class="hljs-title"><span class="hljs-class"><span class="hljs-title">A</span></span></span><span class="hljs-class"> </span><span class="hljs-title"><span class="hljs-class"><span class="hljs-title">a4</span></span></span><span class="hljs-class"> = {</span></span>.i = <span class="hljs-number"><span class="hljs-number">0</span></span>};
+
+    <span class="hljs-comment"><span class="hljs-comment">/* default value */</span></span>
+    <span class="hljs-class"><span class="hljs-keyword"><span class="hljs-class"><span class="hljs-keyword">struct</span></span></span><span class="hljs-class"> </span><span class="hljs-title"><span class="hljs-class"><span class="hljs-title">A</span></span></span><span class="hljs-class"> </span><span class="hljs-title"><span class="hljs-class"><span class="hljs-title">a5</span></span></span><span class="hljs-class"> = </span><span class="hljs-title"><span class="hljs-class"><span class="hljs-title">default_A</span></span></span><span class="hljs-class">;</span></span>
+}</code></pre><br>
+Это практически всё, что нужно знать об инициализации в C, и этого достаточно, чтобы вызвать множество хитрых ошибок во многих студенческих проектах. И уж точно проблемы появятся, если считать, что по умолчанию всё инициализируется в <code>0</code>.<br>
+<br>
+<h1>Инициализация в C++</h1><br>
+<h3>Акт 1. Наш герой начинает путь</h3><br>
+Если вам не терпится узнать все <s>ужасы</s> чудеса C++, сначала изучите способы инициализации переменных. Здесь такое же <i>поведение</i>, как в C из предыдущего кода, но с некоторыми оговорками в <i>правилах</i> этого поведения. В тексте я буду выделять <i>курсивом</i> специфический жаргон C++, чтобы подчеркнуть те моменты, где я не просто произвольно называю вещи, а указывают на огромное количество новых… <i>возможностей</i>… в C++ по сравнению с C. Начнём с простого:<br>
+<br>
+<pre><code class="cpp hljs"><span class="hljs-class"><span class="hljs-keyword"><span class="hljs-class"><span class="hljs-keyword">struct</span></span></span><span class="hljs-class"> </span><span class="hljs-title"><span class="hljs-class"><span class="hljs-title">A</span></span></span><span class="hljs-class"> {</span></span>
+    <span class="hljs-keyword"><span class="hljs-keyword">int</span></span> i;
+};
+
+<span class="hljs-function"><span class="hljs-keyword"><span class="hljs-function"><span class="hljs-keyword">int</span></span></span><span class="hljs-function"> </span><span class="hljs-title"><span class="hljs-function"><span class="hljs-title">main</span></span></span><span class="hljs-params"><span class="hljs-function"><span class="hljs-params">()</span></span></span><span class="hljs-function"> </span></span>{
+    A a;
+    <span class="hljs-built_in"><span class="hljs-built_in">std</span></span>::<span class="hljs-built_in"><span class="hljs-built_in">cout</span></span> &lt;&lt; a.i &lt;&lt; <span class="hljs-built_in"><span class="hljs-built_in">std</span></span>::<span class="hljs-built_in"><span class="hljs-built_in">endl</span></span>;
+}</code></pre><br>
+Здесь у С и C++ почти одинаковое поведение. В C просто создаётся объект типа <code>A</code>, значение которого может быть любым. В C++ <code>a</code> <i><a href="https://en.cppreference.com/w/cpp/language/default_initialization">инициализирована по умолчанию</a></i>, то есть для построения структуры используется <i><a href="https://en.cppreference.com/w/cpp/language/default_constructor">конструктор по умолчанию</a></i>. Поскольку <code>A</code> настолько тривиальна, у неё <i>неявно определённый конструктор по умолчанию</i>, который в этом случае ничего не делает. Неявно определенный конструктор по умолчанию «имеет точно такой же эффект», как:<br>
+<br>
+<pre><code class="cpp hljs"><span class="hljs-class"><span class="hljs-keyword"><span class="hljs-class"><span class="hljs-keyword">struct</span></span></span><span class="hljs-class"> </span><span class="hljs-title"><span class="hljs-class"><span class="hljs-title">A</span></span></span><span class="hljs-class"> {</span></span>
+    A(){}
+    <span class="hljs-keyword"><span class="hljs-keyword">int</span></span> i;
+}</code></pre><br>
+Чтобы проверить наличие неинициализированного значения, смотрим на предупреждение во время компиляции. На момент написания этой статьи <code>g++ 8.2.1</code> выдавал хорошие предупреждения, а <code>clang++ 7.0.1</code> в этом случае ничего не выдавал (с установленным <code>-Wuninitialized</code>). Обратите внимание, что включена оптимизация для просмотра дополнительных примеров.<br>
+<br>
+<pre><code class="bash hljs">$ g++ -Wuninitalized -O2 a.cpp
+a.cpp: In <span class="hljs-keyword"><span class="hljs-keyword">function</span></span> ‘int main()’:
+a.cpp:9:20: warning: ‘a.A::i’ is used uninitialized <span class="hljs-keyword"><span class="hljs-keyword">in</span></span> this <span class="hljs-keyword"><span class="hljs-keyword">function</span></span> [-Wuninitialized]
+     std::cout &lt;&lt; a.i &lt;&lt; std::endl;</code></pre><br>
+По сути именно этого мы ожидаем от C. Так как же инициализировать <code>A::i</code>?<br>
+<br>
+<h3>Акт 2. Наш герой спотыкается</h3><br>
+Наверное, можно применить те же способы, что и в С? В конце концов, C++ является надмножеством С, верно? (<i>кхм</i>)<br>
+<br>
+<pre><code class="cpp hljs"><span class="hljs-class"><span class="hljs-keyword"><span class="hljs-class"><span class="hljs-keyword">struct</span></span></span><span class="hljs-class"> </span><span class="hljs-title"><span class="hljs-class"><span class="hljs-title">A</span></span></span><span class="hljs-class"> {</span></span>
+    <span class="hljs-keyword"><span class="hljs-keyword">int</span></span> i;
+};
+
+<span class="hljs-function"><span class="hljs-keyword"><span class="hljs-function"><span class="hljs-keyword">int</span></span></span><span class="hljs-function"> </span><span class="hljs-title"><span class="hljs-function"><span class="hljs-title">main</span></span></span><span class="hljs-params"><span class="hljs-function"><span class="hljs-params">()</span></span></span><span class="hljs-function"> </span></span>{
+    A a = {.i = <span class="hljs-number"><span class="hljs-number">0</span></span>};
+    <span class="hljs-built_in"><span class="hljs-built_in">std</span></span>::<span class="hljs-built_in"><span class="hljs-built_in">cout</span></span> &lt;&lt; a.i &lt;&lt; <span class="hljs-built_in"><span class="hljs-built_in">std</span></span>::<span class="hljs-built_in"><span class="hljs-built_in">endl</span></span>;
+}</code></pre><br>
+<pre><code class="bash hljs">$ g++ -Wuninitialized -O2 -pedantic-errors a.cpp
+a.cpp: In <span class="hljs-keyword"><span class="hljs-keyword">function</span></span> ‘int main()’:
+a.cpp:9:12: error: C++ designated initializers only available with -std=c++2a or -std=gnu++2a [-Wpedantic]
+     A a = {.i = 0};</code></pre><br>
+Вот вам и родственники. Явные инициализаторы не поддерживаются в C++ до C++20. Это стандарт C++, который планируется к выходу в 2020 году. Да, в C++ функцию реализуют через 21 год после того, как она появилась C. Обратите внимание, что я добавил <code>-pedantic-errors</code> для удаления поддержки нестандартных расширений gcc.<br>
+<br>
+Что насчёт такого?<br>
+<br>
+<pre><code class="cpp hljs"><span class="hljs-class"><span class="hljs-keyword"><span class="hljs-class"><span class="hljs-keyword">struct</span></span></span><span class="hljs-class"> </span><span class="hljs-title"><span class="hljs-class"><span class="hljs-title">A</span></span></span><span class="hljs-class"> {</span></span>
+    <span class="hljs-keyword"><span class="hljs-keyword">int</span></span> i;
+};
+
+<span class="hljs-function"><span class="hljs-keyword"><span class="hljs-function"><span class="hljs-keyword">int</span></span></span><span class="hljs-function"> </span><span class="hljs-title"><span class="hljs-function"><span class="hljs-title">main</span></span></span><span class="hljs-params"><span class="hljs-function"><span class="hljs-params">()</span></span></span><span class="hljs-function"> </span></span>{
+    A a = {<span class="hljs-number"><span class="hljs-number">0</span></span>};
+    <span class="hljs-built_in"><span class="hljs-built_in">std</span></span>::<span class="hljs-built_in"><span class="hljs-built_in">cout</span></span> &lt;&lt; a.i &lt;&lt; <span class="hljs-built_in"><span class="hljs-built_in">std</span></span>::<span class="hljs-built_in"><span class="hljs-built_in">endl</span></span>;
+}</code></pre><br>
+<pre><code class="bash hljs">$ g++ -Wuninitialized -O2 -pedantic-errors a.cpp
+$</code></pre><br>
+Ну хоть это работает. Мы также можем сделать <code>A a = {};</code> с тем же эффектом, что и нулевая инициализация <code>a.i</code>. Это потому что <code>A</code> представляет собой <a href="https://en.cppreference.com/w/cpp/language/aggregate_initialization">агрегированный тип</a>. Что это такое?<br>
+<br>
+<b>До C++11</b> агрегированный тип (по сути) является либо простым массивом в стиле C, либо структурой, которая выглядит как простая структура C. Ни спецификаторов доступа, ни базовых классов, ни пользовательских конструкторов, ни виртуальных функций. Агрегированный тип получает агрегированную инициализацию. Что это значит?<br>
+<br>
+<ol>
+<li>Каждый объект класса инициализируется каждым элементом связного списка по порядку.</li>
+<li>Каждый объект без соответствующего связного списка элементов получит <a href="https://en.cppreference.com/w/cpp/language/value_initialization">значение «инициализировано»</a>.</li>
+</ol><br>
+Отлично, что это значит? Если у объекта другой тип класса с пользовательским конструктором, будет вызван этот конструктор. Если объект является типом класса без пользовательского конструктора, как <code>A</code>, он будет рекурсивно инициализирован определённым значением. Если у нас встроенный объект, как <code>int i</code>, то он <a href="https://en.cppreference.com/w/cpp/language/zero_initialization">инициализируется нулём</a>.<br>
+<br>
+Урррррррааа! Наконец-то мы получили своего рода значение по умолчанию: ноль! Ух ты.<br>
+<br>
+<b>После C++11</b> ситуация выглядит иначе… вернёмся к этому позже.<br>
+<br>
+Трудно запомнить и запутано? Обратите внимание, что у каждой версии C++ свой набор правил. <i><b>Так и есть. Это чертовски запутано и никому не нравится</b></i>. Эти правила обычно действуют, поэтому обычно система работает так, будто вы инициализируете элементы как ноль. Но на практике лучше явно всё инициализировать. Я не придираюсь к агрегированной инициализации, но мне не нравится необходимость пробираться сквозь дебри стандарта, чтобы точно узнать, что происходит во время инициализации.<br>
+<br>
+<h3>Акт 3. Герой забрёл в пещеру</h3><br>
+Что ж, инициализируем <code>А</code> методом C++ с <b>конструкторами</b> (<i>торжественная музыка</i>)! Можем назначить элементу <code>i</code> в структуре <code>А</code> начальное значение в <i>пользовательском</i> конструкторе по умолчанию:<br>
+<br>
+<pre><code class="cpp hljs"><span class="hljs-class"><span class="hljs-keyword"><span class="hljs-class"><span class="hljs-keyword">struct</span></span></span><span class="hljs-class"> </span><span class="hljs-title"><span class="hljs-class"><span class="hljs-title">A</span></span></span><span class="hljs-class"> {</span></span>
+    A() : i(<span class="hljs-number"><span class="hljs-number">0</span></span>) {}
+    <span class="hljs-keyword"><span class="hljs-keyword">int</span></span> i;
+};</code></pre><br>
+Это инициализирует <code>i</code> в <i><a href="https://en.cppreference.com/w/cpp/language/initializer_list">списке инициализаторов членов</a></i>. Более грязный способ&nbsp;— установить значение внутри тела конструктора:<br>
+<br>
+<pre><code class="cpp hljs"><span class="hljs-class"><span class="hljs-keyword"><span class="hljs-class"><span class="hljs-keyword">struct</span></span></span><span class="hljs-class"> </span><span class="hljs-title"><span class="hljs-class"><span class="hljs-title">A</span></span></span><span class="hljs-class"> {</span></span>
+    A() { i = <span class="hljs-number"><span class="hljs-number">0</span></span>; }
+    <span class="hljs-keyword"><span class="hljs-keyword">int</span></span> i;
+};</code></pre><br>
+Поскольку тело конструктора может делать практически что угодно, лучше выделить инициализацию в список инициализаторов членов (технически часть тела конструктора).<br>
+<br>
+<blockquote>В C++11 и более поздних версиях можно использовать <a href="https://en.cppreference.com/w/cpp/language/data_members">дефолтные инициализаторы членов</a> (серьёзно, по возможности просто используйте их).<br>
+<br>
+<pre><code class="cpp hljs"><span class="hljs-class"><span class="hljs-keyword"><span class="hljs-class"><span class="hljs-keyword">struct</span></span></span><span class="hljs-class"> </span><span class="hljs-title"><span class="hljs-class"><span class="hljs-title">A</span></span></span><span class="hljs-class"> {</span></span>
+    <span class="hljs-keyword"><span class="hljs-keyword">int</span></span> i = <span class="hljs-number"><span class="hljs-number">0</span></span>; <span class="hljs-comment"><span class="hljs-comment">// default member initializer, available in C++11 and later</span></span>
+};</code></pre></blockquote><br>
+Окей, теперь конструктор по умолчанию гарантирует, что <code>i</code> установлен в 0, когда любая структура <code>A</code> инициализируется по умолчанию. Наконец, если мы хотим разрешить пользователям A задать начальное значение <code>i</code>, можно для этого создать другой конструктор. Или смешать их вместе с аргументами по умолчанию:<br>
+<br>
+<pre><code class="cpp hljs"><span class="hljs-class"><span class="hljs-keyword"><span class="hljs-class"><span class="hljs-keyword">struct</span></span></span><span class="hljs-class"> </span><span class="hljs-title"><span class="hljs-class"><span class="hljs-title">A</span></span></span><span class="hljs-class"> {</span></span>
+    A(<span class="hljs-keyword"><span class="hljs-keyword">int</span></span> i = <span class="hljs-number"><span class="hljs-number">0</span></span>) : i(i) {}
+    <span class="hljs-keyword"><span class="hljs-keyword">int</span></span> i;
+};
+
+<span class="hljs-function"><span class="hljs-keyword"><span class="hljs-function"><span class="hljs-keyword">int</span></span></span><span class="hljs-function"> </span><span class="hljs-title"><span class="hljs-function"><span class="hljs-title">main</span></span></span><span class="hljs-params"><span class="hljs-function"><span class="hljs-params">()</span></span></span><span class="hljs-function"> </span></span>{
+    A a1;
+    <span class="hljs-function"><span class="hljs-function">A </span><span class="hljs-title"><span class="hljs-function"><span class="hljs-title">a2</span></span></span><span class="hljs-params"><span class="hljs-function"><span class="hljs-params">(</span></span><span class="hljs-number"><span class="hljs-function"><span class="hljs-params"><span class="hljs-number">1</span></span></span></span><span class="hljs-function"><span class="hljs-params">)</span></span></span></span>;
+
+    <span class="hljs-built_in"><span class="hljs-built_in">std</span></span>::<span class="hljs-built_in"><span class="hljs-built_in">cout</span></span> &lt;&lt; a1.i &lt;&lt; <span class="hljs-string"><span class="hljs-string">" "</span></span> &lt;&lt; a2.i &lt;&lt; <span class="hljs-built_in"><span class="hljs-built_in">std</span></span>::<span class="hljs-built_in"><span class="hljs-built_in">endl</span></span>;
+}</code></pre><br>
+<pre><code class="bash hljs">$ g++ -pedantic-errors -Wuninitialized -O2 a.cpp
+$ ./a.out
+0 1</code></pre><br>
+<blockquote>Примечание. Нельзя написать <code>A a();</code> для вызова конструктора по умолчанию, потому что он будет воспринят как объявление функции с именем <code>a</code>, которая не принимает аргументов и возвращает объект <code>A</code>. Почему? Потому что кто-то когда-то давно хотел разрешить объявления функций в блоках составных операторов, и теперь мы с этим застряли.</blockquote><br>
+Отлично! Вот и всё. Миссия выполнена. Вы получили толчок и готовы продолжать приключения в мире C++, раздобыв полезное руководство по выживанию с инструкциями по инициализации переменных. Разворачиваемся и идём дальше!<br>
+<br>
+<h3>Акт 4. Герой продолжает погружаться в темноту</h3><br>
+Мы <i>могли</i> бы остановиться. Но, если мы хотим использовать <i>современные</i> возможности <i>современного</i> C++, то должны углубиться дальше. На самом деле моя версия g++ (8.2.1), по умолчанию использует <code>gnu++1y</code>, что эквивалентно C++14 с некоторыми дополнительными расширениями GNU. Более того, эта версия g++ также полностью поддерживает C++17. «Разве это имеет значение?» — можете вы спросить. Парень, надевай свои рыболовные сапоги и следуй за мной в самую гущу.<br>
+<br>
+Во всех последних версиях, включая C++11, реализован этот новомодный способ инициализации объектов, который называется <i><a href="https://en.cppreference.com/w/cpp/language/list_initialization">список инициализации</a></i>. Чувствуете, как холодок пробежал по спине? Это также называется <i>единообразной инициализацией</i>. Есть несколько веских причин использовать этот синтаксис: см. <a href="https://isocpp.org/wiki/faq/cpp11-language-misc">здесь</a> и <a href="https://isocpp.org/wiki/faq/cpp11-language">здесь</a>. Одна забавная цитата из FAQ:<br>
+<br>
+<blockquote><i>Единообразная инициализация C++11 не является абсолютно единообразной, но это почти так.</i></blockquote><br>
+Список инициализации применяется с фигурными скобками (<code>{thing1, thing2, ...}</code>, это называется <i>braced-init-list</i>) и выглядит следующим образом:<br>
+<br>
+<pre><code class="cpp hljs"><span class="hljs-meta"><span class="hljs-meta">#</span><span class="hljs-meta-keyword"><span class="hljs-meta"><span class="hljs-meta-keyword">include</span></span></span><span class="hljs-meta"> </span><span class="hljs-meta-string"><span class="hljs-meta"><span class="hljs-meta-string">&lt;iostream&gt; </span></span></span></span>
+<span class="hljs-class"><span class="hljs-keyword"><span class="hljs-class"><span class="hljs-keyword">struct</span></span></span><span class="hljs-class"> </span><span class="hljs-title"><span class="hljs-class"><span class="hljs-title">A</span></span></span><span class="hljs-class"> {</span></span>
+    <span class="hljs-keyword"><span class="hljs-keyword">int</span></span> i;
+};
+<span class="hljs-function"><span class="hljs-keyword"><span class="hljs-function"><span class="hljs-keyword">int</span></span></span><span class="hljs-function"> </span><span class="hljs-title"><span class="hljs-function"><span class="hljs-title">main</span></span></span><span class="hljs-params"><span class="hljs-function"><span class="hljs-params">()</span></span></span><span class="hljs-function"> </span></span>{
+    A a1;      <span class="hljs-comment"><span class="hljs-comment">// default initialization -- as before</span></span>
+    A a2{};    <span class="hljs-comment"><span class="hljs-comment">// direct-list-initialization with empty list</span></span>
+    A a3 = {}; <span class="hljs-comment"><span class="hljs-comment">// copy-list-initialization with empty list</span></span>
+    <span class="hljs-built_in"><span class="hljs-built_in">std</span></span>::<span class="hljs-built_in"><span class="hljs-built_in">cout</span></span> &lt;&lt; a1.i &lt;&lt; <span class="hljs-string"><span class="hljs-string">" "</span></span> &lt;&lt; a2.i &lt;&lt; <span class="hljs-string"><span class="hljs-string">" "</span></span> &lt;&lt; a3.i &lt;&lt; <span class="hljs-built_in"><span class="hljs-built_in">std</span></span>::<span class="hljs-built_in"><span class="hljs-built_in">endl</span></span>;
+}</code></pre><br>
+<pre><code class="bash hljs">$ g++ -std=c++11 -pedantic-errors -Wuninitialized -O2 a.cpp
+a.cpp: In <span class="hljs-keyword"><span class="hljs-keyword">function</span></span> ‘int main()’:
+a.cpp:9:26: warning: ‘a1.A::i’ is used uninitialized <span class="hljs-keyword"><span class="hljs-keyword">in</span></span> this <span class="hljs-keyword"><span class="hljs-keyword">function</span></span> [-Wuninitialized]
+     std::cout &lt;&lt; a1.i &lt;&lt; <span class="hljs-string"><span class="hljs-string">" "</span></span> &lt;&lt; a2.i &lt;&lt; <span class="hljs-string"><span class="hljs-string">" "</span></span> &lt;&lt; a3.i « std::endl;</code></pre><br>
+Эй, эй, вы это заметили? Остался неинициализированным только <code>a1.i</code>. Очевидно, что список инициализации работает иначе, чем просто вызов конструктора.<br>
+<br>
+<code>A a{};</code> производит то же поведение, что и <code>A a = {};</code>. В обоих случаях <code>a</code> инициализируется пустым списком braced-init-list. Кроме того, <code>A a = {};</code> больше не называется агрегатной инициализацией&nbsp;— теперь это <i>copy-list-initialization</i> (<i>вздыхает</i>). Мы уже говорили, что <code>A a;</code> создаёт объект с неопределённым значением и вызывает конструктор по умолчанию.<br>
+<br>
+В строках 7/8 происходит следующее (помните, что это <b>после C++11</b>):<br>
+<br>
+<ol>
+<li>Список инициализации для <code>A</code> приводит ко второму пункту.<br>
+</li>
+<li>Срабатывает <i>агрегатная инициализация</i>, поскольку A является <i>агрегатным типом</i>.<br>
+</li>
+<li>Поскольку список пуст, все члены инициализируются пустыми списками.<br>
+<ol>
+<li><i>int i{}</i> приводит к инициализации значения <code>i</code>, равного 0.</li>
+</ol></li>
+</ol><br>
+А если список не пуст?<br>
+<br>
+<pre><code class="cpp hljs"><span class="hljs-function"><span class="hljs-keyword"><span class="hljs-function"><span class="hljs-keyword">int</span></span></span><span class="hljs-function"> </span><span class="hljs-title"><span class="hljs-function"><span class="hljs-title">main</span></span></span><span class="hljs-params"><span class="hljs-function"><span class="hljs-params">()</span></span></span><span class="hljs-function"> </span></span>{
+    A a1{<span class="hljs-number"><span class="hljs-number">0</span></span>}; 
+    A a2{{}};
+    A a3{a1};
+    <span class="hljs-built_in"><span class="hljs-built_in">std</span></span>::<span class="hljs-built_in"><span class="hljs-built_in">cout</span></span> &lt;&lt; a1.i &lt;&lt; <span class="hljs-string"><span class="hljs-string">" "</span></span> &lt;&lt; a2.i &lt;&lt; <span class="hljs-string"><span class="hljs-string">" "</span></span> &lt;&lt; a3.i &lt;&lt; <span class="hljs-built_in"><span class="hljs-built_in">std</span></span>::<span class="hljs-built_in"><span class="hljs-built_in">endl</span></span>;
+}</code></pre><br>
+<pre><code class="bash hljs">$ g++ -std=c++11 -pedantic-errors -Wuninitialized -O2 a.cpp
+$</code></pre><br>
+<code>a1.i</code> инициализируется в 0, <code>a2.i</code> инициализируется пустым списком, а <code>a3</code>&nbsp;— копия, построенная из <code>a1</code>. Вы ведь знаете, что такое конструктор копий, <i>верно</i>? Тогда вы знаете также о конструкторах перемещения, ссылках rvalue, а также передаваемых ссылках, pr-значениях, x-значениях, gl-значе… ладно, неважно.<br>
+<br>
+К сожалению, в каждой версии с C++11 значение агрегата изменялось, хотя функционально до сих пор между агрегатами C++17 и C++20 нет никакой разницы. В зависимости от того, какая используется версия стандарта C++, что-то может быть или не быть агрегатом. Тренд в направлении либерализации. Например, публичные базовые классы в агрегатах разрешены начиная с C++17, что в свою очередь усложняет правила инициализации агрегатов. Всё замечательно!<br>
+<br>
+Как себя чувствуете? Немного водички? Сжимаются кулаки? Может, сделаем перерыв, выйдем на улицу?<br>
+<br>
+<h3>Акт 5. Прощай, здравый смысл</h3><br>
+Что произойдет, если <code>A</code> не является агрегатным типом?<br>
+<br>
+Вкратце, что такое агрегат:<br>
+<br>
+<ul>
+<li>массив или<br>
+</li>
+<li>структура/класс/объединение, где<br>
+<ul>
+<li>нет приватных/защищённых членов<br>
+</li>
+<li>нет заявленных или предоставленных пользователем конструкторов<br>
+</li>
+<li>нет виртуальных функций<br>
+</li>
+<li>нет инициализаторов членов по умолчанию (в C++11, для последующих версий без разницы)<br>
+</li>
+<li>нет базовых классов (публичные базовые классы разрешены в C++17)<br>
+</li>
+<li>нет унаследованных конструкторов (<code>using Base::Base;</code>, в C++17)</li>
+</ul></li>
+</ul><br>
+Так что неагрегатный объект может быть таким:<br>
+<br>
+<pre><code class="cpp hljs"><span class="hljs-meta"><span class="hljs-meta">#</span><span class="hljs-meta-keyword"><span class="hljs-meta"><span class="hljs-meta-keyword">include</span></span></span><span class="hljs-meta"> </span><span class="hljs-meta-string"><span class="hljs-meta"><span class="hljs-meta-string">&lt;iostream&gt;</span></span></span></span>
+<span class="hljs-class"><span class="hljs-keyword"><span class="hljs-class"><span class="hljs-keyword">struct</span></span></span><span class="hljs-class"> </span><span class="hljs-title"><span class="hljs-class"><span class="hljs-title">A</span></span></span><span class="hljs-class"> {</span></span>
+    A(){};
+    <span class="hljs-keyword"><span class="hljs-keyword">int</span></span> i;
+};
+<span class="hljs-function"><span class="hljs-keyword"><span class="hljs-function"><span class="hljs-keyword">int</span></span></span><span class="hljs-function"> </span><span class="hljs-title"><span class="hljs-function"><span class="hljs-title">main</span></span></span><span class="hljs-params"><span class="hljs-function"><span class="hljs-params">()</span></span></span><span class="hljs-function"> </span></span>{
+    A a{};
+    <span class="hljs-built_in"><span class="hljs-built_in">std</span></span>::<span class="hljs-built_in"><span class="hljs-built_in">cout</span></span> &lt;&lt; a.i &lt;&lt; <span class="hljs-built_in"><span class="hljs-built_in">std</span></span>::<span class="hljs-built_in"><span class="hljs-built_in">endl</span></span>;
+}</code></pre><br>
+<pre><code class="bash hljs">$ g++ -std=c++11 -pedantic-errors -Wuninitialized -O2 a.cpp
+a.cpp: In <span class="hljs-keyword"><span class="hljs-keyword">function</span></span> ‘int main()’:
+a.cpp:8:20: warning: ‘a.A::i’ is used uninitialized <span class="hljs-keyword"><span class="hljs-keyword">in</span></span> this <span class="hljs-keyword"><span class="hljs-keyword">function</span></span> [-Wuninitialized]
+     std::cout &lt;&lt; a.i &lt;&lt; std::endl;</code></pre><br>
+Здесь у <code>A</code> есть предоставленный пользователем конструктор, поэтому инициализация списка работает иначе.<br>
+<br>
+В строке 7 происходит следующее:<br>
+<br>
+<ol>
+<li>Список инициализации для <code>A</code> приводит ко второму пункту.</li>
+<li>Не-агрегат с пустым braced-init-list вызывает инициализацию значения, идём к третьему пункту.</li>
+<li>Найден пользовательский конструктор, так что вызывается конструктор по умолчанию, который ничего не делает в этом случае, <code>a.i</code> не инициализируется.</li>
+</ol><br>
+<blockquote>Что такое конструктор, предоставленный пользователем?<br>
+<br>
+<pre><code class="cpp hljs"><span class="hljs-class"><span class="hljs-keyword"><span class="hljs-class"><span class="hljs-keyword">struct</span></span></span><span class="hljs-class"> </span><span class="hljs-title"><span class="hljs-class"><span class="hljs-title">A</span></span></span><span class="hljs-class"> {</span></span>
+    A() = <span class="hljs-keyword"><span class="hljs-keyword">default</span></span>;
+};</code></pre><br>
+Это <i>не</i> конструктор, предоставленный пользователем. Это как если вооще не объявлено никакого конструктора, а <code>A</code> является агрегатом.<br>
+<br>
+<pre><code class="cpp hljs"><span class="hljs-class"><span class="hljs-keyword"><span class="hljs-class"><span class="hljs-keyword">struct</span></span></span><span class="hljs-class"> </span><span class="hljs-title"><span class="hljs-class"><span class="hljs-title">A</span></span></span><span class="hljs-class"> {</span></span>
+    A();
+};
+A::A() = <span class="hljs-keyword"><span class="hljs-keyword">default</span></span>;</code></pre><br>
+<i>Вот это</i> конструктор, предоставленный пользователем. Это словно мы написали <code>A(){}</code> в теле, где <code>А</code> не является агрегатом.<br>
+<br>
+И угадайте что? В C++20 формулировка изменилась: теперь она требует, чтобы у агрегатов не было <i>объявленных</i> пользователем конструкторов :). Что это означает на практике? Я не уверен! Давайте продолжим.</blockquote><br>
+Как насчет следующего:<br>
+<br>
+<pre><code class="cpp hljs"><span class="hljs-meta"><span class="hljs-meta">#</span><span class="hljs-meta-keyword"><span class="hljs-meta"><span class="hljs-meta-keyword">include</span></span></span><span class="hljs-meta"> </span><span class="hljs-meta-string"><span class="hljs-meta"><span class="hljs-meta-string">&lt;iostream&gt;</span></span></span></span>
+<span class="hljs-class"><span class="hljs-keyword"><span class="hljs-class"><span class="hljs-keyword">class</span></span></span><span class="hljs-class"> </span><span class="hljs-title"><span class="hljs-class"><span class="hljs-title">A</span></span></span><span class="hljs-class"> {</span></span>
+    <span class="hljs-keyword"><span class="hljs-keyword">int</span></span> i;
+    <span class="hljs-function"><span class="hljs-keyword"><span class="hljs-function"><span class="hljs-keyword">friend</span></span></span><span class="hljs-function"> </span><span class="hljs-keyword"><span class="hljs-function"><span class="hljs-keyword">int</span></span></span><span class="hljs-function"> </span><span class="hljs-title"><span class="hljs-function"><span class="hljs-title">main</span></span></span><span class="hljs-params"><span class="hljs-function"><span class="hljs-params">()</span></span></span></span>;
+};
+<span class="hljs-function"><span class="hljs-keyword"><span class="hljs-function"><span class="hljs-keyword">int</span></span></span><span class="hljs-function"> </span><span class="hljs-title"><span class="hljs-function"><span class="hljs-title">main</span></span></span><span class="hljs-params"><span class="hljs-function"><span class="hljs-params">()</span></span></span><span class="hljs-function"> </span></span>{
+    A a{};
+    <span class="hljs-built_in"><span class="hljs-built_in">std</span></span>::<span class="hljs-built_in"><span class="hljs-built_in">cout</span></span> &lt;&lt; a.i &lt;&lt; <span class="hljs-built_in"><span class="hljs-built_in">std</span></span>::<span class="hljs-built_in"><span class="hljs-built_in">endl</span></span>;
+}</code></pre><br>
+<code>A</code> — это класс, а не структура, поэтому <code>i</code> будет приватным, и нам пришлось установить <code>main</code> в качестве дружественной функции. Что делает <code>А</code> не агрегатом. Это просто обычный тип класса. Это значит, что <code>a.i</code> останется неинициализированным, верно?<br>
+<br>
+<pre><code class="bash hljs">$ g++ -std=c++11 -pedantic-errors -Wuninitialized -O2 a.cpp
+$</code></pre><br>
+Чёрт побери. И это тогда, когда мы вроде начали разбираться со всем этим. Оказывается, <code>a.i</code> инициализируется как 0, даже если не вызывает инициализацию агрегата:<br>
+<br>
+<ol>
+<li>Инициализация списка для A, переходим к пункту 2.</li>
+<li>Неагрегат, тип класса с конструктором по умолчанию, и пустой список braced-init-list вызывают инициализацию значения, переходим к пункту 3.</li>
+<li>Предоставленный пользователем конструктор не найден, поэтому инициализируем объект как ноль, переходим к пункту 4.</li>
+<li>Вызов инициализации по умолчанию, если неявно определённый конструктор по умолчанию не тривиален (в данном случае условие не срабатывает и ничего не происходит).</li>
+</ol><br>
+Что если мы попробуем агрегатную инициализацию:<br>
+<br>
+<pre><code class="cpp hljs"><span class="hljs-meta"><span class="hljs-meta">#</span><span class="hljs-meta-keyword"><span class="hljs-meta"><span class="hljs-meta-keyword">include</span></span></span><span class="hljs-meta"> </span><span class="hljs-meta-string"><span class="hljs-meta"><span class="hljs-meta-string">&lt;iostream&gt;</span></span></span></span>
+<span class="hljs-class"><span class="hljs-keyword"><span class="hljs-class"><span class="hljs-keyword">class</span></span></span><span class="hljs-class"> </span><span class="hljs-title"><span class="hljs-class"><span class="hljs-title">A</span></span></span><span class="hljs-class"> {</span></span>
+    <span class="hljs-keyword"><span class="hljs-keyword">int</span></span> i;
+    <span class="hljs-function"><span class="hljs-keyword"><span class="hljs-function"><span class="hljs-keyword">friend</span></span></span><span class="hljs-function"> </span><span class="hljs-keyword"><span class="hljs-function"><span class="hljs-keyword">int</span></span></span><span class="hljs-function"> </span><span class="hljs-title"><span class="hljs-function"><span class="hljs-title">main</span></span></span><span class="hljs-params"><span class="hljs-function"><span class="hljs-params">()</span></span></span></span>;
+};
+<span class="hljs-function"><span class="hljs-keyword"><span class="hljs-function"><span class="hljs-keyword">int</span></span></span><span class="hljs-function"> </span><span class="hljs-title"><span class="hljs-function"><span class="hljs-title">main</span></span></span><span class="hljs-params"><span class="hljs-function"><span class="hljs-params">()</span></span></span><span class="hljs-function"> </span></span>{
+    A a = {<span class="hljs-number"><span class="hljs-number">1</span></span>};
+    <span class="hljs-built_in"><span class="hljs-built_in">std</span></span>::<span class="hljs-built_in"><span class="hljs-built_in">cout</span></span> &lt;&lt; a.i &lt;&lt; <span class="hljs-built_in"><span class="hljs-built_in">std</span></span>::<span class="hljs-built_in"><span class="hljs-built_in">endl</span></span>;
+}</code></pre><br>
+<pre><code class="bash hljs">$ g++ -std=c++11 -pedantic-errors -Wuninitialized -O2 a.cpp
+a.cpp: In <span class="hljs-keyword"><span class="hljs-keyword">function</span></span> ‘int main()’:
+a.cpp:7:13: error: could not convert ‘{1}’ from ‘&lt;brace-enclosed initializer list&gt;’ to ‘A’
+     A a = {1};</code></pre><br>
+<code>A</code> не является агрегатом, поэтому происходит следующее:<br>
+<br>
+<ol>
+<li>Инициализация списка для A, переходим к пункту 2.<br>
+</li>
+<li>Поиск подходящего конструктора.<br>
+</li>
+<li>Нет способа преобразовать <code>1</code> в <code>A</code>, компиляция завершается ошибкой.</li>
+</ol><br>
+В качестве бонуса озорной примерчик:<br>
+<br>
+<pre><code class="cpp hljs"><span class="hljs-meta"><span class="hljs-meta">#</span><span class="hljs-meta-keyword"><span class="hljs-meta"><span class="hljs-meta-keyword">include</span></span></span><span class="hljs-meta"> </span><span class="hljs-meta-string"><span class="hljs-meta"><span class="hljs-meta-string">&lt;iostream&gt;</span></span></span></span>
+<span class="hljs-class"><span class="hljs-keyword"><span class="hljs-class"><span class="hljs-keyword">struct</span></span></span><span class="hljs-class"> </span><span class="hljs-title"><span class="hljs-class"><span class="hljs-title">A</span></span></span><span class="hljs-class"> {</span></span>
+    A(<span class="hljs-keyword"><span class="hljs-keyword">int</span></span> i) : i(i) {}
+    A() = <span class="hljs-keyword"><span class="hljs-keyword">default</span></span>;
+    <span class="hljs-keyword"><span class="hljs-keyword">int</span></span> i;
+};
+<span class="hljs-function"><span class="hljs-keyword"><span class="hljs-function"><span class="hljs-keyword">int</span></span></span><span class="hljs-function"> </span><span class="hljs-title"><span class="hljs-function"><span class="hljs-title">main</span></span></span><span class="hljs-params"><span class="hljs-function"><span class="hljs-params">()</span></span></span><span class="hljs-function"> </span></span>{
+    A a{};
+    <span class="hljs-built_in"><span class="hljs-built_in">std</span></span>::<span class="hljs-built_in"><span class="hljs-built_in">cout</span></span> &lt;&lt; a.i &lt;&lt; <span class="hljs-built_in"><span class="hljs-built_in">std</span></span>::<span class="hljs-built_in"><span class="hljs-built_in">endl</span></span>;
+}</code></pre><br>
+Здесь нет приватных переменных, как в предыдущем примере, но есть пользовательский конструктор, как в предпоследнем примере: таким образом, A не является агрегатом. Предоставленный пользователем конструктор исключает нулевую инициализацию, <i>верно</i>?<br>
+<br>
+<pre><code class="bash hljs">$ g++ -std=c++11 -pedantic-errors -Wuninitialized -O2 a.cpp
+$</code></pre><br>
+<i>Нет</i>! Разберёмся по пунктам:<br>
+<br>
+<ol>
+<li>Инициализация списка для A, переходим к пункту 2.</li>
+<li>Неагрегат, тип класса с конструктором по умолчанию, и пустой список braced-init-list вызывают инициализацию значения, переходим к пункту 3.</li>
+<li>Не найден пользовательский конструктор <i>по умолчанию</i> (<i>вот что я упустил выше</i>), поэтому объект <b>инициализируется как ноль</b>, переходим к пункту 4.</li>
+<li>Вызов инициализации по умолчанию, если неявно определённый конструктор по умолчанию не тривиален (в данном случае условие не срабатывает и ничего не происходит).</li>
+</ol><br>
+Один последний пример:<br>
+<br>
+<pre><code class="cpp hljs"><span class="hljs-meta"><span class="hljs-meta">#</span><span class="hljs-meta-keyword"><span class="hljs-meta"><span class="hljs-meta-keyword">include</span></span></span><span class="hljs-meta"> </span><span class="hljs-meta-string"><span class="hljs-meta"><span class="hljs-meta-string">&lt;iostream&gt;</span></span></span></span>
+<span class="hljs-class"><span class="hljs-keyword"><span class="hljs-class"><span class="hljs-keyword">struct</span></span></span><span class="hljs-class"> </span><span class="hljs-title"><span class="hljs-class"><span class="hljs-title">A</span></span></span><span class="hljs-class"> {</span></span>
+    A(){}
+    <span class="hljs-keyword"><span class="hljs-keyword">int</span></span> i;
+};
+<span class="hljs-class"><span class="hljs-keyword"><span class="hljs-class"><span class="hljs-keyword">struct</span></span></span><span class="hljs-class"> </span><span class="hljs-title"><span class="hljs-class"><span class="hljs-title">B</span></span></span><span class="hljs-class"> :</span></span> <span class="hljs-keyword"><span class="hljs-keyword">public</span></span> A {
+    <span class="hljs-keyword"><span class="hljs-keyword">int</span></span> j;
+};
+<span class="hljs-function"><span class="hljs-keyword"><span class="hljs-function"><span class="hljs-keyword">int</span></span></span><span class="hljs-function"> </span><span class="hljs-title"><span class="hljs-function"><span class="hljs-title">main</span></span></span><span class="hljs-params"><span class="hljs-function"><span class="hljs-params">()</span></span></span><span class="hljs-function"> </span></span>{
+    B b = {};
+    <span class="hljs-built_in"><span class="hljs-built_in">std</span></span>::<span class="hljs-built_in"><span class="hljs-built_in">cout</span></span> &lt;&lt; b.i &lt;&lt; <span class="hljs-string"><span class="hljs-string">" "</span></span> &lt;&lt; b.j &lt;&lt; <span class="hljs-built_in"><span class="hljs-built_in">std</span></span>::<span class="hljs-built_in"><span class="hljs-built_in">endl</span></span>;
+}</code></pre><br>
+<pre><code class="bash hljs">$ g++ -std=c++11 -pedantic-errors -Wuninitialized -O2 a.cpp
+a.cpp: In <span class="hljs-keyword"><span class="hljs-keyword">function</span></span> ‘int main()’:
+a.cpp:11:25: warning: ‘b.B::&lt;anonymous&gt;.A::i’ is used uninitialized <span class="hljs-keyword"><span class="hljs-keyword">in</span></span> this <span class="hljs-keyword"><span class="hljs-keyword">function</span></span> [-Wuninitialized]
+     std::cout &lt;&lt; b.i &lt;&lt; <span class="hljs-string"><span class="hljs-string">" "</span></span> &lt;&lt; b.j &lt;&lt; std::endl;</code></pre><br>
+<code>b.j</code> инициализируется, а <code>b.i</code> нет. Что происходит в этом примере? Не знаю! Все базы <code>b</code> и члены здесь должны получить нулевую инициализацию. Я задал вопрос на <a href="https://stackoverflow.com/questions/54028846/why-is-a-member-not-getting-zero-initialized-in-this-example">Stack Overflow</a>, и <s>на момент публикации этого сообщения не получил твёрдого ответа, кроме возможной ошибки компилятора</s> люди пришли к консенсусу, что здесь ошибка компилятора. Эти правила тонкие и сложные для <i>всех</i>. Для сравнения, статический анализатор clang (не обычный компилятор) вообще не предупреждает о неинициализированных значениях. Разбирайтесь сами.<br>
+<br>
+...<i>(тупо смотрит на вас) (взгляд превращается в вежливую улыбку)</i> хорошо, давайте нырнём ещё глубже!<br>
+<br>
+<h3>Акт 6. Бездна</h3><br>
+В C++11 появилось нечто под названием <a href="https://en.cppreference.com/w/cpp/utility/initializer_list"><code>std::initializer_list</code></a>. У него собственный тип: очевидно, <code>std::initializer_list&lt;T&gt;</code>. Вы можете создать его с помощью braced-init-list. И кстати, braced-init-list для списка инициализации не имеет типа. Не путайте initializer_list со списком инициализации и braced-init-list! Все они имеют отношение к спискам инициализаторов членов и инициализаторам членов по умолчанию, так как помогают инициализировать нестатические элементы данных, но при этом сильно отличаются. Они связаны, но разные! Несложно, правда?<br>
+<br>
+<pre><code class="cpp hljs"><span class="hljs-class"><span class="hljs-keyword"><span class="hljs-class"><span class="hljs-keyword">struct</span></span></span><span class="hljs-class"> </span><span class="hljs-title"><span class="hljs-class"><span class="hljs-title">A</span></span></span><span class="hljs-class"> {</span></span>
+    <span class="hljs-keyword"><span class="hljs-keyword">template</span></span> &lt;<span class="hljs-keyword"><span class="hljs-keyword">typename</span></span> T&gt;
+    A(<span class="hljs-built_in"><span class="hljs-built_in">std</span></span>::<span class="hljs-built_in"><span class="hljs-built_in">initializer_list</span></span>&lt;T&gt;) {}
+    <span class="hljs-keyword"><span class="hljs-keyword">int</span></span> i;
+};
+
+<span class="hljs-function"><span class="hljs-keyword"><span class="hljs-function"><span class="hljs-keyword">int</span></span></span><span class="hljs-function"> </span><span class="hljs-title"><span class="hljs-function"><span class="hljs-title">main</span></span></span><span class="hljs-params"><span class="hljs-function"><span class="hljs-params">()</span></span></span><span class="hljs-function"> </span></span>{
+    A a1{<span class="hljs-number"><span class="hljs-number">0</span></span>};
+    A a2{<span class="hljs-number"><span class="hljs-number">1</span></span>, <span class="hljs-number"><span class="hljs-number">2</span></span>, <span class="hljs-number"><span class="hljs-number">3</span></span>};
+    A a3{<span class="hljs-string"><span class="hljs-string">"hey"</span></span>, <span class="hljs-string"><span class="hljs-string">"thanks"</span></span>, <span class="hljs-string"><span class="hljs-string">"for"</span></span>, <span class="hljs-string"><span class="hljs-string">"reading!"</span></span>};
+    <span class="hljs-built_in"><span class="hljs-built_in">std</span></span>::<span class="hljs-built_in"><span class="hljs-built_in">cout</span></span> &lt;&lt; a1.i &lt;&lt; a2.i &lt;&lt; a3.i &lt;&lt; <span class="hljs-built_in"><span class="hljs-built_in">std</span></span>::<span class="hljs-built_in"><span class="hljs-built_in">endl</span></span>;
+}</code></pre><br>
+<pre><code class="bash hljs">$ g++ -std=c++17 -pedantic-errors -Wuninitialized -O2 a.cpp
+a.cpp: In <span class="hljs-keyword"><span class="hljs-keyword">function</span></span> ‘int main()’:
+a.cpp:12:21: warning: ‘a1.A::i’ is used uninitialized <span class="hljs-keyword"><span class="hljs-keyword">in</span></span> this <span class="hljs-keyword"><span class="hljs-keyword">function</span></span> [-Wuninitialized]
+     std::cout &lt;&lt; a1.i &lt;&lt; a2.i &lt;&lt; a3.i &lt;&lt; std::endl;
+                     ^
+a.cpp:12:29: warning: ‘a2.A::i’ is used uninitialized <span class="hljs-keyword"><span class="hljs-keyword">in</span></span> this <span class="hljs-keyword"><span class="hljs-keyword">function</span></span> [-Wuninitialized]
+     std::cout &lt;&lt; a1.i &lt;&lt; a2.i &lt;&lt; a3.i &lt;&lt; std::endl;
+                             ^
+a.cpp:12:37: warning: ‘a3.A::i’ is used uninitialized <span class="hljs-keyword"><span class="hljs-keyword">in</span></span> this <span class="hljs-keyword"><span class="hljs-keyword">function</span></span> [-Wuninitialized]
+     std::cout &lt;&lt; a1.i &lt;&lt; a2.i &lt;&lt; a3.i &lt;&lt; std::endl;</code></pre><br>
+Окей. У <code>A</code> один шаблонный конструктор, который принимает <code>std::initializer_list&lt;T&gt;</code>. Каждый раз вызывается конструктор, предоставляемый пользователем, что ничего не делает, поэтому <code>i</code> остаётся неинициализированным. Тип <code>T</code> выводится в зависимости от элементов в списке, а новый конструктор создаётся в зависимости от типа.<br>
+<br>
+<ul>
+<li>Таким образом, в восьмой строке <code>{0}</code> выводится как <code>std::initializer_list&lt;int&gt;</code> с одним элементом <code>0</code>.</li>
+<li>В девятой строке <code>{1, 2, 3}</code> выводится как <code>std::initializer_list&lt;int&gt;</code> с тремя элементами.</li>
+<li>В десятой строке список инициализации braced-init-list выводится как <code>std::initializer_list&lt;const char*&gt;</code> с четырьмя элементами.</li>
+</ul><br>
+<blockquote>Примечание: <code>A a{}</code> приведёт к ошибке, так как тип не может быть выведен. Например, нам нужно написать <code>a{std::initializer_list&lt;int&gt; {}}</code>. Или мы можем точно указать конструктор, как в <code>A(std::initializer_list&lt;int&gt;){}</code>.</blockquote><br>
+<code>std::initializer_list</code> действует примерно как типичный контейнер STL, но только с тремя компонентными функциями: <code>size</code>, <code>begin</code> и <code>end</code>. Итераторы <code>begin</code> и <code>end</code> вы можете нормально разыменовать, увеличивать и сравнивать. Это полезно, когда требуется инициализировать объект списками разной длины:<br>
+<br>
+<pre><code class="cpp hljs"><span class="hljs-meta"><span class="hljs-meta">#</span><span class="hljs-meta-keyword"><span class="hljs-meta"><span class="hljs-meta-keyword">include</span></span></span><span class="hljs-meta"> </span><span class="hljs-meta-string"><span class="hljs-meta"><span class="hljs-meta-string">&lt;vector&gt;</span></span></span></span>
+<span class="hljs-meta"><span class="hljs-meta">#</span><span class="hljs-meta-keyword"><span class="hljs-meta"><span class="hljs-meta-keyword">include</span></span></span><span class="hljs-meta"> </span><span class="hljs-meta-string"><span class="hljs-meta"><span class="hljs-meta-string">&lt;string&gt;</span></span></span></span>
+<span class="hljs-function"><span class="hljs-keyword"><span class="hljs-function"><span class="hljs-keyword">int</span></span></span><span class="hljs-function"> </span><span class="hljs-title"><span class="hljs-function"><span class="hljs-title">main</span></span></span><span class="hljs-params"><span class="hljs-function"><span class="hljs-params">()</span></span></span><span class="hljs-function"> </span></span>{
+    <span class="hljs-built_in"><span class="hljs-built_in">std</span></span>::<span class="hljs-built_in"><span class="hljs-built_in">vector</span></span>&lt;<span class="hljs-keyword"><span class="hljs-keyword">int</span></span>&gt; v_1_int{<span class="hljs-number"><span class="hljs-number">5</span></span>};
+    <span class="hljs-built_in"><span class="hljs-built_in">std</span></span>::<span class="hljs-built_in"><span class="hljs-built_in">vector</span></span>&lt;<span class="hljs-keyword"><span class="hljs-keyword">int</span></span>&gt; v_5_ints(<span class="hljs-number"><span class="hljs-number">5</span></span>);
+    <span class="hljs-built_in"><span class="hljs-built_in">std</span></span>::<span class="hljs-built_in"><span class="hljs-built_in">vector</span></span>&lt;<span class="hljs-built_in"><span class="hljs-built_in">std</span></span>::<span class="hljs-built_in"><span class="hljs-built_in">string</span></span>&gt; v_strs = {<span class="hljs-string"><span class="hljs-string">"neato!"</span></span>, <span class="hljs-string"><span class="hljs-string">"blammo!"</span></span>, <span class="hljs-string"><span class="hljs-string">"whammo!"</span></span>, <span class="hljs-string"><span class="hljs-string">"egh"</span></span>};
+}</code></pre><br>
+У <code>std::vector&lt;T&gt;</code> есть конструктор, который принимает <code>std::initializer_list&lt;T&gt;</code>, поэтому мы можем легко инициализировать векторы, как показано выше.<br>
+<br>
+<blockquote>Примечание. Вектор <code>v_1_int</code> создан из его конструктора, который берёт <code>std::initializer_list&lt;int&lt; init</code> с одним элементом <code>5</code>.<br>
+<br>
+Вектор <code>v_5_ints</code> создан из конструктора <code>size_t count</code>, который инициализирует вектор из (<code>5</code>) элементов и инициализирует их в значения (в данном случае все равны <code>0</code>).</blockquote><br>
+Оки–доки, последний пример:<br>
+<br>
+<pre><code class="cpp hljs"><span class="hljs-meta"><span class="hljs-meta">#</span><span class="hljs-meta-keyword"><span class="hljs-meta"><span class="hljs-meta-keyword">include</span></span></span><span class="hljs-meta"> </span><span class="hljs-meta-string"><span class="hljs-meta"><span class="hljs-meta-string">&lt;iostream&gt;</span></span></span></span>
+<span class="hljs-class"><span class="hljs-keyword"><span class="hljs-class"><span class="hljs-keyword">struct</span></span></span><span class="hljs-class"> </span><span class="hljs-title"><span class="hljs-class"><span class="hljs-title">A</span></span></span><span class="hljs-class"> {</span></span>
+    A(<span class="hljs-built_in"><span class="hljs-built_in">std</span></span>::<span class="hljs-built_in"><span class="hljs-built_in">initializer_list</span></span>&lt;<span class="hljs-keyword"><span class="hljs-keyword">int</span></span>&gt; l) : i(<span class="hljs-number"><span class="hljs-number">2</span></span>) {}
+    A(<span class="hljs-keyword"><span class="hljs-keyword">int</span></span> i = <span class="hljs-number"><span class="hljs-number">1</span></span>) : i(i) {}
+    <span class="hljs-keyword"><span class="hljs-keyword">int</span></span> i;
+};
+<span class="hljs-function"><span class="hljs-keyword"><span class="hljs-function"><span class="hljs-keyword">int</span></span></span><span class="hljs-function"> </span><span class="hljs-title"><span class="hljs-function"><span class="hljs-title">main</span></span></span><span class="hljs-params"><span class="hljs-function"><span class="hljs-params">()</span></span></span><span class="hljs-function"> </span></span>{
+    A a1;
+    A a2{};
+    <span class="hljs-function"><span class="hljs-function">A </span><span class="hljs-title"><span class="hljs-function"><span class="hljs-title">a3</span></span></span><span class="hljs-params"><span class="hljs-function"><span class="hljs-params">(</span></span><span class="hljs-number"><span class="hljs-function"><span class="hljs-params"><span class="hljs-number">3</span></span></span></span><span class="hljs-function"><span class="hljs-params">)</span></span></span></span>;
+    A a4 = {<span class="hljs-number"><span class="hljs-number">5</span></span>};
+    A a5{<span class="hljs-number"><span class="hljs-number">4</span></span>, <span class="hljs-number"><span class="hljs-number">3</span></span>, <span class="hljs-number"><span class="hljs-number">2</span></span>};
+    <span class="hljs-built_in"><span class="hljs-built_in">std</span></span>::<span class="hljs-built_in"><span class="hljs-built_in">cout</span></span> &lt;&lt; a1.i &lt;&lt; <span class="hljs-string"><span class="hljs-string">" "</span></span>
+              &lt;&lt; a2.i &lt;&lt; <span class="hljs-string"><span class="hljs-string">" "</span></span>
+              &lt;&lt; a3.i &lt;&lt; <span class="hljs-string"><span class="hljs-string">" "</span></span>
+              &lt;&lt; a4.i &lt;&lt; <span class="hljs-string"><span class="hljs-string">" "</span></span>
+              &lt;&lt; a5.i &lt;&lt; <span class="hljs-built_in"><span class="hljs-built_in">std</span></span>::<span class="hljs-built_in"><span class="hljs-built_in">endl</span></span>;
+}</code></pre><br>
+На первый взгляд, это не слишком сложно. У нас два конструктора: один принимает <code>std::initializer_list&lt;int&gt;</code>, а другой с аргументами по умолчанию принимает <code>int</code>. Прежде чем посмотреть на выдачу ниже, попробуйте сказать, каким будет значение для каждого <code>i</code>.<br>
+<br>
+Подумали...? Посмотрим, что получится.<br>
+<br>
+<pre><code class="bash hljs">$ g++ -std=c++11 -pedantic-errors -Wuninitialized -O2 a.cpp
+$ ./a.out
+1 1 3 2 2</code></pre><br>
+С <code>a1</code> всё должно быть легко. Это простая инициализация по умолчанию, которая выбирает конструктор по умолчанию, используя его аргументы по умолчанию. <code>a2</code> использует список инициализации с пустым списком. Поскольку у <code>A</code> есть конструктор по умолчанию (с аргументами по умолчанию), происходит инициализация значения с простым обращением к этому конструктору. Если бы у <code>A</code> не было этого конструктора, то пошло бы обращение к конструктору в третьей строке с вызовом пустого списка. <code>a3</code> использует скобки, а не список braced-init-list, поэтому разрешение перегрузки выбирает <code>3</code> с конструктором, принимающим <code>int</code>. Далее, <code>а4</code> использует список инициализации, для которого разрешение перегрузки склоняется в пользу конструктора, принимающего объект <code>std::initializer_list</code>. Очевидно, <code>a5</code> нельзя соотнести с каким-то <code>int</code>, поэтому используется тот же конструктор, что и для <code>a4</code>.<br>
+<br>
+<h1>Эпилог</h1><br>
+Надеюсь, вы поняли, что эта статья (<i>в основном</i>) полемическая и, надеюсь, немного информативная. Многие описанные здесь нюансы можно игнорировать, и язык будет предсказуемо реагировать, если вы не забудете инициализировать переменные перед использованием и инициализировать элементы данных во время построения. Для написания грамотного кода необязательно изучать все пограничные ситуации С++, вы всё равно по ходу работы разберётесь с подводными камнями и идиомами. <i>Для ясности</i>, список инициализация&nbsp;— хорошая вещь. Если вы написали конструктор по умолчанию, он вызывается и должен всё инициализировать. В противном случае все инициализируется нулём, а затем независимо активируются дефолтные инициализаторы членов. Неинициализированное поведение тоже нужно оставить, потому что где-то, вероятно, есть код, который <i>полагается</i> на неинициализированные переменные.<br>
+<br>
+Надеюсь, мне удалось продемонстрировать, что C++ большой, трудный язык (по многим историческим причинам). Вся статья посвящена нюансам инициализации. <i>Просто инициализации переменных</i>. И мы даже не раскрыли тему целиком, а кратко описали лишь 5 типов инициализации. Саймон в <a href="https://blog.tartanllama.xyz/initialization-is-bonkers/">оригинальной статье</a> упоминает 18 типов инициализации.<br>
+<br>
+Я бы не хотел обучать новичков программированию на примере C++. В этой статье не нашлось места концепциям системного программирования, рассуждениям о парадигмах программирования, методологиям решения задач или фундаментальным алгоритмам. Если вы заинтересованы в C++, то записывайтесь на курс конкретно по C++, но имейте в виду, что там будут изучать именно этот язык. Если вам интересует <i>C с классами</i> или <i>C с пространствами имён</i>, то сначала узнайте о реализации <code>this</code> и коллизиях идентификаторов в C.<br>
+<br>
+C — отличный, чёткий, быстрый, хорошо поддерживаемый и широко используемый язык для решения проблем в различных областях. И у него точно нет 18 типов инициализации.<br>
+<br>
+<hr><br>
+Кстати, я совершенно забыл, что <a href="https://lobste.rs/s/0wvqqc/stop_teaching_c_as_first_language">рассуждал точно на эту тему месяц назад</a>. Вот что делает подсознание.<br>
+<br>
+<hr><br>
+Обсуждение этой статьи и критика на разных форумах:<br>
+<br>
+<ol>
+<li><a href="https://lobste.rs/s/tul188/initialization_c_is_seriously_bonkers">Lobste.rs</a><br>
+</li>
+<li><a href="https://news.ycombinator.com/item%3Fid%3D18832311">Hacker News</a><br>
+</li>
+<li><a href="https://www.reddit.com/r/cpp/comments/ad07zw/initialization_in_c_is_seriously_bonkers/">Reddit</a></li>
+</ol><br>
+<i>Отвечая на самую распространённую критику:</i> да, можно научиться разумным способам инициализации переменных и никогда не встретиться с <i>бездной</i>. На этот счёт я специально написал в эпилоге, что список инициализации&nbsp;— хорошая вещь. Лично я редко пользуюсь шаблонами, но всё равно использую C++. Дело не в этом. Дело в том, что начинающий программист может полностью игнорировать STL и использовать стандартную библиотеку C, игнорировать ссылки, исключения и наследование. Так мы приближаемся к C с классами, за исключением того, что это не C, и вы всё ещё не понимаете указатели, выделение памяти, стек, кучу, виртуальную память. И теперь всякий раз, когда мне действительно нужен C, я должен переключиться на <i>другой</i> язык, который мог выучить с самого начала. Если вы собираетесь использовать C++, используйте C++. Но если вы хотите использовать C++ без всех особенностей C++, то просто изучите C. И повторю из <b>первого абзаца</b>, я не против C++. Мы видим бородавки на теле любимых и всё равно любим их.<br>
+<br>
+<font color="gray"><blockquote>И это всё, что я могу сказать об этом.</blockquote></font></div>

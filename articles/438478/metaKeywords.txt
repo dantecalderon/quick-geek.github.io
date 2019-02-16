@@ -1,0 +1,1 @@
+softmart, gitlab, continuous integration, continuous deployment, continuous delivery, git, ci, cd, ci/cd, devops

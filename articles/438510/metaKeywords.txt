@@ -1,0 +1,1 @@
+javascript, архитектура, oop, inheritance, composition, banana monkey
