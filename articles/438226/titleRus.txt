@@ -1,0 +1,1 @@
+Решение проблем с установкой .NET Framework 3.5 на Windows 8 в сети с WSUS

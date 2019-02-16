@@ -1,0 +1,1 @@
+Translation "Prepare your applications for 64-bit requirements"

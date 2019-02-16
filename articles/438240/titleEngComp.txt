@@ -1,0 +1,1 @@
+Load testing of CPU and SSD cloud hosters: compare Selectel, Servers, MCS and Ya.Oblako

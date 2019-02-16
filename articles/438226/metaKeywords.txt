@@ -1,0 +1,1 @@
+.NET Framework 3.5, Windows 8, AD, WSUS, 0x800F0906

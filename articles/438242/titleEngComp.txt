@@ -1,0 +1,1 @@
+Compress the list of IP-addresses in the best way
