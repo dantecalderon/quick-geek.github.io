@@ -1,0 +1,1 @@
+Основы Signed Distance Field в 2D
