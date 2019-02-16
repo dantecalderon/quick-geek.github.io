@@ -1,0 +1,1 @@
+pvs-studio, SAST, DevOps, DevSecOps, static code analysis, static code analyzer, ROI, статический анализ кода, возврат инвестиций

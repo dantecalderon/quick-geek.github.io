@@ -1,0 +1,1 @@
+Why is TypeScript based on every new web application in PayPal?

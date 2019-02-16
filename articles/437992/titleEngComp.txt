@@ -1,0 +1,1 @@
+Microservices. Versioning in continuous integration and CI / CD deployment systems using TFS as an example
