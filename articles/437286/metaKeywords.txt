@@ -1,0 +1,1 @@
+kubernetes, .net core, prometheus, grafana, блог компании модульбанк, теги никто не читает, серьёзно

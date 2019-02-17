@@ -1,0 +1,1 @@
+We deploy a virtual machine with Windows with a virtual video card forwarded with QEMU and Intel GVT-g

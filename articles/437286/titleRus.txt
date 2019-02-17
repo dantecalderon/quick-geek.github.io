@@ -1,0 +1,1 @@
+Пробую .NET Core + Kubernetes + appmetrics + prometheus + grafana + jobs + health checks

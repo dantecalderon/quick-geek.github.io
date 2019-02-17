@@ -1,0 +1,1 @@
+Begin to study microcontrollers on the example of STM32F030f4p6
