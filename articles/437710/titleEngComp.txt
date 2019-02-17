@@ -1,0 +1,1 @@
+Limiting local user rights in Linux to the minimum

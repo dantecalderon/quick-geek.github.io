@@ -1,0 +1,1 @@
+Draw a cartoon explosion for 180 lines of naked C ++
