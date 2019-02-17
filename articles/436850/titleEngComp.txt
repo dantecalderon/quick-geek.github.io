@@ -1,0 +1,1 @@
+Common mistakes when writing unit tests. Yandex lecture
