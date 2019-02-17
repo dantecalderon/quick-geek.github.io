@@ -1,0 +1,1 @@
+snapshots, unit testing, jest, babel, functional programming

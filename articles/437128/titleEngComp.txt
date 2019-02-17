@@ -1,0 +1,1 @@
+QtCreator and its use as IDE for Rust

@@ -1,0 +1,1 @@
+AWS, MongoDB, open source, продажа удобства, DocumentDB, GPL, AGPL, копилефт, DBaaS, SSPL, SaaS, IaaS, PaaS, Redis
