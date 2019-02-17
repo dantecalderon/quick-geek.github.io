@@ -1,0 +1,1 @@
+Git, система управления версиями, merge, fetch, pull, rebase

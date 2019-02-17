@@ -1,0 +1,1 @@
+Noise Security Bit 0x22 (Fault Injection attacks, 35С3 and Wallet.fail)

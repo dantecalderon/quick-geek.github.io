@@ -1,0 +1,1 @@
+Перевод руководства по Stream API от Benjamin Winterberg

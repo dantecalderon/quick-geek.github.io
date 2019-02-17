@@ -1,0 +1,69 @@
+<div class="post__text post__text-html js-mediator-article">  I have to participate in different projects for work, so I know well how all my colleagues work.  I remember that the company started using Git literally a couple of weeks before I arrived.  On the monitors of the developers there were stickers hanging around: first add, then commit, then push. <br><br><div style="text-align:center;"><img src="https://habrastorage.org/getpro/habr/post_images/4d2/7f3/159/4d27f3159d6a24c6d901c1fa574a34ed.png"></div><br>  They did not know why.  Programmers were simply told to strictly follow the instructions, otherwise the trouble.  But problems arose so often that I decided to hold a Git seminar. <br><a name="habracut"></a><br><h1>  Idea </h1><br>  I like to make a map in my head.  I do not say mental maps, because this is a well-known type of diagram.  It's about some pictures, structures, or any graphical representation in the mind.  For example, in childhood I taught arithmetic by representing playing cubes. <br><br>  Therefore, I have prepared several drawings.  You do not have to look at them in order to understand the text.  For each there is an explanation. <br><br>  In addition, it is very important to teach people terms.  Otherwise, he will not understand the message from Git.  Drawings are a good way. <br><br><h1>  Distributed Version Control System </h1><br><img src="https://habrastorage.org/getpro/habr/post_images/0d8/fcc/663/0d8fcc66392f73eb1357918f2014dc6b.png"><br><br>  In the figure, four areas are distributed as follows: <br><br><ul><li>  Development environment: <br><ul><li>  Working directory </li><li>  Staging or index </li><li>  Local repository </li></ul></li><li>  Server: <br><ul><li>  Remote repository </li></ul></li></ul><br>  Here you can explain the advantages of a distributed version control system. <br><br><h1>  Repository cloning </h1><br><img src="https://habrastorage.org/getpro/habr/post_images/dd0/b67/f25/dd0b67f25470555eb3712421ec185574.png"><br><br>  When cloning, data from a remote repository is moved into two areas: <br><br><ul><li>  Working directory </li><li>  Local repository </li></ul><br><h1>  Making changes to the working directory </h1><br><img src="https://habrastorage.org/getpro/habr/post_images/39d/3df/301/39d3df3010c2f91332efcebeb2a1446c.png"><br><br>  There are two types of files in the working directory: <br><br><ul><li>  <b>Monitored</b> : Files that Git knows about. </li><li>  <b>Untracked</b> : which have not yet been added, so Git does not know about them. </li></ul><br><h1>  Update Remote Repository </h1><br><img src="https://habrastorage.org/getpro/habr/post_images/e31/8f0/d3e/e318f0d3e35459cec30d61a534663cbf.png"><br><br>  After preparing the changes in the <b>working directory,</b> they must be added to the staging area. <br><br>  When a number of changes have accumulated there with a common goal, it's time to create a commit in the <b>local repository</b> with a message about this goal. <br><br>  If there are one or more commits in the <b>local repository</b> that are ready for sharing by the rest of the world, they are sent to a <b>remote repository</b> . <br><br>  At this point, you can talk about the different states of the file in the development environment: <b>changed</b> , <b>intermediate</b> (staged) and <b>fixed</b> (commited). <br><br><img src="https://habrastorage.org/getpro/habr/post_images/5f7/2df/d04/5f72dfd0442b4ab09d684edd5624ab92.png"><br><br>  Further you can explain: <br><br><ul><li>как показать изменения файла в <b>рабочем каталоге</b>: <code>git diff</code></li>
+<li>как показать изменения файла в <b>промежуточной области</b>: <code>git diff --staged</code></li>
+<li>как изменить файл в <b>рабочем каталоге</b> после добавления в <b>промежуточную область</b></li>
+<li>и т.&nbsp;д.</li>
+</ul><br>
+<h1>Обновление среды разработки</h1><br>
+<h3>Получение (fetching)</h3><br>
+<img src="https://habrastorage.org/getpro/habr/post_images/4a1/404/487/4a140448721af0c97f0a8718f31e328e.png"><br>
+<br>
+При выполнении <code>git fetch</code> данные из <b>удалённого репозитория</b> перемещаются только в <b>локальный репозиторий</b>.<br>
+<br>
+<h3>Вытягивание (pulling)</h3><br>
+<img src="https://habrastorage.org/getpro/habr/post_images/005/62c/b22/00562cb2287f02fcee6ba2dc6d326705.png"><br>
+<br>
+При выполнении <code>git pull</code> данные из <b>удалённого репозитория</b> перемещаются в две области:<br>
+<br>
+<ul>
+<li>В <b>локальный репозиторий</b>: <code>fetch</code></li>
+<li>В <b>рабочий каталог</b>: <code>merge</code></li>
+</ul><br>
+Если важна история коммитов, рассмотрите возможность использования <code>git pull --rebase</code>. Тогда вместо команд <code>fetch + merge</code> выполняются команды <code>fetch + rebase</code>. Ваши локальные коммиты будут воспроизведены, так что вы не увидите в истории коммитов известную <i><a href="https://stackoverflow.com/questions/16666089/whats-the-difference-between-git-merge-and-git-rebase">форму бриллианта</a></i>.<br>
+<br>
+<img src="https://habrastorage.org/getpro/habr/post_images/e46/316/265/e46316265accd6405a226aaf25de90b8.png"><br>
+<br>
+<h1>Дальнейшие действия</h1><br>
+Можете добавить в среду разработки ещё одну область, чтобы проще прятать накопленные изменения: <b>грязный рабочий каталог</b>.<br>
+<br>
+Когда люди усвоят эти понятия, вам будет легче объяснить дальнейшее: ветви, историю коммитов, перебазировку и так далее, потому что прочный фундамент уже заложен.<br>
+<br>
+<h1>Дружеское напоминание</h1><br>
+Я работала с другими системами управления версиями (Visual SourceSafe, TFS и Subversion): по моему скромному опыту, недостаток знаний вредит и со старым инструментом, и с новым. Сосредоточьтесь не только на выборе инструмента, но и на его освоении.<br>
+<br>
+<h1>Дальнейшее чтение</h1><br>
+<ul>
+<li><a href="https://git-scm.com/book/en">Книга Pro Git</a></li>
+</ul><br>
+<h1>Полученные отзывы</h1><br>
+Мой друг <a href="https://twitter.com/marcvege">Марк Виллаграса</a> напомнил, что очень полезно решить <a href="https://www.slideshare.net/raquelmorenocarmena/git-challenges">задачки Git</a> и делиться с коллегами решением.<br>
+<br>
+Ресурсы из <a href="https://news.ycombinator.com/item%3Fid%3D18919599">комментариев на Hacker News</a>:<br>
+<br>
+<ul>
+<li><a href="http://perl.plover.com/yak/git/">Величайшее изобретение Линуса Торвальдса</a><br>
+</li>
+<li><a href="https://www.youtube.com/watch%3Fv%3D4XpnKHJAok8">Лекция Линуса Торвальдса о Git</a><br>
+</li>
+<li><a href="https://www.youtube.com/watch%3Fv%3D1ffBJ4sVUb4">Linux.conf.au 2013 — Git для детей от 4 лет</a><br>
+</li>
+<li><a href="https://jwiegley.github.io/git-from-the-bottom-up">Git от начала до конца</a><br>
+</li>
+<li><a href="http://ftp.newartisans.com/pub/git.from.bottom.up.pdf">Git от начала до конца (PDF)</a><br>
+</li>
+<li><a href="https://learngitbranching.js.org/">Изучаем ветвления Git</a><br>
+</li>
+<li><a href="https://github.com/k88hudson/git-flight-rules">Правила полётов для git</a><br>
+</li>
+<li><a href="https://magit.vc/">Пакет Emacs: Magit</a><br>
+</li>
+<li><a href="https://chris.beams.io/posts/git-commit/">Как написать хорошее сообщение для коммита</a><br>
+</li>
+<li><a href="https://www.atlassian.com/git/tutorials">Станьте гуру git</a><br>
+</li>
+<li><a href="http://gitimmersion.com/">Погружение в Git</a><br>
+</li>
+<li><a href="https://eu.udacity.com/course/how-to-use-git-and-github--ud775">Udacity: как использовать Git и GitHub</a></li>
+</ul><br>
+Прочитав <a href="https://www.reddit.com/r/programming/comments/agko6r/how_to_teach_git/">комментарии на Reddit</a>, я подумала, что более точным названием этой статьи было бы <b>«Идея, как научить людей использовать Git»</b>, потому что это только идея, которая появилась в моей голове, когда я сама несколько лет назад изучала Git по <a href="https://git-scm.com/book/en">книге Pro Git</a>. Статья не является полным руководством, лишь отправная точка. Уверена, что все эти ресурсы будут очень полезны. Спасибо!<br>
+<br>
+И спасибо <a href="https://stuartm.com/">Стюарту Максвеллу</a>, который поделился ссылкой на Hacker News, и <a href="https://www.reddit.com/user/cryptoz">u/cryptoz</a>, который запостил её на Reddit!</div>

@@ -1,0 +1,1 @@
+javascript, fsm, finite state machine, behavior, конечный автомат

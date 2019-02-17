@@ -1,0 +1,1 @@
+Libratus strategic poker bot adapted for military simulators

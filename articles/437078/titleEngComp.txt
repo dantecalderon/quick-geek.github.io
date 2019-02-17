@@ -1,0 +1,1 @@
+How to speed up work with APIs in the R language using parallel computing, using the Yandex.Direct API as an example

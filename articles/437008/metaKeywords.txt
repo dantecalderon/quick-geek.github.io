@@ -1,0 +1,1 @@
+nlp (natural language processing), ABBYY, machine learning, нейросети, нейронные сети, саммаризация, ner, rnn, эмбеддинги, токены

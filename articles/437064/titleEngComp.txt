@@ -1,0 +1,1 @@
+Gomoku's winning strategy - 35 moves
