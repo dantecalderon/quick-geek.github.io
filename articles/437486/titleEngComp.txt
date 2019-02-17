@@ -1,0 +1,1 @@
+AlphaStar - a new artificial intelligence system for StarCraft II from DeepMind (full translation)

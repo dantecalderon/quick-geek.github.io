@@ -1,0 +1,1 @@
+What are pure functions in javascript?

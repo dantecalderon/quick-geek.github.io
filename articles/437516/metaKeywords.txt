@@ -1,0 +1,1 @@
+C#, .net, pvs-studio, aws sdk, static code analysis, visual studio
