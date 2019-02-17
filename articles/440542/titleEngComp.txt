@@ -1,0 +1,1 @@
+Vuex - excessive use of getters in the application. Parsing error

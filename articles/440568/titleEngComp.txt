@@ -1,0 +1,1 @@
+We write an educational application on Go and Javascript to assess the real return on equity. Part 2 - Backend Testing

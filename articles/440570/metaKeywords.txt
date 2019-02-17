@@ -1,0 +1,1 @@
+перевод, rsm, gi, shaders, hlsl, directx, opengl
