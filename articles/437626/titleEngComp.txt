@@ -1,0 +1,1 @@
+The performance of the trading platform on a simple example

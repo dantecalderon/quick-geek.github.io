@@ -1,0 +1,1 @@
+Architectural pattern "Iterator" ("Iterator") in the universe "Swift"

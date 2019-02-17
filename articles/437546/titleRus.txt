@@ -1,0 +1,1 @@
+Linux машина в домене Windows AD с помощью sssd и krb5

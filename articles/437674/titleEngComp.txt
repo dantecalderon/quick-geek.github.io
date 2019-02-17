@@ -1,0 +1,1 @@
+Methods for recognizing 3D objects for unmanned vehicles. Yandex report

@@ -1,0 +1,1 @@
+OpenSceneGraph: Procedural animation of geometry and state attributes

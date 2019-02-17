@@ -1,0 +1,1 @@
+Linux machine in a Windows AD domain using sssd and krb5

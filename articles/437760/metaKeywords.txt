@@ -1,0 +1,1 @@
+stm32, stm, arm, cortex, gcc, g++, gdb, openocd, arm-none-eabi, debug, отладка, vscode, c, c++, intellisense, hardware, embedded

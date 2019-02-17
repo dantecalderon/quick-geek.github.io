@@ -1,0 +1,1 @@
+DD-WRT, маршрутизатор, 802.11n, 802.11ac, Atheros, Ubuntu, FireHOL, пассивное сканирование, hostapd, Virtual SSID, виртуальный SSID
