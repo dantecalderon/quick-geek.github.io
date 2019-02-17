@@ -1,0 +1,1 @@
+формальная верификация, модернизация безопасности ПО, Боинг, AH-6, Беспилотная Птичка, Unmanned Little Bird, ULB, sel4, CAmkES, Rockwell Collins, CompCert, CoCon, CakeML, Milawa, Candle, FSCQ, CertiKOS, проблема четырёх красок, гипотеза Кеплера, теорема Фейта — Томпсона, теорема о нечётном порядке, capDL, Ivory, синтез драйверов, типобезопасность

@@ -1,0 +1,1 @@
+3cx, stun, firewall checker, full cone nat, symmetric nat, проблемы, односторонняя слышимость, маршрутизатор, сетевой экран, публикация портов

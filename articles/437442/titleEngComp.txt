@@ -1,0 +1,1 @@
+Technical support 3CX responds: configure the router for the PBX VoIP server

@@ -1,0 +1,1 @@
+отказоустойчивость, high availability, postgresql, replication, linux, devops

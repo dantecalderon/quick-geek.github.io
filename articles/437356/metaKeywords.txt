@@ -1,0 +1,1 @@
+ssd, 3D NAND, NVMe, QLC NAND

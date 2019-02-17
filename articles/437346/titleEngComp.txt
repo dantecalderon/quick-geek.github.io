@@ -1,0 +1,1 @@
+A game (not) for fools. Writing AI for the Fool (Part 1)

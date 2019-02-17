@@ -1,0 +1,1 @@
+GitLab 11.7 поставляется с Releases, Multi-level Child Epics и реестром NPM
