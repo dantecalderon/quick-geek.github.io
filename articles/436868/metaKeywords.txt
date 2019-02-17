@@ -1,0 +1,1 @@
+статический анализ, ci, jenkins, artifactory

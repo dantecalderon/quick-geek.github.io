@@ -1,0 +1,1 @@
+docker-pretty-ps — наконец-то удобный для чтения «docker ps»

@@ -1,0 +1,1 @@
+Guix, Unix, Nix, NixOS, Emacs-Guix, ад зависимостей, Debian, Arch Linux, Gentoo, *BSD, Portage, Guile Scheme, Lisp

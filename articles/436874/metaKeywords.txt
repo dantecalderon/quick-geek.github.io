@@ -1,0 +1,1 @@
+hba-adapter, cpu, new-year, amd epyc

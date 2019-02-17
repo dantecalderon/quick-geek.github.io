@@ -1,0 +1,65 @@
+<div class="post__text post__text-html js-mediator-article">  I have not managed to overcome the signal server while writing a multiplayer chat, so I began to look for ready-made frameworks.  The easiest of all seemed to me EasyRTC. <br><a name="habracut"></a><br>  According to the instructions, everything is installed very simply, both on Windows and Linux: <br>  1. Download and install Node.js. <br>  2. From Github'a download easyRTC, go to the downloaded folder. <br>  3. We type in the console npm install (recall in the directory of the downloaded easyRTC folder) the necessary packages for Node.js are installed <br>  4. We also start the server in the console: node server.js. <br>  Everything!!!  Now, by default, at the time of your server 8080 running examples of using easyRTC are running. <br>  To write your own chat, you need to connect socket.io.js and easyrtc.js on your page, using nginx, you can “proxy” as follows: <br>  In the configuration file: <br><pre> upstream backendEasyRTC {
+		 server 127.0.0.1:9080;
+     }
+ In the server section:
+ location /socket.io {
+                        #proxy_pass http: // 127.0.0.1:9080;
+			 proxy_pass http: // backendEasyRTC;
+			 proxy_http_version 1.1;
+			 proxy_set_header Upgrade $ http_upgrade;
+			 proxy_set_header Connection "upgrade";
+			 proxy_set_header Host $ host;
+         }
+</pre><br>  Socket.io.js and easyrtc.js (which is located in the api folder) should be placed in static, respectively. <br><br>  Next, you need to configure easyRTC: <br><br>  In the easyrtc.js file, change easyRTC.webSocket to: <br><pre> easyRTC.webSocket = io.connect ('http: // your server');
+</pre><br>  and in the config.js configuration file (located in the same place as server.js), change the standard port to yours, in my case 9080: <br><pre> config.httpPort = 9080;
+</pre><br><br>  Include the necessary files on your page <br><pre> &lt;script src = "/ socket.io/socket.io.js"&gt; &lt;/ script&gt;
+ &lt;script type = "text / javascript" src = "/ static / js / easyrtc.js"&gt; &lt;/ script&gt;
+</pre><br><br>  We register video tags: <br>  For remote users <br><pre> &lt;video autoplay = "autoplay" id = "remoteVideo1"&gt; &lt;/ video&gt;
+ &lt;video autoplay = "autoplay" id = "remoteVideo2"&gt; &lt;/ video&gt;
+</pre><br>  And to display yourself <br><pre> &lt;video autoplay = "autoplay" id = "localVideo" muted = "muted" volume = "0"&gt; &lt;/ video&gt;
+</pre><br><br>  Run easyRTC at the start of the page: <br><pre> var maxCALLERS = 3;  // Number of people in the room
+ window.onload - function () {
+   easyRTC.setLoggedInListener (callEverybodyElse);  // Fires when a new webrtc stream appears.
+   easyRTC.initManaged ("myroom", "localVideo", ["remoteVideo1", "remoteVideo2], loginSuccess);
+ // myroom - the name of the room where users will be
+ // localVideo - your video
+  // ["remoteVideo1", "remoteVideo2] - where to output remote user streams. 
+ // loginSuccess - in it you can find your thread id
+ }
+
+ function loginSuccess (easyRTCId) {
+     console.log ('My id' + easyRTCId);  // Useful for further user identification
+ }
+
+ function callEverybodyElse (otherPeople) {
+             easyRTC.setLoggedInListener (null); 
+             var list = []; 
+             var connectCount = 0;
+    
+             for (var i in otherPeople) { 
+                 list.push (i);
+             }
+     // By default, the new stream is the last in the array
+             function establishConnection (position) {
+                 function callSuccess () {
+                     connectCount ++;
+                     if (connectCount &lt;maxCALLERS &amp;&amp; position&gt; 0) {
+                         establishConnection (position-1);
+                     }
+                 }
+                 function callFailure () {
+                     easyRTC.showError ("CALL-REJECTED", "Rejected by other party");
+                     if (connectCount &lt;maxCALLERS &amp;&amp; position&gt; 0) {
+                         establishConnection (position-1);
+                     }            
+                 }
+                 easyRTC.call (list [position], callSuccess, callFailure);    
+             }
+             if (list.length&gt; 0) { 
+                 establishConnection (list.length-1); 
+             }
+         }
+</pre><br><br>  Additionally, you can specify the connection port: <br><pre> easyRTC.setSocketUrl (": 9088");
+</pre><br>  Video bitrate: <br><pre> easyRTC.setVideoBandwidth (40);
+</pre><br>  Video resolution: <br><pre> easyRTC.setVideoDims (320,180);  - video resolution
+</pre><br>  This is the minimum that is needed for multiplayer chat. <br>  Additionally in the easy.c.js config.js files, as well as on Github and Google Groups. <br>  Thank you if you have read to the end. <br><br>  Website: <a href="http://www.easyrtc.com/%25E2%2580%258E">http://www.easyrtc.com/</a> <br>  Github: <a href="https://github.com/priologic/easyrtc">https://github.com/priologic/easyrtc</a> <br>  Google Groups: <a href="https://groups.google.com/d/forum/easyrtc">https://groups.google.com/d/forum/easyrtc</a> </div>

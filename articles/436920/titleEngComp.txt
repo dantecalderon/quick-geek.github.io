@@ -1,0 +1,1 @@
+PAS2JS Transporter from Pascal to JavaScript: Delphi incompatibilities and workarounds
