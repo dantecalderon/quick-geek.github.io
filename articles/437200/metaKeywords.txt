@@ -1,0 +1,1 @@
+sdet, тестирование, angular, java, selenium-webdriver, drag&amp;drop

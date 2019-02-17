@@ -1,0 +1,1 @@
+Proposed changes to Chromium will disrupt uBlock Origin

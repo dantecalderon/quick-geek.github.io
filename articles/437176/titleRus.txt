@@ -1,0 +1,1 @@
+Приложение для iOS и Android на Kotlin + Flutter UI

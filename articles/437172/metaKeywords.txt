@@ -1,0 +1,1 @@
+jmeter, mq, websphere, jms, тестирование, test automation, qa, qa automation, qa testing, queues, ibm, websphere application server, websphere mq
