@@ -1,0 +1,1 @@
+Запускаем свой нейросетевой детектор на Raspberry Pi с помощью Neural Compute Stick и OpenVINO

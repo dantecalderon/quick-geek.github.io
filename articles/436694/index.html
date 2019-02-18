@@ -1,0 +1,85 @@
+<!doctype html>
+<html class="no-js" lang="en">
+
+<head>
+  <!-- Global site tag (gtag.js) - Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=UA-134228602-1"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'UA-134228602-1');
+  </script>
+
+  <meta charset="utf-8">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  <title>My Pascal compiler and Polish modern art</title>
+  <meta name="description" content="Origins 
+ A few years ago I wrote the Pascal compiler. The motivation was simple: in my youth I learned from my first books on programming that the co...">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+  <link rel="stylesheet" href="../../css/main.css">
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+  <script>window.jQuery || document.write('<script src="../../js/vendors/jquery-3.3.1.min.js"><\/script>')</script>
+</head>
+
+<body>
+  <!--[if lte IE 9]>
+    <p class="browserupgrade">You are using an <strong>outdated</strong> browser. Please <a href="https://browsehappy.com/">upgrade your browser</a> to improve your experience and security.</p>
+  <![endif]-->
+  <nav class="page-headings-container js-page-headings-container"></nav>
+  <div class="tools-bar js-tools-bar">
+    <!-- <a href="https://quick-geek.github.io/search.html" title="Search">🔎</a> -->
+    <a class="js-list-of-headings-button" data-state="closed" href="#" title="Headings">📜</a>
+    <a class="js-go-to-top-button" href="#" title="Go to Top">⬆️</a>
+    <a class="js-go-to-bottom-button" href="#" title="Go to Bottom">⬇️</a>
+  </div>
+  <section class="page js-page"><h1>My Pascal compiler and Polish modern art</h1><div class="post__text post__text-html js-mediator-article"><h2>  Origins </h2><br>  A few years ago I wrote the Pascal compiler.  The motivation was simple: in my youth I learned from my first books on programming that the compiler was an extremely difficult thing.  This statement was stuck with a thorn in the brain, and in the end it required verification by experience. <br><br><img src="https://habrastorage.org/webt/b2/ki/kn/b2kiknbgwl4rcqwjgtbex6ucfn8.jpeg" alt="image"><br>  <i>ha.art.pl</i> <br><br>  First, the simplest <a href="https://en.wikipedia.org/wiki/PL/0">PL / 0</a> compiler was born, and the almost full-featured Pascal compiler for MS-DOS gradually grew out of it.  I was inspired by the book <a href="http://www.ethoberon.ethz.ch/WirthPubl/CBEAll.pdf">Compiler Construction</a> , written by the creator of the language Pascal Niklaus Wirth.  And let the views of Wirth are already outdated and have lost all connection with the realities of IT, and the compilers do not quite like Wirth taught.  However, his methods are still simple, elegant, and most importantly - they <i>bring joy</i> , because independently disassembling the text of a program by recursive descent and generating machine code is much more tempting than calling <a href="https://en.wikipedia.org/wiki/Yacc">yaks</a> , <a href="https://en.wikipedia.org/wiki/GNU_Bison">bison</a> and all their successors for help. <br><br>  The fate of my compiler was not the most trivial.  He lived two lives: the first - in my hands, the second - in the hands of Polish connoisseurs of computer antiquities. <br><a name="habracut"></a><br><h2>  XD Pascal </h2><br>  My newly baked compiler is called <a href="https://sourceforge.net/projects/xdpascal/">XD Pascal</a> .  He supported all the operators of Pascal, except <code>goto</code> and <code>with</code> .  The first one seemed to me difficult to implement, since it destroyed the ideally hierarchical structure of the program.  The second created confusion with the areas of visibility of names. <br><br>  All major data types were also supported.  Only unsigned integers, sets, enumerations, and variant entries are left out of the box — but these are clearly not essential items.  Nevertheless, I could not deny myself the pleasure of floating-point numbers and their arithmetic on the 8087 coprocessor - this was reflected in my professional inclination for engineering calculations. <br><br>  When implementing the procedures and functions, I was afraid that recursion and storage of local variables on the stack would be a big problem.  However, the real difficulty specific to Pascal lurked in a completely different place - in working with nested procedures.  There may be a completely innocent need to refer to a local variable of an external procedure from an internal one.  However, in the internal procedure there is no address of the stack frame of the external procedure — the internal procedure does not know what the address of the desired variable is counted from.  This address must be transferred to the internal procedure every time through an additional hidden parameter.  I suspect that it was this complication that caused C developers to completely abandon the embedding of functions.  However, they are in Pascal, and this has to be considered. <br><br>  The code generator created the simplest COM executable files for real MS-DOS mode.  The machine code was generated directly, without the help of an external assembler or linker.  For data, I used the 32-bit registers of the 80386 architecture, and the addressing remained 16-bit, as a segment-offset pair. <br><br>  The memory model roughly corresponded to the “small” one (if someone else remembers this terminology of the 16-bit era): for the code, the global data and the stack, one segment of 64 kb was allocated. <br><br><img src="https://habrastorage.org/webt/xl/s3/cd/xls3cdmmbp9uz7wn-6c_fq6mibi.png" alt="image"><br>  <i>Memory usage</i> <br><br>  Generating EXE files and switching segments on the fly seemed too complicated, and the tight framework of the “small” model made me say goodbye to the idea of ​​self-compilation.  Of course, I encountered self-compiled compilers, whose code was completely fit in one segment (for example, <a href="http://www.avhohlov.narod.ru/p9800ru.htm">Context</a> ).  However, they rarely knew how to do anything useful other than this self-compilation.  I wanted to make my compiler at least a little suitable for numerical calculations and graphics output.  Therefore, among the examples of programs appeared fractals, the solution of linear equations according to Gauss, the fast Fourier transform and even the Kalman filter estimation of errors of an inertial navigation system. <br><br><img src="https://habrastorage.org/webt/jc/ok/xi/jcokximzi3cwbsolsh3wtbomo20.png" alt="image"><br>  <i>Fragment of the Mandelbrot Set</i> <br><br><img src="https://habrastorage.org/webt/ih/c9/a6/ihc9a64xrqc_alfhse2fwe4jrwo.png" alt="image"><br>  <i>Fast Fourier Transform</i> <br><br><img src="https://habrastorage.org/webt/hc/xy/f0/hcxyf0udd1gbkzkwtukw2-gkwis.png" alt="image"><br>  <i>Estimation of inertial navigation system errors</i> <br><br>  What I got in the end, most of all resembled the ancient world of Turbo Pascal 3.0 (still without the PLO) and the amateur <a href="https://github.com/BeRo1985/berotinypascal">BeRo Tiny Pascal</a> .  The author of the latter has mastered self-compilation under Windows, but he sacrificed floating-point arithmetic and many grammar subtleties that I wanted to observe.  Of the more modern features in my XD Pascal, single-line comments ( <code>//</code> ) and auto- <code>Result</code> appeared borrowed from Delphi. <br><br>  However, since my birth my compiler has been marked with the seal of death.  Pascal is already irreversibly going out of fashion, and MS-DOS has long become archaic.  That day, when I switched from 32-bit Windows XP to 64-bit Windows 7 without a DOS virtual machine, I mentally buried my project. <br><br><h2>  Revival </h2><br>  Then a strange thing happened.  After three years of complete oblivion, a certain group of Polish retrocomputing enthusiasts and fans of Atari found my compiler.  Apparently, the abstract problems of self-compilability and the strictness of the implementation of grammar worried them a little.  They just needed a handy programming tool for their favorite car.  From my project, they made their own <a href="http://mads.atari8.info/">Mad Pascal compiler</a> for architecture 6502. The grammar of the language has grown, there is support for modules with sections of the interface and implementation, the <code>goto</code> operator, unsigned integers, sets and enumerations, assembler inserts.  Instead of machine code, assembler code was now generated.  His final broadcast was done by an assembler of his own design. <br><br>  Externally, the language has become noticeably closer to the actual standard of Pascal.  Inside, the compiler looks somewhat frightening, the reserved words are mixed with the names of standard procedures, but this does not bother the authors at all.  No matter how it looks, but the case turned out to be surprisingly tenacious: Mad Pascal has been regularly updated for three years, many games have been written on it, the authors annually speak at <a href="http://www.sillyventure.eu/pl/">Silly Venture retroconference</a> (link requires VPN).  There is a feeling that the traditions of honoring Atari are very strong in Poland. <br><br><iframe width="560" height="315" src="https://www.youtube.com/embed/bFOVFtPFi_I" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen=""></iframe><br>  In the spring of 2018, an event occurred that was quite remarkable for the Polish crowd of Atari fans: the book <a href="http://www.ha.art.pl/wydawnictwo/nowe-ksiazki/5330-robbo-solucja.html">“Robbo.</a>  <a href="http://www.ha.art.pl/wydawnictwo/nowe-ksiazki/5330-robbo-solucja.html">Solucja "</a> (" Robbo. Passage ") in the genre of experimental literature.  Here it must be said that the game <a href="https://en.wikipedia.org/wiki/Robbo_(video_game)">Robbo</a> for Atari, published 30 years ago, still excites the hearts of the older generation of Poles and fills them with patriotic enthusiasm.  In general, it is not surprising that a book about the game appeared.  The only funny thing is that according to the authors, it consists of 60% of the instructions for passing the game, generated by the Atari computer itself.  The generation program is written on the very Mad Pascal. <br><br><img src="https://habrastorage.org/webt/sr/oj/qf/srojqfmkyrz87h8mnqvjoehm5ui.jpeg" alt="image"><br>  <i>graczpospolita.pl</i> <br><br>  And it seems that <a href="http://retroage.net/recenzje-prasyksiazek/robbo-solucja">some people</a> took the book as a worthy example of modern art: <br><blockquote>  It would be wrong to treat the book only as a collectible for Robbo fans or, more generally, for Atari fans.  We have to deal with a rare case of the clash of the culture of video games with literature (in this case, electronic), when the starting point is a “game” and not a “literature”.  For some, it is meaningless art for the sake of art.  For others, such a crossing carries entirely new possibilities and experiences.  Nothing prevents you from creating a version of Robbo, which you can finish with the help of the “passage” from the book.  The book agrees well with my view of the game as an art.  An art in which a player can be both perceiving and creative - if during the “game” there is an “audience” watching the player creating his own “game” story.  The content of the book can be adapted for performance with a player passing Robbo, using elements of the “step-by-step instructions” from the book.  In order not to remain unsubstantiated: a performance based on “Robbo.  Solucja ”was held on May 11, 2018 in the Bunker Contemporary Art Gallery in Krakow, during the presentation of the book as part of the Inexhaustibility exhibition. </blockquote>  Performance in Krakow.  For this it was worth writing a compiler. </div><p>Source: <a href="https://habr.com/ru/post/436694/">https://habr.com/ru/post/436694/</a></p>
+<section class="navigation-panel">
+<h4>More articles:</h4>
+<nav class="list-of-articles-container js-list-of-articles-container">Waiting for the list from <a href="../../index.html">here</a>...</nav>
+</section>
+<script src="../../js/main.js"></script>
+
+<!-- Yandex.Metrika counter -->
+<script type="text/javascript" >
+  (function (d, w, c) {
+      (w[c] = w[c] || []).push(function() {
+          try {
+              w.yaCounter52319614 = new Ya.Metrika({
+                  id:52319614,
+                  clickmap:true,
+                  trackLinks:true,
+                  accurateTrackBounce:true,
+                  webvisor:true
+              });
+          } catch(e) { }
+      });
+
+      var n = d.getElementsByTagName("script")[0],
+          s = d.createElement("script"),
+          f = function () { n.parentNode.insertBefore(s, n); };
+      s.type = "text/javascript";
+      s.async = true;
+      s.src = "https://mc.yandex.ru/metrika/watch.js";
+
+      if (w.opera == "[object Opera]") {
+          d.addEventListener("DOMContentLoaded", f, false);
+      } else { f(); }
+  })(document, window, "yandex_metrika_callbacks");
+</script>
+<noscript><div><img src="https://mc.yandex.ru/watch/52319614" style="position:absolute; left:-9999px;" alt="" /></div></noscript>
+
+<!-- Google Analytics -->
+  <script>
+    window.ga = function () { ga.q.push(arguments) }; ga.q = []; ga.l = +new Date;
+    ga('create', 'UA-134228602-1', 'auto'); ga('send', 'pageview')
+  </script>
+  <script src="https://www.google-analytics.com/analytics.js" async defer></script>
+
+</section>
+</body>
+
+</html>

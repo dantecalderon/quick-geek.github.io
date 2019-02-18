@@ -76,4 +76,8 @@ $(function() {
 		
 	// 	$('.js-list-of-articles-container').append($listOfAllArticles);
 	// });
+
+
+	//Get the list of all articles
+	$('.js-list-of-articles-container').load('../../index.html .js-all-articles-list');
 });

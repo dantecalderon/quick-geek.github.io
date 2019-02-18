@@ -1,0 +1,84 @@
+<!doctype html>
+<html class="no-js" lang="en">
+
+<head>
+  <!-- Global site tag (gtag.js) - Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=UA-134228602-1"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'UA-134228602-1');
+  </script>
+
+  <meta charset="utf-8">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  <title>Analysis of trends in Russian YouTube for 2018</title>
+  <meta name="description" content="Old-timers probably don’t remember, but at the end of 2017, there was a widespread discussion on the Internet that “often wired” videos were often fou...">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+  <link rel="stylesheet" href="../../css/main.css">
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+  <script>window.jQuery || document.write('<script src="../../js/vendors/jquery-3.3.1.min.js"><\/script>')</script>
+</head>
+
+<body>
+  <!--[if lte IE 9]>
+    <p class="browserupgrade">You are using an <strong>outdated</strong> browser. Please <a href="https://browsehappy.com/">upgrade your browser</a> to improve your experience and security.</p>
+  <![endif]-->
+  <nav class="page-headings-container js-page-headings-container"></nav>
+  <div class="tools-bar js-tools-bar">
+    <!-- <a href="https://quick-geek.github.io/search.html" title="Search">🔎</a> -->
+    <a class="js-list-of-headings-button" data-state="closed" href="#" title="Headings">📜</a>
+    <a class="js-go-to-top-button" href="#" title="Go to Top">⬆️</a>
+    <a class="js-go-to-bottom-button" href="#" title="Go to Bottom">⬇️</a>
+  </div>
+  <section class="page js-page"><h1>Analysis of trends in Russian YouTube for 2018</h1><div class="post__text post__text-html js-mediator-article"><p>  Old-timers probably don’t remember, but at the end of 2017, there was a widespread discussion on the Internet that “often wired” videos were often found on YouTube trends. </p><br><p>  Therefore, on the eve of the new 2018, I wrote a utility for collecting information about videos that are in trend.  For each video, a title, a list of tags, a date of creation are requested, as well as a history of changes in varnishes / dislikes / views.  Development led on TypeScript for NodeJS, the code itself is laid out on <a href="https://github.com/SHTrassEr/TubeWarden">GitHub</a> . </p><br><p>  As a result, now there is an opportunity to build beautiful graphics: <br><img src="https://habrastorage.org/webt/7y/wt/qq/7ywtqqjdebt-wbmcf7ckzvuq1zu.png" alt="Graph of changes in the number of likes and dislikes"><br></p><br><p>  It is also possible to build graphs of changes in trends for keywords.  In total for the 2018th year, information was collected on 29,271 videos.  Statistics are collected now. </p><br><a name="habracut"></a><br><h4>  General principle of work </h4><br><ol><li>  Every 5 minutes, the current list of trends is taken. </li><li>  For each new video, the main information is saved (title, tag list, creation date) </li><li>  Based on the title and tags, each video is assigned a keyword cloud. </li><li>  Schedule information is requested on likes / dislikes / views for each of the videos.  The statistics is collected within two days, the first time requests go at intervals of 2 minutes, then the interval increases.  If there is a suspicion of cheating, the interval is again set to 2 minutes. </li></ol><br><p>  If the graph of changes in the number of likes / dislikes on one of the sites is a straight line, then only the first and last value on this site is saved.  This is done to reduce the size of the database.  Now there are only 6908449 records in the table with statistics, the table on the disk is 458 mb. </p><br><h4>  The principle of the automatic detection of markups </h4><br><p>  For myself, the task was formulated as follows: you need to mark videos that have a “ladder” on the chart for changing likes / dislikes.  Steps at this same ladder are determined on the basis of three adjacent statistics measurements.  The angle between the two straight lines is taken into account: one straight line is drawn between the first and the second measurement, the second between the second and the third, as well as the lengths of the segments.  Graphs that have many small irregularities are also marked. </p><br><p>  An example of suspicious graphics: <br><br><img src="https://habrastorage.org/webt/6z/e5/ut/6ze5utvohsd411fayyzwmldculi.png" alt="Suspicious graphics example"></p><br><p>  All the parameters of the algorithm were determined by me manually and checked on the video already collected at that time and during the year changes were made to this algorithm.  Therefore, it’s probably not worth taking these results seriously for each individual video.  In my defense, I can say that when the parameters were changed, a recalculation was launched for all the videos already collected, so the same algorithm was applied to all the videos. </p><br><p>  In general, it is impossible to say whether there was a cheat on one (or several) changes of likes / dislikes.  Any suspicious drops can be explained by the work of CQRS or flares on the sun.  Yes, one schedule is smooth, the other is stepped, but perhaps all videos occasionally encounter similar behavior?  That is why, to compile a general picture, information was collected from all videos that hit the trends. </p><br><h4>  Cheat statistics </h4><br><p>  For the 2018th year, the algorithm showed the following results: <br>  Suspicion of cheating likes: 180 videos (0.32% of the total number of videos) <br>  Suspicion of dizlyku cheating: 1303 video (4.45% of the total number of video) </p><br><p>  There are few videos with suspicious graphics, but this was not always the case: in the first month of 2018, 96 such videos were recorded (more than 50% of all suspicious likes for the year).  However, in February, such videos became much smaller, only 8. </p><br><p>  Here, you probably should again refer to the old-timers, who may recall (or not remember) the event that occurred on January 10, 2018, when <a href="https://lenta.ru/news/2018/01/10/youtube_ban/">YouTube blocked many channels</a> .  For my part, I can say that among those blocked were those for which my utility managed to gather information.  Graph of one of the deleted videos: <br><br><img src="https://habrastorage.org/webt/iy/bd/5o/iybd5oqxuxolrltbwdxfhuzblrq.png" alt="image"></p><br><p>  If we assume that there were really some cheating, then it seems that YouTube has done a lot of work and now you can see videos that are suspicious about likes in trends not every day (and those that are found often look like an accident or error).  On the other hand, such a drop in wrap can be explained by the fact that, unlike dislikes, it does not make sense to wind up likes from videos that have already become trendy. </p><br><p>  And some more statistics.  On average, tracked videos gain 21,479 likes and 2,863 dies. <br>  Suspicion of cheating likes: 15502/4250 <br>  Suspicion of dizlaikov cheat: 16868/22087 <br>  Thus, if you look at the result, there is no benefit from cheating likes, while it is quite possible to increase the percentage of dislikes. </p><br><p>  Suspicious on dizlakam graphics are uneven.  For example, on the Yevgeny Roizman channel, out of 21 videos caught in a trend, more than half are marked by the algorithm as twisted on dizlikes. </p><br><p>  About the graphics from the title of this article.  If we assume that there is a set of accounts in the amount of 5-10 thousand, which they first gave the command to put on dislikes, and then, not waiting for the end of work on the same set, they gave the command to put likes, then you can probably get a similar schedule. </p><br><p>  The strangest schedule that I met: <br><br><img src="https://habrastorage.org/webt/ju/uc/8b/juuc8biighymuz1v7yixeru9xne.png" alt="image"><br>  I would be grateful if someone offered an explanation of what the devil is going on here.  By the way, it can be noted that according to this schedule, statistics were collected for almost a week, not two days. <br></p><br><h4>  The principle of the algorithm for measuring the popularity of keywords </h4><br><p>  As already said, for each video is saved the name and set of tags.  Further, the name and each of the tags is divided into separate words, they are run through a stemmer and saved as a cloud of keywords for the video. </p><br><p>  Having the information about when the video got into the trends and when the trends came out, as well as the sets of words for the video, you can make a graph of the change in popularity for each of the keywords.  At the moment, the schedule for changing keyword threads is arranged by day.  As a measure, the total time (in hours) is used, which all videos with this keyword were in trends. </p><br><p>  Example: in the trends there were only two videos corresponding to the keyword.  One video lasted 5 hours in trends, the other - 10 hours.  Then the popularity of the keyword is set to 10 + 5 = 15. </p><br><h4>  Sample keyword popularity charts </h4><br><p>  According to the algorithm that I wrote above, the most resonant and most noticeable event of 2018 was not the elections and not even football, but the tragedy in Kemerovo: <br><br><img src="https://habrastorage.org/webt/e9/7m/oo/e97moopozljs3fdn6bagpogufwg.png" alt="trend chart: Kemerovo, elections, football"></p><br><p>  Unlike all other events, the tragedy in Kemerovo has affected everyone, and the video on this incident ousted the rest from the trends. </p><br><p>  Well, a bit of politics: <br><br><img src="https://habrastorage.org/webt/ml/-z/-q/ml-z-qlb9axm58ep4thp19qc8u8.png" alt="image"></p><br><h4>  How to feel </h4><br><p>  <a href="https://tubewarden.ru/">View charts and play with trends here</a> . <br></p><br><p>  The system is now running on Amazon Cloud, using two instances: <br><br></p><ul><li>  t2.micro - web server </li><li>  t3.small - server with MySQL.  Utilities for collecting statistics are executed on the same server. </li></ul><br>  Perhaps, in the event of a load, the web server will fall down first, while the second server will continue to collect statistics.  This is me to the fact that you should not be surprised if everything stops working. <br><br><p>  The database itself as of 01/23/2019 can be downloaded from the <a href="">link</a> . </p><br><p>  I also wrote two plugins for <a href="https://chrome.google.com/webstore/detail/tube-warden/jnphebeelkkkdkebpnobcdbmjggdaaif">chrome</a> and <a href="https://addons.mozilla.org/ru/firefox/addon/tube-warden/">filrefox</a> in my time.  Now the only benefit: right on the list of YouTube trends you can see the number of likes / dislikes for each video. <br></p></div><p>Source: <a href="https://habr.com/ru/post/436750/">https://habr.com/ru/post/436750/</a></p>
+<section class="navigation-panel">
+<h4>More articles:</h4>
+<nav class="list-of-articles-container js-list-of-articles-container">Waiting for the list from <a href="../../index.html">here</a>...</nav>
+</section>
+<script src="../../js/main.js"></script>
+
+<!-- Yandex.Metrika counter -->
+<script type="text/javascript" >
+  (function (d, w, c) {
+      (w[c] = w[c] || []).push(function() {
+          try {
+              w.yaCounter52319614 = new Ya.Metrika({
+                  id:52319614,
+                  clickmap:true,
+                  trackLinks:true,
+                  accurateTrackBounce:true,
+                  webvisor:true
+              });
+          } catch(e) { }
+      });
+
+      var n = d.getElementsByTagName("script")[0],
+          s = d.createElement("script"),
+          f = function () { n.parentNode.insertBefore(s, n); };
+      s.type = "text/javascript";
+      s.async = true;
+      s.src = "https://mc.yandex.ru/metrika/watch.js";
+
+      if (w.opera == "[object Opera]") {
+          d.addEventListener("DOMContentLoaded", f, false);
+      } else { f(); }
+  })(document, window, "yandex_metrika_callbacks");
+</script>
+<noscript><div><img src="https://mc.yandex.ru/watch/52319614" style="position:absolute; left:-9999px;" alt="" /></div></noscript>
+
+<!-- Google Analytics -->
+  <script>
+    window.ga = function () { ga.q.push(arguments) }; ga.q = []; ga.l = +new Date;
+    ga('create', 'UA-134228602-1', 'auto'); ga('send', 'pageview')
+  </script>
+  <script src="https://www.google-analytics.com/analytics.js" async defer></script>
+
+</section>
+</body>
+
+</html>

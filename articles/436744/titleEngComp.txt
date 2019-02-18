@@ -1,0 +1,1 @@
+We launch our neural network detector on the Raspberry Pi using the Neural Compute Stick and OpenVINO

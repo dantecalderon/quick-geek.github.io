@@ -1,0 +1,1 @@
+Developing a hexapod from scratch (part 3) - Math

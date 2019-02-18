@@ -1,0 +1,85 @@
+<!doctype html>
+<html class="no-js" lang="en">
+
+<head>
+  <!-- Global site tag (gtag.js) - Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=UA-134228602-1"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'UA-134228602-1');
+  </script>
+
+  <meta charset="utf-8">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  <title>What does IoT consist of</title>
+  <meta name="description" content="If you refer to Wikipedia in search of a definition for the term “Internet of Things”, you can see the following: 
+ The Internet of Things (Internet o...">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+  <link rel="stylesheet" href="../../css/main.css">
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+  <script>window.jQuery || document.write('<script src="../../js/vendors/jquery-3.3.1.min.js"><\/script>')</script>
+</head>
+
+<body>
+  <!--[if lte IE 9]>
+    <p class="browserupgrade">You are using an <strong>outdated</strong> browser. Please <a href="https://browsehappy.com/">upgrade your browser</a> to improve your experience and security.</p>
+  <![endif]-->
+  <nav class="page-headings-container js-page-headings-container"></nav>
+  <div class="tools-bar js-tools-bar">
+    <!-- <a href="https://quick-geek.github.io/search.html" title="Search">🔎</a> -->
+    <a class="js-list-of-headings-button" data-state="closed" href="#" title="Headings">📜</a>
+    <a class="js-go-to-top-button" href="#" title="Go to Top">⬆️</a>
+    <a class="js-go-to-bottom-button" href="#" title="Go to Bottom">⬇️</a>
+  </div>
+  <section class="page js-page"><h1>What does IoT consist of</h1><div class="post__text post__text-html js-mediator-article"><img src="https://rickbouter.files.wordpress.com/2014/12/intel_04_iot-01-1-01.jpg" alt="image"><br>  If you refer to Wikipedia in search of a definition for the term “Internet of Things”, you can see the following: <br><blockquote>  The Internet of Things (Internet of Things, IoT) is the concept of a computing network of physical objects (“things”) equipped with embedded technologies for interacting with each other or with the external environment, regarding the organization of such networks as a phenomenon that can restructure economic and social processes, excluding from the part of actions and operations the need for human participation. </blockquote>  In this article I would like to consider how exactly “things” this idea can be realized in our world and how they can interact with each other or with the external environment. <br><a name="habracut"></a><br>  The basic elements are divided into several types: sensors, actuators and gates. <br><br><h4>  Sensors </h4><br>  Perhaps it makes no sense to explain the meaning and purpose of this type of elements.  It is no different from the standard ones: various thermometers, microphones, cameras and dozens of other, less common devices.  Some of them can be seen on the image of the Sensors Starter Kit for Arduino: <br><br><img src="https://ae01.alicdn.com/kf/HTB1NoNkpfuSBuNkHFqDq6xfhVXau/KEYES-sensor-suite-24-Arduino.jpg" alt="image"><br><br><h4>  Actuators </h4><br>  This type of elements is intended to affect the environment, or a specific object in it.  This role can be performed by a wide variety of devices: from servo drives and speakers to locks (of course, electronic) with lighting devices. <br><br><h4>  Gates </h4><br>  These are devices that are usually assigned the logic of superficial analysis of information coming from sensors connected to them.  In certain situations, data analysis may require a small amount of computing resources, so that gates are quite capable of making some decisions on their own.  In making such decisions, they send certain control commands to the actuators, who, in turn, are already performing their functions. <br>  If the processing of information is costly, or this information is to be collected, the gates send it to the server, where further work is done with it.  It is quite likely that you can use microcomputers (above) or microprocessors (below) as gates: <br><br><img src="https://pi-pc.ru/wp-content/uploads/2017/01/913XYU1VtjL._SL1500_.jpg" alt="image"><br><br><img src="https://cdn-reichelt.de/bilder/web/xxl_ws/A300/ARDUINO_R3.png" alt="image"><br><br>  In order to build a monitoring system, it will be enough to use only sensors and a server that will act as a gate.  For example, thanks to the motion sensor and the conditional “raspberry,” you can effortlessly organize a count of the number of people passing through any checkpoint. <br><br>  By adding an actuator in the face of a dynamics to a previously constructed model, it is possible to ensure that the passage of each nth passing is echoed by majestic fanfare. <br><br>  So, to complicate the construction of such a cell can be quite long.  However, at some point inevitably there will be a need for long-term storage of the collected statistics, its analysis, visualization, and so on.  Here you will need full-fledged servers that will be able to delegate these obligations.  Such servers together form clouds, to which gates are connected. <br><br><h3>  Transport </h3><br>  Now that it is more or less clear which devices are used to create the infrastructure, we can look at how these devices interact with each other.  As can be seen in the first image, there are 2 conditional groups - the cloud and the periphery. <br><br>  Cells consisting of the above types of devices, as you can see, are located at the periphery and use special communication protocols for communication.  LoRa and ZigBee are most common.  Both of these networks are very slow compared to, for example, 4G or even 3G, but they also have their advantages. <br><br>  One of the main is their energy efficiency.  The fact is that the idea of ​​the Internet of things is to create an environment of devices that communicate with each other without human participation.  It is worth noting that in some cases completely avoid human intervention can not be avoided.  For example, in the system of counting the number of people who have gone, there is a motion sensor.  He, like any other electrical device, needs power.  To conduct wires with power to each such sensor (if there are more than 5 of them and they are strongly scattered in space) seems not the best idea.  Accordingly, they will work on batteries or rechargeable batteries.  If the consumption of the charge is excessive, they will need to change the batteries quite often.  And this will lead to what the Internet of things is striving to get away from - it will be necessary for someone to replace these batteries.  But if the sensors are energy efficient, then it will be enough just to insert the battery and forget about it for a year, two, five, etc. <br><br>  Another advantage of these networks is high noise immunity.  Each bit of information in these networks is sent by a separate radio signal, so it is quite simple to select it against the background noise. <br><br><h4>  A small comparison of LoRa and ZigBee </h4><br><table><tbody><tr><td>  Main comparative characteristics </td><td><img src="http://1c-atyrau.dugoba.ru/img/lora-logo.jpg" alt="image"></td><td><img src="http://ipkey.com.ua/media/k2/items/cache/4602f2f5153477027a754713438bf3d0_XL.jpg" alt="image"></td></tr><tr><td>  Topology </td><td>  star </td><td>  plain and mesh </td></tr><tr><td>  Frequency range (depending on the country) </td><td>  2.4 GHz, 868/915 MHz, 433 MHz, 169 MHz </td><td>  2.4 GHz, 915 MHz, 868 MHz </td></tr><tr><td>  Network nodes </td><td><ul><li>  base station </li><li>  host </li></ul></td><td><ul><li>  router </li><li>  coordinator (one of the routers) </li><li>  host </li></ul></td></tr><tr><td>  Open range </td><td>  10 - 15 km </td><td>  ~ 500 m (depends on transmitter power) </td></tr><tr><td>  Speed </td><td>  0.3 - 50 kbps </td><td>  5 - 250 kbps </td></tr></tbody></table><br><br>  But between the periphery and the hood, as well as inside the cloud, are usually used, familiar and familiar to all wi-fi with ethernet, cellular and satellite networks, etc. <br><br><h4>  Comparison of different types of networks based on speed and range </h4><br><img src="https://upload.wikimedia.org/wikipedia/commons/1/1f/%D0%A1%D1%80%D0%B0%D0%B2%D0%BD%D0%B5%D0%BD%D0%B8%D0%B5_%D0%B1%D0%B5%D1%81%D0%BF%D1%80%D0%BE%D0%B2%D0%BE%D0%B4%D0%BD%D1%8B%D1%85_%D1%82%D0%B5%D1%85%D0%BD%D0%BE%D0%BB%D0%BE%D0%B3%D0%B8%D0%B9.png" alt="image"><br><br><h3>  Conclusion </h3><br>  Now, having considered the device of the Internet of things networks, it can be said for sure that in terms of the hardware, there is nothing mysterious and complicated.  A simple IoT network can be made by anyone who can buy components that are quite cheap today and write code from a couple of lines.  However, in order to develop and implement serious projects, such as the implementation of the concept of a smart home or even a smart city, you need to put a lot of effort into it.  After all, in order for all these devices to work with each other, a platform is needed that is able to control all the processes going on. <br><br>  Also, do not forget that other technologies can be used in the clouds of the Internet of things, helping to unlock its potential to a greater degree.  These can be BigData, BlockChain, and neural networks with machine learning.  But each of the last listed technologies is a separate vast area of ​​computer (and not very) sciences. </div><p>Source: <a href="https://habr.com/ru/post/436708/">https://habr.com/ru/post/436708/</a></p>
+<section class="navigation-panel">
+<h4>More articles:</h4>
+<nav class="list-of-articles-container js-list-of-articles-container">Waiting for the list from <a href="../../index.html">here</a>...</nav>
+</section>
+<script src="../../js/main.js"></script>
+
+<!-- Yandex.Metrika counter -->
+<script type="text/javascript" >
+  (function (d, w, c) {
+      (w[c] = w[c] || []).push(function() {
+          try {
+              w.yaCounter52319614 = new Ya.Metrika({
+                  id:52319614,
+                  clickmap:true,
+                  trackLinks:true,
+                  accurateTrackBounce:true,
+                  webvisor:true
+              });
+          } catch(e) { }
+      });
+
+      var n = d.getElementsByTagName("script")[0],
+          s = d.createElement("script"),
+          f = function () { n.parentNode.insertBefore(s, n); };
+      s.type = "text/javascript";
+      s.async = true;
+      s.src = "https://mc.yandex.ru/metrika/watch.js";
+
+      if (w.opera == "[object Opera]") {
+          d.addEventListener("DOMContentLoaded", f, false);
+      } else { f(); }
+  })(document, window, "yandex_metrika_callbacks");
+</script>
+<noscript><div><img src="https://mc.yandex.ru/watch/52319614" style="position:absolute; left:-9999px;" alt="" /></div></noscript>
+
+<!-- Google Analytics -->
+  <script>
+    window.ga = function () { ga.q.push(arguments) }; ga.q = []; ga.l = +new Date;
+    ga('create', 'UA-134228602-1', 'auto'); ga('send', 'pageview')
+  </script>
+  <script src="https://www.google-analytics.com/analytics.js" async defer></script>
+
+</section>
+</body>
+
+</html>

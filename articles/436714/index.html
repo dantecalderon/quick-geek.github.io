@@ -1,0 +1,84 @@
+<!doctype html>
+<html class="no-js" lang="en">
+
+<head>
+  <!-- Global site tag (gtag.js) - Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=UA-134228602-1"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'UA-134228602-1');
+  </script>
+
+  <meta charset="utf-8">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  <title>Work begins with testing</title>
+  <meta name="description" content="In the life of each developer, there comes a moment when he thinks about creating a test component for his brainchild. Get better - in the life of eve...">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+  <link rel="stylesheet" href="../../css/main.css">
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+  <script>window.jQuery || document.write('<script src="../../js/vendors/jquery-3.3.1.min.js"><\/script>')</script>
+</head>
+
+<body>
+  <!--[if lte IE 9]>
+    <p class="browserupgrade">You are using an <strong>outdated</strong> browser. Please <a href="https://browsehappy.com/">upgrade your browser</a> to improve your experience and security.</p>
+  <![endif]-->
+  <nav class="page-headings-container js-page-headings-container"></nav>
+  <div class="tools-bar js-tools-bar">
+    <!-- <a href="https://quick-geek.github.io/search.html" title="Search">🔎</a> -->
+    <a class="js-list-of-headings-button" data-state="closed" href="#" title="Headings">📜</a>
+    <a class="js-go-to-top-button" href="#" title="Go to Top">⬆️</a>
+    <a class="js-go-to-bottom-button" href="#" title="Go to Bottom">⬇️</a>
+  </div>
+  <section class="page js-page"><h1>Work begins with testing</h1><div class="post__text post__text-html js-mediator-article">  In the life of each developer, there comes a moment when he thinks about creating a test component for his brainchild.  Get better - in the life of every good developer.  When you are a junior and do not bear special responsibility, you have the right to a lot of mistakes and you can fix them at any time.  You are not responsible for the product that you create and do not have the motivation to spend an extra minute on re-checking the generated code.  “Oh, nothing, this joint cannot be reproduced”, “it seems that this thing works”, “well, at least, it does what it needs” - if you want to outgrow the level of programmer's nursery, then you will have to negate each of these thoughts. <br><br>  With the development of your own programming experience, you have new, more and more cool / large clients.  From some you will even be delighted (from all, if you are just lucky) - and people are good, and pay generously, and are not picky about the problems that arise.  Let's consider one such simple case (very simple, but the main thing is behind it) of creating a form handler from a programmer who does not know the trouble. <br><a name="habracut"></a><br>  So, a simple task arrived - to write a form handler.  The goal is to accept bids from customers for the purchase of bricks.  The customer is large, engaged in large deliveries of bricks in bulk (for example, in the amount of 500,000 rubles or more - in order to feel at least some level of responsibility for what is happening).  The competition is mad - customers can quickly go to the supplier of bricks, if you do not answer within 24 hours. <br><br>  Our programmer was told that the client’s data should be saved from the form - representative’s full name, telephone number, customer’s company name, order quantity and an optional order description field.  Having flipped brains, the simplest form with standard fields for the front of the site was quickly created: <br><br><img src="http://dl4.joxi.net/drive/2019/01/16/0025/3302/1694950/50/6d6647072b.png" alt="the form"><br><br>  Data from the form is sent by an AJAX request, without reloading the page.  Next, the programmer takes on the design of the form handler and he has to cope with a rather trivial task - add entries for the new client to the existing Orders table and send the customer an email with an alert for the new client. <br><br><img src="http://dl3.joxi.net/drive/2019/01/16/0025/3302/1694950/50/4393f0f44e.png" alt="simple insert code"><br><br>  The form works, the data is successfully saved, the customer is satisfied.  But suddenly an angry call comes from the customer “so they say, and so, the order was received - the millionaire company wants to buy all the bricks from me, but the phone number did not come from the form and now how to contact them?!  Tomorrow they will find another supplier!  How so what did you do ?!  It's your fault ... ”.  The customer breaks and throws, minus nerves, minus trust and minus respect.  The situation is extremely standard for a junior - the absence of any validation and testing of incoming data from the form.  The first task (validation) is solved very simply, by adding validation rules: <br><br><img src="http://dl4.joxi.net/drive/2019/01/16/0025/3302/1694950/50/3cbaa9c0e8.png" alt="validation"><br><cut><br>  Henceforth, the client of the site will indicate only the correct data we need for further processing.  At the same stage, the developer comes to the idea of ​​the need to test the code to further avoid such an awkward situation.  For example, testing the last name field will look like this (to simplify the basic example, the csrf protection is disabled): <br><br><img src="http://dl3.joxi.net/drive/2019/01/16/0025/3302/1694950/50/00ccfbb500.png" alt="missing field test"><br><br>  We know that in the absence of this field, the code should return a response with an error and the 400 status we have written. Such testing methods are prescribed for each specific situation (or a specific field validation, everything depends on the tasks set and the developer’s imagination). <br><br>  But is there any other way of working out other than “I did, and now I will check”?  We first write the code, stumble on the shoals of execution, fix, and then remember about the tests.  This approach can go sideways for us and our customer, given the lost multimillion-dollar client (albeit theoretically, but everyone would have such clients).  And here I wondered - what if we start the logic of creating an application from the opposite end - first we will present the requirements for the “performer”, and then make it meet these requirements?  Let's try. <br><br>  We will leave the task as before, change only the approach to it.  We need to write a form handler with the fio, phone, corp, quant and content fields.  The result of the successful execution is status 200, adding a field to the Order with the message “ok” and returning data on the entry made, the remaining options are status 400 and a list of errors. <br><cut><br>  First of all, we need to write a test method for validly filling out the form data: <br><br><img src="http://dl3.joxi.net/drive/2019/01/16/0025/3302/1694950/50/479183d938.png" alt="valid method"><br><br>  Next, create the necessary route and controller method (empty for now).  If we run the check now, it is quite expected that we get an error.  Validation of valid data filling is not all that we need.  Now we start testing the validation of form fields.  Determine which fields are required - fio, phone, corp, quant and add a method to check (comment is not required): <br><br><img src="http://dl3.joxi.net/drive/2019/01/16/0025/3302/1694950/50/9fbc334d6e.png" alt="emptiness"><br><br>  The form handler will simply have to check for incoming data fio, phone, corp, quant.  Since we have removed all the required fields from the request, an error in errors should be returned for each of them.  If at least one of them is not - the problem of execution.  If desired, you can add a message check, as was done previously (check for “ok”). <br>  We make a check for the minimum length of the fio, phone and corp fields (the same will be done for the maximum length and for invalid characters in these fields). <br><br><img src="http://dl3.joxi.net/drive/2019/01/16/0025/3302/1694950/50/e6d3507ea2.png" alt="minimum length"><br><br>  Our checks are decorated, you can run and check <br><br><img src="http://dl4.joxi.net/drive/2019/01/16/0025/3302/1694950/50/d3d2572d83.png" alt="result of checking"><br><br>  Perfect.  Our application crashed in 5 of 5 tests.  Our further goal is to go through test methods that set invalid values ​​to fields, and form validation rules for incoming data.  The logic is something like this: the fio field cannot be empty;  length not less than 3 and not more than 120;  this is a string with a set of characters allowed in the name (letter, hyphen, indent).  The result of this logic in all fields: <br><br><img src="http://dl4.joxi.net/drive/2019/01/16/0025/3302/1694950/50/1bc13f4444.png" alt="validation"><br><br>  In response, in the case of the file, a list of errors errors is added that correspond to each “problem” field.  This will help us to check specific fields for validation (assertJsonStructure in the test file).  Next, we add a method under a validation check and get the final version: <br><br><img src="http://dl4.joxi.net/drive/2019/01/16/0025/3302/1694950/50/b979543be1.png" alt="final method"><br><br>  And finally, we can test how our script handles testing (remember, there were 5 files in 5 tests). <br><br><img src="http://dl3.joxi.net/drive/2019/01/16/0025/3302/1694950/50/e17df357d5.png" alt="OK"><br><br>  As you can see, all the tests passed successfully and only one record was entered into the database (since only one method was configured for valid operation). <br><br><img src="http://dl4.joxi.net/drive/2019/01/16/0025/3302/1694950/50/77c0dabe23.png" alt="the result is entered into the database"><br><br>  What are the conclusions?  Developing an application, starting with tests, is a better option than the usual writing of functionality.  The need to get from the method only what is needed is comparable to army discipline - the code does exactly what you require from it, not one step to the side.  However, this approach has a negative side (albeit controversial) - the fact is that writing additional functionality (which is testing) also takes a part of the time allotted for the development of the project.  As for me, the choice is clear - a good programmer must write tests, and starting from the test functionality helps to write a well-working and reliable project.  I will try to use it in something less trivial. </cut></cut></div><p>Source: <a href="https://habr.com/ru/post/436714/">https://habr.com/ru/post/436714/</a></p>
+<section class="navigation-panel">
+<h4>More articles:</h4>
+<nav class="list-of-articles-container js-list-of-articles-container">Waiting for the list from <a href="../../index.html">here</a>...</nav>
+</section>
+<script src="../../js/main.js"></script>
+
+<!-- Yandex.Metrika counter -->
+<script type="text/javascript" >
+  (function (d, w, c) {
+      (w[c] = w[c] || []).push(function() {
+          try {
+              w.yaCounter52319614 = new Ya.Metrika({
+                  id:52319614,
+                  clickmap:true,
+                  trackLinks:true,
+                  accurateTrackBounce:true,
+                  webvisor:true
+              });
+          } catch(e) { }
+      });
+
+      var n = d.getElementsByTagName("script")[0],
+          s = d.createElement("script"),
+          f = function () { n.parentNode.insertBefore(s, n); };
+      s.type = "text/javascript";
+      s.async = true;
+      s.src = "https://mc.yandex.ru/metrika/watch.js";
+
+      if (w.opera == "[object Opera]") {
+          d.addEventListener("DOMContentLoaded", f, false);
+      } else { f(); }
+  })(document, window, "yandex_metrika_callbacks");
+</script>
+<noscript><div><img src="https://mc.yandex.ru/watch/52319614" style="position:absolute; left:-9999px;" alt="" /></div></noscript>
+
+<!-- Google Analytics -->
+  <script>
+    window.ga = function () { ga.q.push(arguments) }; ga.q = []; ga.l = +new Date;
+    ga('create', 'UA-134228602-1', 'auto'); ga('send', 'pageview')
+  </script>
+  <script src="https://www.google-analytics.com/analytics.js" async defer></script>
+
+</section>
+</body>
+
+</html>

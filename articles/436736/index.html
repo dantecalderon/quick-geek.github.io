@@ -1,0 +1,84 @@
+<!doctype html>
+<html class="no-js" lang="en">
+
+<head>
+  <!-- Global site tag (gtag.js) - Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=UA-134228602-1"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'UA-134228602-1');
+  </script>
+
+  <meta charset="utf-8">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  <title>Simple time use forecasting practices</title>
+  <meta name="description" content="The ability to qualitatively assess development time costs is one of the key skills of a good development manager. Erroneous predictions of the deadli...">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+  <link rel="stylesheet" href="../../css/main.css">
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+  <script>window.jQuery || document.write('<script src="../../js/vendors/jquery-3.3.1.min.js"><\/script>')</script>
+</head>
+
+<body>
+  <!--[if lte IE 9]>
+    <p class="browserupgrade">You are using an <strong>outdated</strong> browser. Please <a href="https://browsehappy.com/">upgrade your browser</a> to improve your experience and security.</p>
+  <![endif]-->
+  <nav class="page-headings-container js-page-headings-container"></nav>
+  <div class="tools-bar js-tools-bar">
+    <!-- <a href="https://quick-geek.github.io/search.html" title="Search">🔎</a> -->
+    <a class="js-list-of-headings-button" data-state="closed" href="#" title="Headings">📜</a>
+    <a class="js-go-to-top-button" href="#" title="Go to Top">⬆️</a>
+    <a class="js-go-to-bottom-button" href="#" title="Go to Bottom">⬇️</a>
+  </div>
+  <section class="page js-page"><h1>Simple time use forecasting practices</h1><div class="post__text post__text-html js-mediator-article"><p>  The ability to qualitatively assess development time costs is one of the key skills of a good development manager.  Erroneous predictions of the deadlines for completing tasks, as my personal experience indicates, is one of the if not the main sources of pain for managers, it is very large-scale. </p><br><p>  Practices that make it possible not to rely on luck in this matter and trying to guess the time required to implement an idea in the code are simple and accessible to everyone.  Planning is quite an ordinary job, and doing it requires well-defined actions. <a name="habracut"></a></p><br><h2 id="sformulirovat-opisaniya-funkcionalnosti">  Formulate functional descriptions </h2><br><p>  The basis of good planning, well-formulated description of the functionality that needs to be implemented.  The best way in my opinion is a rather long-thought out format for user stories or behavior patterns (use cases): </p><br><p>  <em>As a user, I want to pay for an order with a plastic card</em> </p><br><p>  What good is this wording?  Clarity.  A good manager consciously limits the amount of information available to participants for discussion.  The less information, the less likelihood of an error. </p><br><p>  What do we have here?  Firstly, the user of the implemented functionality is clearly indicated - a registered user who has already placed an order earlier.  Secondly, the required functionality is quite clearly limited in the amount of data used and in time.  Thirdly, the action performed by the consumer is atomically.  The last moment is very important.  Sequences or God forbid non-linear sequences of actions indicated in the description of functionality - this is the road straight to hell.  And for all participants in the process. </p><br><p>  Subjectively, I deduced for myself that the ideal language seems to be implying that the consumer is doing something that does not require more than a minute or a couple of minutes of time for an informed user.  In this case, an informed user considers such a user who performs the indicated action for the first time in our application, but has previously performed similar actions by some other means or in other applications. </p><br><h2 id="opredelit-spiski-zadach">  Define task lists </h2><br><p>  What's next?  Further it is necessary to break each of the functional descriptions into tasks.  It is necessary to do this together with the developer, who is expected to implement the selected functionality.  What to include in the task list?  If the developer sees the task for the first time and has not touched it before, then literally all the actions that are supposed to be required, including research and collaboration: </p><br><ol><li>  Examine the documentation for the integration with the payment gateway regarding the part of payments with plastic cards </li><li>  Coordinate with the payment gateway experts the chosen method of connection and making payments </li><li>  Agree with the project manager on the chosen method of connection and making payments </li><li>  Implement storing and retrieving data necessary for interacting with a payment gateway (customer IDs, security keys) </li><li>  Implement receipt and preparation of order data to be paid. </li><li>  Develop (connect provided by the payment gateway) form for entering plastic card data by the user </li><li>  Implement the transfer of data on the order and its value in the form of payment </li><li>  Implement the receipt, processing and saving of data on successful payment </li><li>  Implement error handling during the payment process </li><li>  Implement the mapping of payment receipt to the user </li><li>  Implement the user to display error messages that occurred during the payment </li></ol><br><p>  The more detailed the list, the closer to reality will be the estimate of development time.  After the list is ready, ask the developer to put an estimate at the end of the description of each of the items in the working hours.  Sum up the clock and assume that you can orient yourself around the time you have.  Why am I talking about?  Because plans never stand the meeting of reality.  It is impossible to plan everything, and surprises almost always come up during work.  And the more detailed your task list is, the fewer surprises can occur, and the less extra time it will take to deal with these surprises. </p><br><p>  As you complete the items in the task list, ask the developer to indicate the time actually spent on the task, so you will be able to assess the quality of your planning. </p><br><h2 id="instrumenty">  Instruments </h2><br><p> I am not a supporter of expensive or not very clear planning tools, with poker, combustion charts and <code>story point</code> .  I think management should rely on common sense and the principle of maintaining simplicity. </p><br><p>  For successful visualization of the development process management, there are enough trivial tools, such as <a href="https://trello.com/">Trelo</a> or <a href="https://help.github.com/articles/about-project-boards/">Github project boards</a> .  Both here and there the descriptions of the functionality can be arranged in the form of cards in lists, and a list of tasks can be attached to each of the cards with an indication of the forecast for the execution time simply as a number after a dash at the end of the description: </p><br><p>  <em>As a user, I want to pay for an order with a plastic card - 30 hours</em> </p><br><p>  At the same time, nothing prevents the project manager from adding to the description the actual time spent.  This can be done every evening, at the end of the working day: </p><br><p>  <em>As a user, I want to pay for an order with a plastic card - 30h - 15h</em> </p><br><p>  Lagging behind the schedule can be detected at sufficiently early stages of work, discuss the current situation with the developer and take corrective actions and, as a minimum, notify the customer about a possible lag and its causes, which are quite often quite objective. </p></div><p>Source: <a href="https://habr.com/ru/post/436736/">https://habr.com/ru/post/436736/</a></p>
+<section class="navigation-panel">
+<h4>More articles:</h4>
+<nav class="list-of-articles-container js-list-of-articles-container">Waiting for the list from <a href="../../index.html">here</a>...</nav>
+</section>
+<script src="../../js/main.js"></script>
+
+<!-- Yandex.Metrika counter -->
+<script type="text/javascript" >
+  (function (d, w, c) {
+      (w[c] = w[c] || []).push(function() {
+          try {
+              w.yaCounter52319614 = new Ya.Metrika({
+                  id:52319614,
+                  clickmap:true,
+                  trackLinks:true,
+                  accurateTrackBounce:true,
+                  webvisor:true
+              });
+          } catch(e) { }
+      });
+
+      var n = d.getElementsByTagName("script")[0],
+          s = d.createElement("script"),
+          f = function () { n.parentNode.insertBefore(s, n); };
+      s.type = "text/javascript";
+      s.async = true;
+      s.src = "https://mc.yandex.ru/metrika/watch.js";
+
+      if (w.opera == "[object Opera]") {
+          d.addEventListener("DOMContentLoaded", f, false);
+      } else { f(); }
+  })(document, window, "yandex_metrika_callbacks");
+</script>
+<noscript><div><img src="https://mc.yandex.ru/watch/52319614" style="position:absolute; left:-9999px;" alt="" /></div></noscript>
+
+<!-- Google Analytics -->
+  <script>
+    window.ga = function () { ga.q.push(arguments) }; ga.q = []; ga.l = +new Date;
+    ga('create', 'UA-134228602-1', 'auto'); ga('send', 'pageview')
+  </script>
+  <script src="https://www.google-analytics.com/analytics.js" async defer></script>
+
+</section>
+</body>
+
+</html>

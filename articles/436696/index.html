@@ -1,0 +1,84 @@
+<!doctype html>
+<html class="no-js" lang="en">
+
+<head>
+  <!-- Global site tag (gtag.js) - Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=UA-134228602-1"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'UA-134228602-1');
+  </script>
+
+  <meta charset="utf-8">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  <title>How to generate binaural sound on a mono channel audio track - video will help</title>
+  <meta name="description" content="Specialists from the University of Texas at Austin (UT Austin) have developed a neural network that processes mono-channel audio recording on video an...">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+  <link rel="stylesheet" href="../../css/main.css">
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+  <script>window.jQuery || document.write('<script src="../../js/vendors/jquery-3.3.1.min.js"><\/script>')</script>
+</head>
+
+<body>
+  <!--[if lte IE 9]>
+    <p class="browserupgrade">You are using an <strong>outdated</strong> browser. Please <a href="https://browsehappy.com/">upgrade your browser</a> to improve your experience and security.</p>
+  <![endif]-->
+  <nav class="page-headings-container js-page-headings-container"></nav>
+  <div class="tools-bar js-tools-bar">
+    <!-- <a href="https://quick-geek.github.io/search.html" title="Search">🔎</a> -->
+    <a class="js-list-of-headings-button" data-state="closed" href="#" title="Headings">📜</a>
+    <a class="js-go-to-top-button" href="#" title="Go to Top">⬆️</a>
+    <a class="js-go-to-bottom-button" href="#" title="Go to Bottom">⬇️</a>
+  </div>
+  <section class="page js-page"><h1>How to generate binaural sound on a mono channel audio track - video will help</h1><div class="post__text post__text-html js-mediator-article">  Specialists from the University of Texas at Austin (UT Austin) have <a href="http://vision.cs.utexas.edu/projects/2.5D_visual_sound/">developed a</a> neural network that processes mono-channel audio recording on video and recreates its “surround” sound. <br><br>  We tell how it works. <br><br> <a href="https://habr.com/ru/company/audiomania/blog/436696/"><img src="https://habrastorage.org/webt/xu/ry/o3/xuryo3tf8x35qjyqidooxlh-aao.jpeg"></a> <a name="habracut"></a><br>  <font color="#A9A9A9"><i>Photo <a href="https://www.flickr.com/photos/rosiejuliet/31116349755/">marneejill</a> / <a href="https://creativecommons.org/licenses/by-sa/2.0/">CC BY-SA</a></i></font> <br><br><h2>  New method for creating 3D sound </h2><br>  Surround sound is often found in games or movies, but 3D sound is rare in conditional videos on the web.  To record it requires expensive equipment, which is not always accessible to video creators - often smartphones are used exclusively for shooting. <br><br>  The audio track recorded in this way limits our perception of the video: it is not able to convey how sound sources are located in space and how they move.  Because of this, the sound of the video can be felt "flat." <br><br>  The solution to this problem was taken up at UT Austin - a university professor Kristen Grauman and a student Ruohan Gao.  They created a system based on machine learning algorithms, which makes it possible to turn a mono-channel audio recording into a “volumetric” video recording.  The technology is called "2.5D Visual Sound". <br><br>  This is not a full-fledged spatial sound, but “simulated”.  However, according to the developers, for an ordinary listener the difference will be almost imperceptible. <br><br><h2>  How technology works </h2><br>  The system, developed at UT Austin, <a href="https://arxiv.org/pdf/1812.04204.pdf">uses</a> two neural networks. <br><br>  The first neural network is based on the <a href="https://en.wikipedia.org/wiki/ResNet">ResNet</a> architecture, which in 2015 was presented by researchers from Microsoft.  It recognizes objects in the video and collects information about their movement in the frame.  At the output, the network generates a matrix, called a feature map, with the coordinates of the objects on each frame of the video. <br><br>  This information is transmitted to the second neural network - Mono2Binaural.  It was developed at the University of Texas.  The network also takes as input <a href="https://ru.wikipedia.org/wiki/%25D0%25A1%25D0%25BF%25D0%25B5%25D0%25BA%25D1%2582%25D1%2580%25D0%25BE%25D0%25B3%25D1%2580%25D0%25B0%25D0%25BC%25D0%25BC%25D0%25B0">spectrograms of</a> audio recordings obtained using the <a href="https://ru.wikipedia.org/wiki/%25D0%259E%25D0%25BA%25D0%25BE%25D0%25BD%25D0%25BD%25D0%25BE%25D0%25B5_%25D0%25BF%25D1%2580%25D0%25B5%25D0%25BE%25D0%25B1%25D1%2580%25D0%25B0%25D0%25B7%25D0%25BE%25D0%25B2%25D0%25B0%25D0%25BD%25D0%25B8%25D0%25B5_%25D0%25A4%25D1%2583%25D1%2580%25D1%258C%25D0%25B5">window Fourier transform</a> using <a href="https://ru.wikipedia.org/wiki/%25D0%259E%25D0%25BA%25D0%25BE%25D0%25BD%25D0%25BD%25D0%25BE%25D0%25B5_%25D0%25BF%25D1%2580%25D0%25B5%25D0%25BE%25D0%25B1%25D1%2580%25D0%25B0%25D0%25B7%25D0%25BE%25D0%25B2%25D0%25B0%25D0%25BD%25D0%25B8%25D0%25B5_%25D0%25A4%25D1%2583%25D1%2580%25D1%258C%25D0%25B5">the Hann function</a> . <br><br>  Mono2Binaural consists of ten <a href="https://ru.wikipedia.org/wiki/%25D0%25A1%25D0%25B2%25D1%2591%25D1%2580%25D1%2582%25D0%25BE%25D1%2587%25D0%25BD%25D0%25B0%25D1%258F_%25D0%25BD%25D0%25B5%25D0%25B9%25D1%2580%25D0%25BE%25D0%25BD%25D0%25BD%25D0%25B0%25D1%258F_%25D1%2581%25D0%25B5%25D1%2582%25D1%258C">convolutional</a> layers.  After each of these layers, there is a batch normalization block (batch normalization) in the network, which <a href="https://habr.com/ru/post/309302/">increases the</a> prediction accuracy of the algorithm, and a linear rectification unit with the ReLU <a href="https://ru.wikipedia.org/wiki/%25D0%25A4%25D1%2583%25D0%25BD%25D0%25BA%25D1%2586%25D0%25B8%25D1%258F_%25D0%25B0%25D0%25BA%25D1%2582%25D0%25B8%25D0%25B2%25D0%25B0%25D1%2586%25D0%25B8%25D0%25B8">activation function</a> . <br><br>  The convolutional layers of the neural network analyze the frequency changes in the spectrogram and make up a matrix containing information about which part of the spectrogram should belong to the left audio channel and which part should belong to the right one.  After that, using the inverse window Fourier transform, a new audio recording is generated. <br><br>  In this case, Mono2Binaural is able to reproduce the spatial sound for each of the objects in the video separately.  For example, a neural network can recognize two instruments in a video clip - a drum and a pipe - and create a separate audio track for each of them. <br><br><h2>  Opinions on "2.5D Visual Sound" </h2><br>  According to the developers themselves, they managed to create a technology that recreates "realistic spatial sensation."  Mono2Binaural showed a good result during testing, and therefore the authors are confident that their project has great potential. <br><br>  To prove the effectiveness of its technology, experts conducted a series of experiments.  They invited a group of people who compared the sound of two tracks: one was created using Mono2Binaural, and the second - by the Ambisonics method. <br><br>  The latter was developed at the University of California at San Diego.  This method also creates “surround” audio from mono sound, but, unlike the new technology, it works only with 360-degree video. <br><br><blockquote>  Most listeners chose Mono2Binaural audio as closest to the actual sound.  Testing also showed that in 60% of cases, users correctly identified the location of the sound source by ear. </blockquote><br>  The algorithm still has some drawbacks.  For example, a neural network poorly distinguishes the sounds of a large number of objects.  Plus, obviously, she will not be able to determine the position of the sound source, which is not in the video.  However, developers are planning to solve these problems. <br><br><h2>  Analogs of technology </h2><br>  In the field of sound recognition by video, there are several similar projects.  We wrote about one of them earlier.  This is a “ <a href="https://habr.com/company/audiomania/blog/410627/">visual microphone</a> ” from MIT specialists.  Their algorithm recognizes on silent video microscopic oscillations of objects under the influence of acoustic waves and restores the sound that was heard in the room on the basis of these data.  Scientists managed to “count” the melody of the song <a href="https://ru.wikipedia.org/wiki/Mary_Had_a_Little_Lamb">Mary Had a Little Lamb</a> from a pack of chips, a homemade plant, and even a brick. <br><br><img src="https://habrastorage.org/webt/k_/8l/vs/k_8lvsrouc7mc8czmgv_kytfp1y.jpeg"><br>  <font color="#A9A9A9"><i>Photo by <a href="https://www.flickr.com/photos/quinnanya/4826179332/">Quinn Dombrowski</a> / <a href="https://creativecommons.org/licenses/by-sa/2.0/">CC BY-SA</a></i></font> <br><br>  Other projects are developing technologies for recording sound in 360-degree videos.  One of them is Ambisonics, which we mentioned earlier.  The principle of the algorithm is similar to Mono2Binaural: it <a href="http://www.svcl.ucsd.edu/~morgado/spatialaudiogen/spatialaudiogen.pdf">analyzes the</a> movement of objects in the frame and relates them to changes in the sound.  However, Ambisonics technology has several limitations: the neural network only works with 360-degree video and doesn’t produce sound if there is an echo on the recording. <br><br>  Another project in this area is G-Audio Sol VR360.  Unlike other developments, the technology <a href="https://www.audiomediainternational.com/business/gaudio-lab-reveals-livestreaming-audio-tool-for-360video">has already been implemented</a> in a custom service for sound processing Sol.  It creates spatial audio for 360-degree videos from concerts or sports.  Lack of service - generated videos are played only in Sol applications. <br><br><h2>  findings </h2><br>  The developers of systems for creating spatial sound see the main area of ​​application of technology in VR and AR-applications for maximum immersion of a person into the atmosphere of a game or film.  If we manage to overcome a number of difficulties that they face, the technology can also be applied to help visually impaired people.  With the help of such systems, they will be able to understand in more detail what is happening in the frame on video clips. <br><br><hr><br>  <i>More about audio technology in our Telegram channel:</i> <i><br><br></i>  <i>Go</i> <i><img src="https://habrastorage.org/webt/xq/5o/_r/xq5o_rmc8w8juvbckkxdgn5adaw.png"></i>  <i><a href="https://t.me/audiomaniaRU/683">InSight recorded the sound of the Martian wind for the first time.</a></i> <i><br><img src="https://habrastorage.org/webt/xq/5o/_r/xq5o_rmc8w8juvbckkxdgn5adaw.png"></i>  <i><a href="https://t.me/audiomaniaRU/682">Eight audio technologies that will fall into the hall of fame TECnology in 2019</a></i> <i><br><img src="https://habrastorage.org/webt/xq/5o/_r/xq5o_rmc8w8juvbckkxdgn5adaw.png"></i>  <i><a href="https://t.me/audiomaniaRU/680">Windows with active noise cancellation muffle the sounds of the metropolis</a></i> <br><br><hr></div><p>Source: <a href="https://habr.com/ru/post/436696/">https://habr.com/ru/post/436696/</a></p>
+<section class="navigation-panel">
+<h4>More articles:</h4>
+<nav class="list-of-articles-container js-list-of-articles-container">Waiting for the list from <a href="../../index.html">here</a>...</nav>
+</section>
+<script src="../../js/main.js"></script>
+
+<!-- Yandex.Metrika counter -->
+<script type="text/javascript" >
+  (function (d, w, c) {
+      (w[c] = w[c] || []).push(function() {
+          try {
+              w.yaCounter52319614 = new Ya.Metrika({
+                  id:52319614,
+                  clickmap:true,
+                  trackLinks:true,
+                  accurateTrackBounce:true,
+                  webvisor:true
+              });
+          } catch(e) { }
+      });
+
+      var n = d.getElementsByTagName("script")[0],
+          s = d.createElement("script"),
+          f = function () { n.parentNode.insertBefore(s, n); };
+      s.type = "text/javascript";
+      s.async = true;
+      s.src = "https://mc.yandex.ru/metrika/watch.js";
+
+      if (w.opera == "[object Opera]") {
+          d.addEventListener("DOMContentLoaded", f, false);
+      } else { f(); }
+  })(document, window, "yandex_metrika_callbacks");
+</script>
+<noscript><div><img src="https://mc.yandex.ru/watch/52319614" style="position:absolute; left:-9999px;" alt="" /></div></noscript>
+
+<!-- Google Analytics -->
+  <script>
+    window.ga = function () { ga.q.push(arguments) }; ga.q = []; ga.l = +new Date;
+    ga('create', 'UA-134228602-1', 'auto'); ga('send', 'pageview')
+  </script>
+  <script src="https://www.google-analytics.com/analytics.js" async defer></script>
+
+</section>
+</body>
+
+</html>

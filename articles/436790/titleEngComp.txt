@@ -1,0 +1,1 @@
+256 lines of bare C ++: we write a ray tracer from scratch in a few hours
