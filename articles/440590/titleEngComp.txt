@@ -1,0 +1,1 @@
+Where do the legs of the Java Memory Model grow

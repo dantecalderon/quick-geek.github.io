@@ -1,0 +1,1 @@
+BCM2837B0, ARM A53, ThreadX, Poka Yoke, vcgencmd, NAS

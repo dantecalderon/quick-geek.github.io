@@ -1,0 +1,1 @@
+Important changes in the CTE in PostgreSQL 12
