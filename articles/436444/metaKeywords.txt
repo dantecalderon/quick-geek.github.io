@@ -1,0 +1,1 @@
+aws, aws amazon, devops, пре-релиз, релиз, деплой, deploy, deployment server, Prometheus, Ansible roles, ansible, packer, realtimeboard

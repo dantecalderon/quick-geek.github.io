@@ -1,0 +1,1 @@
+Миграция с Mongo на Postgres: опыт газеты The Guardian

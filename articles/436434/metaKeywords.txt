@@ -1,0 +1,1 @@
+PVS-Studio, intellij idea, findbugs, SpotBugs, SonarQube, SonarJava, Java, open source, открытый исходный код, статический анализ кода, статические анализаторы кода, Maven, Gradle, ошибки в коде

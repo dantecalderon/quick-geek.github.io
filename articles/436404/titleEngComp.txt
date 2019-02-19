@@ -1,0 +1,1 @@
+Failover balancing of VoIP traffic. Load switching between data centers at peak-time
