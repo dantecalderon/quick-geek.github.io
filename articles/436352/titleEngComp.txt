@@ -1,0 +1,1 @@
+Digest news from the world of PostgreSQL. Issue number 14

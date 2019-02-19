@@ -1,0 +1,92 @@
+<!doctype html>
+<html class="no-js" lang="en">
+
+<head>
+  <!-- Global site tag (gtag.js) - Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=UA-134228602-1"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'UA-134228602-1');
+  </script>
+
+  <meta charset="utf-8">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  <title>Top 9 Security Practices at Kubernetes</title>
+  <meta name="description" content="Note trans. : This is not the first article with general security recommendations in Kubernetes that we translate in our blog. However, its relevance ...">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+  <link rel="stylesheet" href="../../css/main.css">
+
+  <script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+  <script>
+    (adsbygoogle = window.adsbygoogle || []).push({
+      google_ad_client: "ca-pub-6974184241884155",
+      enable_page_level_ads: true
+    });
+  </script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+  <script>window.jQuery || document.write('<script src="../../js/vendors/jquery-3.3.1.min.js"><\/script>')</script>
+</head>
+
+<body>
+  <!--[if lte IE 9]>
+    <p class="browserupgrade">You are using an <strong>outdated</strong> browser. Please <a href="https://browsehappy.com/">upgrade your browser</a> to improve your experience and security.</p>
+  <![endif]-->
+  <nav class="page-headings-container js-page-headings-container"></nav>
+  <div class="tools-bar js-tools-bar">
+    <!-- <a href="https://quick-geek.github.io/search.html" title="Search">🔎</a> -->
+    <a class="js-list-of-headings-button" data-state="closed" href="#" title="Headings">📜</a>
+    <a class="js-go-to-top-button" href="#" title="Go to Top">⬆️</a>
+    <a class="js-go-to-bottom-button" href="#" title="Go to Bottom">⬇️</a>
+  </div>
+  <section class="page js-page"><h1>Top 9 Security Practices at Kubernetes</h1><div class="post__text post__text-html js-mediator-article">  <i><b>Note</b></i>  <i><b>trans.</b></i>  <i>: This is <a href="https://habr.com/ru/company/flant/blog/417905/">not the first article</a> with general security recommendations in Kubernetes that we translate in our blog.</i>  <i>However, its relevance - at least as a reminder of simple and important things that should not be ignored due to lack of time - is only confirmed by recent events mentioned by the author at the beginning of the material.</i>  <i>By the way, the author is Connor Gilbert, product manager at StackRox, which offers a ready-made platform for securing applications deployed as part of Kubernetes clusters.</i>  <i>So, this is what he advises readers of the CNCF blog ...</i> <i><br><br></i>  <i><b>NB</b> : To make the article more informative, for some of the terms / methods mentioned by the author, we added links to relevant documentation.</i> <br><br><img src="https://habrastorage.org/webt/rr/ce/ki/rrcekiyjzfuqxa1w3wzc4ilmggg.jpeg"><br><br>  Last month, Kubernetes, the world's most popular container orchestration system, <a href="https://www.stackrox.com/post/2018/12/kubernetes-first-major-security-hole-discovered/">discovered the</a> first major security vulnerability that hit the project's ecosystem.  Vulnerability <a href="https://nvd.nist.gov/vuln/detail/CVE-2018-1002105">CVE-2018-1002105</a> allows attackers to compromise clusters through the API-server Kubernetes, which allows to execute malicious code to install malware, etc. <a name="habracut"></a><br><br>  Earlier in the same year, the incorrect configuration of the Kubernetes control panel led to the fact that <a href="https://arstechnica.com/information-technology/2018/02/tesla-cloud-resources-are-hacked-to-run-cryptocurrency-mining-malware/">a</a> software for mining cryptocurrencies <a href="https://arstechnica.com/information-technology/2018/02/tesla-cloud-resources-are-hacked-to-run-cryptocurrency-mining-malware/">was installed</a> on Tesla resources.  Then, the attackers took advantage of the fact that one of the Kubernetes panels was not password-protected, which allowed them to access one of the pods with an account to access the larger Tesla infrastructure in AWS. <br><br>  Organizations that force the process of introducing containers and their orchestration must also take mandatory steps to protect such a critical part of their infrastructure.  Below are the nine best practices in Kubernetes based on customer data: follow them to better protect your infrastructure. <br><br><h2>  1. Update to the latest version. </h2><br>  In each quarterly release [Kubernetes], there are not only bug fixes, but also new security features: we recommend working with the latest stable version to take advantage of them. <br><br>  Using the latest release with the latest patches will be especially relevant in light of the recent detection of CVE-2018-1002105.  Updates and support may be more difficult than the new features offered in releases, so plan your updates at least once a quarter. <br><br>  Significantly simplify the update can use providers managed Kubernetes-solutions. <br><br><h2>  2. Enable role-based access control (RBAC) </h2><br>  Use <a href="https://kubernetes.io/docs/reference/access-authn-authz/rbac/">RBAC</a> (Role-Based Access Control) to control who can access the Kubernetes API and what rights they have.  Usually RBAC is enabled by default in Kubernetes version 1.6 and higher (or later in the case of some providers), but if you have been updated since then and did not change the configuration, you should double-check your settings.  Because of the mechanism by which authorization controllers work together in Kubernetes <i>(for a general sequence of operations, see the article “ <a href="https://habr.com/ru/company/flant/blog/342658/">What happens in Kubernetes when starting the kubectl run? Part 1</a> ”)</i> , it is necessary to have RBAC and outdated ABAC enabled (Attribute-Based Access Control). <br><br>  However, it is not enough to include RBAC - it still needs to be used effectively.  In general, rights should be avoided for the entire cluster <i>(cluster-wide)</i> , giving preference to rights in certain namespaces.  Avoid granting cluster administrator privileges to anyone even for debugging - it is much safer to allocate rights only on a case-by-case basis. <br><br>  You can view cluster roles and just roles with the commands <code>kubectl get clusterrolebinding</code> or <code>kubectl get rolebinding --all-namespaces</code> .  And so you can quickly check to whom the <code>cluster-admin</code> role has been issued (in this example, only for the <code>masters</code> group): <br><br><pre> <code class="bash hljs">$ kubectl describe clusterrolebinding cluster-admin Name: cluster-admin Labels: kubernetes.io/boostrapping=rbac-defaults Annotations: rbac.authorization.kubernetes.io/autoupdate=<span class="hljs-literal"><span class="hljs-literal">true</span></span> Role: Kind: ClusterRole Name: cluster-admin Subjects: Kind Name ---- ---- Group system:masters Namespace ---------</code> </pre> <br>  If the application requires access to the Kubernetes API, create separate service accounts <i>(</i> give <i>more details about them in <a href="https://habr.com/ru/company/flant/blog/422801/">this material</a> - <b>approx. Transl.</b> )</i> And give them the minimum set of rights required for each use case.  This approach is much better than issuing too large rights to the default account in the namespace. <br><br>  Most applications do not need access to the API at all: for them, <a href="https://kubernetes.io/docs/tasks/configure-pod-container/configure-service-account/">you can set the</a> <code>automountServiceAccountToken</code> to <code>false</code> . <br><br><h2>  3. Use namespaces to set security boundaries. </h2><br>  Creating separate namespaces is important as the first level of component isolation.  It is much easier to adjust security settings — for example, network policies — when different types of workloads are deployed in separate namespaces. <br><br>  Does your team use namespaces effectively?  Check their list for non-standard (not created by default): <br><br><pre> <code class="bash hljs">$ kubectl get ns NAME STATUS AGE default Active 16m kube-public Active 16m kube-system Active 16m</code> </pre> <br><h2>  4. Separate sensitive workloads. </h2><br>  Good practice for limiting the potential consequences of a compromise is to run workloads with confidential data on a dedicated set of machines.  This approach reduces the risk that an application with sensitive data will be accessed by a less secure application running in the same container environment or on the same host.  For example, a kubelet of a compromised node usually has access to the contents of secrets only if they are mounted to pods that are scheduled to be executed on the same node.  If important secrets can be found on the many nodes of the cluster, the attacker will have more opportunities to get them. <br><br>  Separation can be done using <i>node pools</i> ( <i>node pools</i> (in the cloud or for on-premises)), as well as Kubernetes control mechanisms, such as namespaces, <a href="https://kubernetes.io/docs/concepts/configuration/taint-and-toleration/">taints, tolerations,</a> and others. <br><br><h2>  5. Protect access to cloud metadata </h2><br>  Sensitive metadata — for example, kubelet administrative credentials — can be stolen or used with malicious intent to escalate privileges in a cluster.  For example, a <a href="https://hackerone.com/reports/341876">recent find</a> within Shop bounds from Shopify showed in detail how a user could exceed permissions by getting metadata from a cloud provider using specially crafted data for one of the microservices. <br><br>  In GKE, the <a href="https://cloud.google.com/kubernetes-engine/docs/how-to/protecting-cluster-metadata">metadata concealment</a> function of hiding metadata changes the cluster deployment mechanism in such a way as to avoid such a problem, and we recommend using it until a permanent solution is implemented. <br><br>  Similar countermeasures may be required in other environments. <br><br><h2>  6. Create and define cluster network policies </h2><br>  Network Policies - <a href="https://kubernetes.io/docs/concepts/services-networking/network-policies/">Network Policies</a> - allow you to control network access to and from containerized applications.  To use them, you must have a network provider with the support of such a resource;  in the case of providers of managed Kubernetes solutions like Google Kubernetes Engine (GKE), you will need to enable support.  (Enabling network policies for existing clusters in GKE will require a short rolling update.) <br><br>  Once everything is ready, start with simple default network policies — say, blocking (by default) traffic from other namespaces. <br><br>  If you use the Google Container Engine, you can check if policy support is enabled in running clusters: <br><br><pre> <code class="bash hljs">$ gcloud container clusters list \ --format=<span class="hljs-string"><span class="hljs-string">'table[box] (name,addonsConfig.networkPolicyConfig)'</span></span></code> </pre> <br><img src="https://habrastorage.org/webt/li/p_/m0/lip_m0ktegylgndbgtlryqcmxwk.png"><br><br><h2>  7. Set Cluster Pod Security Policy </h2><br>  The pod's security policy sets the default values ​​used to run workloads in the cluster.  Consider defining the policy and turning on the <a href="https://kubernetes.io/docs/reference/access-authn-authz/admission-controllers/">ad</a> security <a href="https://kubernetes.io/docs/reference/access-authn-authz/admission-controllers/">controller's admission.</a> Pod Security Policy: the instructions for these steps vary depending on the cloud provider or deployment model used. <br><br>  For starters, you can require <a href="https://kubernetes.io/docs/concepts/policy/pod-security-policy/">disabling</a> in <code>NET_RAW</code> <a href="https://linux.die.net/man/7/capabilities">capability</a> containers to protect against some types of spoofing attacks. <br><br><h2>  8. Work on node security </h2><br>  To improve node security, you can perform the following steps: <br><br><ol><li>  <b>Make sure the host is safe and properly configured</b> .  One of the ways - <a href="https://www.cisecurity.org/cis-benchmarks/">CIS Benchmarks</a> ;  many products have an autochecker that automatically checks the system for compliance with these standards. </li><li>  <b>Monitor the network availability of important ports</b> .  Make sure that the network blocks access to the ports used by the kubelet, including 10250 and 10255. Consider restricting access to the Kubernetes API server - with the exception of trusted networks.  In clusters that did not require authentication and authorization in the kubelet API, attackers used access to such ports to launch miners for cryptocurrencies. </li><li>  <b>Minimize administrative access to Kubernetes nodes</b> .  Access to the cluster nodes should in principle be limited: for debugging and other tasks, as a rule, it is possible to do without direct access to the node. </li></ol><br><h2>  9. Enable Audit Logging </h2><br>  Make sure that the <a href="https://kubernetes.io/docs/tasks/debug-application-cluster/audit/">audit logs</a> are enabled and that you are tracking the appearance of unusual or unwanted API calls in them, especially in the context of any authorization failures — such entries will have a message with the status “Forbidden”.  Authorization failures can mean that the attacker is trying to use the received credentials. <br><br>  Managed solution providers (including GKE) provide access to this data in their interfaces and can assist you in setting up notifications in case of authorization failures. <br><br><h2>  Looking to the future </h2><br>  Follow these guidelines to make the Kubernetes cluster more secure.  Remember that even after the cluster is configured safely, it is necessary to ensure the security in other aspects of the configuration and operation of the containers.  To improve the security of the technology stack, examine the tools that provide a central system for managing deployed containers, continuously monitoring and protecting containers and cloud (native cloud) applications. <br><br><h2>  PS from translator </h2><br>  Read also in our blog: <br><br><ul><li>  “ <a href="https://habr.com/ru/company/flant/blog/417905/">11 ways to (not) become a victim of hacking at Kubernetes</a> ”; </li><li>  “ <a href="https://habr.com/ru/company/flant/blog/422801/">Understand RBAC in Kubernetes</a> ”; </li><li>  “ <a href="https://habr.com/ru/company/flant/blog/353808/">OPA and SPIFFE - two new projects at CNCF for the security of cloud applications</a> ”; </li><li>  " <a href="https://habr.com/ru/company/flant/blog/337154/">Vulnerable Docker VM - a virtual puzzle for Docker and pentesting</a> "; </li><li>  " <a href="https://habr.com/ru/company/flant/blog/425085/">7 best practices for the operation of containers according to Google</a> ". </li></ul></div><p>Source: <a href="https://habr.com/ru/post/436300/">https://habr.com/ru/post/436300/</a></p>
+<section class="navigation-panel">
+<h4>More articles:</h4>
+<nav class="list-of-articles-container js-list-of-articles-container">Waiting for the list from <a href="../../index.html">here</a>...</nav>
+</section>
+<script src="../../js/main.js"></script>
+
+<!-- Yandex.Metrika counter -->
+<script type="text/javascript" >
+  (function (d, w, c) {
+      (w[c] = w[c] || []).push(function() {
+          try {
+              w.yaCounter52319614 = new Ya.Metrika({
+                  id:52319614,
+                  clickmap:true,
+                  trackLinks:true,
+                  accurateTrackBounce:true,
+                  webvisor:true
+              });
+          } catch(e) { }
+      });
+
+      var n = d.getElementsByTagName("script")[0],
+          s = d.createElement("script"),
+          f = function () { n.parentNode.insertBefore(s, n); };
+      s.type = "text/javascript";
+      s.async = true;
+      s.src = "https://mc.yandex.ru/metrika/watch.js";
+
+      if (w.opera == "[object Opera]") {
+          d.addEventListener("DOMContentLoaded", f, false);
+      } else { f(); }
+  })(document, window, "yandex_metrika_callbacks");
+</script>
+<noscript><div><img src="https://mc.yandex.ru/watch/52319614" style="position:absolute; left:-9999px;" alt="" /></div></noscript>
+
+<!-- Google Analytics -->
+  <script>
+    window.ga = function () { ga.q.push(arguments) }; ga.q = []; ga.l = +new Date;
+    ga('create', 'UA-134228602-1', 'auto'); ga('send', 'pageview')
+  </script>
+  <script src="https://www.google-analytics.com/analytics.js" async defer></script>
+
+</section>
+</body>
+
+</html>

@@ -1,0 +1,1 @@
+Amazon Echo, Google Home, Алиса, Project Alias, Raspberry Pi, ReSpeaker, Tensorflow, Keras, распознавание речи

@@ -1,0 +1,1 @@
+Machine Learning для Vertica

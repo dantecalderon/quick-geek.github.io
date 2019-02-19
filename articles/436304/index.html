@@ -1,0 +1,92 @@
+<!doctype html>
+<html class="no-js" lang="en">
+
+<head>
+  <!-- Global site tag (gtag.js) - Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=UA-134228602-1"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'UA-134228602-1');
+  </script>
+
+  <meta charset="utf-8">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  <title>Zimbra Collaboration Suite and Anti Phishing</title>
+  <meta name="description" content="It's no secret that one of the main external threats to businesses and organizations today is e-mail. The ability to use social engineering, turned e-...">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+  <link rel="stylesheet" href="../../css/main.css">
+
+  <script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+  <script>
+    (adsbygoogle = window.adsbygoogle || []).push({
+      google_ad_client: "ca-pub-6974184241884155",
+      enable_page_level_ads: true
+    });
+  </script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+  <script>window.jQuery || document.write('<script src="../../js/vendors/jquery-3.3.1.min.js"><\/script>')</script>
+</head>
+
+<body>
+  <!--[if lte IE 9]>
+    <p class="browserupgrade">You are using an <strong>outdated</strong> browser. Please <a href="https://browsehappy.com/">upgrade your browser</a> to improve your experience and security.</p>
+  <![endif]-->
+  <nav class="page-headings-container js-page-headings-container"></nav>
+  <div class="tools-bar js-tools-bar">
+    <!-- <a href="https://quick-geek.github.io/search.html" title="Search">🔎</a> -->
+    <a class="js-list-of-headings-button" data-state="closed" href="#" title="Headings">📜</a>
+    <a class="js-go-to-top-button" href="#" title="Go to Top">⬆️</a>
+    <a class="js-go-to-bottom-button" href="#" title="Go to Bottom">⬇️</a>
+  </div>
+  <section class="page js-page"><h1>Zimbra Collaboration Suite and Anti Phishing</h1><div class="post__text post__text-html js-mediator-article">  It's no secret that one of the main external threats to businesses and organizations today is e-mail.  The ability to use social engineering, turned e-mail into fertile ground for committing cybercrime.  For example, a case is known for certain when an infected .xls file came to the post of an employee of one of the enterprises, intended to open in MS Excel no higher than a certain version.  Only due to the fact that the title of the file contained the magic phrase “Salary Increase”, the entire team of the company purposefully spent several hours searching for a suitable version of MS Excel to open it until the IT service intervened.  If it were easier to execute the file sent by the attacker, this cyber attack could well be crowned with success. <br><br><img src="https://habrastorage.org/getpro/habr/post_images/e98/93d/7d9/e9893d7d9f995c2a24dce02df7fa5d51.png" alt="image"><a name="habracut"></a><br><br>  Someone may argue that such attacks can be counteracted through the training of enterprise personnel in the basics of information security, but things are not so simple.  The fact is that cybercrime has already taken shape in an illegal business and their market is growing by leaps and bounds.  This means that for each employee of the IT department of the enterprise there are several thousand cyber attackers and they will always be a few steps ahead.  That is why, in protecting the enterprise from cyber attacks, it is necessary to rely not only on people, but also on software solutions.  Let's see what tools the Zimbra Collaboration Suite offers to protect an enterprise from phishing attacks. <br><br>  A classic bundle from Amavis, SpamAssassin and ClamAV is responsible for filtering incoming mail to Zimbra.  This solution allows you to cut off most incoming phishing emails and spam emails.  On the other hand, its use does not guarantee that no phishing letter will reach the addressee and for the complete protection against the phishing threat, the IT manager will have to apply a number of other tricks and tricks. <br><br>  A common misconception is that phishing can be easily defeated by teaching staff the basics of information security literacy.  Careful reading of the names of domain names in the body of letters and care when working with attachments are not always able to guarantee 100% protection of the enterprise against phishing attacks.  It is far from always that an enterprise employee has time to carefully inspect the links inside the emails and check the extension of the files sent to him in the attachment.  In such cases, the <a href="https://github.com/Zimbra-Community/spoofing-and-phishing-alert-zimlet">Spoofing and Phishing Alert Zimlet</a> may be useful to the IT manager, who displays a warning to the user that the email he received is allegedly phishing, or that the name in the "Sender" field has been changed.  Thanks to such warnings, the employee will probably be attentive to the suspicious email and will most likely consult with the IT department before following the link from the email. <br><br><img src="https://habrastorage.org/getpro/habr/post_images/0f0/9bc/ebc/0f09bcebcbd0c8bf0109803d68e9f00d.png" alt="image"><br><br>  A rather radical way to protect against phishing is to set up a rule for DKIM, according to which all emails sent from a domain other than the stated one would simply not reach the addressee.  This is done by editing the file <b>/opt/zimbra/conf/opendkim.conf.in</b> , where it is enough to write the following lines: <br><br><blockquote>  On-NoSignature reject <br>  Mode sv </blockquote><br>  After that, you just need to restart OpenDKIM using the <b>zmopendkimctl restart</b> command for the changes to take effect.  We especially note that such a protective measure will not suit everyone, because after adding the appropriate rule to OpenDKIM, the email server will reject any email without a DKIM signature, which creates certain risks for the business.  We recommend that you carefully weigh everything before using this method of protection against phishing. <br><br>  But such protection may occasionally fail, because phishing emails can come from trusted sources.  Cybercriminals have long understood that there is no point in hacking into large and well-protected corporations directly.  It is much easier to hack its reliable counterparty, which, for example, is engaged in cleaning the premises or supplying drinking water.  Since such contractors send invoices and other letters to a large corporation at least once a month, and their information protection is usually much worse, it is much easier for attackers to hack the IT infrastructure of a small company and send an infected file to a large corporation .  Accustomed to receiving monthly bills, an accountant will almost certainly open a file sent from a trusted mailbox, triggering a cyber attack on the enterprise. <br><br>  In such a situation, Spoofing and Phishing Alert Zimlet and even the rule for OpenDKIM are unlikely to help you, since the letter is sent from the real address and with a targeted attack it may not contain any signs of phishing at all.  The ClamAV antivirus system built into the Zimbra Collaboration Suite can help protect against such attacks. It scans every attachment that arrives at the server, including archives.  Thanks to a constantly updated database of signatures, ClamAV is quite reliable and helps protect against the vast majority of virus threats. <br><br>  But, again, with a targeted and well-planned attack, the antivirus may simply not react to the infected attachment.  That is why a good idea in addition to the antivirus will be blocking attachments on the basis of their expansion.  You can block various potentially dangerous files with .exe extensions and many others by entering the command <b>zmprov "+ zimbraMtaBlockedExtension" {bat, cmd, docm, exe, js, lnk, ocx, rar, vbs, vbx}</b> . <br><br>  All these techniques, as well as a <a href="https://habr.com/ru/company/zimbra/blog/419513/">strict password policy</a> , timely software update and systematic work on employee training, can reliably protect an enterprise both from receiving phishing emails and from the unpleasant consequences associated with their receipt.  It is also recommended to periodically conduct a kind of “phishing exercises” - purposefully send phishing emails to users in order to identify those employees who are not able to recognize the threat and conduct additional classes on them with them. </div><p>Source: <a href="https://habr.com/ru/post/436304/">https://habr.com/ru/post/436304/</a></p>
+<section class="navigation-panel">
+<h4>More articles:</h4>
+<nav class="list-of-articles-container js-list-of-articles-container">Waiting for the list from <a href="../../index.html">here</a>...</nav>
+</section>
+<script src="../../js/main.js"></script>
+
+<!-- Yandex.Metrika counter -->
+<script type="text/javascript" >
+  (function (d, w, c) {
+      (w[c] = w[c] || []).push(function() {
+          try {
+              w.yaCounter52319614 = new Ya.Metrika({
+                  id:52319614,
+                  clickmap:true,
+                  trackLinks:true,
+                  accurateTrackBounce:true,
+                  webvisor:true
+              });
+          } catch(e) { }
+      });
+
+      var n = d.getElementsByTagName("script")[0],
+          s = d.createElement("script"),
+          f = function () { n.parentNode.insertBefore(s, n); };
+      s.type = "text/javascript";
+      s.async = true;
+      s.src = "https://mc.yandex.ru/metrika/watch.js";
+
+      if (w.opera == "[object Opera]") {
+          d.addEventListener("DOMContentLoaded", f, false);
+      } else { f(); }
+  })(document, window, "yandex_metrika_callbacks");
+</script>
+<noscript><div><img src="https://mc.yandex.ru/watch/52319614" style="position:absolute; left:-9999px;" alt="" /></div></noscript>
+
+<!-- Google Analytics -->
+  <script>
+    window.ga = function () { ga.q.push(arguments) }; ga.q = []; ga.l = +new Date;
+    ga('create', 'UA-134228602-1', 'auto'); ga('send', 'pageview')
+  </script>
+  <script src="https://www.google-analytics.com/analytics.js" async defer></script>
+
+</section>
+</body>
+
+</html>

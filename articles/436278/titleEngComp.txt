@@ -1,0 +1,1 @@
+Checking a CDK project with the IntelliJ IDEA static analyzer

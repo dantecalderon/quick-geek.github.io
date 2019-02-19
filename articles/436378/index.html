@@ -1,0 +1,95 @@
+<!doctype html>
+<html class="no-js" lang="en">
+
+<head>
+  <!-- Global site tag (gtag.js) - Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=UA-134228602-1"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'UA-134228602-1');
+  </script>
+
+  <meta charset="utf-8">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  <title>bobaos.pub - KNX TP / UART, Raspberry Pi and Redis</title>
+  <meta name="description" content="There is no limit to perfection. It would seem that everything worked well, minor bugs were fixed and so on. 
+
+
+ Now I will tell, firstly, about the p...">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+  <link rel="stylesheet" href="../../css/main.css">
+
+  <script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+  <script>
+    (adsbygoogle = window.adsbygoogle || []).push({
+      google_ad_client: "ca-pub-6974184241884155",
+      enable_page_level_ads: true
+    });
+  </script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+  <script>window.jQuery || document.write('<script src="../../js/vendors/jquery-3.3.1.min.js"><\/script>')</script>
+</head>
+
+<body>
+  <!--[if lte IE 9]>
+    <p class="browserupgrade">You are using an <strong>outdated</strong> browser. Please <a href="https://browsehappy.com/">upgrade your browser</a> to improve your experience and security.</p>
+  <![endif]-->
+  <nav class="page-headings-container js-page-headings-container"></nav>
+  <div class="tools-bar js-tools-bar">
+    <!-- <a href="https://quick-geek.github.io/search.html" title="Search">🔎</a> -->
+    <a class="js-list-of-headings-button" data-state="closed" href="#" title="Headings">📜</a>
+    <a class="js-go-to-top-button" href="#" title="Go to Top">⬆️</a>
+    <a class="js-go-to-bottom-button" href="#" title="Go to Bottom">⬇️</a>
+  </div>
+  <section class="page js-page"><h1>bobaos.pub - KNX TP / UART, Raspberry Pi and Redis</h1><div class="post__text post__text-html js-mediator-article"><p><img src="https://habrastorage.org/webt/mk/ug/z5/mkugz54jcb4qlo4lcafp9qykrdi.png"></p><br><p>  There is no limit to perfection.  It would seem that everything worked well, minor bugs were fixed and so on. </p><br><p>  Now I will tell, firstly, about the problems that I faced during all the time that has passed since the previous article, and, secondly, about the decisions that contributed to the current status of the project. </p><a name="habracut"></a><br><p>  → <a href="https://habr.com/en/post/354246/">Article about the previous version</a> </p><br><h3 id="oboznacheniya">  Legend </h3><br><p> <code>bobaos</code> - npm module for interacting with BAOS 83x using UART.  Returns raw data.  Used in all other modules listed below. </p><br><p>  <code>bdsd.sock</code> is a script for working with KNX objects.  Stores the list of datapoints, when sending / receiving converts values.  From DPT1 to true / false, from DPT9 to float.  Also listens to Unix Socket for receiving requests from other processes. </p><br><p>  <code>bobaos.pub</code> is a new version that uses <code>redis</code> for interprocess communication. <br>  <code>KNX объект/датапоинт</code> is a BAOS 83x module communication object configured in ETS, to which (or not) the group address (a) corresponds.  In current versions of iron, the maximum amount is 1000. </p><br><h3 id="zadacha">  Task </h3><br><p>  The main task is the same as the previous version.  A connection to a serial port can only open one.  Scripts working with KNX, I want to run a lot.  In addition to this, I wanted to implement interprocess communication.  Those.  so that not only one <code>bdsd.sock</code> process listened to a socket, but each running script could both send and receive requests. </p><br><h3 id="ideya">  Idea </h3><br><p>  An idea was born in my head to make my message broker on node.js on top of Unix sockets, to which clients would connect, subscribe to topics and receive / send messages according to the code written in them.  I knew that there were ready-made solutions, about which only lazy people hadn’t heard recently, I studied, but the idea of ​​making my decision was intrusive. </p><br><p>  And in the end the service started. </p><br><p>  Wrote a logger who sends messages to the topic.  Subscribers receive and are free to do anything, or rather what is written.  Conveniently - logs from several sources can be viewed in one console output. </p><br><p>  I wrote, posted to npm package bobaos.pub, which, unlike bdsd.sock, no longer creates a socket file, but connects to a broker.  At first glance, everything works as it should. </p><br><h3 id="problema">  Problem </h3><br><p>  Then I launched a script that periodically sends requests to the KNX bus for the night.  Waking up in the morning, by the blinking of the LEDs signaling the sending / transfer of data, I realized that something was wrong.  Messages did not reach on time.  Found out that the samopisny message broker took up almost all of the RAM available from 512MB (from BeagleBoard Black).  Further work with nodejs confirmed that memory is the weak point of js scripts. </p><br><h3 id="reshenie">  Decision </h3><br><p>  As a result, it was decided to switch from samopisny Unix sockets to Redis (by the way, he also knows how to work with them).  Perhaps it was worth figuring out the memory, finding the leaks, but I wanted to run faster. </p><br><p>  bobaos means communicating over UART with wrapping messages in FT1.2, our communication is synchronous.  Those.  <code>&lt;..сообщение-подтверждение-ответ..&gt;</code> .  The bobaos module, which is responsible for communication, stores all requests in the array, pulls out from there one by one, sends it to the UART, and when an incoming response is resolved, the promise responsible for this request is allowed. </p><br><p>  You can go the following way: the service listens to the PUB / SUB channel redis, accepts requests, sends to KNX.  In this case, the load on the request queue falls on the js <code>bobaos</code> module.  To implement, you need to write a simple module, subscribed to the channel and converts messages using the <code>JSON.parse()</code> method.  Further, this module can be used in other scripts. </p><br><p>  Another option, which eventually stopped: use the existing task manager on top of <code>redis</code> .  There are several choices made on the <code>bee-queue</code> . </p><br><p>  → <a href="https://github.com/bee-queue/bee-queue">Under the hood</a> </p><br><p>  It describes how the <code>bee-queue</code> works.  If you implement this library for other programming languages, you can thus make client libraries for <code>bobaos</code> . </p><br><p>  In the second version, all requests are stored in <code>redis</code> lists, are pulled out in turn and sent to the serial port. </p><br><p>  Next, a rewrite of the previous version follows, but I already keep all the data on datapoint in the <code>redis</code> database.  The only inconvenience that I feel is that all requests are asynchronous, respectively, getting an array of values ​​is a little harder than just turning to an array. </p><br><p>  Small optimizations have been made </p><br><p>  If previously there were separate <code>getValue/getValues/readValue/readValues/setValue/setValues</code> , now <code>getValue/readValue/setValues</code> accept both a single value and an array. </p><br><p>  The <code>getValue([id1, id2, ...])</code> method <code>getValue([id1, id2, ...])</code> in the previous version sent a request to the serial port for each datpoint.  But it is possible to send a request for several values.  Restrictions - the size of the response should be equal to <code>BufferSize</code> , the maximum - 250 bytes;  also it is impossible to go beyond the number of objects, for current versions of BAOS 83x modules - 1000. </p><br><p>  The lengths of the values ​​are known, the title too.  Further, a rather simple algorithm with while loops and awaits =) </p><br><ol><li>  Sort the array, delete duplicate elements, if any.  get the <code>idUniq</code> array. </li><li>  We start the cycle <code>i &lt; idUniq.length</code> , in which we do the following: <br>  a) Take <code>start: idUniq[i]</code> , for it we count the maximum number of values ​​we can get.  For example, if all objects are of type DPT1 / DPT5 (1 byte), then we can get values ​​in the amount of 48. There is one note: if, for example, we have set up objects in ETS <code>#[1, 2, 3, 10, 20]</code> , then, when the <code>GetDatapointValue.Req(1, 30)</code> is requested <code>GetDatapointValue.Req(1, 30)</code> zero one-byte values ​​will be returned in response, even for non-existent data points <code>[4, 5, 6, ..., 30]</code> . <br>  b) Counting occurs in the new cycle <code>j &lt; i + max</code> (where <code>max</code> is 50, or, if close to 1000, then the maximum is <code>1000 - id + 1</code> , for 990 it will be 11, for 999 - 2), if in the process of counting we meet array elements from the original query, then <code>i</code> assigned the variable <code>i</code> by its index. <br>  c) If in the cycle <code>j</code> calculated length goes beyond the maximum length of the buffer, then we form the element of the "map" of requests <code>{start: start, number: number}</code> , throw it into a separate array, increase the variable <code>i</code> (or assign the index found in the <code>idUniq</code> array), interrupt cycle <code>j</code> , both cycles are restarted. </li></ol><br><p>  Thus, we form several requests for <code>bobaos</code> .  For example, if you send a <code>getValue([1, 2, 3, 40, 48, 49, 50, 100, 998, 999, 1000])</code> request <code>getValue([1, 2, 3, 40, 48, 49, 50, 100, 998, 999, 1000])</code> , then the requests may be for the particular case of the following: </p><br><pre> <code class="plaintext hljs">{start: 1, number: 48}, // 1, 2, 3, 40, 48 {start: 49, number: 48}, // 49, 50 {start: 100, number: 48}, // 100 {start: 998, number: 3} // 998, 999, 1000</code> </pre> <br><p>  It could be done differently: </p><br><pre> <code class="plaintext hljs">{start: 1, number: 48}, // 1, 2, 3, 40, 48 {start: 49, number: 2}, // 49, 50 {start: 100, number: 1}, // 100 {start: 998, number: 3} // 998, 999, 1000</code> </pre> <br><p>  Requests would be the same, given less.  But I stopped at the first option, since the values ​​obtained are saved to the <code>redis</code> database, respectively, they can be obtained using the <code>getStoredValue</code> method, which I try to use more often than <code>getValue</code> , which sends data on the serial port. </p><br><p>  A separate queue is created for the <code>ping/get sdk state/reset</code> service methods.  Thus, if there is something wrong with the serial port communication (the frame counter is lost, etc.) and the execution stopped on some task, you can send a <code>reset</code> request to another queue, and accordingly restart <code>sdk</code> . </p><br><h2 id="klientskaya-chast---bobaossub">  Client part - bobaos.sub </h2><br><p>  The <code>bobaos.sub</code> module can be used to control KNX data points in user scripts. </p><br><p>  The following example covers all module functions: </p><br><pre> <code class="plaintext hljs">const BobaosSub = require("bobaos.sub"); // в параметры можно передать опционально: // redis: объект либо url // request_channel: "bobaos_req" по умолчанию, // service_channel: "bobaos_service" по умолчанию, // broadcast_channel: "bobaos_bcast" по умолчанию let my = BobaosSub(); my.on("connect", _ =&gt; { console.log("connected to ipc, still not subscribed to channels"); }); my.on("ready", async _ =&gt; { try { console.log("hello, friend"); console.log("ping:", await my.ping()); console.log("get sdk state:", await my.getSdkState()); console.log("get value:", await my.getValue([1, 107, 106])); console.log("get stored value:", await my.getValue([1, 107, 106])); console.log("get server item:", await my.getServerItem([1, 2, 3])); console.log("set value:", await my.setValue({id: 103, value: 0})); console.log("read value:", await my.readValue([1, 103, 104, 105])); console.log("get programming mode:", await my.getProgrammingMode()); console.log("set programming mode:", await my.setProgrammingMode(true)); console.log("get parameter byte", await my.getParameterByte([1, 2, 3, 4])); console.log("reset", await my.reset()); } catch(e) { console.log("err", e.message); } }); my.on("datapoint value", payload =&gt; { // Имейте в виду, что payload может быть как объектом, так и массивом // так что необходима проверка Array.isArray(payload) console.log("broadcasted datapoint value: ", payload); }); my.on("server item", payload =&gt; { // Имейте в виду, что payload может быть как объектом, так и массивом // так что необходима проверка Array.isArray(payload) console.log("broadcasted server item: ", payload); }); my.on("sdk state", payload =&gt; { console.log("broadcasted sdk state: ", payload); });</code> </pre> <br><h2 id="bobaostool">  bobaos.tool </h2><br><p>  The command line interface has been rewritten.  About how I implemented it the following article: </p><br><p>  → <a href="https://habr.com/en/post/426615/">We write CLI on NodeJS</a> </p><br><p>  The teams have become shorter, clearer and more functional. </p><br><pre> <code class="plaintext hljs">bobaos&gt; progmode ? BAOS module in programming mode: false bobaos&gt; progmode 1 BAOS module in programming mode: true bobaos&gt; progmode false BAOS module in programming mode: false bobaos&gt; description 1 2 3 #1: length = 2, dpt = dpt9, prio: low, flags: [C-WTU] #2: length = 1, dpt = dpt1, prio: low, flags: [C-WT-] #3: length = 1, dpt = dpt1, prio: low, flags: [C-WT-] bobaos&gt; set 2: 0 20:27:06:239, id: 2, value: false, raw: [AA==] bobaos&gt; set [2: 0, 3: false] 20:28:48:586, id: 2, value: false, raw: [AA==] 20:28:48:592, id: 3, value: false, raw: [AA==]</code> </pre> <br><h2 id="posleslovie">  Afterword </h2><br><p>  It turned out working stable system.  <code>Redis</code> as a backend works stably well.  During the development, a lot of cones were stuffed.  But the learning process is such that sometimes it is inevitable.  From this experience, I note that <code>nodejs</code> processes consume quite a lot of RAM (20MB at the start) and there may be leaks.  For home automation, this is critical - because the script should work all the time, and if it grows over time more, then by a certain moment it can take up all the space.  Therefore, you need to carefully write scripts, understand how the garbage collector works and keep everything under control. </p><br><p>  Updated documentation can be found <a href="https://bobaoskit.github.io/">here</a> . </p><br><p>  In the next article I will talk about how using <code>redis</code> and <code>bee-queue</code> made a service for software accessories. </p><br><p>  <strong>UPD:</strong> <a href="https://habr.com/en/post/437846/">bobaoskit - accessories, dnssd and websocket</a> </p><br><p>  I would appreciate any feedback. </p></div><p>Source: <a href="https://habr.com/ru/post/436378/">https://habr.com/ru/post/436378/</a></p>
+<section class="navigation-panel">
+<h4>More articles:</h4>
+<nav class="list-of-articles-container js-list-of-articles-container">Waiting for the list from <a href="../../index.html">here</a>...</nav>
+</section>
+<script src="../../js/main.js"></script>
+
+<!-- Yandex.Metrika counter -->
+<script type="text/javascript" >
+  (function (d, w, c) {
+      (w[c] = w[c] || []).push(function() {
+          try {
+              w.yaCounter52319614 = new Ya.Metrika({
+                  id:52319614,
+                  clickmap:true,
+                  trackLinks:true,
+                  accurateTrackBounce:true,
+                  webvisor:true
+              });
+          } catch(e) { }
+      });
+
+      var n = d.getElementsByTagName("script")[0],
+          s = d.createElement("script"),
+          f = function () { n.parentNode.insertBefore(s, n); };
+      s.type = "text/javascript";
+      s.async = true;
+      s.src = "https://mc.yandex.ru/metrika/watch.js";
+
+      if (w.opera == "[object Opera]") {
+          d.addEventListener("DOMContentLoaded", f, false);
+      } else { f(); }
+  })(document, window, "yandex_metrika_callbacks");
+</script>
+<noscript><div><img src="https://mc.yandex.ru/watch/52319614" style="position:absolute; left:-9999px;" alt="" /></div></noscript>
+
+<!-- Google Analytics -->
+  <script>
+    window.ga = function () { ga.q.push(arguments) }; ga.q = []; ga.l = +new Date;
+    ga('create', 'UA-134228602-1', 'auto'); ga('send', 'pageview')
+  </script>
+  <script src="https://www.google-analytics.com/analytics.js" async defer></script>
+
+</section>
+</body>
+
+</html>

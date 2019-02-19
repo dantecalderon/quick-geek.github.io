@@ -1,0 +1,92 @@
+<!doctype html>
+<html class="no-js" lang="en">
+
+<head>
+  <!-- Global site tag (gtag.js) - Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=UA-134228602-1"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'UA-134228602-1');
+  </script>
+
+  <meta charset="utf-8">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  <title>Failover balancing of VoIP traffic. Load switching between data centers at peak-time</title>
+  <meta name="description" content="A few words about what we do. DINS participates in the development and support of UCaaS service in the international market for corporate clients. The...">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+  <link rel="stylesheet" href="../../css/main.css">
+
+  <script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+  <script>
+    (adsbygoogle = window.adsbygoogle || []).push({
+      google_ad_client: "ca-pub-6974184241884155",
+      enable_page_level_ads: true
+    });
+  </script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+  <script>window.jQuery || document.write('<script src="../../js/vendors/jquery-3.3.1.min.js"><\/script>')</script>
+</head>
+
+<body>
+  <!--[if lte IE 9]>
+    <p class="browserupgrade">You are using an <strong>outdated</strong> browser. Please <a href="https://browsehappy.com/">upgrade your browser</a> to improve your experience and security.</p>
+  <![endif]-->
+  <nav class="page-headings-container js-page-headings-container"></nav>
+  <div class="tools-bar js-tools-bar">
+    <!-- <a href="https://quick-geek.github.io/search.html" title="Search">🔎</a> -->
+    <a class="js-list-of-headings-button" data-state="closed" href="#" title="Headings">📜</a>
+    <a class="js-go-to-top-button" href="#" title="Go to Top">⬆️</a>
+    <a class="js-go-to-bottom-button" href="#" title="Go to Bottom">⬇️</a>
+  </div>
+  <section class="page js-page"><h1>Failover balancing of VoIP traffic. Load switching between data centers at peak-time</h1><div class="post__text post__text-html js-mediator-article"><p>  A few words about what we do.  DINS participates in the development and support of UCaaS service in the international market for corporate clients.  The service is used by both small companies and startups, as well as big business.  Clients connect via the Internet using the SIP protocol over TCP, TLS or WSS.  This creates a rather heavy load: almost 1.5 million connections from endpoints - Polycom / Cisco / Yealink telephones and software clients for PC / Mac / IOS / Android. </p><br><p>  In the article, I talk about how the VoIP entry points are arranged. </p><a name="habracut"></a><br><h3 id="predystoriya">  Prehistory </h3><br><p>  On the perimeter of the system (between the terminal devices and the core) are commercial SBC (Session Border Controller). </p><br><p>  Since 2012, we have used solutions from Acme Packet, which was later acquired by Oracle.  Before that, we used NatPASS. </p><br><p>  Briefly list the functionality that we use: </p><br><p>  • NAT traversal; <br>  • B2BUA; <br>  • SIP normalization (allowed / disallowed headers, header manipulation rules, etc) <br>  • TLS &amp; SRTP offload; <br>  • Conversion of transport (within the system we use SIP over UDP); <br>  • MOS monitoring (via RTCP-XR); <br>  • ACLs, Bruteforce detection; <br>  • Reduced registration traffic due to increased contact expiration (low expire on the access side, high on the kernel side); <br>  • Per-Method SIP messages throttling. </p><br><p>  Commercial systems have their own obvious advantages (out-of-the-box functionality, commercial support) and minuses (price, delivery time, lack of opportunity or too long implementation times for new features we need, time to solve problems, etc.).  Gradually, the disadvantages began to outweigh, and it became clear that there was a need to develop their own solutions. </p><br><p>  The development was launched a year and a half ago.  In the border subsystem, we traditionally distinguish 2 main components: SIP and Media servers;  over each component load balancers.  I work here on entry points / balancers, so I will try to talk about them. </p><br><h4 id="trebovaniya">  Requirements </h4><br><ul><li>  Fault tolerance: the system must provide a service if one or more instances in the data center or the entire data center fails </li><li>  Serviceability: we want to be able to switch loads from one data center to others </li><li>  Scalability: I want to increase capacity quickly and inexpensively. </li></ul><br><h4 id="balansirovka">  Balancing </h4><br><p>  We chose IPVS (aka LVS) in IPIP mode (traffic tunneling).  I will not go into the comparative analysis of NAT / DR / TUN / L3DSR, (you can read about modes, for example, <a href="http://www.linuxvirtualserver.org/Documents.html">here</a> ), I will mention only the reasons: </p><br><ul><li>  We do not want to impose on backends the requirement to be on a common subnet with LVS (pools contain backends from both their own and remote data centers); </li><li>  The backend should receive the original source IP of the client (or its NAT), in other words, source NAT is not suitable; </li><li>  The backend should support simultaneous work with multiple VIPs. </li></ul><br><p>  We are balancing the media traffic as well (it turned out very difficult, we are going to refuse), so the current deployment scheme in the data center looks like this: <br><br><img src="https://habrastorage.org/webt/fk/vh/wg/fkvhwgftogjrev-a931o3a9qk-e.png"><br><br>  The current strategy of IPVS balancing is “sed” (Shortest Expected Delay), more about it.  Unlike the Weighted Round Robin / Weighted Least-Connection, it allows you not to overflow traffic to backends with lower weights until you reach a certain threshold.  Shortest expected delay is calculated using the formula (Ci + 1) / Ui, where Ci is the number of connections on the backend i, Ui is the weight of the backend.  For example, if the pool has backends with weights of 50,000 and 2, new connections will be distributed across the first until each server reaches 25,000 connections or until it reaches the uthreshold — the limit on the total number of connections. <br>  You can read more about balancing strategies in <a href="https://linux.die.net/man/8/ipvsadm">man ipvsadm</a> . </p><br><p>  The IPVS pool looks like this (hereinafter, the made-up IP addresses are shown): </p><br><pre><code class="plaintext hljs"># ipvsadm -ln Prot LocalAddress:Port Scheduler Flags -&gt; RemoteAddress:Port Forward Weight ActiveConn InActConn TCP 1.1.1.1:5060 sed -&gt; 10.11.100.181:5060 Tunnel 50000 5903 4 -&gt; 10.11.100.192:5060 Tunnel 50000 5905 1 -&gt; 10.12.100.137:5060 Tunnel 2 0 0 -&gt; 10.12.100.144:5060 Tunnel 2 0 0</code> </pre> <br><p>  The load on the VIP is distributed among the servers with a weight of 50,000 (they are deployed in the same data center as a specific LVS instance), if they are overloaded or fall into the blacklist, the load will be poured onto the backup part of the pool - servers with a weight of 2, which are located adjacent data center. </p><br><p>  Exactly the same pool, but with weights on the contrary, is set up in the adjacent data center (on the production system, the number of backends, of course, is much larger). </p><br><p>  Synchronizing connections via ipvs sync allows the backup LVS to be aware of all current connections. </p><br><p>  A “dirty” trick was used for synchronization between data centers, which nevertheless works fine.  IPVS sync works only through multicast, which was difficult for us to correctly deliver to the neighboring DC.  Instead of multicast, we duplicate the synchronization traffic using the iptables target TEE from the ipvs master in the ip-ip tunnel to the server in the neighboring DC, and there can be several target hosts / data centers: </p><br><pre> <code class="plaintext hljs">#### start ipvs sync master role: ipvsadm --start-daemon master --syncid 10 --sync-maxlen 1460 --mcast-interface sync01 --mcast-group 224.0.0.81 --mcast-port 8848 --mcast-ttl 1 #### duplicate all sync packets to remote LVS servers using iptables TEE target: iptables -t mangle -A POSTROUTING -d 224.0.0.81/32 -o sync01 -j TEE --gateway 172.20.21.10 # ip-ip remote lvs server 1 iptables -t mangle -A POSTROUTING -d 224.0.0.81/32 -o sync01 -j TEE --gateway 172.20.21.14 # ip-ip remote lvs server 2 #### start ipvs sync backup role: ipvsadm --start-daemon backup --syncid 10 --sync-maxlen 1460 --mcast-interface sync01 --mcast-group 224.0.0.81 --mcast-port 8848 --mcast-ttl 1 #### be ready to receive sync sync packets from remote LVS servers: iptables -t mangle -A PREROUTING -d 224.0.0.81/32 -i loc02_srv01 -j TEE --gateway 127.0.0.1 iptables -t mangle -A PREROUTING -d 224.0.0.81/32 -i loc02_srv02 -j TEE --gateway 127.0.0.1</code> </pre> <br><p>  In fact, each of our LVS server plays both roles at once (master &amp; backup), on the one hand, this is simply convenient, as it eliminates role changes when switching traffic, on the other, it is necessary, since each DC by default processes the traffic of its group public VIPs. </p><br><h4 id="pereklyuchenie-nagruzki-mezhdu-data-centrami">  Load transfer between data centers </h4><br><p>  In normal operation, each public IP address is advertised on the Internet from anywhere (in this diagram from two data centers).  The incoming VIP traffic is routed to the DC we need at the moment using the BGP attribute MED (Multi Exit Discriminator) with different values ​​for Active DC and Backup DC.  At the same time, Backup DC is always ready to accept traffic if something happens to the active one: <br><br><img src="https://habrastorage.org/webt/ir/s6/ht/irs6htkfhrve2zzevsl0cwcg4k4.png"><br><br>  By changing the values ​​of BGP MEDs and using the IPVS-sync cross-location, we are able to smoothly transfer traffic from the backends of one data center to another, without affecting the established telephone calls, which will naturally end sooner or later.  The process is fully automated (for each VIP we have a button in the management console), and it looks like this: </p><br><ol><li><p>  SIP-VIP is active in DC1 (left), the cluster in DC2 (right) is a backup, thanks to ipvs synchronization, it has information in the memory about the established connections.  On the left, active VIPs are announced with a MED value of 100, on the right - with a value of 500: <br><br><img src="https://habrastorage.org/webt/v6/di/th/v6dithpguub8rbq7ggurj_vdlxi.png"></p><br></li><li><p>  The toggle button causes a change in so-called.  “Target_state” (internal concept declaring BGP MEDs values ​​at a given time).  Here we do not hope that DC1 is OK and is ready to handle traffic, so LVS in DC2 comes to “force active”, lowering the value of MEDs to 50, and thus pulls traffic to itself.  If the backends in DC1 are alive and available, the calls will not break.  All new tcp connections (registrations) will be sent to DC2 backends: <br><br><img src="https://habrastorage.org/webt/lx/zo/cb/lxzocb7gt-zzrznicu5k9hiju2k.png"></p><br></li><li><p>  DC1 received a new target_state replication and set the backup value to MEDs (500).  When DC2 finds out about this, it normalizes its value (50 =&gt; 100).  It remains to wait for the completion of all active calls in DC1 and terminate the established tcp connections.  SBC-instances in DC1 enter the necessary services in the so-called.  “graceful shutdown” status: “SIP 503” replies to the next SIP requests and break connections, while new connections are not accepted.  Also, these instances fall into the blacklist on LVS.  When breaking, the client establishes a new registration / connection, which already comes in DC2: <br><br><img src="https://habrastorage.org/webt/by/rq/uf/byrquf_81kp8zvvryrrjzdtcl-a.png"></p><br></li><li><p>  The process ends when all traffic in DC2. <br><br><img src="https://habrastorage.org/webt/1m/dm/h8/1mdmh8styniixoof0cragfatdqq.png"></p><br></li><li><p>  DC1 and DC2 swapped roles. <br><br><img src="https://habrastorage.org/webt/wu/t3/ts/wut3ts2mq5iznucnkesz2r3mnra.png"></p><br></li></ol><br><p>  Under conditions of constant high load on entry points, it turned out to be very convenient to be able to switch traffic at any time.  The same mechanism starts automatically if backup DC suddenly began to receive traffic.  At the same time, to protect against flapping, switching is triggered only once in one direction and a lock is set for automatic switchings; human intervention is required to remove it. </p><br><h4 id="chto-vnutri">  What's inside </h4><br><p>  VRRP cluster &amp; IPVS manager: Keepalived.  Keepalived is responsible for switching VIPs within the cluster, as well as for backends healthchecking / blacklisting. </p><br><p>  BGP Stack: ExaBGP.  Responsible for announcing routes on VIP-addresses and putting down relevant BGP MEDs.  Fully controlled by the management server.  A robust BGP daemon written in Python is actively developing and performs its task 100%. </p><br><p>  Management server (API / Monitoring / sub-components management): Pyro4 + Flask.  It is a Provisioning server for Keepalived and ExaBGP, manages all other system settings (sysctl / iptables / ipset / etc), provides monitoring (gnlpy), adds and removes backends on demand (they communicate with its API). </p><br><h4 id="cifry">  Numbers </h4><br><p>  A virtual machine with four cores Intel Xeon Gold 6140 CPU @ 2.30GHz serves a 300Mbps / 210Kpps traffic stream (media traffic, about 3 thousand simultaneous calls during peak-time process through them).  CPU utilization with this - 60%. </p><br><p>  Now this is enough to serve traffic to 100 thousand end devices (desk phones).  To service all traffic (more than 1 million terminals), we build about 10 pairs of such clusters in several data centers. </p></div><p>Source: <a href="https://habr.com/ru/post/436404/">https://habr.com/ru/post/436404/</a></p>
+<section class="navigation-panel">
+<h4>More articles:</h4>
+<nav class="list-of-articles-container js-list-of-articles-container">Waiting for the list from <a href="../../index.html">here</a>...</nav>
+</section>
+<script src="../../js/main.js"></script>
+
+<!-- Yandex.Metrika counter -->
+<script type="text/javascript" >
+  (function (d, w, c) {
+      (w[c] = w[c] || []).push(function() {
+          try {
+              w.yaCounter52319614 = new Ya.Metrika({
+                  id:52319614,
+                  clickmap:true,
+                  trackLinks:true,
+                  accurateTrackBounce:true,
+                  webvisor:true
+              });
+          } catch(e) { }
+      });
+
+      var n = d.getElementsByTagName("script")[0],
+          s = d.createElement("script"),
+          f = function () { n.parentNode.insertBefore(s, n); };
+      s.type = "text/javascript";
+      s.async = true;
+      s.src = "https://mc.yandex.ru/metrika/watch.js";
+
+      if (w.opera == "[object Opera]") {
+          d.addEventListener("DOMContentLoaded", f, false);
+      } else { f(); }
+  })(document, window, "yandex_metrika_callbacks");
+</script>
+<noscript><div><img src="https://mc.yandex.ru/watch/52319614" style="position:absolute; left:-9999px;" alt="" /></div></noscript>
+
+<!-- Google Analytics -->
+  <script>
+    window.ga = function () { ga.q.push(arguments) }; ga.q = []; ga.l = +new Date;
+    ga('create', 'UA-134228602-1', 'auto'); ga('send', 'pageview')
+  </script>
+  <script src="https://www.google-analytics.com/analytics.js" async defer></script>
+
+</section>
+</body>
+
+</html>

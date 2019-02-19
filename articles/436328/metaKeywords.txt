@@ -1,0 +1,1 @@
+java, Maven, Gradle, IntelliJ IDEA, pvs-studio, SAST, C++, C#, .net, информационная безопасность, си++, си/си++, статический анализ, static code analysis, devops, devsecops, devtools

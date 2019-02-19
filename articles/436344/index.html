@@ -1,0 +1,92 @@
+<!doctype html>
+<html class="no-js" lang="en">
+
+<head>
+  <!-- Global site tag (gtag.js) - Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=UA-134228602-1"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'UA-134228602-1');
+  </script>
+
+  <meta charset="utf-8">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  <title>Fibaro Home Center 2 and thermostat for floor heating HeatIt. How to raise the temperature</title>
+  <meta name="description" content="I faced the task of managing a warm floor from the interface of Fibaro Home Center 2. It seems to be the simplest task, but no. At the request of the ...">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+  <link rel="stylesheet" href="../../css/main.css">
+
+  <script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+  <script>
+    (adsbygoogle = window.adsbygoogle || []).push({
+      google_ad_client: "ca-pub-6974184241884155",
+      enable_page_level_ads: true
+    });
+  </script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+  <script>window.jQuery || document.write('<script src="../../js/vendors/jquery-3.3.1.min.js"><\/script>')</script>
+</head>
+
+<body>
+  <!--[if lte IE 9]>
+    <p class="browserupgrade">You are using an <strong>outdated</strong> browser. Please <a href="https://browsehappy.com/">upgrade your browser</a> to improve your experience and security.</p>
+  <![endif]-->
+  <nav class="page-headings-container js-page-headings-container"></nav>
+  <div class="tools-bar js-tools-bar">
+    <!-- <a href="https://quick-geek.github.io/search.html" title="Search">🔎</a> -->
+    <a class="js-list-of-headings-button" data-state="closed" href="#" title="Headings">📜</a>
+    <a class="js-go-to-top-button" href="#" title="Go to Top">⬆️</a>
+    <a class="js-go-to-bottom-button" href="#" title="Go to Bottom">⬇️</a>
+  </div>
+  <section class="page js-page"><h1>Fibaro Home Center 2 and thermostat for floor heating HeatIt. How to raise the temperature</h1><div class="post__text post__text-html js-mediator-article">  I faced the task of managing a warm floor from the interface of Fibaro Home Center 2. It seems to be the simplest task, but no.  At the request of the customer thermostats should be repelled by the temperature of the floor.  It was decided to use HeatIt thermostats. <br><br><img src="https://habrastorage.org/webt/fz/mf/8_/fzmf8_iydmmy3icnfdwrwuufdlg.jpeg" alt="image"><br><a name="habracut"></a><br>  They are most suited to customer requirements: <br><br><ul><li>  minimalistic design </li><li>  the ability to extinguish everything that glows on the panel </li><li>  the ability to work based on the temperature of the floor </li><li>  the possibility of direct association with external relays (since the floor is water-heated, you need to control the relays placed in the boiler room, which open and close the valves of the respective circuits) </li></ul><br>  Having studied the materials in the network a little bit, I found out that the “cool” Fibaro Home Center 2 cannot nominally set the temperature on the thermostats to&gt; 30 degrees in the web interface and&gt; 28 degrees in the mobile application.  That for the maximum temperature of the floor, of course not enough. <br><br><img src="https://habrastorage.org/webt/hn/or/x6/hnorx6-xkntp2ge3fzocx-c6bdw.png" alt="image"><br><br>  At the same time Thermostats HeatIt make it possible to set up to 40 degrees.  The question arises why Fibaro does not allow the installer to set the range of possible temperatures.  Well, okay, I thought, think of something.  There was even an idea to shift the readings of the NTC sensor with an additional resistor, but then the customer would have to get used to the temperature readings in conventional “parrots”, which is not good. <br><br>  There was a thought, but what if you take and send in some way greater value? <br><br>  The exchange between the web client and Home Center 2 is described in the <a href="https://manuals.fibaro.com/content/other/FIBARO_System_REST_API.pdf">Fibaro REST API</a> <br>  But it turned out to be easier for me to intercept all the commands in Wireshark. <br><br>  Specifically for HeatIt: <br><blockquote>  POST / api / devices / 9 / action / setMode {"args": [1]} <br>  POST / api / devices / 9 / action / setSetpointMode {"args": [1]} <br>  POST / api / devices / 9 / action / setThermostatSetpoint {"args": [1,27]} </blockquote><div class="spoiler">  <b class="spoiler_title">Description</b> <div class="spoiler_text">  setMode - mode selection (arguments: 1 - on, heating, 11 - economical heating, 0 - off) <br>  setSetpointMode — selects which mode the set temperature is displayed from (the arguments are the same) <br>  setThermostatSetpoint - setting the target temperature for the mode (respectively, the first argument is the mode, the second is the temperature) <br></div></div><br>  You can also send requests like: <br><blockquote>  GET / api / callAction? DeviceID = ID &amp; name = setThermostatSetpoint &amp; arg1 = MODE &amp; arg2 = TEMP VALUE </blockquote>  etc. <br><br>  You can also find out all the commands and values ​​for all installed devices using the REST request: <br><blockquote>  GET / api / devices </blockquote>  So, we send the thermostat a temperature of 35 degrees, and, oh, a miracle, the thermostat accepted it. <br><br>  Now the task is to come up with a replacement for the standard thermostat control. <br><br>  The first option is the Fibaro virtual device. <br><br>  I sketched the form: <br><br><img src="https://habrastorage.org/webt/fq/iq/3v/fqiq3v0n0omwd1f_lny4_jjowti.jpeg"><br><br>  Let's start writing scripts: <br><br>  To begin, let us know the ID of all devices of interest to us, for this you need to go to the settings of each “device” relating to our thermostat and look at the ID on the page or in the address bar of the browser. <br><br>  In my case, the device for setting the target temperature (setPoint) - ID: <b>7</b> <br><br>  Floor Temperature Sensor - ID: <b>8</b> <br><br>  Select thermostat operation mode - ID: <b>9</b> <br><br><img src="https://habrastorage.org/webt/8f/wu/2t/8fwu2txxghejau1f6xwlb8jy9to.jpeg"><br><br><img src="https://habrastorage.org/webt/y6/m_/xm/y6m_xmgpan5f54wysh3eukx078c.jpeg"><br><br>  Also, our virtual device also has its ID, it can be seen only in the address bar of my browser, it is ID <b>12</b> .  Then each element of the virtual device also has its own ID, in my case: <br><br>  “Current temp.” I have ID “ <b>Label1</b> ”, “Target temperature” - ID “ <b>Label2</b> ” <br>  The “+” and “-” buttons are ID “ <b>Button1</b> ” and ID “ <b>Button2</b> ”, respectively.  “Mode” - ID “ <b>Label1</b> ”. <br>  Well, the buttons "OFF", "ECO" and "ON" - ID “ <b>Button3</b> ”, ID “ <b>Button4</b> ” and ID “ <b>Button5</b> ”, respectively. <br><br>  Main loop: <br><br><pre><code class="lua hljs"><span class="hljs-comment"><span class="hljs-comment">-- запрашиваем текущую температуру пола и целевую температуру, а так же выбранный режим работы термостата: floor_temp = fibaro:getValue(8, 'value') currentSetPoint = tonumber(fibaro:getValue(7, 'value')) mode = fibaro:getValue(9, 'mode') -- здесь отображаем текущую температуру fibaro:call(12, "setProperty", "ui.Label1.value", floor_temp) -- в зависимости от выбранного режима отображаем целевую температуру и сам режим в соответствующих полях if (mode == '1') then fibaro:call(12, "setProperty", "ui.Label3.value", "ON") fibaro:call(12, "setProperty", "ui.Label2.value", currentSetPoint) elseif (mode == '11') then fibaro:call(12, "setProperty", "ui.Label3.value", "ECO") fibaro:call(12, "setProperty", "ui.Label2.value", currentSetPoint) elseif (mode == '0') then fibaro:call(12, "setProperty", "ui.Label3.value", "OFF") fibaro:call(12, "setProperty", "ui.Label2.value", "OFF") end</span></span></code> </pre> <br>  Next, write scripts for the buttons: <br>  With the mode selection buttons, everything is simple: <br>  “OFF”: <br><br><pre> <code class="lua hljs">fibaro:call(<span class="hljs-number"><span class="hljs-number">9</span></span>, <span class="hljs-string"><span class="hljs-string">'setMode'</span></span>,<span class="hljs-number"><span class="hljs-number">0</span></span>)</code> </pre> <br>  “ECO”: <br><br><pre> <code class="lua hljs">fibaro:call(<span class="hljs-number"><span class="hljs-number">9</span></span>, <span class="hljs-string"><span class="hljs-string">'setMode'</span></span>,<span class="hljs-number"><span class="hljs-number">11</span></span>) fibaro:call(<span class="hljs-number"><span class="hljs-number">7</span></span>, <span class="hljs-string"><span class="hljs-string">'setSetpointMode'</span></span>,<span class="hljs-number"><span class="hljs-number">11</span></span>)</code> </pre> <br>  “ON”: <br><br><pre> <code class="lua hljs">fibaro:call(<span class="hljs-number"><span class="hljs-number">9</span></span>, <span class="hljs-string"><span class="hljs-string">'setMode'</span></span>,<span class="hljs-number"><span class="hljs-number">1</span></span>) fibaro:call(<span class="hljs-number"><span class="hljs-number">7</span></span>, <span class="hljs-string"><span class="hljs-string">'setSetpointMode'</span></span>,<span class="hljs-number"><span class="hljs-number">1</span></span>)</code> </pre> <br>  For the "+" button: <br><br><pre> <code class="lua hljs"><span class="hljs-comment"><span class="hljs-comment">-- узнаем текущую целевую температуру currentSetPoint = tonumber(fibaro:getValue(7, 'value')) -- прописываем условие, что бы температуру нельзя было увеличить более 40 градусов if (currentSetPoint &lt; 40) then setPoint = currentSetPoint + 1 else setPoint = 40 end -- отправляем новую температуру в термостат fibaro:call(7, 'setThermostatSetpoint',11, setPoint)</span></span></code> </pre> <br>  For the "-" button: <br><br><pre> <code class="lua hljs">currentSetPoint = <span class="hljs-built_in"><span class="hljs-built_in">tonumber</span></span>(fibaro:getValue(<span class="hljs-number"><span class="hljs-number">7</span></span>, <span class="hljs-string"><span class="hljs-string">'value'</span></span>)) <span class="hljs-keyword"><span class="hljs-keyword">if</span></span> (currentSetPoint &gt; <span class="hljs-number"><span class="hljs-number">5</span></span>) <span class="hljs-keyword"><span class="hljs-keyword">then</span></span> setPoint = currentSetPoint - <span class="hljs-number"><span class="hljs-number">1</span></span> <span class="hljs-keyword"><span class="hljs-keyword">else</span></span> setPoint = <span class="hljs-number"><span class="hljs-number">5</span></span> <span class="hljs-keyword"><span class="hljs-keyword">end</span></span> fibaro:call(<span class="hljs-number"><span class="hljs-number">7</span></span>, <span class="hljs-string"><span class="hljs-string">'setThermostatSetpoint'</span></span>,<span class="hljs-number"><span class="hljs-number">11</span></span>, setPoint)</code> </pre> <br>  In general, everything. <br><br>  It works fine, the only problem is the delay after pressing the button.  If managed from a local network, it is 1-2 seconds, but if managed remotely, the delay can be up to 10 seconds.  Those.  if necessary, add or lower the temperature by a dozen degrees remotely, it may take a couple of minutes. <br><br>  In general, this is of course a crutch, but so far there is no other way out.  In other matters, running into before I say, the whole system will eventually come under the control of Iridium Mobile, so this is a temporary solution. </div><p>Source: <a href="https://habr.com/ru/post/436344/">https://habr.com/ru/post/436344/</a></p>
+<section class="navigation-panel">
+<h4>More articles:</h4>
+<nav class="list-of-articles-container js-list-of-articles-container">Waiting for the list from <a href="../../index.html">here</a>...</nav>
+</section>
+<script src="../../js/main.js"></script>
+
+<!-- Yandex.Metrika counter -->
+<script type="text/javascript" >
+  (function (d, w, c) {
+      (w[c] = w[c] || []).push(function() {
+          try {
+              w.yaCounter52319614 = new Ya.Metrika({
+                  id:52319614,
+                  clickmap:true,
+                  trackLinks:true,
+                  accurateTrackBounce:true,
+                  webvisor:true
+              });
+          } catch(e) { }
+      });
+
+      var n = d.getElementsByTagName("script")[0],
+          s = d.createElement("script"),
+          f = function () { n.parentNode.insertBefore(s, n); };
+      s.type = "text/javascript";
+      s.async = true;
+      s.src = "https://mc.yandex.ru/metrika/watch.js";
+
+      if (w.opera == "[object Opera]") {
+          d.addEventListener("DOMContentLoaded", f, false);
+      } else { f(); }
+  })(document, window, "yandex_metrika_callbacks");
+</script>
+<noscript><div><img src="https://mc.yandex.ru/watch/52319614" style="position:absolute; left:-9999px;" alt="" /></div></noscript>
+
+<!-- Google Analytics -->
+  <script>
+    window.ga = function () { ga.q.push(arguments) }; ga.q = []; ga.l = +new Date;
+    ga('create', 'UA-134228602-1', 'auto'); ga('send', 'pageview')
+  </script>
+  <script src="https://www.google-analytics.com/analytics.js" async defer></script>
+
+</section>
+</body>
+
+</html>

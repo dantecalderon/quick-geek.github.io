@@ -1,0 +1,1 @@
+Neural network speech synthesis using the Tacotron 2 architecture, or “Get alignment or die tryin '”

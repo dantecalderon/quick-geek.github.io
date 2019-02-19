@@ -1,0 +1,92 @@
+<!doctype html>
+<html class="no-js" lang="en">
+
+<head>
+  <!-- Global site tag (gtag.js) - Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=UA-134228602-1"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'UA-134228602-1');
+  </script>
+
+  <meta charset="utf-8">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  <title>Hacking Amazon Echo and Google Home to protect privacy</title>
+  <meta name="description" content="Security experts are skeptical about the concepts of “smart home” and “Internet of things”. Manufacturers strive to collect more data about users, whi...">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+  <link rel="stylesheet" href="../../css/main.css">
+
+  <script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+  <script>
+    (adsbygoogle = window.adsbygoogle || []).push({
+      google_ad_client: "ca-pub-6974184241884155",
+      enable_page_level_ads: true
+    });
+  </script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+  <script>window.jQuery || document.write('<script src="../../js/vendors/jquery-3.3.1.min.js"><\/script>')</script>
+</head>
+
+<body>
+  <!--[if lte IE 9]>
+    <p class="browserupgrade">You are using an <strong>outdated</strong> browser. Please <a href="https://browsehappy.com/">upgrade your browser</a> to improve your experience and security.</p>
+  <![endif]-->
+  <nav class="page-headings-container js-page-headings-container"></nav>
+  <div class="tools-bar js-tools-bar">
+    <!-- <a href="https://quick-geek.github.io/search.html" title="Search">🔎</a> -->
+    <a class="js-list-of-headings-button" data-state="closed" href="#" title="Headings">📜</a>
+    <a class="js-go-to-top-button" href="#" title="Go to Top">⬆️</a>
+    <a class="js-go-to-bottom-button" href="#" title="Go to Bottom">⬇️</a>
+  </div>
+  <section class="page js-page"><h1>Hacking Amazon Echo and Google Home to protect privacy</h1><div class="post__text post__text-html js-mediator-article"><img src="https://habrastorage.org/webt/zg/nm/2t/zgnm2tb6npcnxhul4x4rh8dby98.jpeg"><br><br>  Security experts are skeptical about the concepts of “smart home” and “Internet of things”.  Manufacturers strive to collect more data about users, which is fraught with leaks.  Amazon recently sent <a href="https://habr.com/ru/post/434062/">1700 conversations from a</a> single user with Alexa's home assistant to the wrong address. <br><br>  This is an isolated case, but Amazon <a href="https://www.cnbc.com/2018/11/19/how-to-delete-amazon-alexa-conversations.html">keeps audio recordings</a> on its servers, <a href="https://www.wired.com/story/amazon-echo-and-google-home-voice-data-delete/">like Google</a> .  A home assistant like Amazon Echo and Google Home is a full-fledged bug that the user himself installs in the house, voluntarily agreeing to wiretapping.  So far, there is no evidence that such devices record without uttering a trigger word, but technically nothing prevents them from doing so. <br><br>  Project Alias ​​is designed to change things and bring back control to people. <br><a name="habracut"></a><br>  <a href="http://bjoernkarmann.dk/project_alias">Project Alias</a> is the technological equivalent of a parasitic fungus that lives on a foreign body.  And this is a very useful "parasite", because it acts as a protector for its true owner, that is, man.  Alias ​​blocks the transfer of information to Amazon and Google corporations, <a href="">drowning out the host microphones</a> . <br><br><img src="https://habrastorage.org/webt/ep/v8/nq/epv8nqk6riasf_06xstcihoidda.png"><br><br>  Assembly instructions are <a href="https://www.instructables.com/id/Project-Alias/">published on the Instructables website</a> , and the program code <a href="https://github.com/bjoernkarmann/project_alias">is posted on Github</a> . <br><br>  To install will need: <br><br><ul><li>  a single-board computer with the Raspbian operating system, Raspberry Pi A + is sufficient; </li><li>  <a href="http://wiki.seeedstudio.com/ReSpeaker_2_Mics_Pi_HAT/">ReSpeaker 2-Mics Pi HAT</a> plug <a href="http://wiki.seeedstudio.com/ReSpeaker_2_Mics_Pi_HAT/">-in</a> with microphones; </li><li>  <a href="http://www.visaton.de/en/products/miniature-speakers/k-16-50-ohm">Tiny Speaker 16mm</a> speakers; </li><li>  Micro SD card, audio cable, wires and four screws; </li><li>  access to a 3D printer for printing the cover and holder. </li></ul><br><img src="https://habrastorage.org/webt/al/is/e2/alise2zjqpu5pnjlkbywumyrdbi.jpeg"><br><br>  The network has published 3D models of covers for Google Home ( <a href="">stl</a> ) and Amazon Echo ( <a href="">stl</a> ), as well as a 3D model of the speaker holder ( <a href="">stl</a> ). <br><br>  The next step is to build Alias.  It includes connecting speakers to the ReSpeaker module and connecting the 5V power supply to the Raspberry Pi (solder directly on the GPIO). <br><br><img src="https://habrastorage.org/webt/_n/pb/rh/_npbrhjwkofgctscykpg7dqokcq.jpeg"><br><br><img src="https://habrastorage.org/webt/qz/gp/bh/qzgpbh_oavosykccuelcoz9qwkw.jpeg"><br><br>  After assembly, the software begins: <br><br><ol><li>  Download the latest version of Raspbian on micro SD. <br><br>  Copy files <b>ssh</b> and <b>wpa_supplicant.conf</b> from the <a href="https://github.com/bjoernkarmann/project_alias/blob/master/setup">project folder</a> , edit the latter in accordance with their WiFi settings. <br><br></li><li>  Install sound driver for ReSpeaker. <br><br><pre><code class="bash hljs"><span class="hljs-built_in"><span class="hljs-built_in">cd</span></span> &amp;&amp; git <span class="hljs-built_in"><span class="hljs-built_in">clone</span></span> https://github.com/respeaker/seeed-voicecard.git <span class="hljs-built_in"><span class="hljs-built_in">cd</span></span> seeed-voicecard &amp;&amp; sudo ./install.sh</code> </pre> <br></li><li>  Install Tensorflow and Keras. <br><br><pre> <code class="bash hljs">sudo apt-get install python3-dev python3-pip git libatlas-base-dev sudo pip3 install tensorflow keras</code> </pre> <br></li><li>  Install the remaining required modules. <br><br><pre> <code class="bash hljs">sudo apt-get install python3-numpy python3-spidev python-h5py sudo apt-get install python3-pyaudio libsdl-ttf2.0-0 python3-pygame sudo pip3 install flask flask_socketio python_speech_features</code> </pre> <br></li><li>  Clone the Alias ​​project. <br><br><pre> <code class="bash hljs">git <span class="hljs-built_in"><span class="hljs-built_in">clone</span></span> https://github.com/bjoernkarmann/project_alias.git</code> </pre> <br></li><li>  Install the boot script and reload the Raspberry Pi. </li></ol><br>  Then you need to train Alias ​​to recognize your name, it can be arbitrary (any sound is less than 2 s).  The developers write that it is enough 4–6 times to write the name on the phone and press the <i>Train Alias</i> button. <br><br><img src="https://habrastorage.org/webt/ca/p6/k0/cap6k0dmjrrdqqsg_upsx_hiruu.jpeg"><br><br>  If desired, then the name can be changed. <br><br>  And it's all.  In the future, Raspberry Pi performs speech recognition itself, and the voice assistant no longer responds to the standard name (for example, Alex) and does not send any data to the Google / Amazon cloud. <br><br><img src="https://habrastorage.org/webt/dr/sy/qf/drsyqfxwtclbss39lge0sjg-tvk.gif"><br><br>  The authors of the project are Danish developers <a href="http://bjoernkarmann.dk/">Bjorn Karmann</a> and <a href="http://www.toreknudsen.dk/">Tore Knudsen</a> . <br><br>  Manufacturers of such gadgets consider the buyer simply a <i>user of the</i> product, and not the true owner.  Perhaps they will try, through lawyers, to ban the modification of gadgets, considering them to be their intellectual property.  But according to the laws of many countries, the purchased product becomes the full <i>property of the</i> buyer, and he has the right to do anything with it. <br><br>  Looking at this project, the question arises: why bother buying Amazon Echo and Google Home at all if speech recognition is performed on Raspberry Pi with Tensorflow and Keras?  Is that as a stand ... <br><br><hr><br>  Join today for many developers and innovators in the field of the Internet of Things <a href="https://clck.ru/EpkzA">Manage various PKI-based IoT devices with GlobalSign solutions.</a> <br><img src="https://habrastorage.org/webt/kg/bl/f7/kgblf7ozm3d6_4juwotichyy9lu.png"></div><p>Source: <a href="https://habr.com/ru/post/436284/">https://habr.com/ru/post/436284/</a></p>
+<section class="navigation-panel">
+<h4>More articles:</h4>
+<nav class="list-of-articles-container js-list-of-articles-container">Waiting for the list from <a href="../../index.html">here</a>...</nav>
+</section>
+<script src="../../js/main.js"></script>
+
+<!-- Yandex.Metrika counter -->
+<script type="text/javascript" >
+  (function (d, w, c) {
+      (w[c] = w[c] || []).push(function() {
+          try {
+              w.yaCounter52319614 = new Ya.Metrika({
+                  id:52319614,
+                  clickmap:true,
+                  trackLinks:true,
+                  accurateTrackBounce:true,
+                  webvisor:true
+              });
+          } catch(e) { }
+      });
+
+      var n = d.getElementsByTagName("script")[0],
+          s = d.createElement("script"),
+          f = function () { n.parentNode.insertBefore(s, n); };
+      s.type = "text/javascript";
+      s.async = true;
+      s.src = "https://mc.yandex.ru/metrika/watch.js";
+
+      if (w.opera == "[object Opera]") {
+          d.addEventListener("DOMContentLoaded", f, false);
+      } else { f(); }
+  })(document, window, "yandex_metrika_callbacks");
+</script>
+<noscript><div><img src="https://mc.yandex.ru/watch/52319614" style="position:absolute; left:-9999px;" alt="" /></div></noscript>
+
+<!-- Google Analytics -->
+  <script>
+    window.ga = function () { ga.q.push(arguments) }; ga.q = []; ga.l = +new Date;
+    ga('create', 'UA-134228602-1', 'auto'); ga('send', 'pageview')
+  </script>
+  <script src="https://www.google-analytics.com/analytics.js" async defer></script>
+
+</section>
+</body>
+
+</html>

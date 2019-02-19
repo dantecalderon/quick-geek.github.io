@@ -1,0 +1,99 @@
+<!doctype html>
+<html class="no-js" lang="en">
+
+<head>
+  <!-- Global site tag (gtag.js) - Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=UA-134228602-1"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'UA-134228602-1');
+  </script>
+
+  <meta charset="utf-8">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  <title>Compilation @pythonetc, December 2018</title>
+  <meta name="description" content="This is the seventh collection of tips on Python and programming from my author’s @pythonetc channel. 
+
+ Previous selections: 
+
+
+
+- November 2018 
+- O...">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+  <link rel="stylesheet" href="../../css/main.css">
+
+  <script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+  <script>
+    (adsbygoogle = window.adsbygoogle || []).push({
+      google_ad_client: "ca-pub-6974184241884155",
+      enable_page_level_ads: true
+    });
+  </script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+  <script>window.jQuery || document.write('<script src="../../js/vendors/jquery-3.3.1.min.js"><\/script>')</script>
+</head>
+
+<body>
+  <!--[if lte IE 9]>
+    <p class="browserupgrade">You are using an <strong>outdated</strong> browser. Please <a href="https://browsehappy.com/">upgrade your browser</a> to improve your experience and security.</p>
+  <![endif]-->
+  <nav class="page-headings-container js-page-headings-container"></nav>
+  <div class="tools-bar js-tools-bar">
+    <!-- <a href="https://quick-geek.github.io/search.html" title="Search">🔎</a> -->
+    <a class="js-list-of-headings-button" data-state="closed" href="#" title="Headings">📜</a>
+    <a class="js-go-to-top-button" href="#" title="Go to Top">⬆️</a>
+    <a class="js-go-to-bottom-button" href="#" title="Go to Bottom">⬇️</a>
+  </div>
+  <section class="page js-page"><h1>Compilation @pythonetc, December 2018</h1><div class="post__text post__text-html js-mediator-article"><img src="https://habrastorage.org/webt/ym/yr/ke/ymyrkeb-wvhtziekuyiqlmijpak.png"><br><br>  This is the seventh collection of tips on Python and programming from my author’s @pythonetc channel. <br><br>  Previous selections: <br><br><ul><li>  <a href="https://habr.com/ru/company/mailru/blog/432628/">November 2018</a> <br></li><li>  <a href="https://habr.com/company/mailru/blog/429186/">October 2018</a> <br></li><li>  <a href="https://habr.com/company/mailru/blog/425125/">September 2018</a> <br></li><li>  <a href="https://habr.com/company/mailru/blog/422789/">August 2018</a> <br></li><li>  <a href="https://habr.com/company/mailru/blog/419025/">July 2018</a> <br></li><li>  <a href="https://habr.com/company/mailru/blog/416605/">June 2018</a> <br></li></ul><a name="habracut"></a><br><h2>  Multiple contexts </h2><br>  Sometimes you need to run some block of code in several context managers: <br><br><pre><code class="python hljs"><span class="hljs-keyword"><span class="hljs-keyword">with</span></span> open(<span class="hljs-string"><span class="hljs-string">'f'</span></span>) <span class="hljs-keyword"><span class="hljs-keyword">as</span></span> f: <span class="hljs-keyword"><span class="hljs-keyword">with</span></span> open(<span class="hljs-string"><span class="hljs-string">'g'</span></span>) <span class="hljs-keyword"><span class="hljs-keyword">as</span></span> g: <span class="hljs-keyword"><span class="hljs-keyword">with</span></span> open(<span class="hljs-string"><span class="hljs-string">'h'</span></span>) <span class="hljs-keyword"><span class="hljs-keyword">as</span></span> h: <span class="hljs-keyword"><span class="hljs-keyword">pass</span></span></code> </pre> <br>  Since the days of Python 2.7 and 3.1, this can be done with a single expression: <br><br><pre> <code class="python hljs">o = open <span class="hljs-keyword"><span class="hljs-keyword">with</span></span> o(<span class="hljs-string"><span class="hljs-string">'f'</span></span>) <span class="hljs-keyword"><span class="hljs-keyword">as</span></span> f, o(<span class="hljs-string"><span class="hljs-string">'g'</span></span>) <span class="hljs-keyword"><span class="hljs-keyword">as</span></span> g, o(<span class="hljs-string"><span class="hljs-string">'h'</span></span>) <span class="hljs-keyword"><span class="hljs-keyword">as</span></span> h: <span class="hljs-keyword"><span class="hljs-keyword">pass</span></span></code> </pre> <br>  And earlier you could use the <code>contextlib.nested</code> function: <br><br><pre> <code class="python hljs"><span class="hljs-keyword"><span class="hljs-keyword">with</span></span> nested(o(<span class="hljs-string"><span class="hljs-string">'f'</span></span>), o(<span class="hljs-string"><span class="hljs-string">'g'</span></span>), o(<span class="hljs-string"><span class="hljs-string">'h'</span></span>)) <span class="hljs-keyword"><span class="hljs-keyword">as</span></span> (f, g, h): <span class="hljs-keyword"><span class="hljs-keyword">pass</span></span></code> </pre> <br>  If you are working with an unspecified number of context managers, it is better to choose more advanced tools.  <code>contextlib.ExitStack</code> allows you to enter any number of contexts at any time and guarantees to exit from them at the end of execution: <br><br><pre> <code class="python hljs"><span class="hljs-keyword"><span class="hljs-keyword">with</span></span> ExitStack() <span class="hljs-keyword"><span class="hljs-keyword">as</span></span> stack: f = stack.enter_context(o(<span class="hljs-string"><span class="hljs-string">'f'</span></span>)) g = stack.enter_context(o(<span class="hljs-string"><span class="hljs-string">'g'</span></span>)) other = [ stack.enter_context(o(filename)) <span class="hljs-keyword"><span class="hljs-keyword">for</span></span> filename <span class="hljs-keyword"><span class="hljs-keyword">in</span></span> filenames ]</code> </pre><br><h2>  Objects in interpreter memory </h2><br>  All objects that are currently in the interpreter’s memory can be accessed using <code>gc.get_objects()</code> : <br><br><pre> <code class="python hljs">In : <span class="hljs-class"><span class="hljs-keyword"><span class="hljs-class"><span class="hljs-keyword">class</span></span></span><span class="hljs-class"> </span><span class="hljs-title"><span class="hljs-class"><span class="hljs-title">A</span></span></span><span class="hljs-class">:</span></span> ...: <span class="hljs-function"><span class="hljs-keyword"><span class="hljs-function"><span class="hljs-keyword">def</span></span></span><span class="hljs-function"> </span><span class="hljs-title"><span class="hljs-function"><span class="hljs-title">__init__</span></span></span><span class="hljs-params"><span class="hljs-function"><span class="hljs-params">(self, x)</span></span></span><span class="hljs-function">:</span></span> ...: self._x = x ...: ...: <span class="hljs-function"><span class="hljs-keyword"><span class="hljs-function"><span class="hljs-keyword">def</span></span></span><span class="hljs-function"> </span><span class="hljs-title"><span class="hljs-function"><span class="hljs-title">__repr__</span></span></span><span class="hljs-params"><span class="hljs-function"><span class="hljs-params">(self)</span></span></span><span class="hljs-function">:</span></span> ...: class_name = type(self).__name__ ...: x = self._x ...: <span class="hljs-keyword"><span class="hljs-keyword">return</span></span> <span class="hljs-string"><span class="hljs-string">f'</span><span class="hljs-subst"><span class="hljs-string"><span class="hljs-subst">{class_name}</span></span></span><span class="hljs-string">(</span><span class="hljs-subst"><span class="hljs-string"><span class="hljs-subst">{x!r}</span></span></span><span class="hljs-string">)'</span></span> ...: In : A(<span class="hljs-number"><span class="hljs-number">1</span></span>) Out: A(<span class="hljs-number"><span class="hljs-number">1</span></span>) In : A(<span class="hljs-number"><span class="hljs-number">2</span></span>) Out: A(<span class="hljs-number"><span class="hljs-number">2</span></span>) In : A(<span class="hljs-number"><span class="hljs-number">3</span></span>) Out: A(<span class="hljs-number"><span class="hljs-number">3</span></span>) In : [x <span class="hljs-keyword"><span class="hljs-keyword">for</span></span> x <span class="hljs-keyword"><span class="hljs-keyword">in</span></span> gc.get_objects() <span class="hljs-keyword"><span class="hljs-keyword">if</span></span> isinstance(x, A)] Out: [A(<span class="hljs-number"><span class="hljs-number">1</span></span>), A(<span class="hljs-number"><span class="hljs-number">2</span></span>), A(<span class="hljs-number"><span class="hljs-number">3</span></span>)]</code> </pre><br><h2>  Character Numbers </h2><br><pre> <code class="python hljs">In : int(<span class="hljs-string"><span class="hljs-string">'୧৬༣'</span></span>) Out: <span class="hljs-number"><span class="hljs-number">163</span></span></code> </pre> <br>  <code>0 1 2 3 4 5 6 7 8 9</code> - these are not the only characters that are considered numbers.  Python follows the rules of Unicode and counts the numbers of several hundred characters.  Full list <a href="http://www.fileformat.info/info/unicode/category/Nd/list.htm">here</a> . <br><br>  This has implications for functions like <code>int</code> , <code>unicode.isdecimal</code> and even <code>re.match</code> : <br><br><pre> <code class="python hljs">In : int(<span class="hljs-string"><span class="hljs-string">'௯'</span></span>) Out: <span class="hljs-number"><span class="hljs-number">9</span></span> In : <span class="hljs-string"><span class="hljs-string">'٢'</span></span>.isdecimal() Out: <span class="hljs-keyword"><span class="hljs-keyword">True</span></span> In : bool(re.match(<span class="hljs-string"><span class="hljs-string">'\d'</span></span>, <span class="hljs-string"><span class="hljs-string">'౫'</span></span>)) Out: <span class="hljs-keyword"><span class="hljs-keyword">True</span></span></code> </pre> <br><h2>  Midnight UTC </h2><br><pre> <code class="python hljs"><span class="hljs-meta"><span class="hljs-meta">&gt;&gt;&gt; </span></span>bool(datetime(<span class="hljs-number"><span class="hljs-number">2018</span></span>, <span class="hljs-number"><span class="hljs-number">1</span></span>, <span class="hljs-number"><span class="hljs-number">1</span></span>).time()) <span class="hljs-keyword"><span class="hljs-keyword">False</span></span> &gt;&gt;&gt; bool(datetime(<span class="hljs-number"><span class="hljs-number">2018</span></span>, <span class="hljs-number"><span class="hljs-number">1</span></span>, <span class="hljs-number"><span class="hljs-number">1</span></span>, <span class="hljs-number"><span class="hljs-number">13</span></span>, <span class="hljs-number"><span class="hljs-number">12</span></span>, <span class="hljs-number"><span class="hljs-number">11</span></span>).time()) <span class="hljs-keyword"><span class="hljs-keyword">True</span></span></code> </pre> <br>  Before Pyhon 3.5, <code>datetime.time()</code> objects were considered false if they represented midnight UTC.  This can lead to non-obvious bugs.  In the following example, <code>if not</code> may not be executed, not because <code>create_time</code> <br>  is <code>None</code> , but because it is midnight. <br><br><pre> <code class="python hljs"><span class="hljs-function"><span class="hljs-keyword"><span class="hljs-function"><span class="hljs-keyword">def</span></span></span><span class="hljs-function"> </span><span class="hljs-title"><span class="hljs-function"><span class="hljs-title">create</span></span></span><span class="hljs-params"><span class="hljs-function"><span class="hljs-params">(created_time=None)</span></span></span><span class="hljs-function"> -&gt; </span><span class="hljs-keyword"><span class="hljs-function"><span class="hljs-keyword">None</span></span></span><span class="hljs-function">:</span></span> <span class="hljs-keyword"><span class="hljs-keyword">if</span></span> <span class="hljs-keyword"><span class="hljs-keyword">not</span></span> created_time: created_time = datetime.now().time()</code> </pre> <br>  You can work around this bug by explicitly checking for <code>None</code> : <code>if created_time is None</code> . <br><br><h2>  Asynchronous work in FS </h2><br>  Python does not support asynchronous file operations.  To make them non-blocking, you have to use threads. <br><br>  For asynchronous code execution in a stream, use the <code>loop.run_in_executor</code> method. <br><br>  For you, this can be done by a third-party <code>aiofiles</code> module, which provides a convenient and simple interface: <br><br><pre> <code class="python hljs"><span class="hljs-keyword"><span class="hljs-keyword">async</span></span> <span class="hljs-keyword"><span class="hljs-keyword">with</span></span> aiofiles.open(<span class="hljs-string"><span class="hljs-string">'filename'</span></span>, mode=<span class="hljs-string"><span class="hljs-string">'r'</span></span>) <span class="hljs-keyword"><span class="hljs-keyword">as</span></span> f: contents = <span class="hljs-keyword"><span class="hljs-keyword">await</span></span> f.read()</code> </pre></div><p>Source: <a href="https://habr.com/ru/post/436322/">https://habr.com/ru/post/436322/</a></p>
+<section class="navigation-panel">
+<h4>More articles:</h4>
+<nav class="list-of-articles-container js-list-of-articles-container">Waiting for the list from <a href="../../index.html">here</a>...</nav>
+</section>
+<script src="../../js/main.js"></script>
+
+<!-- Yandex.Metrika counter -->
+<script type="text/javascript" >
+  (function (d, w, c) {
+      (w[c] = w[c] || []).push(function() {
+          try {
+              w.yaCounter52319614 = new Ya.Metrika({
+                  id:52319614,
+                  clickmap:true,
+                  trackLinks:true,
+                  accurateTrackBounce:true,
+                  webvisor:true
+              });
+          } catch(e) { }
+      });
+
+      var n = d.getElementsByTagName("script")[0],
+          s = d.createElement("script"),
+          f = function () { n.parentNode.insertBefore(s, n); };
+      s.type = "text/javascript";
+      s.async = true;
+      s.src = "https://mc.yandex.ru/metrika/watch.js";
+
+      if (w.opera == "[object Opera]") {
+          d.addEventListener("DOMContentLoaded", f, false);
+      } else { f(); }
+  })(document, window, "yandex_metrika_callbacks");
+</script>
+<noscript><div><img src="https://mc.yandex.ru/watch/52319614" style="position:absolute; left:-9999px;" alt="" /></div></noscript>
+
+<!-- Google Analytics -->
+  <script>
+    window.ga = function () { ga.q.push(arguments) }; ga.q = []; ga.l = +new Date;
+    ga('create', 'UA-134228602-1', 'auto'); ga('send', 'pageview')
+  </script>
+  <script src="https://www.google-analytics.com/analytics.js" async defer></script>
+
+</section>
+</body>
+
+</html>
