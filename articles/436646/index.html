@@ -1,0 +1,84 @@
+<!doctype html>
+<html class="no-js" lang="en">
+
+<head>
+  <!-- Global site tag (gtag.js) - Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=UA-134228602-1"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'UA-134228602-1');
+  </script>
+
+  <meta charset="utf-8">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  <title>Translucent to Android and adjustResize</title>
+  <meta name="description" content="The ability to use translucent in android appeared in KITKAT . And it looks in the right design is pretty impressive. And with the advent of fashion f...">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+  <link rel="stylesheet" href="../../css/main.css">
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+  <script>window.jQuery || document.write('<script src="../../js/vendors/jquery-3.3.1.min.js"><\/script>')</script>
+</head>
+
+<body>
+  <!--[if lte IE 9]>
+    <p class="browserupgrade">You are using an <strong>outdated</strong> browser. Please <a href="https://browsehappy.com/">upgrade your browser</a> to improve your experience and security.</p>
+  <![endif]-->
+  <nav class="page-headings-container js-page-headings-container"></nav>
+  <div class="tools-bar js-tools-bar">
+    <!-- <a href="https://quick-geek.github.io/search.html" title="Search">🔎</a> -->
+    <a class="js-list-of-headings-button" data-state="closed" href="#" title="Headings">📜</a>
+    <a class="js-go-to-top-button" href="#" title="Go to Top">⬆️</a>
+    <a class="js-go-to-bottom-button" href="#" title="Go to Bottom">⬇️</a>
+  </div>
+  <section class="page js-page"><h1>Translucent to Android and adjustResize</h1><div class="post__text post__text-html js-mediator-article"><p><img src="https://habrastorage.org/webt/_i/yv/gi/_iyvgitl-6ikln2hbjud8opzauk.jpeg"></p><br><p>  The ability to use <strong>translucent</strong> in android appeared in <strong>KITKAT</strong> .  And it looks in the right design is pretty impressive.  And with the advent of fashion for devices with “Bangs”, it seems to be just a necessary thing in any warm tube startups. </p><br><p>  Let’s imagine a situation: you’ve written down a stunningly beautiful design that scrolls under StatusBar and NavigationBar.  And here you add an input field and understand that <strong>adjustResize</strong> does not work for you. </p><br><p>  You can: </p><br><ol><li>  To score, - the user will close the keyboard himself to see what is under it. </li><li>  Abandon <strong>translucent</strong> , style is not yours, everything will be old, reliable, like everyone else. </li><li>  As soon as the user starts scrolling, hide the keyboard.  You are well done!  All right, skype even under ios does it!  And there is no transparency. </li><li>  Put all input fields on separate screens.  As a bonus - every extra transition to the screen, minus convenience and conversion. </li><li>  Cut down your <strong>adjustResize</strong> . <a name="habracut"></a></li></ol><br><h2>  All translucent complexity </h2><br><p>  There are several difficulties with <strong>translucent</strong> implementation: </p><br><ol><li>  It is necessary to take into account the design for devices less <strong>KITKAT</strong> (I think that in 2019, this is almost irrelevant, especially for new projects).  Perhaps, for devices less than <strong>LOLLIPOP</strong> can a game of candle is not worth it?  You can’t get transparent NavigationBar and “Man” on such devices either. </li><li>  If you are thinking about <strong>translucent</strong> , then you most likely want something more complicated than a static background, something scrolling under the StatusBar and NavigationBar, something that <strong>can</strong> not be done with <strong>fitsSystemWindows</strong> , which means that the height of the StatusBar and NavigationBar will have to be dynamically substituted. </li><li>  And finally, the main thing: <strong>adjustResize</strong> works only without <strong>translucent</strong> or for those View which <strong>fitsSystemWindows</strong> . </li></ol><br><h2>  What it is about and how it should work </h2><br><p><img src="https://habrastorage.org/webt/9m/gb/u6/9mgbu6guzo5tinnr2vof4jen2cy.gif"></p><br><h2>  Solution to the problem </h2><br><p>  It seems to be a simple solution: <strong>adjustResize</strong> does not work, it means that you have to respond to the opening of the claviarot yourself.  But the trouble android does not provide not only the height of the keyboard (and it may be different even for different EditText fields), but even the fact of its opening or closing.  There is no official way.  How so google? </p><br><p>  Of course there is a solution!  And when you have information about the current height of the keyboard, you can do with it what you want: add <strong>padding</strong> or <strong>margin to the</strong> bottom for those View, which should respond to the keyboard and now custom <strong>adjustResize is</strong> ready. </p><br><h2>  Code </h2><br><p>  To understand that the keyboard has been opened, use <strong>OnGlobalLayoutListener</strong> .  Embed pieces of code in the post does not see the point.  Why write 100 lines about what is expressed in code over 50? <br>  The solution to the problem is presented in the <a href="https://bitbucket.org/trimf/android-translucent-theme-and-adjustresize">repository</a> . </p><br><p>  <strong>Take a</strong> closer look at <strong>KeyboardHeightProvider</strong> and <strong>BaseTranslucentActivity</strong> . </p><br><p>  The project is as simple as possible, understandable, there is nothing superfluous in it that is not related to the problem. <br>  There is an example for a simple TextView, RecyclerView and ScrollView.  The same technique was tested and works fine for NestedScrollView, NestedFragments, CoordinatorLayout, ViewPager, etc. </p><br><p>  Ps: <a href="https://developer.android.com/reference/android/view/WindowInsets">https://developer.android.com/reference/android/view/WindowInsets</a> solves the problem with the keyboard as well. </p></div><p>Source: <a href="https://habr.com/ru/post/436646/">https://habr.com/ru/post/436646/</a></p>
+<section class="navigation-panel">
+<h4>More articles:</h4>
+<nav class="list-of-articles-container js-list-of-articles-container">Waiting for the list from <a href="../../index.html">here</a>...</nav>
+</section>
+<script src="../../js/main.js"></script>
+
+<!-- Yandex.Metrika counter -->
+<script type="text/javascript" >
+  (function (d, w, c) {
+      (w[c] = w[c] || []).push(function() {
+          try {
+              w.yaCounter52319614 = new Ya.Metrika({
+                  id:52319614,
+                  clickmap:true,
+                  trackLinks:true,
+                  accurateTrackBounce:true,
+                  webvisor:true
+              });
+          } catch(e) { }
+      });
+
+      var n = d.getElementsByTagName("script")[0],
+          s = d.createElement("script"),
+          f = function () { n.parentNode.insertBefore(s, n); };
+      s.type = "text/javascript";
+      s.async = true;
+      s.src = "https://mc.yandex.ru/metrika/watch.js";
+
+      if (w.opera == "[object Opera]") {
+          d.addEventListener("DOMContentLoaded", f, false);
+      } else { f(); }
+  })(document, window, "yandex_metrika_callbacks");
+</script>
+<noscript><div><img src="https://mc.yandex.ru/watch/52319614" style="position:absolute; left:-9999px;" alt="" /></div></noscript>
+
+<!-- Google Analytics -->
+  <script>
+    window.ga = function () { ga.q.push(arguments) }; ga.q = []; ga.l = +new Date;
+    ga('create', 'UA-134228602-1', 'auto'); ga('send', 'pageview')
+  </script>
+  <script src="https://www.google-analytics.com/analytics.js" async defer></script>
+
+</section>
+</body>
+
+</html>

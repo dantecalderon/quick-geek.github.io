@@ -1,0 +1,1 @@
+Translucent to Android and adjustResize

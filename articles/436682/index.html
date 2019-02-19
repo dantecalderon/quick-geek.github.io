@@ -1,0 +1,84 @@
+<!doctype html>
+<html class="no-js" lang="en">
+
+<head>
+  <!-- Global site tag (gtag.js) - Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=UA-134228602-1"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'UA-134228602-1');
+  </script>
+
+  <meta charset="utf-8">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  <title>Do not create your own PS (DSL) to extend the functionality of the application.</title>
+  <meta name="description" content="When you want to give the user the opportunity to write plugins for your application, you get up before choosing how to provide an API. Under the cut,...">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+  <link rel="stylesheet" href="../../css/main.css">
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+  <script>window.jQuery || document.write('<script src="../../js/vendors/jquery-3.3.1.min.js"><\/script>')</script>
+</head>
+
+<body>
+  <!--[if lte IE 9]>
+    <p class="browserupgrade">You are using an <strong>outdated</strong> browser. Please <a href="https://browsehappy.com/">upgrade your browser</a> to improve your experience and security.</p>
+  <![endif]-->
+  <nav class="page-headings-container js-page-headings-container"></nav>
+  <div class="tools-bar js-tools-bar">
+    <!-- <a href="https://quick-geek.github.io/search.html" title="Search">🔎</a> -->
+    <a class="js-list-of-headings-button" data-state="closed" href="#" title="Headings">📜</a>
+    <a class="js-go-to-top-button" href="#" title="Go to Top">⬆️</a>
+    <a class="js-go-to-bottom-button" href="#" title="Go to Bottom">⬇️</a>
+  </div>
+  <section class="page js-page"><h1>Do not create your own PS (DSL) to extend the functionality of the application.</h1><div class="post__text post__text-html js-mediator-article"><p>  When you want to give the user the opportunity to write plugins for your application, you get up before choosing how to provide an API.  Under the cut, I'll show you why the worst solution for this would be to invent your own programming language and parse the source code, as well as furniture. </p><br><p><img src="https://habrastorage.org/webt/mm/z3/fl/mmz3flzbwecfpjejtazzand6dfs.png" alt="CPDV"></p><a name="habracut"></a><br><h2 id="yap--eto-ne-osnovnaya-funkciya-prilozheniya">  The app is not the main function of the application. </h2><br><p>  Imagine that we opened the production of modular furniture.  There are some basic elements: tabletops, coasters, bedside tables, etc.  There is a production line related to the processing of wood: machines, saws, varnishes, all with the latest technology.  But all this must somehow be stapled.  We know that there are 100,500 companies that specialize in the production of hardware and bolts, there are some standards for furniture fasteners that were invented by a community of professionals to make their customers easier.  How far-sighted a solution would be to deploy an additional line for the production of our own bolts, nuts and corners? </p><br><p>  What can we win? </p><br><ul><li>  We can thus <abbr title="If in your Steinway piano at least one detail is not from Steinway - this is not Steinway">brand our product</abbr> so that the hamster would feel its own "or it’s", and carry more money. </li><li>  Maybe this will allow us not to pay copyright for one of the bolts, or to solve the problem of logistics. </li><li>  We can enter a new market for bolts and nuts by setting our standard, which is <abbr title="So where are the TRS (Jack) 2.5mm now?">faster, better and higher.</abbr> </li></ul><br><p>  But let's keep it clean. </p><br><ul><li>  "Ilitarity" is the work of salespeople.  Salesman will do or will not make the brand Elite both with the new production line and without it. </li><li>  Copyright, as a rule (not always, of course), is cheaper than developing from scratch.  And solving the problem of delivering a single item by deploying a new production line, you are only aggravating it. </li><li>  If we want to try for ourselves a new field of activity - no need to associate it with what we are already a pro.  It may seem that it is easier to push the bolts with furniture, but if the bolts do not take off, they will carry the furniture with them.  At least, that which already stands at clients. </li></ul><br><p>  Returning to our sheep: if you make an ecosystem for extensions of your application, then you have an <strong>application</strong> .  It does something good, something that you are good at. </p><br><h2 id="ksp--kontakt-script-processor-ili-liniya-proizvodstva-boltov-v-mire-digital-audio">  KSP - Kontakt Script Processor, or the bolt production line in the digital audio world </h2><br><p><img src="https://habrastorage.org/webt/e1/ky/8h/e1ky8heowpw6mhn41blmegpt6os.png" alt="Kontakt"></p><br><p>  I will tell one story about such a language: </p><br><p>  <strong>Kontakt</strong> is a ompomler from the Austrian company <strong>Native Instruments</strong> .  Currently, it is very difficult to find a project using virtual tools, in which it is not used.  Over the past 10 years, Kontakt has taken most of the sampled instrument market.  The secret is simple: in due time, Kontakt proposed two innovations that turned the approach to the development of sampled virtual tools. </p><br><p>  The first innovation was directly related to its main function: it was very careful with the memory (and the samples in wav are the one that still eat, both HDD and RAM).  <strong>NI</strong> made a <em>lossless</em> compression format with fast decoding and wrote a revolutionary audio buffering system for its time. </p><br><h3 id="vtoroy-innovaciey-stal-ksp">  The second innovation was KSP </h3><br><p>  Before contact, there were two ways to functionally organize recorded samples into a MIDI-controlled instrument: </p><br><ul><li>  Write your own engine from scratch in C ++, or another language that can use the VST SDK from Steinberg (and there are other plug-in formats, let's say AAX). </li><li>  Use a ready-made sampler made for musicians who are not familiar with programming, but have sounds that need to be organized into some kind of system.  Let's say <strong>Giga Studio</strong> .  But such romplers, as a rule, were either closed, or in order to finish to fit their needs, they required no less staff than bare development under the VST SDK. </li></ul><br><p>  The contact pleased both those and those: for quick prototyping there is a convenient GUI, understandable to any musician who read the manual, and for further refinement there is a <strong>programming language</strong> with conditions, functions (from version 4) and the standard library representing the API to the most part of the functionality implemented through the GUI, as well as to the parameters for playing back samples directly.  Among other things, since version 2, it has become possible to customize the interface with all sorts of whistles and perdeals, which allowed us to show our uniqueness on an almost unlimited scale.  And the developers code is hidden from the eyes twice: obfuscation and protection against changing <abbr title="Yes, it does not work in the version">tools</abbr> . </p><br><p>  Given the increasing popularity of the engine, as well as the impressive period of active development of the rompler, today Kontakt is something like a Kalashnikov in the Digital Audio world.  It is easy to learn, reliable as a tank, has the ability to dove it in reasonable limits for a loved one, and holds a huge market of satisfied users. </p><br><h3 id="ne-vse-tak-raduzhno">  Not so rosy </h3><br><p>  The inevitable happened: innovation in the form of KSP has become a scourge.  Trying to make the syntax available for dummies, which are musicians, instead of solving the API implementation on human PL, Nativ wrote their own interpreter of their own language, whose architecture did not initially imply such a violent flight of fantasy tool developers that we are seeing now.  Already by version 3, the Nativs had lost hope of keeping up with the appetites of users, and they simply began to rivet the new functions of the standard library, allowing users to deal with the code development environment on their own. </p><br><p> Moreover, even then <strong>Nils Lieberg KScriptEditor appeared</strong> , forked with <strong>Scintilla</strong> , which for a long time served as the main IDE for KSP.  It is ridiculous to say, but when the Nativs realized that the contact could not cope with the size of the source being fed, they introduced functions into the language without even bothering to pass arguments to them.  And a month later, taskfunc appeared in <code>taskfunc</code> , passing arguments to functions that take no arguments. </p><br><p>  After a while, Nils realized that he was attacking the Nativs rake: it makes no sense to develop his own IDE.  He moved the compiler and the implemented IDE functionality to SublimeText2, and waved the handle.  At the moment, the reins of government of SublimeKSP are the developer, it seems, of <abbr title="company developing tools for Kontakt">Fluffy Audio</abbr> . </p><br><p><img src="https://habrastorage.org/webt/6j/fg/yx/6jfgyxlkmajwlnkdxnibbd-f8zg.png" alt="For the third time on the same rake"></p><br><h3 id="nu-vy-ponyali">  Well, you understand) </h3><br><p>  And again, the code generator, which is a language with an import system, a parser, a compiler, a syntax different from KSP, but still supporting backward compatibility with it, for an unknown reason, turns out to be a terrible mountain of crutches that cannot be thrown away. due to the backward compatibility of projects of library developers who have been developing their KSP engines for years. </p><br><p>  Suppose the import system works globally with respect to the file from which the compilation starts, so in order to compile one module that is in a subfolder, you need to completely change its import paths according to its position in the project structure.  And the guy who supports him would be happy to change it, but then he will break the projects of the same <abbr title="another company developing tools for Kontakt">Spitfire Audio</abbr> for a long time.  And this fact alone complicates the modular (we will keep silent about the unit) testing to hell. </p><br><p>  It would seem that the solution to the problem is to use symlinks, but something somewhere there does not work as expected, and symlinks work only partially.  This kind of problem is not one thing.  Among other things, after Nils, the development was not carried out by modifying the compiler itself, which already received the parsing code.  And, again, for reasons of backward compatibility, adding plug-in plug-ins of extended syntax, each of which receives the source code that was originally cut into strings, parses them independently, and performs modifications. </p><br><p>  Considering that most of the preprocessor logic rests on macros and inline functions that expand the code into a huge canvas, which holds 80% of always true or always false conditions (by substituting constants at the input of the condition), which are minimized back at the stage parsing AST, the compile time of the "correct" source is comparable to C projects, this is in an interpreted language for teapots. </p><br><p>  To say that for KSP developers has become a pain - to say nothing. </p><br><h3 id="ne-kontaktom-edinym">  Not a single contact. </h3><br><p>  I cannot give examples from other areas, but from the DigitalAudio realm: </p><br><ul><li>  <strong>Lemur</strong> is an application for shovels with a desktop editor, which allows you to quickly make beautiful interfaces for communicating shovels using the <abbr title="Open Sound Control is a protocol for controlling devices and programs, which came to replace MIDI in the field of automation of audio parameters: for example, volume knobs and pan.">OSC</abbr> protocol.  It has its own programming language, which can be used in special <em>script</em> objects scattered throughout the project tree.  There is no way to make a compiler for it like what is done for KSP. </li><li>  <strong>Reaper</strong> - <abbr title="Digital Workstation. The main tool of sound engineers and arrangers">DAW</abbr> with a developed ecosystem for developing extensions.  As a result, wherever possible, I duplicated my <abbr title="shortened version of JavaScript (apparently, for quick parsing)"><em>JSFX (ReaScript) JP</em></abbr> as an API for C ++, lua, and Python. </li><li>  <strong>HISE</strong> is a young harvester for writing and assembling <abbr title="Universal plugin format for DAW, developed by Steinberg">VST \ VSTi</abbr> , which will sooner or later kill Kontakt from the Swedish developer <em>Christoph Haart</em> .  Inside the editor itself, it allows you to write on modified JavaScript, which is parsed and compiled into a binary already by C ++ objects.  The idea with its own parser for introducing additional entities (for example, register variables, if I translated correctly) worked until users transferred their code from HISE to their favorite IDE with syntax highlighting, static analysis and formatting tools using <em>JsPrettier</em> .  Now Christophe has sketched a couple of header files for compiling static libraries in C ++, which can then be used as modules in the editor.  In parallel, he continues to complement HISEScript (because it is no longer possible to call it JavaScript) with new functions, but we know that ... </li></ul><br><h1 id="vyvod">  Conclusion </h1><br><p>  Write your own application, devoting yourself to its main functionality, do not waste time on the parser, semantics and syntax.  This is interesting until you start, but with a high probability will lead to a dead end.  A programming language cannot be a part of an application: it is a kind of a separate production line that requires a lot of time for servicing, modifying and supporting the community.  In turn, if you hope that you lower the threshold of entry for dummies - drop this thing.  This teapot, as a rule, is afraid of typing anything at all, and will not bother yourself with your simple syntax. </p><br><p>  While novice plugin developers for your program, you can simply make a small <em>QuickStartGuide</em> , introducing them to the basic concepts of the chosen YP for expanding functionality and slowly feeding it your API, which is part of the ecosystem of this language. </p><br><p>  <em>PS No, writing your own parser for a ready PL is also a bad idea.</em> </p><br><p>  I will be glad to any criticism of the article, the first pancake and all the cases. </p></div><p>Source: <a href="https://habr.com/ru/post/436682/">https://habr.com/ru/post/436682/</a></p>
+<section class="navigation-panel">
+<h4>More articles:</h4>
+<nav class="list-of-articles-container js-list-of-articles-container">Waiting for the list from <a href="../../index.html">here</a>...</nav>
+</section>
+<script src="../../js/main.js"></script>
+
+<!-- Yandex.Metrika counter -->
+<script type="text/javascript" >
+  (function (d, w, c) {
+      (w[c] = w[c] || []).push(function() {
+          try {
+              w.yaCounter52319614 = new Ya.Metrika({
+                  id:52319614,
+                  clickmap:true,
+                  trackLinks:true,
+                  accurateTrackBounce:true,
+                  webvisor:true
+              });
+          } catch(e) { }
+      });
+
+      var n = d.getElementsByTagName("script")[0],
+          s = d.createElement("script"),
+          f = function () { n.parentNode.insertBefore(s, n); };
+      s.type = "text/javascript";
+      s.async = true;
+      s.src = "https://mc.yandex.ru/metrika/watch.js";
+
+      if (w.opera == "[object Opera]") {
+          d.addEventListener("DOMContentLoaded", f, false);
+      } else { f(); }
+  })(document, window, "yandex_metrika_callbacks");
+</script>
+<noscript><div><img src="https://mc.yandex.ru/watch/52319614" style="position:absolute; left:-9999px;" alt="" /></div></noscript>
+
+<!-- Google Analytics -->
+  <script>
+    window.ga = function () { ga.q.push(arguments) }; ga.q = []; ga.l = +new Date;
+    ga('create', 'UA-134228602-1', 'auto'); ga('send', 'pageview')
+  </script>
+  <script src="https://www.google-analytics.com/analytics.js" async defer></script>
+
+</section>
+</body>
+
+</html>

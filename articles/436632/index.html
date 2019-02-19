@@ -1,0 +1,85 @@
+<!doctype html>
+<html class="no-js" lang="en">
+
+<head>
+  <!-- Global site tag (gtag.js) - Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=UA-134228602-1"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'UA-134228602-1');
+  </script>
+
+  <meta charset="utf-8">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  <title>How we build a system for processing, storing and analyzing data in SIBUR</title>
+  <meta name="description" content="In early 2018, we actively began the process of digitization of production and processes in the company. In the petrochemical sector, this is not just...">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+  <link rel="stylesheet" href="../../css/main.css">
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+  <script>window.jQuery || document.write('<script src="../../js/vendors/jquery-3.3.1.min.js"><\/script>')</script>
+</head>
+
+<body>
+  <!--[if lte IE 9]>
+    <p class="browserupgrade">You are using an <strong>outdated</strong> browser. Please <a href="https://browsehappy.com/">upgrade your browser</a> to improve your experience and security.</p>
+  <![endif]-->
+  <nav class="page-headings-container js-page-headings-container"></nav>
+  <div class="tools-bar js-tools-bar">
+    <!-- <a href="https://quick-geek.github.io/search.html" title="Search">🔎</a> -->
+    <a class="js-list-of-headings-button" data-state="closed" href="#" title="Headings">📜</a>
+    <a class="js-go-to-top-button" href="#" title="Go to Top">⬆️</a>
+    <a class="js-go-to-bottom-button" href="#" title="Go to Bottom">⬇️</a>
+  </div>
+  <section class="page js-page"><h1>How we build a system for processing, storing and analyzing data in SIBUR</h1><div class="post__text post__text-html js-mediator-article">  In early 2018, we actively began the process of digitization of production and processes in the company.  In the petrochemical sector, this is not just a fashion trend, but a new evolutionary step towards increasing efficiency and competitiveness.  Taking into account the specifics of the business, which shows good economic results even without any digitalization, the “digitalisers” face a difficult task: after all, changing the established processes in the company is a rather painstaking job. <br><br>  Our digitalization began with the creation of two centers and corresponding functional blocks. <br><br>  This is the “Digital Technology Function”, which includes all product areas: process digitalization, IIoT and advanced analytics, as well as a data management center, which has become an independent direction. <br><br> <a href="https://habr.com/ru/company/sibur_official/blog/436632"><img src="https://habrastorage.org/webt/4g/jl/qx/4gjlqx_herptacpn_zj0wl1tyai.png" width="900"></a> <br><br>  And that's just the main task of the data office is to fully implement a culture of decision-making based on data (yes, yes, data-driven decision), as well as, in principle, streamline everything related to working with data: analytics, processing storage and reporting.  The peculiarity is that all our digital tools must not only actively use their own data, that is, those that generate themselves (for example, mobile bypasses, or IIoT sensors), but also external data, with a clear understanding of where and why they are needed use. <br><br>  My name is Artem Danilov, I am the head of the “Infrastructure and Technologies” department in SIBUR, in this post I will tell you how and on which we build a large data processing and storage system for the whole SIBUR.  To begin, let's talk only about high-level architecture and how you can become part of our team. <br><a name="habracut"></a><br>  Here are the directions that work in the data office includes: <br><br>  <b>1. Work with data</b> <br><br>  Here are the guys who are actively engaged in the inventory and cataloging of our data.  They understand the needs of a particular function, can determine what kind of analytics you may need, which metrics should be monitored for decision making and how data is used in a particular business area. <br><br>  <b>2. BI and data visualization</b> <br><br>  The direction is closely related to the first and allows you to visually present the result of the work of the guys from the first team. <br><br>  <b>3. Direction of data quality control</b> <br><br>  Here, data quality control tools are being introduced and the implementation of the entire methodology of such control is being carried out.  In other words, the guys from here implement software, write various checks and tests, understand how cross-checks occur between different systems, note the functions of those employees who are responsible for the quality of the data, and also establish a common methodology. <br><br>  <b>4. Management NSI</b> <br><br>  We are a big company.  We have many different kinds of reference books - both contractors, and materials, and a directory of enterprises ... In general, believe me, reference books are more than enough. <br><br>  When a company actively buys something for its business, it usually has special processes for filling in these directories.  Otherwise, chaos will reach such a level that it will be impossible to work from the word “absolutely”.  We also have such a system (MDM). <br><br>  The problem here is this.  For example, in one of the regional divisions, of which we have a lot, employees sit and enter data into the system.  Bring hands, with all the consequences of this method.  That is, they need to enter data, verify that everything has arrived in the system in the desired form, without duplicates.  However, some things, in the case of filling in some details and required fields, you have to search and google yourself.  For example, you have an INN company, and you need the rest of the information — you check through special services and an Unified Statements Incorporation. <br><br>  All this data, of course, already exists somewhere, so it would be right to just automatically pull them up. <br><br>  Previously, in the company, in principle, there was no single position, a clear team that would deal with it.  There were a lot of disparate units manually entering data.  But it is usually difficult for such structures to even formulate what exactly and where exactly in the process of working with data it is necessary to change everything so that everything is excellent.  Therefore, we are revising the format and management structure of the NSI. <br><br>  <b>5. Implementing a data warehouse (data node)</b> <br><br>  That's exactly what we started to do in this area. <br><br>  Let's immediately define the terms, or the phrases that I use may intersect with any other concepts.  Roughly speaking, data node = data lake + data warehouse.  A little further I will reveal this in more detail. <br><br><h2>  Architecture </h2><br>  First of all, we tried to estimate with which data exactly we have to work - what systems are there, what sensors.  They understood that they would be like streaming data (this is what enterprises themselves generate from all their equipment, these are IIoT, etc.) and classical systems, different CRM, ERP and the like. <br><br>  Understood that the data in current systems will not be straightforward in order to quite a lot in terms of volume, but with the introduction of digital tools and IIoT they will become very much.  And there will be very heterogeneous data from the classical accounting systems.  Therefore, they invented the architecture of such a plan. <br><br><img src="https://habrastorage.org/webt/gl/du/oi/glduoijtyvx22eji6khqkqfv36w.png" width="900"><br><br>  Further details on the blocks. <br><br><h2>  Storage </h2><br><img src="https://habrastorage.org/webt/ln/_0/-f/ln_0-f2nprbrqjd3kij_28w1omk.png" width="900"><br><br>  This is the main core of our platform.  What is used to process and store data.  The task is to load data from more than 60 different systems when they start delivering them.  That is, there is generally all the data that may be useful for making some decisions. <br><br>  Let's start with the extraction and processing of data.  For these purposes, we plan to use the NiFi ETL tool for streaming and packet data, as well as streaming processing tools: Flume for initial data reception and decoding, Kafka for buffering, Flink and Spark Streaming as the main tools for processing data streams. <br><br>  The most difficult to work with systems stack SAP.  You need to extract data from SAP using a separate ETL tool - SAP Data Services. <br><br>  As storage tools, we plan to use the Cloudera Hadoop platform (HDFS, HBASE, Hive, Impala itself), the analytical DBMS Vertica, and, for individual cases, elasticsearch. <br><br>  In principle, we use the most modern stack.  Yes, you can try to shower us with tomatoes and make fun of what we call the most modern stack, but in reality - it is. <br><br>  We are not limited to legacy development, but we cannot use the bleeding edge in an industrial solution due to the obvious enterprise orientation of our platform.  Therefore, maybe we are not dragging Horton, but confine ourselves to Clouder, wherever possible, we are definitely trying to drag a newer tool. <br><br><img src="https://habrastorage.org/webt/lf/wm/zp/lfwmzpvisjt9aqjdluibpq5erbo.png" width="900"><br><br>  For data quality control, SAS Data Quality is used, and Airflow to manage all this good.  Monitoring of the entire platform is done through the ELK stack.  For the most part, we are planning to do visualization on Tableau, some completely static reports on SAP BO. <br><br>  We already understand that some of the tasks cannot be implemented through standard BI solutions, since it requires a completely sophisticated real-time visualization with a lot of cardboard controls.  Therefore, we will write our own visualization framework that could be embedded in the developed digital products. <br><br><h2>  Pro Digital Platform </h2><br>  If you look a little wider, now we are building a single digital platform with colleagues from the function of digital technologies, whose task is to quickly develop our own applications. <br><br>  Data Lake is one of the elements of this platform. <br>  As part of this activity, we understand that we will need to implement a convenient interface for accessing analytical data.  Therefore, we plan to implement the Data API and the production object model for more convenient access to production data. <br><br><h2>  What else do we do and who do we need </h2><br>  In addition to storing and processing data, all machine learning will work on our platform, as well as the IIoT framework.  The lake will act both as a source of data for training and model work, and as power for model work.  Now an ML framework is ready that will work on top of the platform. <br><br><img src="https://habrastorage.org/webt/r2/tc/fm/r2tcfmmxq-nndk0dqy7zazdfwfs.jpeg" width="900"><br><br>  Right now the team has me, a couple of architects and 6 developers, so we are actively looking for new people (I need <a href="https://nn.hh.ru/vacancy/23295717">data architects</a> and <a href="https://nn.hh.ru/vacancy/24355762">data engineers</a> ) who will help us with the development of the platform.  There is no need to poke around at the legacy (the legacy here is only at the entrance from the systems), the stack is fresh. <br><br><iframe width="560" height="315" src="https://www.youtube.com/embed/QkZgrAs8PJg" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen=""></iframe><br><br>  That's where the subtleties will be - it's in the integrations.  Connecting the old with the new, so that it all works fine and solves the problem is a challenge.  In addition, it will be necessary to invent, work out and hang a bunch of very different metrics. <br><br>  Data collection is carried out from all major systems - 1C, SAP and a lot of everything else.  On the basis of the data collected here, all analytics, all prediction, all digital reporting will be built. <br><br>  Briefly enough, we want to make you work with data really cool.  For example, marketing and sales - they have people who collect all the statistics by hand.  That is, they sit and pump out disparate data from different formats from 5 different systems, load them from 5 different programs, then unload themselves into an Excel file for all this to be considered.  Then they bring information into a single Excel table, somehow trying to do visualization. <br><br>  In general, the time it takes the car to all this.  We want to solve similar problems with our platform.  And in the following posts we will describe in detail how we linked the elements together and set up the correct operation of the system. <br><br>  By the way, besides the <a href="https://nn.hh.ru/vacancy/23295717">architects</a> and <a href="https://nn.hh.ru/vacancy/24355762">data engineers</a> in this team, we will be happy to see: <br><br><ul><li>  <a href="https://nn.hh.ru/vacancy/28550325">BI developers</a> </li><li>  <a href="https://nn.hh.ru/vacancy/28550527">Data Quality Specialists</a> </li><li>  <a href="https://nn.hh.ru/vacancy/27910035">Backend Developers</a> </li><li>  <a href="https://nn.hh.ru/vacancy/29737672">NSI experts</a> </li><li>  <a href="https://nn.hh.ru/vacancy/29737623">Data partner</a> </li>
+</ul></div><p>Source: <a href="https://habr.com/ru/post/436632/">https://habr.com/ru/post/436632/</a></p>
+<section class="navigation-panel">
+<h4>More articles:</h4>
+<nav class="list-of-articles-container js-list-of-articles-container">Waiting for the list from <a href="../../index.html">here</a>...</nav>
+</section>
+<script src="../../js/main.js"></script>
+
+<!-- Yandex.Metrika counter -->
+<script type="text/javascript" >
+  (function (d, w, c) {
+      (w[c] = w[c] || []).push(function() {
+          try {
+              w.yaCounter52319614 = new Ya.Metrika({
+                  id:52319614,
+                  clickmap:true,
+                  trackLinks:true,
+                  accurateTrackBounce:true,
+                  webvisor:true
+              });
+          } catch(e) { }
+      });
+
+      var n = d.getElementsByTagName("script")[0],
+          s = d.createElement("script"),
+          f = function () { n.parentNode.insertBefore(s, n); };
+      s.type = "text/javascript";
+      s.async = true;
+      s.src = "https://mc.yandex.ru/metrika/watch.js";
+
+      if (w.opera == "[object Opera]") {
+          d.addEventListener("DOMContentLoaded", f, false);
+      } else { f(); }
+  })(document, window, "yandex_metrika_callbacks");
+</script>
+<noscript><div><img src="https://mc.yandex.ru/watch/52319614" style="position:absolute; left:-9999px;" alt="" /></div></noscript>
+
+<!-- Google Analytics -->
+  <script>
+    window.ga = function () { ga.q.push(arguments) }; ga.q = []; ga.l = +new Date;
+    ga('create', 'UA-134228602-1', 'auto'); ga('send', 'pageview')
+  </script>
+  <script src="https://www.google-analytics.com/analytics.js" async defer></script>
+
+</section>
+</body>
+
+</html>

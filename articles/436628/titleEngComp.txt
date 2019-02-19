@@ -1,0 +1,1 @@
+Improving Q-Learning agent trading stocks, by adding recurrence and rewards

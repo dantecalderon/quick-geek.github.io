@@ -1,0 +1,1 @@
+MPS 2018.3: generation plans, improvements in the assembly and packaging language and in the editor's language, updated interface

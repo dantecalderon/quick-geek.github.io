@@ -1,0 +1,1 @@
+pykd, synexts, dbgeng, debugger, AddSyntheticModule, AddSyntheticSymbol

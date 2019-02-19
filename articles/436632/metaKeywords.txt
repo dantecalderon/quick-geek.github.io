@@ -1,0 +1,1 @@
+DataLake, СИБУР, хранение данных, HDFS, HBASE, Hive, Impala, дата-офис, визуализация данных, MDM
