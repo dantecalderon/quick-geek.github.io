@@ -1,0 +1,1 @@
+English-language cross-platform utility for viewing Russian qualified x509 certificates

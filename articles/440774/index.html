@@ -1,0 +1,84 @@
+<!doctype html>
+<html class="no-js" lang="en">
+
+<head>
+  <!-- Global site tag (gtag.js) - Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=UA-134228602-1"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'UA-134228602-1');
+  </script>
+
+  <meta charset="utf-8">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  <title>NHTSA's serious mathematical errors allowed Tesla to declare autopilot safety.</title>
+  <meta name="description" content="The National Highway Traffic Safety Administration (NHTSA) is risking its reputation after a devastating report published by a small research and cons...">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+  <link rel="stylesheet" href="../../css/main.css">
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+  <script>window.jQuery || document.write('<script src="../../js/vendors/jquery-3.3.1.min.js"><\/script>')</script>
+</head>
+
+<body>
+  <!--[if lte IE 9]>
+    <p class="browserupgrade">You are using an <strong>outdated</strong> browser. Please <a href="https://browsehappy.com/">upgrade your browser</a> to improve your experience and security.</p>
+  <![endif]-->
+  <nav class="page-headings-container js-page-headings-container"></nav>
+  <div class="tools-bar js-tools-bar">
+    <!-- <a href="https://quick-geek.github.io/search.html" title="Search">🔎</a> -->
+    <a class="js-list-of-headings-button" data-state="closed" href="#" title="Headings">📜</a>
+    <a class="js-go-to-top-button" href="#" title="Go to Top">⬆️</a>
+    <a class="js-go-to-bottom-button" href="#" title="Go to Bottom">⬇️</a>
+  </div>
+  <section class="page js-page"><h1>NHTSA's serious mathematical errors allowed Tesla to declare autopilot safety.</h1><div class="post__text post__text-html js-mediator-article"><div style="text-align:center;"><img src="https://habrastorage.org/getpro/habr/post_images/361/ab7/76c/361ab776c3d8c57aba9c156eaf1774f7.png" width="550"></div><br>  The National Highway Traffic Safety Administration (NHTSA) is risking its reputation after a <a href="http://quality-control.us/nhtsa_autopilot_safety_claims.html">devastating report</a> published by a small research and consulting firm called Quality Control Systems.  This report is devoted to the analysis of the NHTSA report from 2017, as a result of which officials found out that the Tesla autopilot reduces the risk of getting into an accident by 40% (the diagram above). <br><a name="habracut"></a><br>  The report was published only now, almost two years later.  Quality Control Systems had to sue the NHTSA so that, in accordance with the Law on Freedom of Information, to obtain the data underlying the agency’s findings. <br><br>  In its report, QCS talks about the shortcomings of the NHTSA methodology, which are serious enough to completely discredit the 40 percent figure that Tesla has quoted several times over the past two years, highlighting the safety benefits of the autopilot. <br><br>  NHTSA studied autopilot safety after the <a href="https://habr.com/ru/post/369445/">accident with the death of Tesla owner Joshua Brown in 2016</a> .  The autopilot, or more precisely the Autosteer lane maintenance feature, was active during the crash, and Brown ignored several warnings to put his hands back on the steering wheel.  Critics have wondered if the autopilot can reduce safety by encouraging the driver to pay less attention to the road. <br><br>  However, NHTSA found out that Autosteer actually reduced the breakdown rate by 40%, so everything is fine.  Tesla <a href="https://www.tesla.com/en_EU/blog/update-last-week%25E2%2580%2599s-accident%3Fredirect%3Dno">quoted</a> this figure in her blog, where she argued for the protection of technology.  A few weeks later, Ilon Musk even <a href="https://arstechnica.com/cars/2018/05/sorry-elon-musk-theres-no-clear-evidence-autopilot-saves-lives/">scolded reporters</a> who were "fixated" on Tesla accidents, and did not tell that the autopilot objectively makes driving safer. <br><br>  As it turns out, the arguments of Ilona Mask could arise as a result of the fatal error of Tesla experts in calculating statistics. <br><br>  What is the point, if briefly.  How did NHTSA evaluate transport safety?  The most understandable and logical way.  They asked Tesla for complete statistics on all vehicles sold between 2014 and 2016, and calculated the accident rate before and after installing Autosteer. <br><br>  They chose this technique: they took the number of accidents before the autopilot was installed and divided them by the number of miles traveled before Autosteer was activated.  Similarly, they took the number of accidents after installing the autopilot and also divided by the number of miles traveled after activating Autosteer. <br><br>  Total Tesla provided data on 43,781 cars. <br><br>  The only problem is that in the table from Tesla for most cars the data is incomplete.  For example, it is not indicated at what point Autosteer was activated on the car.  It turned out that for 29 051 cars in the database there are no required fields for such calculations. <br><br>  When calculating, NHTSA counted all these cars as 100% equipped with Autosteer, as if they hadn’t traveled a single mile before activating this function.  However, 18 accidents that occurred with the participation of these cars are recorded in the statistics <b>to Autosteer</b> , which is more than 20% of all 86 accidents that occurred with Tesla cars without the Autosteer function! <br><br>  It is obvious that such a serious bias in the calculation of the final statistics greatly shifted the result in favor of the safety of Autosteer.  How much is unknown.  We cannot calculate real data for the entire sample, since most of the data is corrupted.  However, QCS carried out similar calculations for 5714 cars, for which there was complete odometer information “before Autosteer” and “after Autosteer” without a gap between these two points (this is another shortcoming of the Tesla database: in many cars these two numbers did not match).  So, on a normal sample, the calculation showed that the accident rate after installing Autosteer increased by 59%.  Although this cannot be considered an objective figure, because 5714 cars represent too small a part of the Tesla car fleet and there is no way to know whether they are a representative sample. <br><br>  Apparently, NHTSA has long noticed its mistake, just embarrassed to admit it.  Back in May last year, the ministry distanced itself from its own report, <a href="https://arstechnica.com/cars/2018/05/sorry-elon-musk-theres-no-clear-evidence-autopilot-saves-lives/">calling</a> it a “quick comparison”, which “does not evaluate the effectiveness of Autosteer technology”. <br><br>  Why did they refuse to give QCS initial data for re-examination for so long?  After all, the request for information was sent in February 2017, about a month after the publication of the original report.  The agency could not immediately provide information because Tesla claimed data privacy. <br><br>  Only during the <a href="http://quality-control.us/Memorandum_Opinion_and_Order.pdf">trial, the</a> court rejected NHTSA’s arguments on statistical confidentiality and ordered the information to be declassified. </div><p>Source: <a href="https://habr.com/ru/post/440774/">https://habr.com/ru/post/440774/</a></p>
+<section class="navigation-panel">
+<h4>More articles:</h4>
+<nav class="list-of-articles-container js-list-of-articles-container">Waiting for the list from <a href="../../index.html">here</a>...</nav>
+</section>
+<script src="../../js/main.js"></script>
+
+<!-- Yandex.Metrika counter -->
+<script type="text/javascript" >
+  (function (d, w, c) {
+      (w[c] = w[c] || []).push(function() {
+          try {
+              w.yaCounter52319614 = new Ya.Metrika({
+                  id:52319614,
+                  clickmap:true,
+                  trackLinks:true,
+                  accurateTrackBounce:true,
+                  webvisor:true
+              });
+          } catch(e) { }
+      });
+
+      var n = d.getElementsByTagName("script")[0],
+          s = d.createElement("script"),
+          f = function () { n.parentNode.insertBefore(s, n); };
+      s.type = "text/javascript";
+      s.async = true;
+      s.src = "https://mc.yandex.ru/metrika/watch.js";
+
+      if (w.opera == "[object Opera]") {
+          d.addEventListener("DOMContentLoaded", f, false);
+      } else { f(); }
+  })(document, window, "yandex_metrika_callbacks");
+</script>
+<noscript><div><img src="https://mc.yandex.ru/watch/52319614" style="position:absolute; left:-9999px;" alt="" /></div></noscript>
+
+<!-- Google Analytics -->
+  <script>
+    window.ga = function () { ga.q.push(arguments) }; ga.q = []; ga.l = +new Date;
+    ga('create', 'UA-134228602-1', 'auto'); ga('send', 'pageview')
+  </script>
+  <script src="https://www.google-analytics.com/analytics.js" async defer></script>
+
+</section>
+</body>
+
+</html>

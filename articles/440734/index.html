@@ -1,0 +1,87 @@
+<!doctype html>
+<html class="no-js" lang="en">
+
+<head>
+  <!-- Global site tag (gtag.js) - Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=UA-134228602-1"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'UA-134228602-1');
+  </script>
+
+  <meta charset="utf-8">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  <title>Open Session In View in Spring Boot: Hidden Threat</title>
+  <meta name="description" content="Everyone here is right, each in his own way, and therefore everyone is wrong here. 
+ "The Tale of Troika" (A. and B. Strugatsky) 
+
+ If you are using S...">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+  <link rel="stylesheet" href="../../css/main.css">
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+  <script>window.jQuery || document.write('<script src="../../js/vendors/jquery-3.3.1.min.js"><\/script>')</script>
+</head>
+
+<body>
+  <!--[if lte IE 9]>
+    <p class="browserupgrade">You are using an <strong>outdated</strong> browser. Please <a href="https://browsehappy.com/">upgrade your browser</a> to improve your experience and security.</p>
+  <![endif]-->
+  <nav class="page-headings-container js-page-headings-container"></nav>
+  <div class="tools-bar js-tools-bar">
+    <!-- <a href="https://quick-geek.github.io/search.html" title="Search">🔎</a> -->
+    <a class="js-list-of-headings-button" data-state="closed" href="#" title="Headings">📜</a>
+    <a class="js-go-to-top-button" href="#" title="Go to Top">⬆️</a>
+    <a class="js-go-to-bottom-button" href="#" title="Go to Bottom">⬇️</a>
+  </div>
+  <section class="page js-page"><h1>Open Session In View in Spring Boot: Hidden Threat</h1><div class="post__text post__text-html js-mediator-article"><blockquote>  Everyone here is right, each in his own way, and therefore everyone is wrong here. <br>  <strong>"The Tale of Troika" (A. and B. Strugatsky)</strong> </blockquote><p>  If you are using Spring Data JPA, after updating to Spring Boot 2, when starting the application, you may notice a new warning in the log: </p><br><blockquote>  spring.jpa.open-in-view is enabled by default.  Therefore, database queries may be performed during view rendering.  Explicitly configure spring.jpa.open-in-view to disable this warning. </blockquote><p>  In this article I will try to explain what it means, who is to blame and what to do. </p><br><p> To raise a full-fledged application on Spring Boot, only one <code>@SpringBootApplication</code> annotation is <code>@SpringBootApplication</code> .  In order to make this possible, the framework uses a large number of autoconfigurations and default settings.  Moreover, to work out of the box, Spring Boot developers had to choose certain concepts of application development from several alternative options for each, so that the user does not have to choose them explicitly.  On the one hand, this is good for a quick start and easy development, but on the other hand, after a while it may turn out that some default concept / paradigm / setting is not suitable for the project, and to reject it you will have to redo much.  One such concept is the <strong>Open Session In View (OSIV) mode</strong> , which is included by default in Spring Boot. </p><a name="habracut"></a><br><p>  In this mode, the Hibernate session is kept open all the time while processing an HTTP request, including the step of creating a view (JSON resource) or an HTML page.  This makes it possible to lazy load data in the presentation layer after the transaction commit in the business logic layer.  For example, we request the essence of the <code>Article</code> from the database.  The article should be displayed along with comments.  OSIV allows for HTML rendering to simply call the <code>getComments()</code> entity method, and comments will be loaded with a separate request.  When OSIV is disabled, we will get a <code>LazyInitializationException</code> , since the session is already closed, and the essence of the <code>Article</code> no longer managed by Hibernate.  Most Hibernate developers have come across <code>LazyInitializationException</code> ;  OSIV allows you to avoid it by loading data as needed at any stage of processing an HTTP request. </p><br><p>  OSIV in Spring Boot is implemented using the <code>OpenEntityManagerInViewInterceptor</code> web query <code>OpenEntityManagerInViewInterceptor</code> .  Unlike pure Spring, here it is enabled by default. </p><br><p>  OSIV is considered antipattern.  Vlad Mihalcea, one of the developers of Hibernate, explained his best practices in his article: <a href="https://vladmihalcea.com/the-open-session-in-view-anti-pattern/">The Open Session In Anti-Pattern</a> .  Key points: </p><br><ul><li>  Queries to the database without a transaction work in the auto-commit mode, heavily loading it. </li><li>  There is no division of responsibility; any layer of the application can generate SQL queries, which makes testing difficult. </li><li>  A n + 1 problem occurs when each collection associated with an entity is loaded with a separate request. </li><li>  Long connections to the database again increase the load on it and reduce the bandwidth. </li></ul><br><p>  These are rather unpleasant problems of the OSIV mode and seemingly strong arguments for not using it.  However, <a href="https://github.com/spring-projects/spring-boot/issues/7107">in the default shutdown request</a> , Spring Boot developers also made a strong case for why OSIV should be enabled for new projects: </p><br><ul><li>  Backward compatibility.  Existing applications when upgrading to Spring Boot 2 could encounter bugs and bugs due to disabled OSIV.  To avoid this, you only need to set a single <code>spring.jpa.open-in-view</code> value, but this will also make it difficult to switch to the new version. </li><li>  For Spring Boot, ease of use for beginners and a quick start are important.  If you turn off OSIV, it may be unclear for beginners why such an intuitively expected thing does not work, like getting a collection of related elements when accessing an entity method.  Instead, the user will receive a <code>LazyInitializationException</code> , which will slow his path to a running application. </li><li>  OSIV allows you to increase the simplicity of the code, convenience and speed of development. </li><li>  It is hard to find simple examples of how an application should be built without OSIV. </li><li>  Without OSIV, the business logic layer needs to know how the data will be represented in the UI, that is, what DTOs it needs or what related data should be loaded along with the root entity.  This is again the lack of shared responsibility. </li></ul><br><p>  So, we can distinguish two views on this problem.  From the point of view of the database architect (DBA), Open Session In View is certainly unacceptable, since the interaction of the application with the database is not optimally organized and causes an increased load.  But we often use less optimal solutions for the sake of speed, ease of development and ease of learning tools - we write in managed languages, use text data formats for networking, and so on.  From the perspective of a framework developer to simplify the development and quick start of newbies, OSIV allows you to reduce the cognitive load, the number of concepts needed to start developing an application.  If the developer chose JPA, he has already agreed to a slight decrease in performance in exchange for ease of development.  JPA helps to make friends with the object and relational data models.  When working in an object style to obtain related elements, we simply refer to the method of the entity (even if in the presentation layer), this is simple, logical and intuitively expected, although this simplicity is deceptive. </p><br><p>  There are many examples and tutorials for working in Open Session In View mode. The architecture is generally understandable: the service layer requests the JPA entity, the view layer serializes it to JSON directly, via an intermediate DTO, or uses data from it to render the HTML page. </p><br><p>  Less clear how to work without OSIV.  One of the Spring developers in the above-mentioned request complains about this, they say a lot of cries about the anti-pattern, but there are no simple examples of how to live without it.  In this embodiment, entities can only be used for writing, and for reading, numerous DTOs, separate for each data set in the UI, which are mapped directly from the database.  Or custom SQL queries with a join-s description of the necessary related collections for a particular web query.  That is, more boilerplate and a description of the needs of the UI in the business logic layer.  With the OSIV mode disabled, the JPA abstraction starts to flow, the application describes more technical details of interaction with the database. </p><br><p>  Thus, developing with OSIV is simpler.  But the problem is that if in the future you want to abandon it, you will have to redo a lot, the concept of working with the database in the project by setting one property will not change.  You may have to redo the entire application architecture.  However, abandoning OSIV can be a premature optimization that will slow development speed, which can be critical for a startup, for example.  You can use OSIV and optimize database queries only in the slowest places.  For example, requests for entity collections are most affected by the n + 1 problem, when each entity pulls several requests for related collections. </p><br><p>  So, if you want to do it right, you need to develop without OSIV.  But if development speed and simplicity of code are important, you can use this mode, resigning yourself to some loss of performance. </p><br><p>  The main thing is that this performance problem does not turn into a huge technical debt in a few years.  The situation is doubly dangerous when developers do not even suspect that they are accumulating this debt, because Spring Boot silently chose the Open Session In View concept for them.  Therefore, it is excellent that as a result of the above request, it was decided to output to the log a warning about the mode used, given by me at the beginning of the article. </p><br><p>  I hope that the warning and this article about my will help developers make a more informed decision - whether to use the concept of Open Session In View in the application on Spring Boot.  I led and discussed the main arguments for and against, I also advise you to read the original discussion.  This problem shows that a large number of autoconfigurations and defaults in Spring / Spring Boot can be dangerous for inattentive developers. </p><br><p>  Do you use OSIV in Spring Boot apps?  If not, how is the architecture of the interaction between the presentation layer and the database organized?  What tricks and / or libraries are used for this? </p></div><p>Source: <a href="https://habr.com/ru/post/440734/">https://habr.com/ru/post/440734/</a></p>
+<section class="navigation-panel">
+<h4>More articles:</h4>
+<nav class="list-of-articles-container js-list-of-articles-container">Waiting for the list from <a href="../../index.html">here</a>...</nav>
+</section>
+<script src="../../js/main.js"></script>
+
+<!-- Yandex.Metrika counter -->
+<script type="text/javascript" >
+  (function (d, w, c) {
+      (w[c] = w[c] || []).push(function() {
+          try {
+              w.yaCounter52319614 = new Ya.Metrika({
+                  id:52319614,
+                  clickmap:true,
+                  trackLinks:true,
+                  accurateTrackBounce:true,
+                  webvisor:true
+              });
+          } catch(e) { }
+      });
+
+      var n = d.getElementsByTagName("script")[0],
+          s = d.createElement("script"),
+          f = function () { n.parentNode.insertBefore(s, n); };
+      s.type = "text/javascript";
+      s.async = true;
+      s.src = "https://mc.yandex.ru/metrika/watch.js";
+
+      if (w.opera == "[object Opera]") {
+          d.addEventListener("DOMContentLoaded", f, false);
+      } else { f(); }
+  })(document, window, "yandex_metrika_callbacks");
+</script>
+<noscript><div><img src="https://mc.yandex.ru/watch/52319614" style="position:absolute; left:-9999px;" alt="" /></div></noscript>
+
+<!-- Google Analytics -->
+  <script>
+    window.ga = function () { ga.q.push(arguments) }; ga.q = []; ga.l = +new Date;
+    ga('create', 'UA-134228602-1', 'auto'); ga('send', 'pageview')
+  </script>
+  <script src="https://www.google-analytics.com/analytics.js" async defer></script>
+
+</section>
+</body>
+
+</html>

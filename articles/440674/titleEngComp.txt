@@ -1,0 +1,1 @@
+Using dot charts to visualize data

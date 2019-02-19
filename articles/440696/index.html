@@ -1,0 +1,84 @@
+<!doctype html>
+<html class="no-js" lang="en">
+
+<head>
+  <!-- Global site tag (gtag.js) - Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=UA-134228602-1"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'UA-134228602-1');
+  </script>
+
+  <meta charset="utf-8">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  <title>Database Refactoring Toolkit: Flyway vs. Liquibase</title>
+  <meta name="description" content="In this article we’ll talk about Flyway and Liquibase , the two most popular Java-based tools for database refactoring. The purpose of the article is ...">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+  <link rel="stylesheet" href="../../css/main.css">
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+  <script>window.jQuery || document.write('<script src="../../js/vendors/jquery-3.3.1.min.js"><\/script>')</script>
+</head>
+
+<body>
+  <!--[if lte IE 9]>
+    <p class="browserupgrade">You are using an <strong>outdated</strong> browser. Please <a href="https://browsehappy.com/">upgrade your browser</a> to improve your experience and security.</p>
+  <![endif]-->
+  <nav class="page-headings-container js-page-headings-container"></nav>
+  <div class="tools-bar js-tools-bar">
+    <!-- <a href="https://quick-geek.github.io/search.html" title="Search">🔎</a> -->
+    <a class="js-list-of-headings-button" data-state="closed" href="#" title="Headings">📜</a>
+    <a class="js-go-to-top-button" href="#" title="Go to Top">⬆️</a>
+    <a class="js-go-to-bottom-button" href="#" title="Go to Bottom">⬇️</a>
+  </div>
+  <section class="page js-page"><h1>Database Refactoring Toolkit: Flyway vs. Liquibase</h1><div class="post__text post__text-html js-mediator-article"><p>  In this article we’ll talk about <a href="https://flywaydb.org/">Flyway</a> and <a href="http://www.liquibase.org/">Liquibase</a> , the two most popular Java-based tools for database refactoring.  The purpose of the article is to compare these tools and find out which of them is better to use in which cases. </p><br><p><img src="https://habrastorage.org/webt/qb/y-/rk/qby-rk-zmymfr22geirsw4t5yrq.png" alt="DB omnibus"></p><a name="habracut"></a><br><h2 id="flyway">  Flyway </h2><br><p>  The Flyway concept is centered around <a href="https://flywaydb.org/documentation/">six different commands</a> to support automated refactoring and versioning of the database.  These commands can be executed from the command line, during the build process (produced using Maven or Gradle) or directly from Java code using API calls.  When executing these commands, you need to provide the connection parameters to the database (url, username, password) that you want to refactor. </p><br><p> The main command is called <code>migrate</code> and performs the function that contains the whole essence of database refactoring: it scans a special folder with sql scripts (each of which has a version number in the file name) and checks which of them have already been applied to the target database.  Then it executes those that have not yet been applied to this database.  In the event of inconsistencies, for example, if a script that has already been applied has changed since it was applied, Flyway interrupts its work with an error message. </p><br><p>  A unique feature of Flyway is that migration scripts can be not only in SQL format, but also in the form of Java code.  The second option allows you to implement dynamic migrations with complex logic.  However, the Java approach should be used with caution, since such migration scripts are usually hard to debug if something goes wrong with them. </p><br><p>  In addition to the main <code>migrate</code> command, Flyway has additional commands that facilitate the process of database refactoring. </p><br><p>  The <code>info</code> command shows all the available migration scripts from the specified folder and notes which ones have already been used and which ones will only be applied to the target database. </p><br><p>  To check if the scripts applied to the database have changed, use the <code>validate</code> command.  It is useful for us to know whether the script already applied from the folder has been changed since it was applied to the database, because this may mean that the script has been applied to different databases in different versions, and this can cause problems. </p><br><p>  If you think that scripts should be used despite the failure shown by the validate command, you can run the repair command.  It will reset the database table used by Flyway to record which scripts have already been applied (by default, this table is called SCHEMA_VERSION). </p><br><p>  And last but not least, the <code>clean</code> command completely clears the selected schema (as you understand, this command should be used only for test databases). </p><br><h2 id="liquibase">  Liquibase </h2><br><p>  Liquibase uses a different approach to the implementation of database refactoring.  Unlike Flyway, which only supports migration scripts in SQL and Java formats, Liquibase allows you to abstract from SQL and thus eliminate the database refactoring to its specific implementation. </p><br><p>  Instead of SQL scripts, Liquibase supports migration scripts in XML, YAML and JSON formats.  In these scripts, you define changes in the database at the abstraction level.  For each change, Liquibase has a corresponding element in XML, YAML and JSON.  For example, a change that creates a new database table in YAML format looks like this: </p><br><pre> <code class="plaintext hljs">createTable: tableName: Customer columns: - column: name: name type: varchar(255) - column: name: address type: varchar(255)</code> </pre> <br><p>  Changes like <code>add column</code> , <code>create index</code> or <code>alter table</code> and others look similar. <br>  During operation, Liquibase automatically applies all scripts that have not yet been applied, and, like Flyway, saves their metadata to a special database table.  Like Flyway, Liquibase can be called from the command line of the build tools or directly through its Java API. </p><br><h2 id="v-kakih-sluchayah-ih-ispolzovat">  When to use them? </h2><br><p>  Both Flyway and Liquibase support all the functions needed for professional refactoring and versioning of the database, so you will always know which version of the database schema you are dealing with and whether it is compatible with the version of your software.  Both tools are integrated with Maven and Gradle and into the Spring Boot ecosystem, so that database refactoring can be fully automated. </p><br><p>  Flyway uses SQL to determine database changes, so you can customize SQL scripts so that they work efficiently with a specific type of database on your project, for example, from Oracle or PostgreSQL.  Liquibase, on the other hand, introduces an additional level of abstraction using XML, YAML or JSON to determine database changes.  Thus, Liquibase is better suited for software that needs to be installed in different environments with different types of database servers.  However, if you need complete control over your SQL, your choice is Flyway, as it allows you to modify the database using fully custom SQL or even using Java code. </p><br><p>  The trick with both tools is that they are supported by one person <em>(from the translator: according to the author)</em> , and not by a large team.  This may have a negative impact on the future development of both bodies, but this is not necessary.  At the time of this writing, activity in <a href="https://github.com/flyway">the</a> Flyway <a href="https://github.com/flyway">GitHub repository</a> is higher than in <a href="https://github.com/liquibase">the Liquibase repository</a> . </p></div><p>Source: <a href="https://habr.com/ru/post/440696/">https://habr.com/ru/post/440696/</a></p>
+<section class="navigation-panel">
+<h4>More articles:</h4>
+<nav class="list-of-articles-container js-list-of-articles-container">Waiting for the list from <a href="../../index.html">here</a>...</nav>
+</section>
+<script src="../../js/main.js"></script>
+
+<!-- Yandex.Metrika counter -->
+<script type="text/javascript" >
+  (function (d, w, c) {
+      (w[c] = w[c] || []).push(function() {
+          try {
+              w.yaCounter52319614 = new Ya.Metrika({
+                  id:52319614,
+                  clickmap:true,
+                  trackLinks:true,
+                  accurateTrackBounce:true,
+                  webvisor:true
+              });
+          } catch(e) { }
+      });
+
+      var n = d.getElementsByTagName("script")[0],
+          s = d.createElement("script"),
+          f = function () { n.parentNode.insertBefore(s, n); };
+      s.type = "text/javascript";
+      s.async = true;
+      s.src = "https://mc.yandex.ru/metrika/watch.js";
+
+      if (w.opera == "[object Opera]") {
+          d.addEventListener("DOMContentLoaded", f, false);
+      } else { f(); }
+  })(document, window, "yandex_metrika_callbacks");
+</script>
+<noscript><div><img src="https://mc.yandex.ru/watch/52319614" style="position:absolute; left:-9999px;" alt="" /></div></noscript>
+
+<!-- Google Analytics -->
+  <script>
+    window.ga = function () { ga.q.push(arguments) }; ga.q = []; ga.l = +new Date;
+    ga('create', 'UA-134228602-1', 'auto'); ga('send', 'pageview')
+  </script>
+  <script src="https://www.google-analytics.com/analytics.js" async defer></script>
+
+</section>
+</body>
+
+</html>

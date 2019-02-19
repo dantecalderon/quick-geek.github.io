@@ -1,0 +1,1 @@
+миграция бд, базы данных, перевод, Java, sql, liquibase, flyway, refactoring

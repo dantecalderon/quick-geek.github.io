@@ -1,0 +1,84 @@
+<!doctype html>
+<html class="no-js" lang="en">
+
+<head>
+  <!-- Global site tag (gtag.js) - Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=UA-134228602-1"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'UA-134228602-1');
+  </script>
+
+  <meta charset="utf-8">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  <title>Google will not block third-party ad blockers in the browser Chromium</title>
+  <meta name="description" content="Google still remembered the principle of Don'y be evil and abandoned the planned changes to the API of the Chromium browser , because of which most ad...">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+  <link rel="stylesheet" href="../../css/main.css">
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+  <script>window.jQuery || document.write('<script src="../../js/vendors/jquery-3.3.1.min.js"><\/script>')</script>
+</head>
+
+<body>
+  <!--[if lte IE 9]>
+    <p class="browserupgrade">You are using an <strong>outdated</strong> browser. Please <a href="https://browsehappy.com/">upgrade your browser</a> to improve your experience and security.</p>
+  <![endif]-->
+  <nav class="page-headings-container js-page-headings-container"></nav>
+  <div class="tools-bar js-tools-bar">
+    <!-- <a href="https://quick-geek.github.io/search.html" title="Search">🔎</a> -->
+    <a class="js-list-of-headings-button" data-state="closed" href="#" title="Headings">📜</a>
+    <a class="js-go-to-top-button" href="#" title="Go to Top">⬆️</a>
+    <a class="js-go-to-bottom-button" href="#" title="Go to Bottom">⬇️</a>
+  </div>
+  <section class="page js-page"><h1>Google will not block third-party ad blockers in the browser Chromium</h1><div class="post__text post__text-html js-mediator-article"><div style="text-align:center;"><img src="https://habrastorage.org/webt/2z/c3/dv/2zc3dvh8qh9qwz8su1jx1ikd7z0.png"></div><br><br>  Google still remembered the principle of <i>Don'y be evil</i> and abandoned the planned <a href="https://bugs.chromium.org/p/chromium/issues/detail%3Fid%3D896897">changes to the API of the Chromium browser</a> , because of which most ad blockers and some other extensions <a href="https://habr.com/ru/post/437548/">became non-functional</a> . <br><br>  The decision was made after the publication of the <a href="https://whotracks.me/blog/adblockers_performance_study.html">study</a> , how much different ad blockers slow down the work of Chromium (see above).  It turned out that these delays are so miserable that they can hardly be considered the reason for the introduction of the new API.  A few hours after this, one of the Chromium developers <a href="https://groups.google.com/a/chromium.org/forum/">officially announced the</a> decision to postpone the new API. <br><a name="habracut"></a><br>  Recall that the <a href="https://bugs.chromium.org/p/chromium/issues/detail%3Fid%3D896897">conflict</a> arose because of the new <a href="https://developer.chrome.com/extensions/declarativeNetRequest">declarativeNetRequest API</a> (part of the <a href="https://docs.google.com/document/d/1nPu6Wy4LWR66EFLeYInl3NzzhHzc-qnk4w4PX-0XMw8/edit">Manifest V3</a> document) programming interfaces, which make it impossible to fully use the <a href="https://developer.chrome.com/extensions/webRequest">webRequest API</a> .  Extensions use API data to block content on the fly during page loading.  In the new system, blockers will not be able to block events, but only to view them.  Instead, extensions are offered to switch to the declarativeNetRequest API - and inform the browser about the events they want to block.  This supposedly should speed up the loading of pages in the browser (because the extensions will no longer slow down the main thread), as well as protect the privacy of users, according to Google. <br><br>  The first to <a href="https://habr.com/ru/post/437218/">raise the alarm was</a> Raymond Hill, author of uBlock Origin and uMatrix.  He <a href="https://bugs.chromium.org/p/chromium/issues/detail%3Fid%3D896897%26desc%3D2">said</a> that his ad blocking extensions “cannot exist” if changes are adopted.  Later pessimism was <a href="https://www.zdnet.com/article/chrome-api-update-will-kill-a-bunch-of-other-extensions-not-just-ad-blockers/">expressed by the</a> developers of other extensions, including F-Secure, NoScript and Ermes Cyber ​​Security.  For example, NoScript for Firefox can’t be transferred to Chrome. <br><br>  Raymond Hill noted that the declarativeNetRequest API is no more than the implementation of one particular filtering engine, and a rather limited implementation (the 30,000 limit is not enough to work out well-known EasyList lists alone). ”  Raymond Hill also noted that the new API does not support some other features, including blocking media elements larger than this size, disabling the execution of JavaScript by introducing Content-Security-Policy directives and deleting outgoing cookie headers. <br><br>  Google claimed that changes are necessary for 1) security;  2) the fast work of the ad blocker built into Chromium, since the current extensions, with their current mechanism of work, slow down the browser, increasing the page rendering time.  However, the <a href="https://whotracks.me/blog/adblockers_performance_study.html">Adblockers Performance Study</a> study, published on February 15, 2019, completely refutes this thesis. <br><br>  The study was conducted by the developers of the advertising blocker Ghostery from the German startup Cliqz.  Probably, they were especially sad to hear accusations from Google, because their blocker had the least effect on page loading speed, leading in all categories with a pretty good margin.  Well, this can be understood, because Ghostery is not really a full-fledged blocker, like, for example, uBlock Origin.  In addition, the choice of extensions for testing can also be criticized, but this is not the point.  The main thing is that ad blockers practically do not slow down the loading of pages, as many (including Google) thought. <br><br>  The comparison showed that “the most popular content blockers are already very effective (they have an average decision time for a request of less than 1 millisecond) and should not lead to any overhead costs noticeable to users.”  Moreover, a study conducted earlier by <a href="https://www.ghostery.com/lp/trackertax/">The Tracker Tax has</a> shown that ad blocking actually <b>speeds up the loading of pages</b> , in some cases <b>twice</b> . <br><br>  If we talk about problems, they are connected more with the work of other extensions, rather than blockers. <br><br><img src="https://habrastorage.org/getpro/habr/post_images/408/59d/551/40859d55115c1323eab2ef5da872e64d.png"><br>  <i><font color="gray">Diagram from the <a href="https://www.debugbear.com/blog/measuring-the-performance-impact-of-chrome-extensions">DebugBear study</a> from December 2018 on how different extensions load the CPU while rendering the page</font></i> <br><br>  Canceling Google’s plans is only a temporary fix, said Chrome’s engineer, Chrome, Devlin.  After finalizing, Manifest V3 will be returned for discussion, taking into account the requirements of all developers. </div><p>Source: <a href="https://habr.com/ru/post/440780/">https://habr.com/ru/post/440780/</a></p>
+<section class="navigation-panel">
+<h4>More articles:</h4>
+<nav class="list-of-articles-container js-list-of-articles-container">Waiting for the list from <a href="../../index.html">here</a>...</nav>
+</section>
+<script src="../../js/main.js"></script>
+
+<!-- Yandex.Metrika counter -->
+<script type="text/javascript" >
+  (function (d, w, c) {
+      (w[c] = w[c] || []).push(function() {
+          try {
+              w.yaCounter52319614 = new Ya.Metrika({
+                  id:52319614,
+                  clickmap:true,
+                  trackLinks:true,
+                  accurateTrackBounce:true,
+                  webvisor:true
+              });
+          } catch(e) { }
+      });
+
+      var n = d.getElementsByTagName("script")[0],
+          s = d.createElement("script"),
+          f = function () { n.parentNode.insertBefore(s, n); };
+      s.type = "text/javascript";
+      s.async = true;
+      s.src = "https://mc.yandex.ru/metrika/watch.js";
+
+      if (w.opera == "[object Opera]") {
+          d.addEventListener("DOMContentLoaded", f, false);
+      } else { f(); }
+  })(document, window, "yandex_metrika_callbacks");
+</script>
+<noscript><div><img src="https://mc.yandex.ru/watch/52319614" style="position:absolute; left:-9999px;" alt="" /></div></noscript>
+
+<!-- Google Analytics -->
+  <script>
+    window.ga = function () { ga.q.push(arguments) }; ga.q = []; ga.l = +new Date;
+    ga('create', 'UA-134228602-1', 'auto'); ga('send', 'pageview')
+  </script>
+  <script src="https://www.google-analytics.com/analytics.js" async defer></script>
+
+</section>
+</body>
+
+</html>

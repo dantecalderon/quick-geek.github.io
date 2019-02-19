@@ -1,0 +1,84 @@
+<!doctype html>
+<html class="no-js" lang="en">
+
+<head>
+  <!-- Global site tag (gtag.js) - Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=UA-134228602-1"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'UA-134228602-1');
+  </script>
+
+  <meta charset="utf-8">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  <title>Database cloning option for development / testing</title>
+  <meta name="description" content="Briefly I will describe how I organized the cloning of the database (creating several copies of the database from one backup) on the current project. ...">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+  <link rel="stylesheet" href="../../css/main.css">
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+  <script>window.jQuery || document.write('<script src="../../js/vendors/jquery-3.3.1.min.js"><\/script>')</script>
+</head>
+
+<body>
+  <!--[if lte IE 9]>
+    <p class="browserupgrade">You are using an <strong>outdated</strong> browser. Please <a href="https://browsehappy.com/">upgrade your browser</a> to improve your experience and security.</p>
+  <![endif]-->
+  <nav class="page-headings-container js-page-headings-container"></nav>
+  <div class="tools-bar js-tools-bar">
+    <!-- <a href="https://quick-geek.github.io/search.html" title="Search">🔎</a> -->
+    <a class="js-list-of-headings-button" data-state="closed" href="#" title="Headings">📜</a>
+    <a class="js-go-to-top-button" href="#" title="Go to Top">⬆️</a>
+    <a class="js-go-to-bottom-button" href="#" title="Go to Bottom">⬇️</a>
+  </div>
+  <section class="page js-page"><h1>Database cloning option for development / testing</h1><div class="post__text post__text-html js-mediator-article">  Briefly I will describe how I organized the cloning of the database (creating several copies of the database from one backup) on the current project.  The method saves time and hard disk space. <br><br>  Situation: there is a thick database (say, a hundred GB).  I would like to have this database with all the data separately for each developer and not spend a terabyte disk on it.  The following is a solution for MSSQL under windows using powershell. <br><br>  Stumbled upon the SQL clone utility from Redgate.  The site has a <a href="https://www.red-gate.com/products/dba/sql-clone/technology-overview">description of how it works</a> .  The very essence of using such a thing: differencing virtual hard disk.  In Russian, this translates as "differential virtual disk" - the disk on which is stored only the difference relative to the "parent" disk. <br><br>  Details under the cut <br><a name="habracut"></a><br><br>  The scheme of work is as follows: <br><ol><li>  Create and connect a regular virtual disk (it will later become the parent). </li><li>  Create one instance of the database from which clones will be made.  We clean out prodovskiy data, prepare the database completely to work in a test environment.  Database files are placed on a virtual disk. </li><li>  Disconnect the database from the server.  Disable virtual disk. </li><li>  Create a differencing disk.  We connect to the system.  We connect the database from this disk to the sql server. </li><li>  Repeat point 4 to achieve a harmonious number of databases. </li></ol><br><br>  Creating a parent disc will not be described, because  This can be done manually through the disk management graphical user interface.  Well, or google the commands and supplement the scripts given in the article. <br><br>  Note times: <br>  In windows 10 and windows server 2016 there are powershell commandlet <a href="https://docs.microsoft.com/en-us/powershell/module/hyper-v/new-vhd%3Fview%3Dwin10-ps">New-VHD</a> .  For those who use previous versions of the server there is a utility diskpart.  Automate working with it is not very convenient, because  at the input, it takes a file with commands to execute. <br><br>  Note two: <br>  Since  if the database files are located on the differencing disk, then the performance of such a solution is far from perfect.  It turns out several levels of indirection: the record goes to the database, which lies on a virtual disk that stores the difference, in the house that Jack built.  I have no specific figures on performance (since on our test loop this is not the first question anyway).  I would be grateful if someone would measure by how much the write / read speed drops. <br><br>  Note three: <br>  Since  the scripts were not intended for wide use and are given solely for example, there is an increased curvature and tight binding to MSSQL. <br><br><div class="spoiler">  <b class="spoiler_title">We initialize some variables:</b> <div class="spoiler_text"><pre><code class="plaintext hljs">$server = "server"; $db_file_name = "db_file_name"; $root_path = "path to folder with disks"; $cred = try { Get-StoredCredential -Target "$server\Administrator"; } catch { Get-Credential -Message "server windows user" -UserName "$server\Administrator" } $db_cred = $(try { Get-StoredCredential -Target "$server\sa"; } catch { Get-Credential -Message "sql server user" -UserName "sa" }).GetNetworkCredential(); $session = New-PSSession -ComputerName $server -Credential $cred;</code> </pre> <br></div></div><br>  Since  the script is run on the developer’s machine, and all actions are performed on the machine with the sql server, it is assumed that powershell remoting is configured.  All commands are executed in an open session. <br>  Get-StoredCredential is the commandlet for storing the credential on the local machine (installed separately).  In principle, you can do without it, so it is wrapped in try / catch. <br><br><div class="spoiler">  <b class="spoiler_title">Next, the diskpart script execution code:</b> <div class="spoiler_text"><pre> <code class="plaintext hljs">function run_script([string]$script, [bool]$suppress_output = $false) { $result = Invoke-Command -Session $session -ArgumentList $script -ScriptBlock { param($script) $script.Split("`r`n") | % { Write-Host $_.Trim() }; Out-File -FilePath "tmp" -InputObject $script -Encoding ascii return diskpart /s "tmp" } if($suppress_output) { return $result; } else { $result | ? { !$_.Contains("Microsoft") -and $_ -ne "" } | Write-Host } }</code> </pre><br></div></div><br><br><div class="spoiler">  <b class="spoiler_title">I execute the sql commands via SQLCMD:</b> <div class="spoiler_text"><pre> <code class="plaintext hljs">function run_sql([string]$sql) { Write-Host $sql SQLCMD -S $server -d master -U $($db_cred.UserName) -P $($db_cred.Password) -Q $sql }</code> </pre><br></div></div><br><br><div class="spoiler">  <b class="spoiler_title">Creating a differencing disk:</b> <div class="spoiler_text"><pre> <code class="plaintext hljs"> run_script "create vdisk file=`"$root_path\$name.vhdx`" parent=`"$root_path\parent_disk.vhdx`""</code> </pre><br></div></div><br><br><div class="spoiler">  <b class="spoiler_title">Next, connect the disk and database:</b> <div class="spoiler_text"><pre> <code class="plaintext hljs"> $disk_letter = Invoke-Command -Session $session -ScriptBlock { ls function:[dz]: -n | ?{ !(test-path $_) } | select -Last 1; } $volumes = run_script "list volume" $true $disks = run_script "list disk" $true $script = " sel vdisk file=`"$current_path\$db_name.vhdx`" attach vdisk"; run_script $script; $disks_after = run_script "list disk" $true $new_disk = $($disks_after | ? { $_ -notin $disks } ) Write-Host $new_disk $new_disk -match "\d+" $diskId = $Matches[0] $script = " select disk $diskId online disk"; run_script $script $volumes_after = run_script "list volume" $true # get added disk $new_volume = $($volumes_after | ? { $_ -notin $volumes } ) Write-Host $new_volume $new_volume -match "\d+" $volumeId = $Matches[0] $script = " select volume $volumeId assign letter=$disk_letter"; run_script $script run_script "list volume"; run_script "list vdisk"; $atach_script = "CREATE DATABASE $db_name ON (FILENAME = '$disk_letter\$db_file_name.mdf'),(FILENAME = '$disk_letter\$db_file_name.ldf') FOR ATTACH"; run_sql "$atach_script"</code> </pre><br></div></div><br><br>  This piece of “ls function: [dz]: -n” is just some kind of magic for getting a list of drive letters.  How it works - no idea, copied from stackoverflow. <br>  In the above code, the biggest difficulty is to get the resulting virtual disk and put it on a specific letter.  He also needs to do online. <br><br><div class="spoiler">  <b class="spoiler_title">Disconnecting a disk is somewhat simpler:</b> <div class="spoiler_text"><pre> <code class="plaintext hljs"> run_sql " ALTER DATABASE $name SET OFFLINE WITH ROLLBACK IMMEDIATE GO sp_detach_db $name"; $script = "select vdisk file=`"$root_path\$name.vhdx`" detach vdisk "; run_script $script</code> </pre><br></div></div><br><br><div class="spoiler">  <b class="spoiler_title">Putting it all together:</b> <div class="spoiler_text"><pre> <code class="plaintext hljs">param( [ValidateSet("detach_all", "attach_all_available", "create_new", "attach_db", "detach_db", "remove_file")][Parameter(mandatory=$true)][string] $mode, [string] $name ) function run_sql([string]$sql) { Write-Host $sql SQLCMD -S $server -d master -U $($db_cred.UserName) -P $($db_cred.Password) -Q $sql } function run_script([string]$script, [bool]$suppress_output = $false) { $result = Invoke-Command -Session $session -ArgumentList $script -ScriptBlock { param($script) $script.Split("`r`n") | % { Write-Host $_.Trim() }; Out-File -FilePath "tmp" -InputObject $script -Encoding ascii return diskpart /s "tmp" } if($suppress_output) { return $result; } else { $result | ? { !$_.Contains("Microsoft") -and $_ -ne "" } | Write-Host } } function attach_disk([string]$db_name, [string]$current_path) { $disk_letter = Invoke-Command -Session $session -ScriptBlock { ls function:[dz]: -n | ?{ !(test-path $_) } | select -Last 1; } $volumes = run_script "list volume" $true $disks = run_script "list disk" $true $script = " sel vdisk file=`"$current_path\$db_name.vhdx`" attach vdisk"; run_script $script; $disks_after = run_script "list disk" $true $new_disk = $($disks_after | ? { $_ -notin $disks } ) Write-Host $new_disk $new_disk -match "\d+" $diskId = $Matches[0] $script = " select disk $diskId online disk"; run_script $script $volumes_after = run_script "list volume" $true # get added disk $new_volume = $($volumes_after | ? { $_ -notin $volumes } ) Write-Host $new_volume $new_volume -match "\d+" $volumeId = $Matches[0] $script = " select volume $volumeId assign letter=$disk_letter"; run_script $script run_script "list volume"; run_script "list vdisk"; $atach_script = "CREATE DATABASE $db_name ON (FILENAME = '$disk_letter\$db_file_name.mdf'),(FILENAME = '$disk_letter\$db_file_name.ldf') FOR ATTACH"; run_sql "$atach_script" } $server = "server"; $db_file_name = "db_file_name"; $cred = try { Get-StoredCredential -Target "$server\Administrator"; } catch { Get-Credential -Message "server windows user" -UserName "$server\Administrator" } $db_cred = $(try { Get-StoredCredential -Target "$server\sa"; } catch { Get-Credential -Message "sql server user" -UserName "sa" }).GetNetworkCredential(); $session = New-PSSession -ComputerName $server -Credential $cred; $root_path = "path to folder with disks"; $files = Invoke-Command -Session $session -ArgumentList $root_path -ScriptBlock { param($root_path) Get-ChildItem -Filter "*.vhdx" -Path $root_path } switch ($mode) { "detach_all" { $files ` | % { Write-Host $("*"*40) `r`n $_.FullName `r`n; $_ } ` | % { " ALTER DATABASE $($_.Name.Replace('.vhdx', '')) SET OFFLINE WITH ROLLBACK IMMEDIATE GO sp_detach_db $($_.Name.Replace('.vhdx', ''))" } ` | % { run_sql "$_" } $files ` | % { Write-Host $("*"*40) `r`n $_.FullName `r`n; $_ } ` | % { run_script "select vdisk file=`"$($_.FullName)`" detach vdisk " } break; } "attach_all_available" { $files | % { $_.Name.Replace('.vhdx', '') } | ? { $_ -ne "parent_disk" } | % { attach_disk $_ $root_path } break; } "attach_db" { attach_disk $name $root_path break; } "detach_db" { run_sql " ALTER DATABASE $name SET OFFLINE WITH ROLLBACK IMMEDIATE GO sp_detach_db $name"; $script = "select vdisk file=`"$root_path\$name.vhdx`" detach vdisk "; run_script $script break; } "create_new" { $script = "create vdisk file=`"$root_path\$name.vhdx`" parent=`"$root_path\parent_disk.vhdx`"" run_script $script attach_disk $name $root_path; break; } "remove_file" { Invoke-Command -Session $session -ArgumentList $name,$root_path -ScriptBlock { param($name, $root_path) Remove-Item -Path "$root_path\$name.vhdx" } } } Remove-PSSession $session</code> </pre><br></div></div><br><br>  Achtung times: <br>  If you reboot the server, you will forget to explain the sql server that these databases are not there, and you need to reconnect them. <br><br>  Achtung two: <br>  The author, of course, checked the teams on his test loop, but does not intend to guarantee anything (especially their performance).  At yout own risk. <br><br>  Total: <br>  Running an additional test database takes a couple of minutes and 40MB on disk.  Thus, it is much more convenient for each developer to organize their own copy of the database. <br><br>  Additionally: <br>  The same script can be used to raise the database for integration tests. <br><br>  I hope it will be useful to someone. </div><p>Source: <a href="https://habr.com/ru/post/440804/">https://habr.com/ru/post/440804/</a></p>
+<section class="navigation-panel">
+<h4>More articles:</h4>
+<nav class="list-of-articles-container js-list-of-articles-container">Waiting for the list from <a href="../../index.html">here</a>...</nav>
+</section>
+<script src="../../js/main.js"></script>
+
+<!-- Yandex.Metrika counter -->
+<script type="text/javascript" >
+  (function (d, w, c) {
+      (w[c] = w[c] || []).push(function() {
+          try {
+              w.yaCounter52319614 = new Ya.Metrika({
+                  id:52319614,
+                  clickmap:true,
+                  trackLinks:true,
+                  accurateTrackBounce:true,
+                  webvisor:true
+              });
+          } catch(e) { }
+      });
+
+      var n = d.getElementsByTagName("script")[0],
+          s = d.createElement("script"),
+          f = function () { n.parentNode.insertBefore(s, n); };
+      s.type = "text/javascript";
+      s.async = true;
+      s.src = "https://mc.yandex.ru/metrika/watch.js";
+
+      if (w.opera == "[object Opera]") {
+          d.addEventListener("DOMContentLoaded", f, false);
+      } else { f(); }
+  })(document, window, "yandex_metrika_callbacks");
+</script>
+<noscript><div><img src="https://mc.yandex.ru/watch/52319614" style="position:absolute; left:-9999px;" alt="" /></div></noscript>
+
+<!-- Google Analytics -->
+  <script>
+    window.ga = function () { ga.q.push(arguments) }; ga.q = []; ga.l = +new Date;
+    ga('create', 'UA-134228602-1', 'auto'); ga('send', 'pageview')
+  </script>
+  <script src="https://www.google-analytics.com/analytics.js" async defer></script>
+
+</section>
+</body>
+
+</html>
