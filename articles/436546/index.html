@@ -1,0 +1,92 @@
+<!doctype html>
+<html class="no-js" lang="en">
+
+<head>
+  <!-- Global site tag (gtag.js) - Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=UA-134228602-1"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'UA-134228602-1');
+  </script>
+
+  <meta charset="utf-8">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  <title>Developing a team to request data from the database - part 3</title>
+  <meta name="description" content="Today, multi-scale tests of the data request team from the database took place, the development process of which was described here and here in detail...">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+  <link rel="stylesheet" href="../../css/main.css">
+
+  <script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+  <script>
+    (adsbygoogle = window.adsbygoogle || []).push({
+      google_ad_client: "ca-pub-6974184241884155",
+      enable_page_level_ads: true
+    });
+  </script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+  <script>window.jQuery || document.write('<script src="../../js/vendors/jquery-3.3.1.min.js"><\/script>')</script>
+</head>
+
+<body>
+  <!--[if lte IE 9]>
+    <p class="browserupgrade">You are using an <strong>outdated</strong> browser. Please <a href="https://browsehappy.com/">upgrade your browser</a> to improve your experience and security.</p>
+  <![endif]-->
+  <nav class="page-headings-container js-page-headings-container"></nav>
+  <div class="tools-bar js-tools-bar">
+    <!-- <a href="https://quick-geek.github.io/search.html" title="Search">🔎</a> -->
+    <a class="js-list-of-headings-button" data-state="closed" href="#" title="Headings">📜</a>
+    <a class="js-go-to-top-button" href="#" title="Go to Top">⬆️</a>
+    <a class="js-go-to-bottom-button" href="#" title="Go to Bottom">⬇️</a>
+  </div>
+  <section class="page js-page"><h1>Developing a team to request data from the database - part 3</h1><div class="post__text post__text-html js-mediator-article"><p>  Today, multi-scale tests of the data request team from the database took place, the development process of which was described <a href="https://habr.com/ru/post/436228/">here</a> and <a href="https://habr.com/ru/post/436348/">here</a> in detail and <strong>very verbally</strong> . </p><br><p>  What did the tests show?  The team works, but ... in the usage scenario in which it has to be activated, it is inconvenient to configure. <a name="habracut"></a></p><br><p>  As I mentioned in the first publication, as much as possible for each data exchange with a KYC service provider, relatively many entries should be selected from the database.  More than a dozen.  The behavior of the algorithm for extracting a record from the database is identical within each request; only the settings change.  If I had first written an integration test that demonstrates the combat usage scenario, I would understand which key details should not be overlooked.  An integration test might look like this: </p><br><pre><code class="javascript hljs">describe(<span class="hljs-string"><span class="hljs-string">'configure and run database requests'</span></span>, () =&gt; { <span class="hljs-keyword"><span class="hljs-keyword">const</span></span> context = <span class="hljs-built_in"><span class="hljs-built_in">require</span></span>(<span class="hljs-string"><span class="hljs-string">'../src/storage/requestContext'</span></span>); <span class="hljs-keyword"><span class="hljs-keyword">const</span></span> requestHandler = <span class="hljs-built_in"><span class="hljs-built_in">require</span></span>(<span class="hljs-string"><span class="hljs-string">'../src/storage/requestHandler'</span></span>); it(<span class="hljs-string"><span class="hljs-string">'should get full recordset from db'</span></span>, (done) =&gt; { <span class="hljs-keyword"><span class="hljs-keyword">for</span></span>(<span class="hljs-keyword"><span class="hljs-keyword">let</span></span> key <span class="hljs-keyword"><span class="hljs-keyword">of</span></span> context.rules.keys()) { <span class="hljs-keyword"><span class="hljs-keyword">let</span></span> handle = requestHandler.bind(context, [key]); context.store.subscribe(handle); } <span class="hljs-keyword"><span class="hljs-keyword">const</span></span> assert = checkDataIsReady.bind(context, [done]); context.store.subscribe(assert); <span class="hljs-keyword"><span class="hljs-keyword">const</span></span> note = { <span class="hljs-attr"><span class="hljs-attr">Id</span></span>: <span class="hljs-number"><span class="hljs-number">1</span></span>, <span class="hljs-attr"><span class="hljs-attr">UserId</span></span>: <span class="hljs-number"><span class="hljs-number">38</span></span> }; <span class="hljs-keyword"><span class="hljs-keyword">const</span></span> start = { <span class="hljs-attr"><span class="hljs-attr">type</span></span>: <span class="hljs-string"><span class="hljs-string">'NOTE'</span></span>, note }; context.store.dispatch(start); }); <span class="hljs-function"><span class="hljs-keyword"><span class="hljs-function"><span class="hljs-keyword">function</span></span></span><span class="hljs-function"> </span><span class="hljs-title"><span class="hljs-function"><span class="hljs-title">checkDataIsReady</span></span></span><span class="hljs-function">(</span><span class="hljs-params"><span class="hljs-function"><span class="hljs-params">args</span></span></span><span class="hljs-function">) </span></span>{ <span class="hljs-keyword"><span class="hljs-keyword">if</span></span>(notAllDataIsHereYet()) <span class="hljs-keyword"><span class="hljs-keyword">return</span></span>; checkUserRecord(); <span class="hljs-comment"><span class="hljs-comment">// // Здесь добавляем нужный код, проверяющий // что все записи из базы данных загружены // const checkIsCompleted = args[0]; checkIsCompleted(); } function notAllDataIsHereYet(){ // // Здесь код, который проверяет // все ли данные получены из базы // return false; } function checkUserRecord(){ const user = context.store.getState().user; expect(user.Id).toEqual(38); expect(user.Name).toEqual('Jack'); } });</span></span></code> </pre> <br><p>  The cardinality of the difference is that we prepare in advance the rules for configuring requests and store them in the <code>context.rules</code> dictionary.  And this dictionary and other objects necessary for executing queries and storing the results are contained in a context that we collect from the preconfigured database store <code>context.db</code> , the preconfigured repository of the <code>context.store</code> state container, and the above dictionary. </p><br><p>  At the same time, query configuration rules can contain both ordinary string data, for example, the name of the table from which data should be requested, as well as factory methods that form queries to the database and dispatch methods that send actions to the state container.  In this scenario, setting the necessary commands looks completely different than it already implies the existing code. </p><br><p>  This architectural solution allows us, among other things, to define various levels of KYC checks, simply in the form of rowsets ( <code>Set</code> ), which are used as keys when storing query configuration rules.  For example, if we want to send for verification only personal data and an address, we simply place the corresponding keys in the rowset: <code>user</code> , <code>person</code> and <code>address</code> . </p><br><p>  In the above test, the maximum configuration option is shown, with a crawl of the entire rules dictionary and setting up a generalized request code, to specific tables.  Well, as can be seen in the code below, the actual launch of requests will occur as a reaction to the events of a change in the state container: </p><br><pre> <code class="javascript hljs"><span class="hljs-keyword"><span class="hljs-keyword">let</span></span> handle = requestHandler.bind(context, [key]); context.store.subscribe(handle);</code> </pre> <br><p>  Descriptions of the implementation process in all chilling details of the blood today will not, because it has not yet taken place ... </p></div><p>Source: <a href="https://habr.com/ru/post/436546/">https://habr.com/ru/post/436546/</a></p>
+<section class="navigation-panel">
+<h4>More articles:</h4>
+<nav class="list-of-articles-container js-list-of-articles-container">Waiting for the list from <a href="../../index.html">here</a>...</nav>
+</section>
+<script src="../../js/main.js"></script>
+
+<!-- Yandex.Metrika counter -->
+<script type="text/javascript" >
+  (function (d, w, c) {
+      (w[c] = w[c] || []).push(function() {
+          try {
+              w.yaCounter52319614 = new Ya.Metrika({
+                  id:52319614,
+                  clickmap:true,
+                  trackLinks:true,
+                  accurateTrackBounce:true,
+                  webvisor:true
+              });
+          } catch(e) { }
+      });
+
+      var n = d.getElementsByTagName("script")[0],
+          s = d.createElement("script"),
+          f = function () { n.parentNode.insertBefore(s, n); };
+      s.type = "text/javascript";
+      s.async = true;
+      s.src = "https://mc.yandex.ru/metrika/watch.js";
+
+      if (w.opera == "[object Opera]") {
+          d.addEventListener("DOMContentLoaded", f, false);
+      } else { f(); }
+  })(document, window, "yandex_metrika_callbacks");
+</script>
+<noscript><div><img src="https://mc.yandex.ru/watch/52319614" style="position:absolute; left:-9999px;" alt="" /></div></noscript>
+
+<!-- Google Analytics -->
+  <script>
+    window.ga = function () { ga.q.push(arguments) }; ga.q = []; ga.l = +new Date;
+    ga('create', 'UA-134228602-1', 'auto'); ga('send', 'pageview')
+  </script>
+  <script src="https://www.google-analytics.com/analytics.js" async defer></script>
+
+</section>
+</body>
+
+</html>

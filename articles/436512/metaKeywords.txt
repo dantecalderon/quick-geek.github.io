@@ -1,0 +1,1 @@
+log4j, devops, moira, grafana dsl, open source, elasticsearch, kibana, яндекс.деньги, heka, мониторинг инфраструктуры, релиз-менеджмент

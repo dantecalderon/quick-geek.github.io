@@ -1,0 +1,92 @@
+<!doctype html>
+<html class="no-js" lang="en">
+
+<head>
+  <!-- Global site tag (gtag.js) - Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=UA-134228602-1"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'UA-134228602-1');
+  </script>
+
+  <meta charset="utf-8">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  <title>How CSS specificity works in a browser</title>
+  <meta name="description" content="Many consider CSS complex. They come up with various excuses: lacking the ability to understand CSS or CSS is bad in itself. But the reality is that p...">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+  <link rel="stylesheet" href="../../css/main.css">
+
+  <script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+  <script>
+    (adsbygoogle = window.adsbygoogle || []).push({
+      google_ad_client: "ca-pub-6974184241884155",
+      enable_page_level_ads: true
+    });
+  </script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+  <script>window.jQuery || document.write('<script src="../../js/vendors/jquery-3.3.1.min.js"><\/script>')</script>
+</head>
+
+<body>
+  <!--[if lte IE 9]>
+    <p class="browserupgrade">You are using an <strong>outdated</strong> browser. Please <a href="https://browsehappy.com/">upgrade your browser</a> to improve your experience and security.</p>
+  <![endif]-->
+  <nav class="page-headings-container js-page-headings-container"></nav>
+  <div class="tools-bar js-tools-bar">
+    <!-- <a href="https://quick-geek.github.io/search.html" title="Search">🔎</a> -->
+    <a class="js-list-of-headings-button" data-state="closed" href="#" title="Headings">📜</a>
+    <a class="js-go-to-top-button" href="#" title="Go to Top">⬆️</a>
+    <a class="js-go-to-bottom-button" href="#" title="Go to Bottom">⬇️</a>
+  </div>
+  <section class="page js-page"><h1>How CSS specificity works in a browser</h1><div class="post__text post__text-html js-mediator-article">  Many consider CSS complex.  They come up with various excuses: lacking the ability to understand CSS or CSS is bad in itself.  But the reality is that people simply did not take the time to really explore it.  If you are reading this article, it means you are interested in learning CSS and this is great! <br><br><img src="https://habrastorage.org/getpro/habr/post_images/726/169/e03/726169e03842071119ad9c903c3e1ea7.jpg" alt="image"><br><br><h3>  What is CSS specificity? </h3><br>  Have you ever written a style, but it doesn't work, then you add <b>! Important</b> (or not), and yet it doesn't work?  Then you look at Devtools and realize that a different style somewhere overlaps yours? <br><br>  This is the specificity of CSS!  This is how the browser chooses which of the competing selectors to apply to the element.  When the browser sees that two or more selectors match the same element, and the selectors have conflicting rules, they need a way to figure out which rule to apply to that element.  The way this happens is called the “CSS specificity value”. <br><br>  <i>Before we dive into CSS specificity, remember these things:</i> <br><a name="habracut"></a><br><ol><li>  CSS specificity is important only when multiple selectors affect the same element.  The browser needs a way to figure out which style to apply to the corresponding element when there are conflicting property values. </li><li>  When two or more matching selectors have the same specificity value (weight), the browser selects the “most recent” matching selector, which appears closer to the bottom of the list of matching selectors.  The next paragraph explains what a “list of suitable selectors is.” </li><li>  The browser creates a “list of suitable selectors” by combining all the styles on a web page and filtering out those that do not correspond to the <i>“currently-being-styled”</i> element.  The first selectors in the style sheet are at the top of the list, and the last selectors are at the bottom. </li><li>  The <b>style</b> property of an element has a greater specificity value than selectors in style sheets, except when there is <b>! Important</b> in the style sheet selector. </li><li>  Using <b>! Important</b> (which is considered bad practice in some cases) changes the specificity of the selector.  When two selectors have the same specificity, the selector with <b>! Important</b> wins.  And when they both have <b>! Important</b> , the “very last” selector wins. </li></ol><br><h4>  Specificity value </h4><br>  Now we can go on to how the browser determines the specificity values ​​of the selector. <br><cut></cut><br>  The specificity of the selector can be represented as a three-digit string separated by a hyphen (or whatever): “2–4–1”.  The first digit is the number of ID selectors present, the second is the number of class selectors, attribute selectors and pseudo-classes, and the third is the number of available type selectors and pseudo-elements.  For example: <br><br><pre><code class="plaintext hljs">#red.blue // 1-1-0 #green // 1-0-0 div.yellow#red // 1-1-1 .red.blue.yellow // 0-3-0</code> </pre> <br><br><h4>  The definition of the “specific” </h4><br>  To determine which selector has greater specificity, you can compare each of the three values. <br><br>  Let's say you have <b>1-1-1</b> and <b>0-3-0</b> , as in the last two examples, and you need to determine which of them has greater specificity.  First you compare the last values <b>1</b> and <b>0</b> , and in this case wins <b>1</b> .  This means that at the moment <code>div.yellow#red</code> has a greater specificity value ... but we have not yet finished comparing the values. <br><br>  Next, compare values <b>1</b> and <b>3</b> , <b>3</b> wins.  Currently, .red.blue.yellow has a greater specificity value. <br><br>  Finally, we compare the first values, <b>1</b> and <b>0</b> , and win <b>1</b> , so <code>div.yellow#red</code> has more specificity than <code>.red.blue.yellow</code> . <br><br>  The CSS specificity of the selector provides a good explanation for why no number of class selectors can override the ID selector. <br><br><h4>  Small warnings </h4><br>  <i>3 “pitfalls” you need to know about:</i> <br><cut></cut><br><ol><li>  I wrote above that the second number in a sequence of numbers consisting of three is "the number of class selectors, attribute selectors, and pseudo-classes."  This is true in all cases, except when it is <code>:not()</code> pseudo-class.  When this <code>:not()</code> pseudo-class, we do not consider it, but simply ignore it.  But selectors inside it are not ignored, they are considered normal. </li><li>  CSS specificity understands the “form” of the selector.  This means that when you have <code>*[id="yellow"]</code> and <code>#yellow</code> , the first is treated as an attribute selector. </li><li>  The universal selector <code>*</code> itself does not count towards the specificity of the selector.  In the paragraph above, the <code>[id="yellow"]</code> part of the selector is what really matters. </li></ol><br><br>  I hope that this article is easy to understand and helped to understand what CSS specificity is.  Now you can look at the style and easily determine how “specific” it is. </div><p>Source: <a href="https://habr.com/ru/post/436610/">https://habr.com/ru/post/436610/</a></p>
+<section class="navigation-panel">
+<h4>More articles:</h4>
+<nav class="list-of-articles-container js-list-of-articles-container">Waiting for the list from <a href="../../index.html">here</a>...</nav>
+</section>
+<script src="../../js/main.js"></script>
+
+<!-- Yandex.Metrika counter -->
+<script type="text/javascript" >
+  (function (d, w, c) {
+      (w[c] = w[c] || []).push(function() {
+          try {
+              w.yaCounter52319614 = new Ya.Metrika({
+                  id:52319614,
+                  clickmap:true,
+                  trackLinks:true,
+                  accurateTrackBounce:true,
+                  webvisor:true
+              });
+          } catch(e) { }
+      });
+
+      var n = d.getElementsByTagName("script")[0],
+          s = d.createElement("script"),
+          f = function () { n.parentNode.insertBefore(s, n); };
+      s.type = "text/javascript";
+      s.async = true;
+      s.src = "https://mc.yandex.ru/metrika/watch.js";
+
+      if (w.opera == "[object Opera]") {
+          d.addEventListener("DOMContentLoaded", f, false);
+      } else { f(); }
+  })(document, window, "yandex_metrika_callbacks");
+</script>
+<noscript><div><img src="https://mc.yandex.ru/watch/52319614" style="position:absolute; left:-9999px;" alt="" /></div></noscript>
+
+<!-- Google Analytics -->
+  <script>
+    window.ga = function () { ga.q.push(arguments) }; ga.q = []; ga.l = +new Date;
+    ga('create', 'UA-134228602-1', 'auto'); ga('send', 'pageview')
+  </script>
+  <script src="https://www.google-analytics.com/analytics.js" async defer></script>
+
+</section>
+</body>
+
+</html>

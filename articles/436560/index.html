@@ -1,0 +1,95 @@
+<!doctype html>
+<html class="no-js" lang="en">
+
+<head>
+  <!-- Global site tag (gtag.js) - Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=UA-134228602-1"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'UA-134228602-1');
+  </script>
+
+  <meta charset="utf-8">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  <title>Cryptographic protocols for electronic voting</title>
+  <meta name="description" content="Democracy is not a vote, it is a vote count. 
+ Tom Stoppard 
+
+ For cryptographic researchers, electronic voting is not primarily related to a voting m...">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+  <link rel="stylesheet" href="../../css/main.css">
+
+  <script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+  <script>
+    (adsbygoogle = window.adsbygoogle || []).push({
+      google_ad_client: "ca-pub-6974184241884155",
+      enable_page_level_ads: true
+    });
+  </script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+  <script>window.jQuery || document.write('<script src="../../js/vendors/jquery-3.3.1.min.js"><\/script>')</script>
+</head>
+
+<body>
+  <!--[if lte IE 9]>
+    <p class="browserupgrade">You are using an <strong>outdated</strong> browser. Please <a href="https://browsehappy.com/">upgrade your browser</a> to improve your experience and security.</p>
+  <![endif]-->
+  <nav class="page-headings-container js-page-headings-container"></nav>
+  <div class="tools-bar js-tools-bar">
+    <!-- <a href="https://quick-geek.github.io/search.html" title="Search">🔎</a> -->
+    <a class="js-list-of-headings-button" data-state="closed" href="#" title="Headings">📜</a>
+    <a class="js-go-to-top-button" href="#" title="Go to Top">⬆️</a>
+    <a class="js-go-to-bottom-button" href="#" title="Go to Bottom">⬇️</a>
+  </div>
+  <section class="page js-page"><h1>Cryptographic protocols for electronic voting</h1><div class="post__text post__text-html js-mediator-article"><img src="https://habrastorage.org/getpro/habr/post_images/548/c09/cbc/548c09cbcf43928aa663f5f6153c56dc.png"><br><br>  <i>Democracy is not a vote, it is a vote count.</i> <i><br></i>  <i><a href="https://ru.wikipedia.org/wiki/%25D0%25A1%25D1%2582%25D0%25BE%25D0%25BF%25D0%25BF%25D0%25B0%25D1%2580%25D0%25B4,_%25D0%25A2%25D0%25BE%25D0%25BC">Tom Stoppard</a></i> <br><br>  For cryptographic researchers, electronic voting is not primarily related to a voting machine and not to online voting — it’s just a <a href="https://encrypted.google.com/search%3Fq%3Dsite%253Aeprint.iacr.org%252F2015%2Be-voting">field for mathematical research</a> .  The study of electronic voting involves the creation of protocols, key mathematical components, protected and <a href="https://en.wikipedia.org/wiki/End-to-end_auditable_voting_systems">verifiable voting systems</a> , or systems in which independent auditors and voters can safely verify the correctness of the vote count.  These systems are not simple theoretical works, but real technologies that were used for real elections: in the city of Tacoma-Maryland State Park, voters trusted <a href="http://scantegrity.org/">Scantegrity II</a> , based on paper ballots with invisible ink, and the cryptographers themselves used <a href="https://vote.heliosvoting.org/">Helios</a> online voting systems. for <a href="http://www.iacr.org/elections/eVoting/">election</a> leadership. <br><a name="habracut"></a><br>  Electronic voting is an extremely difficult topic, so in this article I will confine myself to key concepts: what does safe voice checking mean, how can votes be counted without addressing everyone individually, and what does not allow voters to cheat.  I will not give you a complete description of the entire e-voting protocol with all its nuances, but those who wish can independently search for works on this topic, of <a href="http://scantegrity.org/papers/scantegrityIEEESP.pdf">which there are</a> <a href="https://people.csail.mit.edu/rivest/pubs/AR06.pdf">quite a</a> <a href="http://eprint.iacr.org/2016/670">lot</a> . <br><br><h2>  Secure Confirmation </h2><br>  What should I expect from a safe voting system? <br><br>  The first and the most obvious: you need to check that the ballots are counted correctly, that is, so that everyone can confirm that the final count was made in accordance with the number of ballots filled with voters.  The check should not produce any additional information, except for the totals.  In particular, the verifier should not be able to guess who voted how.  This is equivalent to manually counting paper bulletins. <br><br>  Secondly, it is necessary that any voter can make sure that his vote was counted and counted correctly.  This needs to be able to be done without disclosing his vote, and in a more general case, the voter should not be able to prove who he voted for.  This is done to exclude coercion, and to allow voters to freely choose a candidate, without fear of the consequences of their choice. <br><br>  Finally, the voting system must be protected against fraud: the voter should not be able to vote more than once, and should not be able to change or copy the ballot.  In addition, only registered voters should be able to vote. <br><br>  So let's summarize: we need public verifiability, voter confidence, resistance to coercion, and integrity of the election.  These principles were put forward in a fundamental study of the authorship of Chaum, Neff and others, published in the early 2000s. <br><br><h2>  Basic principles </h2><br>  Most classic e-voting protocols work as follows: <br><ol><li>  The voter receives a token in the form of a bulletin, which changes according to his choice.  Different voters receive different ballots. </li><li>  The voter encrypts the ballot (using a special type of encryption that allows e-voting magic to work and sends it so that the organizers of the voting receive an encrypted ballot. </li><li>  The organizers publish encrypted bulletins on a bulletin board, a “public broadcast channel with memory,” in the jargon of cryptographers - to put it simply, on something like Pastebin. </li><li>  The organizers combine encrypted bulletins to calculate the encrypted total.  Then they decipher it (but not the bulletins themselves!) And publish the results. </li><li>  Having received the result and the encrypted voices, anyone can verify its correctness. </li></ol><br><br><h2>  Secure Counting: Homomorphic Encryption </h2><br>  At step 4, the organizers combine the cryptograms to create a new cryptogram, encrypting the sum of the individual votes.  For this electronic voting scheme, Enc () encryption scheme is used, in which Enc (v1 + v2) can be calculated, having only Enc (v1) and Enc (v2) in hand, and not knowing the encryption key.  Such encryption schemes are called <a href="https://ru.wikipedia.org/wiki/%25D0%2593%25D0%25BE%25D0%25BC%25D0%25BE%25D0%25BC%25D0%25BE%25D1%2580%25D1%2584%25D0%25BD%25D0%25BE%25D0%25B5_%25D1%2588%25D0%25B8%25D1%2584%25D1%2580%25D0%25BE%25D0%25B2%25D0%25B0%25D0%25BD%25D0%25B8%25D0%25B5">homomorphic</a> . <br><br>  For example, if you simplify a lot, US voters do the following on November 8: <br><ol><li>  The Clinton newsletter and the Trump newsletter are received from the organizers (for simplicity, we consider only two candidates). </li><li>  They write Enc (1) on one bulletin and Enc (0) on the other, using the public key issued by the organizers as the key. </li></ol><br><br>  The encrypted ballots are then published on the bulletin board along with the voter ID.  Everyone knows who voted, but it is impossible to understand for whom exactly, since each Enc (0) and Enc (1) are unique, and we use strong and randomized encryption.  If encryption were deterministic, the voter could be forced to reveal his voice by calculating Enc (0) again and comparing it with the value on the board. <br><br>  Finally, the organizers combine all the ballots for Clinton and get the result of Enc (the number of votes for Clinton), and then do the same for the ballots for Trump and get the Enc (the number of votes for Trump).  Then they take the decryption key and decipher these two values, announcing the winner. <br><br>  How to find a homomorphic encryption scheme?  Pretty easy - schemes such as RSA and ElGamal are homomorphic in their base case because they satisfy the equation <br><br>  Enc (v1) × Enc (v2) = Enc (v1 × v2) <br><br>  But this is not exactly what we need - it is a multiplicative homomorphism, but we need an additive one.  There are tricks that turn the RSA and ElGamal schemes into additively homomorphic, but instead I will show a less well-known scheme that is immediately additively homomorphic: <a href="https://ru.wikipedia.org/wiki/%25D0%259A%25D1%2580%25D0%25B8%25D0%25BF%25D1%2582%25D0%25BE%25D1%2581%25D0%25B8%25D1%2581%25D1%2582%25D0%25B5%25D0%25BC%25D0%25B0_%25D0%259F%25D1%258D%25D0%25B9%25D0%25B5">the Paye cryptosystem</a> , which encrypts message v1 to <br><br>  Enc (v1) = g <sup>v1</sup> r1 <sup>n</sup> mod n <sup>2</sup> <br><br>  Where n = pq and g are fixed, and r1 is a random integer from] 1;  n <sup>2</sup> [.  Therefore, we have: <br><br>  Enc (v1) × Enc (v2) = (g <sup>v1</sup> r1 <sup>n</sup> ) × (g <sup>v2</sup> r2 <sup>n</sup> ) mod n <sup>2</sup> = g <sup>v1 + v2</sup> (r1r2) <sup>n</sup> mod n <sup>2</sup> = Enc (v1 + v2) <br><br>  That is, the Paye scheme can be used to count the encrypted votes. <br><br><h2>  Prevent fraud: <a href="https://ru.wikipedia.org/wiki/%25D0%2594%25D0%25BE%25D0%25BA%25D0%25B0%25D0%25B7%25D0%25B0%25D1%2582%25D0%25B5%25D0%25BB%25D1%258C%25D1%2581%25D1%2582%25D0%25B2%25D0%25BE_%25D1%2581_%25D0%25BD%25D1%2583%25D0%25BB%25D0%25B5%25D0%25B2%25D1%258B%25D0%25BC_%25D1%2580%25D0%25B0%25D0%25B7%25D0%25B3%25D0%25BB%25D0%25B0%25D1%2588%25D0%25B5%25D0%25BD%25D0%25B8%25D0%25B5%25D0%25BC">zero disclosure proof</a> </h2><br>  To cheat, a voter may want to write in an Enc (10,000) bulletin instead of an Enc (1) to add votes to the candidate.  In the case of bad intentions, you can write Enc (very_ large_number), so that this would lead to the overflow of the whole and to the failure of the entire system.  How to guarantee the admissibility of a voice (0 or 1) without decoding? <br><br>  The solution will be non-interactive zero disclosure (NINR) [ <a href="https://en.wikipedia.org/wiki/Non-interactive_zero-knowledge_proof">non-interactive zero-knowledge</a> , NIZK].  NINR evidence is a very complex and extremely powerful cryptographic object: in our case it will allow the voter to prove that their cryptogram contains 0 or 1, but without showing the encrypted message itself.  In general, NINR-proofs allow the prover to convince the verifier of the truth of the statement by sending him only a set of data without any other types of interaction. <br><br>  Perhaps the simplest system with zero disclosure is <a href="https://ru.wikipedia.org/wiki/%25D0%25A1%25D1%2585%25D0%25B5%25D0%25BC%25D0%25B0_%25D0%25A8%25D0%25BD%25D0%25BE%25D1%2580%25D1%2580%25D0%25B0">the Schnorr scheme</a> : let's say you know the solution to the discrete logarithm problem (the difficult task behind <a href="https://ru.wikipedia.org/wiki/DSA">DSA</a> and encryption on elliptic curves), and you want to prove that you know its solution without disclosing the solution itself.  That is, you know x such that g <sup>x</sup> = y mod p, and the verifier knows only g, y, and p.  To convince the verifier, you play the following game: <br><ol><li>  Choose a random number r and send it to the verifier g <sup>r</sup> (a commitment). </li><li>  You get a random number from the verifier (call). </li><li>  Send to verifier s = r + cx. </li><li>  The verifier computes g <sup>s</sup> = g <sup>r + cx</sup> and checks that it is equal to g <sup>r</sup> × y <sup>c</sup> = g <sup>r</sup> × (g <sup>x</sup> ) <sup>c</sup> . </li></ol><br><br>  In this interactive protocol, the prover does not reveal the value of x, since it sends only random numbers.  However, only a prover who knows x can send s passing the last check. <br><br>  To make such an interactive protocol non-interactive (one that can be sent in one set of data), NINR-proofs are built.  We play this game on our own and simulate the verifier so that the real tester is convinced that we cannot come up with a NINR-proof without knowing the proven assertion. <br><br><h2>  Conclusion </h2><br><br>  Key ideas discussed in the article: <br><ul><li>  The main problem of a secure electronic voting system is public verifiability.  This is achieved by posting encrypted newsletters in a publicly accessible forum.  Voting organizers should also describe the mechanism that conducts the confirmation itself. </li><li>  The correctness of the vote is confirmed by authorizing each voter with a unique ID and giving voters access that allows them to verify that their ballot is 1) counted and 2) not changed. </li><li>  Voters cannot be punished for voting for "wrong" candidates due to resistance to coercion, which, in particular, is achieved through unpredictable and probabilistic encryption. </li><li>  The privacy of the ballots is guaranteed by the fact that the encrypted voices are not decrypted, but only the result created using homomorphic encryption is decrypted. </li><li>  A scam does not pass if we force voters to publish cryptographic evidence of the validity of their ballot with the help of NINR. </li></ul><br><br>  The concepts and technologies described here may seem deep and complex, but in reality this is only the tip of the iceberg.  You cannot create a securely functioning e-voting system just by following the description.  For example, I omitted such details as a way for voters to check their ballots in practice, the reason for using the NINR server, and so on.  The bottom line is that any secure e-voting protocol is a very complex and full of nuances, and the actual implementation adds additional complexity due to human and organizational factors. <br><br>  To learn more about cryptography related to the subject of electronic voting, you can study these high-quality materials: <br><ul><li>  <a href="https://people.csail.mit.edu/rivest/voting/papers/Chaum-SecretBallotReceiptsTrueVoterVerifiableElections.pdf">David Chaum's 2004 article in IEEE S &amp; P</a> </li><li>  <a href="https://www.usvotefoundation.org/sites/default/files/E2EVIV_full_report.pdf">Report The Future of Voting sponsored by the US Vote Foundation</a> </li><li>  <a href="https://youtu.be/ZDnShu5V99s">Ben Adida's GoogleTech Talk</a> </li><li>  <a href="https://www.usenix.org/legacy/event/sec05/tech/full_papers/karlof/karlof.pdf">How human and operational factors can compromise e-voting schemes</a> </li><li>  <a href="http://www.cs.jhu.edu/~susan/600.641/scribes/lecture10.pdf">Lecture notes on zero-knowledge proofs</a> </li></ul></div><p>Source: <a href="https://habr.com/ru/post/436560/">https://habr.com/ru/post/436560/</a></p>
+<section class="navigation-panel">
+<h4>More articles:</h4>
+<nav class="list-of-articles-container js-list-of-articles-container">Waiting for the list from <a href="../../index.html">here</a>...</nav>
+</section>
+<script src="../../js/main.js"></script>
+
+<!-- Yandex.Metrika counter -->
+<script type="text/javascript" >
+  (function (d, w, c) {
+      (w[c] = w[c] || []).push(function() {
+          try {
+              w.yaCounter52319614 = new Ya.Metrika({
+                  id:52319614,
+                  clickmap:true,
+                  trackLinks:true,
+                  accurateTrackBounce:true,
+                  webvisor:true
+              });
+          } catch(e) { }
+      });
+
+      var n = d.getElementsByTagName("script")[0],
+          s = d.createElement("script"),
+          f = function () { n.parentNode.insertBefore(s, n); };
+      s.type = "text/javascript";
+      s.async = true;
+      s.src = "https://mc.yandex.ru/metrika/watch.js";
+
+      if (w.opera == "[object Opera]") {
+          d.addEventListener("DOMContentLoaded", f, false);
+      } else { f(); }
+  })(document, window, "yandex_metrika_callbacks");
+</script>
+<noscript><div><img src="https://mc.yandex.ru/watch/52319614" style="position:absolute; left:-9999px;" alt="" /></div></noscript>
+
+<!-- Google Analytics -->
+  <script>
+    window.ga = function () { ga.q.push(arguments) }; ga.q = []; ga.l = +new Date;
+    ga('create', 'UA-134228602-1', 'auto'); ga('send', 'pageview')
+  </script>
+  <script src="https://www.google-analytics.com/analytics.js" async defer></script>
+
+</section>
+</body>
+
+</html>

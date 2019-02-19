@@ -1,0 +1,1 @@
+CoreData, IOS, swift, разработка, objectivec

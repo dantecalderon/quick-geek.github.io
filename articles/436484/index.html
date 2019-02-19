@@ -1,0 +1,94 @@
+<!doctype html>
+<html class="no-js" lang="en">
+
+<head>
+  <!-- Global site tag (gtag.js) - Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=UA-134228602-1"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'UA-134228602-1');
+  </script>
+
+  <meta charset="utf-8">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  <title>Where to find DNS settings in MacOS</title>
+  <meta name="description" content="Hello! 
+
+ Recently, I faced the task of debugging the DNS resolver resolving process in MacOS. I did not find a full-fledged material on how exactly i...">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+  <link rel="stylesheet" href="../../css/main.css">
+
+  <script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+  <script>
+    (adsbygoogle = window.adsbygoogle || []).push({
+      google_ad_client: "ca-pub-6974184241884155",
+      enable_page_level_ads: true
+    });
+  </script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+  <script>window.jQuery || document.write('<script src="../../js/vendors/jquery-3.3.1.min.js"><\/script>')</script>
+</head>
+
+<body>
+  <!--[if lte IE 9]>
+    <p class="browserupgrade">You are using an <strong>outdated</strong> browser. Please <a href="https://browsehappy.com/">upgrade your browser</a> to improve your experience and security.</p>
+  <![endif]-->
+  <nav class="page-headings-container js-page-headings-container"></nav>
+  <div class="tools-bar js-tools-bar">
+    <!-- <a href="https://quick-geek.github.io/search.html" title="Search">🔎</a> -->
+    <a class="js-list-of-headings-button" data-state="closed" href="#" title="Headings">📜</a>
+    <a class="js-go-to-top-button" href="#" title="Go to Top">⬆️</a>
+    <a class="js-go-to-bottom-button" href="#" title="Go to Bottom">⬇️</a>
+  </div>
+  <section class="page js-page"><h1>Where to find DNS settings in MacOS</h1><div class="post__text post__text-html js-mediator-article">  Hello! <br><br>  Recently, I faced the task of debugging the DNS resolver resolving process in MacOS.  I did not find a full-fledged material on how exactly it happens, I had to collect information myself. <br><br>  Here is what was found out. <br><a name="habracut"></a><br>  For tasks related to DNS in macOS, is responsible for the daemon named mDNSResponder.  There were adventures in his life - a demon discoveryd (Yosemite) came to replace him, who broke a lot and created a lot of problems.  A year later, Apple came to its senses and returned (El Capitan) a proven mDNSResponder, which immediately fixed about 300 bugs and returned stability. <br><br>  mDNSResponder is part of <a href="https://developer.apple.com/bonjour/">Bonjour</a> , a set of technologies aimed at operating a device on a network without the need for configuration, includes searching for services, auto-assigning addresses and resolving names.  It is Bonjour that is used when you take out your iPhone and are looking for an Apple TV or printer. <br><br><div style="text-align:center;"><img src="https://habrastorage.org/webt/th/6p/kv/th6pkv9pqosnyumxfl3x-ass-am.jpeg" alt="image" width="400"></div><br>  Bonjour is open source, and mDNSResponder respectively.  This simplifies the task if you need to get to the ultimate truth and show all that is hidden.  The archive already has ready-made implementations for Windows, Posix and VxWorks. <br><br>  The daemon processes unicastDNS and multicastDNS.  UnicastDNS is the usual DNS to which we are used and know.  MulticastDNS is a protocol for using DNS in local networks that does not require a server.  If the device needs someone to find - it sends the question - a “question” multicast package and receives an answer from the device with the requested name (if it exists of course).  The protocol itself is described in detail in the <a href="https://tools.ietf.org/html/rfc6762">RFC of the</a> same name. <br><br>  It is the features MulticastDNS that is abused by the <a href="https://github.com/SpiderLabs/Responder">Responder</a> - software for attacks on the local network.  After launch, he insidiously begins to respond to all mDNS requests, luring unsuspecting victims into his paws. <br><br>  It was a digression - and now to the main question - how to see the current DNS cache and the general status of the DNS settings. <br><br>  So, perform the following steps: <br><br><ol><li>  In the terminal we write: <br><br><pre><code class="bash hljs">sudo <span class="hljs-built_in"><span class="hljs-built_in">log</span></span> config --mode <span class="hljs-string"><span class="hljs-string">"private_data:on"</span></span></code> </pre> <br>  this command will allow us to see the output, otherwise it will be hidden under a private stub </li><li>  Open the console, choose our device: <br><br><img src="https://habrastorage.org/webt/pg/0y/ub/pg0yubn1qdimnustcmublmqf-8w.png"><br><br>  and in the filter we write mDNSResponder <br><br><img src="https://habrastorage.org/webt/vy/nz/rq/vynzrqh4bsl-qtwj9npv9rzvevg.png"></li><li>  Perform in the terminal: <br><br><pre> <code class="bash hljs">sudo killall -INFO mDNSResponder</code> </pre> </li><li>  Open the console back and get a great conclusion, which we now analyze a little: <br><br><img src="https://habrastorage.org/webt/xb/e1/bz/xbe1bzrop_gx2fz25_z18yqki1y.png"><br></li></ol><br>  The status of the DNS settings is a large canvas, divided into sections.  The most interesting of them are: <br><br>  Cache - DNS cache is directly stored here: <br><br><pre> <code class="bash hljs">------------ Cache ------------- Slt Q TTL <span class="hljs-keyword"><span class="hljs-keyword">if</span></span> U Type rdlen 3 4290 en0 + PTR 33 _companion-link._tcp.local. PTR VMAC._companion-link._tcp.local. 3 4273 en0 + PTR 37 _companion-link._tcp.local. PTR VMAC\032(2)._companion-link._tcp.local. 6 107951 -U- - Addr 0 isafronov-G8WP. Addr 6 107951 -U- SOA 64 . SOA a.root-servers.net. nstld.verisign-grs.com. 2019011700 1800 900 604800 86400 6 107951 -U- - AAAA 0 isafronov-G8WP. AAAA 6 107951 -U- SOA 64 . SOA a.root-servers.net. nstld.verisign-grs.com. 2019011700 1800 900 604800 86400 9 763 -U- CNAME 37 1-courier.push.apple.com. CNAME 1.courier-push-apple.com.akadns.net. 13 8819 -U- CNAME 22 ax.itunes.apple.com.edgesuite.net. CNAME a1108.gi3.akamai.net.</code> </pre> <br>  The contents of the / etc / hosts file - just in case: <br><br><pre> <code class="bash hljs">--------- /etc/hosts --------- State Interface KnownUnique LO 4 localhost. Addr 127.0.0.1 KnownUnique LO 16 localhost. AAAA ::1 KnownUnique LO 4 vmware-localhost. Addr 127.0.0.1 KnownUnique LO 16 vmware-localhost. AAAA ::1 KnownUnique LO 4 broadcasthost. Addr 255.255.255.255</code> </pre> <br>  Statistics on mDNS - duplicate names, number of packets, interface events: <br><br><pre> <code class="bash hljs">--- MDNS Statistics --- Name Conflicts 0 KnownUnique Name Conflicts 0 Duplicate Query Suppressions 2045 KA Suppressions 0 KA Multiple Packets 0 Poof Cache Deletions 203 -------------------------------- Multicast packets Sent 8211 Multicast packets Received 22382 Remote Subnet packets 1 QU questions received 25960 Normal multicast questions 62197 Answers <span class="hljs-keyword"><span class="hljs-keyword">for</span></span> questions 4259 Unicast responses 0 Multicast responses 0 Unicast response Demotions 0 -------------------------------- Sleeps 181 Wakeups 182 Interface UP events 665 Interface UP Flap events 48 Interface Down events 817 Interface DownFlap events 16 Cache refresh queries 2876 Cache refreshed 28935 Wakeup on Resolves 0</code> </pre> <br>  List of network interfaces: <br><br><pre> <code class="bash hljs">------ Network Interfaces ------ Struct addr Registered MAC BSSID Interface Address 00007FA2FD834E00 11, 00007FA2FD834E00, v6 utun0 00:00:00:00:00:00 00:00:00:00:00:00 Active A fe80::ebfb:c666:8f7b:62ed 00007FA2FF01B800 9, 00007FA2FF01B800, v6 awdl0 DE:14:B1:E7:21:33 00:00:00:00:00:00 Active v6 AM fe80::dc14:b1ff:fee7:2133 00007FA2FD829C00 7, 0000000000000000, v4 en0 F4:5C:89:8E:9D:C1 E4:8D:8C:61:7F:5D 192.168.1.73 dormant <span class="hljs-keyword"><span class="hljs-keyword">for</span></span> 1943 seconds 00007FA2FD00C200 13, 00007FA2FD00C200, v4 en5 42:4D:7F:A3:50:1B 00:00:00:00:00:00 Active v4 AM 169.254.150.120 00007FA2FE008C00 7, 00007FA2FE008C00, v4 en0 F4:5C:89:8E:9D:C1 E4:8D:8C:61:7F:5C Active v4 AM p 192.168.1.73</code> </pre> <br>  List of DNS servers: <br><br><pre> <code class="bash hljs">--------- DNS Servers(2) ---------- DNS Server . en0 127.0.0.1:53 0 Unscoped 30 18283 v4 v6 !cell !exp !clat46 !DNSSECAware DNS Server . en0 127.0.0.1:53 0 InterfaceScoped 30 18291 v4 v6 !cell !exp !clat46 !DNSSECAware v4answers 1 v6answers 1 Last DNS Trigger: 140697 ms ago</code> </pre> <br>  The world of internal and external interactions of the MacOS subsystems is vast and full of mysteries.  Working with domain names is only a small part of it.  For further reading, I recommend: <br><br><ul><li>  <a href="https://developer.apple.com/documentation">Apple official documentation</a> </li><li>  <a href="https://objective-see.com/blog.html">The blog of a</a> malware researcher and * OS enthusiast Patrick Wardle </li><li>  <a href="http://newosxbook.com/index.php">The site</a> and books of the researcher and practice * OS Johnatan Levin </li></ul></div><p>Source: <a href="https://habr.com/ru/post/436484/">https://habr.com/ru/post/436484/</a></p>
+<section class="navigation-panel">
+<h4>More articles:</h4>
+<nav class="list-of-articles-container js-list-of-articles-container">Waiting for the list from <a href="../../index.html">here</a>...</nav>
+</section>
+<script src="../../js/main.js"></script>
+
+<!-- Yandex.Metrika counter -->
+<script type="text/javascript" >
+  (function (d, w, c) {
+      (w[c] = w[c] || []).push(function() {
+          try {
+              w.yaCounter52319614 = new Ya.Metrika({
+                  id:52319614,
+                  clickmap:true,
+                  trackLinks:true,
+                  accurateTrackBounce:true,
+                  webvisor:true
+              });
+          } catch(e) { }
+      });
+
+      var n = d.getElementsByTagName("script")[0],
+          s = d.createElement("script"),
+          f = function () { n.parentNode.insertBefore(s, n); };
+      s.type = "text/javascript";
+      s.async = true;
+      s.src = "https://mc.yandex.ru/metrika/watch.js";
+
+      if (w.opera == "[object Opera]") {
+          d.addEventListener("DOMContentLoaded", f, false);
+      } else { f(); }
+  })(document, window, "yandex_metrika_callbacks");
+</script>
+<noscript><div><img src="https://mc.yandex.ru/watch/52319614" style="position:absolute; left:-9999px;" alt="" /></div></noscript>
+
+<!-- Google Analytics -->
+  <script>
+    window.ga = function () { ga.q.push(arguments) }; ga.q = []; ga.l = +new Date;
+    ga('create', 'UA-134228602-1', 'auto'); ga('send', 'pageview')
+  </script>
+  <script src="https://www.google-analytics.com/analytics.js" async defer></script>
+
+</section>
+</body>
+
+</html>

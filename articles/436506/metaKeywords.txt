@@ -1,0 +1,1 @@
+дерево синтаксического анализа, анализ тональности, сентимент-анализ, классификатор, numpy, scipy, pandas, scikit-learn, matplotlib, seaborn, word2vec, GloVe, ConceptNet Numberbatch

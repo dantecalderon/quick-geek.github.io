@@ -1,0 +1,1 @@
+MemSQL, MemSQL Studio, Flow, TypeScript, tcomb, статическая типизация, динамическая типизация, Babel, flow-typed, DefinitelyTyped
