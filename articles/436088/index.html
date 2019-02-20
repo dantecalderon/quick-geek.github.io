@@ -1,0 +1,94 @@
+<!doctype html>
+<html class="no-js" lang="en">
+
+<head>
+  <!-- Global site tag (gtag.js) - Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=UA-134228602-1"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'UA-134228602-1');
+  </script>
+
+  <meta charset="utf-8">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  <title>Graphic editor GANpaint draws objects and demonstrates the capabilities of GAN.</title>
+  <meta name="description" content="One of the brushes deletes / adds trees, another - people, etc. 
+
+ Generative-contention networks (GAN) create stunningly realistic images, often indi...">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+  <link rel="stylesheet" href="../../css/main.css">
+
+  <script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+  <script>
+    (adsbygoogle = window.adsbygoogle || []).push({
+      google_ad_client: "ca-pub-6974184241884155",
+      enable_page_level_ads: true
+    });
+  </script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+  <script>window.jQuery || document.write('<script src="../../js/vendors/jquery-3.3.1.min.js"><\/script>')</script>
+</head>
+
+<body>
+  <!--[if lte IE 9]>
+    <p class="browserupgrade">You are using an <strong>outdated</strong> browser. Please <a href="https://browsehappy.com/">upgrade your browser</a> to improve your experience and security.</p>
+  <![endif]-->
+  <nav class="page-headings-container js-page-headings-container"></nav>
+  <div class="tools-bar js-tools-bar">
+    <!-- <a href="https://quick-geek.github.io/search.html" title="Search">🔎</a> -->
+    <a class="js-list-of-headings-button" data-state="closed" href="#" title="Headings">📜</a>
+    <a class="js-go-to-top-button" href="#" title="Go to Top">⬆️</a>
+    <a class="js-go-to-bottom-button" href="#" title="Go to Bottom">⬇️</a>
+  </div>
+  <section class="page js-page"><h1>Graphic editor GANpaint draws objects and demonstrates the capabilities of GAN.</h1><div class="post__text post__text-html js-mediator-article"><div style="text-align:center;"><img src="https://habrastorage.org/webt/ja/xr/sf/jaxrsfrilffto7m7wjwxq9tiikm.jpeg" width="480"></div><br>  <i><font color="gray">One of the brushes deletes / adds trees, another - people, etc.</font></i> <br><br>  Generative-contention networks (GAN) create stunningly realistic images, often indistinguishable from real ones.  Since the invention of such networks in 2014, a lot of research has been conducted in this area and a number of applications have been created, including for <a href="https://arxiv.org/abs/1611.07004">image manipulation</a> and <a href="https://arxiv.org/abs/1511.05440">video prediction</a> .  Several variants of GAN have been developed, and the experiments continue. <br><br>  Despite this tremendous success, many questions still remain.  It is not clear what exactly causes terribly unrealistic artifacts, what minimal knowledge is needed to generate specific objects, why does one version of GAN work better than another, what fundamental differences are encoded in their weights?  To better understand the internal workings of GAN, researchers at MIT, MIT-IBM Watson AI and IBM Research divisions developed the GANDissection framework and the <a href="http://gandissect.res.ibm.com/ganpaint.html">GANpaint</a> program, a graphical editor on a generative-contention network. <br><a name="habracut"></a><br>  The work is accompanied by a <a href="https://arxiv.org/abs/1811.10597v2">scientific article</a> , which explains in detail the functionality of the framework and discusses those questions to which researchers are trying to find answers.  In particular, they are trying to study the <b>internal representations of</b> generative-competitive networks.  The “analytical framework for visualizing and understanding GANs at the unit, object and scene level”, that is, the GANDissection framework, should help. <br><br>  By the method of dividing a picture into parts (segmentation-based network dissection), the system determines groups of “interpretable units”, which are closely related to the concepts of objects.  Then, a quantitative assessment of the reasons that cause changes in the interpreted units is carried out.  This is done "by measuring the ability of interventions to control objects at the exit."  Simply put, researchers study the contextual relationship between specific objects and their environment by embedding detected objects in new images. <br><br><img src="https://habrastorage.org/getpro/habr/post_images/e87/479/e14/e87479e14aab06c1149e5d33bfd79c25.png"><br>  <i><font color="gray">The GAN Dissection framework demonstrates that specific neurons in the GAN learn depending on the type of scene that he learns to draw: for example, a jacket neuron appears when studying conference rooms, and a plate neuron appears when drawing kitchens</font></i> <br><br>  To ensure that sets of neurons control the drawing of objects, rather than simply correlate, the framework interferes with the network and activates and deactivates neurons directly.  This is how the graphic editor GANpaint works - it is a visual demonstration of an analytical framework. <br><br><div style="text-align:center;"><img src="https://habrastorage.org/webt/-p/zj/qr/-pzjqr5zp4irhplmdi5f5gpcmkc.gif"></div><br>  GANpaint activates and deactivates neurons on a network trained to create images.  Each button on the left panel corresponds to a set of 20 neurons.  Only seven buttons: <br><br><ul><li>  tree; </li><li>  grass; </li><li>  a door; </li><li>  sky; </li><li>  cloud; </li><li>  brick; </li><li>  dome. </li></ul><br>  GANpaint can add or remove such objects. <br><br>  By switching neurons directly, you can observe the structure of the visual world, which you learned to model a neural network. <br><br>  When studying the results of the work of other generative-competitive networks, an outside observer may wonder: does the GAN really create a new image or does it simply make up the scene from the objects it met during the training?  Maybe the network just remembers the images and then plays them the same way?  This research paper and the editor of GANpaint show that the networks have really studied some aspects of the composition, the authors say. <br><br>  One interesting discovery is that the same neurons control a certain class of objects in different contexts, even if the final appearance of an object varies greatly.  The same neurons can switch to the concept of "door", regardless of whether you need to add a heavy door on a large stone wall or a small door on a tiny hut.  GAN also understands when you can, and when you cannot create objects.  For example, when the door neurons are activated, a door actually appears in the right place in the building.  But if you do the same in the sky or in a tree, then usually such an attempt has no effect. <br><br>  The scientific article <i>“GAN Dissection: Visualizing and Understanding Generative Adversarial Networks” was</i> <a href="https://arxiv.org/abs/1811.10597v2">published</a> on November 26, 2018 on the preprint website arXiv.org (arXiv: 1811.10597v2). <br><br>  Interactive demonstrations, videos, code and data are published <a href="https://github.com/CSAILVision/gandissect">on Github</a> and on <a href="https://gandissect.csail.mit.edu/">the MIT website</a> . <br><br><iframe width="560" height="315" src="https://www.youtube.com/embed/yVCgUYe4JTM" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen=""></iframe></div><p>Source: <a href="https://habr.com/ru/post/436088/">https://habr.com/ru/post/436088/</a></p>
+<section class="navigation-panel">
+<h4>More articles:</h4>
+<nav class="list-of-articles-container js-list-of-articles-container">Waiting for the list from <a href="../../index.html">here</a>...</nav>
+</section>
+<script src="../../js/main.js"></script>
+
+<!-- Yandex.Metrika counter -->
+<script type="text/javascript" >
+  (function (d, w, c) {
+      (w[c] = w[c] || []).push(function() {
+          try {
+              w.yaCounter52319614 = new Ya.Metrika({
+                  id:52319614,
+                  clickmap:true,
+                  trackLinks:true,
+                  accurateTrackBounce:true,
+                  webvisor:true
+              });
+          } catch(e) { }
+      });
+
+      var n = d.getElementsByTagName("script")[0],
+          s = d.createElement("script"),
+          f = function () { n.parentNode.insertBefore(s, n); };
+      s.type = "text/javascript";
+      s.async = true;
+      s.src = "https://mc.yandex.ru/metrika/watch.js";
+
+      if (w.opera == "[object Opera]") {
+          d.addEventListener("DOMContentLoaded", f, false);
+      } else { f(); }
+  })(document, window, "yandex_metrika_callbacks");
+</script>
+<noscript><div><img src="https://mc.yandex.ru/watch/52319614" style="position:absolute; left:-9999px;" alt="" /></div></noscript>
+
+<!-- Google Analytics -->
+  <script>
+    window.ga = function () { ga.q.push(arguments) }; ga.q = []; ga.l = +new Date;
+    ga('create', 'UA-134228602-1', 'auto'); ga('send', 'pageview')
+  </script>
+  <script src="https://www.google-analytics.com/analytics.js" async defer></script>
+
+</section>
+</body>
+
+</html>

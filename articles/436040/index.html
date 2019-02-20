@@ -1,0 +1,92 @@
+<!doctype html>
+<html class="no-js" lang="en">
+
+<head>
+  <!-- Global site tag (gtag.js) - Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=UA-134228602-1"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'UA-134228602-1');
+  </script>
+
+  <meta charset="utf-8">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  <title>Graphics Optimization. Interesting Concave Hull</title>
+  <meta name="description" content="At one point, during the development of the game, I was faced with the issue of performance on modern PCs. Our modeller has a powerful modern red comp...">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+  <link rel="stylesheet" href="../../css/main.css">
+
+  <script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+  <script>
+    (adsbygoogle = window.adsbygoogle || []).push({
+      google_ad_client: "ca-pub-6974184241884155",
+      enable_page_level_ads: true
+    });
+  </script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+  <script>window.jQuery || document.write('<script src="../../js/vendors/jquery-3.3.1.min.js"><\/script>')</script>
+</head>
+
+<body>
+  <!--[if lte IE 9]>
+    <p class="browserupgrade">You are using an <strong>outdated</strong> browser. Please <a href="https://browsehappy.com/">upgrade your browser</a> to improve your experience and security.</p>
+  <![endif]-->
+  <nav class="page-headings-container js-page-headings-container"></nav>
+  <div class="tools-bar js-tools-bar">
+    <!-- <a href="https://quick-geek.github.io/search.html" title="Search">🔎</a> -->
+    <a class="js-list-of-headings-button" data-state="closed" href="#" title="Headings">📜</a>
+    <a class="js-go-to-top-button" href="#" title="Go to Top">⬆️</a>
+    <a class="js-go-to-bottom-button" href="#" title="Go to Bottom">⬇️</a>
+  </div>
+  <section class="page js-page"><h1>Graphics Optimization. Interesting Concave Hull</h1><div class="post__text post__text-html js-mediator-article">  At one point, during the development of the game, I was faced with the issue of performance on modern PCs.  Our modeller has a powerful modern red computer assembly.  But his project was terribly slow, loading one core of the processor. <br><br>  The reason is simple - there are a lot of cores in new processors, but in fact they are less productive in single-threaded applications.  At that time, I had a render in one stream.  But in fact, the reasons were not so much in this.  And in the process of finding a problem, I decided to count how many polygons are present in the scene: <br><br><img src="http://thegreattribes.com/imagestoinet/devblog33/screen006.jpg"><br><br>  On an average game map, with the maximum distance and with a large cluster of palm trees - <b>15,824,756 triangles!</b>  Almost 16 million!  Huge number. <br><a name="habracut"></a><br>  Having played a bit with the card generator, we managed to find a place with 16.75 million: <br><br><img src="http://thegreattribes.com/imagestoinet/devblog33/screen007.jpg"><br><br>  Although, here, a similar place with Christmas trees gave only 8.5 million triangles: <br><br><img src="http://thegreattribes.com/imagestoinet/devblog33/screen008.jpg"><br><br>  On average, the scene consisted of ~ 4 million: <br><br><img src="http://thegreattribes.com/imagestoinet/devblog33/screen009.jpg"><br><br>  In general, I was glad that my render copes with such a huge number of triangles, but their number was excessive.  The decision was on the surface: <br><br><ol><li>  Optimize the number of polygons in the models. </li><li>  Optimize the polygonal grid of the landscape. </li><li>  The implementation of a multi-threaded render. </li></ol><br>  For those who may not be interested in the first item of our optimization program, for example, experienced specialists, I recommend to move safely to the second part. <br><br><h2>  1. Optimization of the number of polygons in models </h2><br>  In our engine, the vegetation is drawn in "packs", the whole landscape is divided into tiles and sub-files, the minimum pack is one subtail. <br><br><img src="http://thegreattribes.com/imagestoinet/habrblog1/screen001.jpg"><br><br>  One pack is one mesh, as reducing the number of meshes significantly reduces the number of CPU-&gt; GPU calls. <br><br><img src="http://thegreattribes.com/imagestoinet/habrblog1/screen002.jpg"><br><br>  Initially, our Christmas trees consisted of truncated cones, going to full cones, managed to remove a couple of extra triangles: <br><br><img src="http://thegreattribes.com/imagestoinet/habrblog1/screen003.jpg"><br><br>  Cherry on the cake was the decision to remove the trunks from the trees, as with our camera angle they were simply not visible. <br><br>  As a result, we managed to reduce the number of polygons, on one package of trees, by an average of 40%.  There are almost no differences: <br><br><img src="http://thegreattribes.com/imagestoinet/habrblog1/screen004.jpg"><br><br>  With palm trees it was more difficult, but packs of 5000 to 6000 polygons needed to be corrected.  How to achieve the massiveness and density of the jungle?  The high density of the jungle was achieved due to the large number of palm trees: <br><br><img src="http://thegreattribes.com/imagestoinet/habrblog1/screen005.jpg"><br><br>  We decided to simplify the palm trees and introduce the second tier of vegetation, which allowed us to maintain the apparent density and achieve the desired 600 - 700 polygons per pack. <br><br><img src="http://thegreattribes.com/imagestoinet/habrblog1/screen006.jpg"><br><br>  Reducing the number of polygons 10 times - an excellent result. <br><br><img src="http://thegreattribes.com/imagestoinet/habrblog1/screen007.jpg"><br><br><h2>  2. Optimization of the polygonal grid of the landscape </h2><br><br>  Initially, the landscape grid had the form: <br><br><img src="http://thegreattribes.com/imagestoinet/devblog33/screen010.jpg"><br><br>  The screenshot shows smooth areas of the landscape, these are tiles of meadows, plains, and even other smooth surfaces.  Small irregularities of the landscape decided to remove.  Thus, he increased the area of ​​identical tiles in height.  Not a tricky test of all the vertices of tiles and subtyles for equality in height, I was able to achieve this result: <br><br><img src="http://thegreattribes.com/imagestoinet/devblog33/screen012.jpg"><br><br>  There were still flat places that could be optimized, and I began to build polygons from those triangles that had the same height.  The tile was taken and all its triangles were sorted into an array of unequal in height triangles and a list of arrays consisting of equal in height and adjacent triangles. <br><br><img src="http://thegreattribes.com/imagestoinet/habrblog1/screen008.jpg"><br><br>  In the above example, it turned out: 1 array of triangles not subject to change, since they were all of different heights (red triangles) and a list consisting of two arrays of triangles with the same height (arrays are filled with color). <br><br>  Now the task was to find a convex-concave contour from the array of triangles (Concave Hull), and the set of triangles could have holes.  Earlier in my work I came across convex contours (Convex Hull), there were no problems with them, I already used the Graham scan algorithm.  But with the construction of the Concave Hull there were problems ... Information on this topic found on the Internet turned out to be quite difficult.  I had to write the implementation of algorithms from scratch.  I will not lie if I say that I have read about a dozen different dissertations on this topic.  But all the proposed algorithms gave an approximate result with some error.  After a week of torment and pain, I got the idea of ​​my own algorithm. <br><br>  I tried to build a contour over a set of triangle vertices, i.e.  I transferred an array of triangles to an array of vertices and built a shell over them.  But for my task it was not required.  According to my conclusions, constructing the shell directly in triangles was simpler, and the accuracy of the concave hull was 100%. <br><br>  Initially, I wanted to put a wrapper here for the source code of the algorithm, but it seems easier to describe it in two words: Basis - the rule: if a vertex of a triangle enters four or less triangles, then one of the edges that forms the vertex lies on the border.  Next, a list of such edges is formed taking into account the removal of identical edges.  We find the edge with the smallest X and Y and start the passage / sorting of the edges from it with the addition of unique vertices to the list.  This list will be the envelope of the set of triangles.  The only thing in the final is to remove the collinear points from the list. <br><br>  As a result of this, I could build the Concave Hull of almost any complexity.  This algorithm did not fit the set with holes, but I walked around this by simply dividing this set into two halves by hole.  Then I got a contour and triangulated it: <br><br><img src="http://thegreattribes.com/imagestoinet/devblog33/screen014.jpg"><br><br><img src="http://thegreattribes.com/imagestoinet/devblog33/screen015.jpg"><br><br><img src="http://thegreattribes.com/imagestoinet/devblog33/screen016.jpg"><br><br>  Everything turned out great: <br><br><img src="http://thegreattribes.com/imagestoinet/devblog33/screen017.jpg"><br><br>  But in the end, I was upset with the result.  The algorithm I developed gave a tangible increase in performance when rendering the scene, since the number of polygons on average was reduced by 60 - 70%.  But at the same time, card generation began to happen 10 times slower.  The algorithm turned out to be very demanding on the cost of time. <br><br>  It took three days to think about the light version of the algorithm for optimizing the polygonal grid of the landscape, which gave these results: <br><br><img src="http://thegreattribes.com/imagestoinet/devblog33/screen027.jpg"><br><br>  Now the calculations of data for optimization have become not noticeable against the background of map generation, and the number of polygons has decreased on average by 40-50%. <br><br>  This article is trial and superficial.  If anyone is interested in the topic of game development, I am ready to continue and expand the article with a speculation of concrete steps, decisions and future plans.  Also, I think you will be interested in the topic of building multi-threaded Open GL applications developed in Java, which I will try to describe in the next article. </div><p>Source: <a href="https://habr.com/ru/post/436040/">https://habr.com/ru/post/436040/</a></p>
+<section class="navigation-panel">
+<h4>More articles:</h4>
+<nav class="list-of-articles-container js-list-of-articles-container">Waiting for the list from <a href="../../index.html">here</a>...</nav>
+</section>
+<script src="../../js/main.js"></script>
+
+<!-- Yandex.Metrika counter -->
+<script type="text/javascript" >
+  (function (d, w, c) {
+      (w[c] = w[c] || []).push(function() {
+          try {
+              w.yaCounter52319614 = new Ya.Metrika({
+                  id:52319614,
+                  clickmap:true,
+                  trackLinks:true,
+                  accurateTrackBounce:true,
+                  webvisor:true
+              });
+          } catch(e) { }
+      });
+
+      var n = d.getElementsByTagName("script")[0],
+          s = d.createElement("script"),
+          f = function () { n.parentNode.insertBefore(s, n); };
+      s.type = "text/javascript";
+      s.async = true;
+      s.src = "https://mc.yandex.ru/metrika/watch.js";
+
+      if (w.opera == "[object Opera]") {
+          d.addEventListener("DOMContentLoaded", f, false);
+      } else { f(); }
+  })(document, window, "yandex_metrika_callbacks");
+</script>
+<noscript><div><img src="https://mc.yandex.ru/watch/52319614" style="position:absolute; left:-9999px;" alt="" /></div></noscript>
+
+<!-- Google Analytics -->
+  <script>
+    window.ga = function () { ga.q.push(arguments) }; ga.q = []; ga.l = +new Date;
+    ga('create', 'UA-134228602-1', 'auto'); ga('send', 'pageview')
+  </script>
+  <script src="https://www.google-analytics.com/analytics.js" async defer></script>
+
+</section>
+</body>
+
+</html>

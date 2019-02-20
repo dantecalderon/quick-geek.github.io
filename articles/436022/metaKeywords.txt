@@ -1,0 +1,1 @@
+Librem 5, open hardware, SOM, EDA, KiCad, Qucs-S, Xyce, поуровневое планирование, Gerblook

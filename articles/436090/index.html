@@ -1,0 +1,136 @@
+<!doctype html>
+<html class="no-js" lang="en">
+
+<head>
+  <!-- Global site tag (gtag.js) - Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=UA-134228602-1"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'UA-134228602-1');
+  </script>
+
+  <meta charset="utf-8">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  <title>Oracle exists</title>
+  <meta name="description" content="Or, a general algorithm for a break problem may exist. 
+ But, as always, there are nuances. 
+ If interested, please under the cat. 
+
+ Introduction 
+ I...">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+  <link rel="stylesheet" href="../../css/main.css">
+
+  <script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+  <script>
+    (adsbygoogle = window.adsbygoogle || []).push({
+      google_ad_client: "ca-pub-6974184241884155",
+      enable_page_level_ads: true
+    });
+  </script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+  <script>window.jQuery || document.write('<script src="../../js/vendors/jquery-3.3.1.min.js"><\/script>')</script>
+</head>
+
+<body>
+  <!--[if lte IE 9]>
+    <p class="browserupgrade">You are using an <strong>outdated</strong> browser. Please <a href="https://browsehappy.com/">upgrade your browser</a> to improve your experience and security.</p>
+  <![endif]-->
+  <nav class="page-headings-container js-page-headings-container"></nav>
+  <div class="tools-bar js-tools-bar">
+    <!-- <a href="https://quick-geek.github.io/search.html" title="Search">🔎</a> -->
+    <a class="js-list-of-headings-button" data-state="closed" href="#" title="Headings">📜</a>
+    <a class="js-go-to-top-button" href="#" title="Go to Top">⬆️</a>
+    <a class="js-go-to-bottom-button" href="#" title="Go to Bottom">⬇️</a>
+  </div>
+  <section class="page js-page"><h1>Oracle exists</h1><div class="post__text post__text-html js-mediator-article">  Or, a general algorithm for a break problem may exist. <br>  But, as always, there are nuances. <br>  If interested, please under the cat. <br><a name="habracut"></a><br><h2>  Introduction </h2><br>  In 1936, Alan Turing proved that there is no general algorithm that analyzes other algorithms and indicates whether the program will hang or not. <br><br>  I would like to immediately dot all the words and describe the terms that are used by me so that there is no understanding. <br><br>  <b>Program hang</b> - the algorithm will work INFINITE the amount of time regardless of the speed of command execution, and parallel calculations.  No matter how big a supercomputer is, we would always run an infinite amount of time. <br><br>  <b>Program execution in a finite time</b> - the algorithm on any machine finishes its calculations no matter how voluminous they are.  For example, if the algorithm runs for 300 million years, this does not mean that it is frozen, just for current resources it must be executed for 300 million years and it will ALWAYS be completed. <br><br>  Now you can continue. <br><br>  Turing's proof can be described as follows: there is a certain oracle S (algorithm) whose input is given a description of algorithm N and input data X. The program stops and returns 1 if algorithm N does not stop, having received input X. <br><br>  The program does not stop otherwise, if the algorithm N stops, having received X as an input. If we feed our oracle a description of ourselves, there will be a contradiction and the algorithm will contradict itself.  Details can be viewed on the <a href="https://ru.wikipedia.org/wiki/%25D0%259F%25D1%2580%25D0%25BE%25D0%25B1%25D0%25BB%25D0%25B5%25D0%25BC%25D0%25B0_%25D0%25BE%25D1%2581%25D1%2582%25D0%25B0%25D0%25BD%25D0%25BE%25D0%25B2%25D0%25BA%25D0%25B8">wiki</a> . <br><br><h2>  The Oracle exists, but he needs a brother </h2><br>  You are not embarrassed by the fact that the oracle should freeze if the algorithm it analyzes stops, here I am very embarrassed with this fact, therefore, for proof, we correct the oracle's conclusion a little.  Let the oracle return 1 or 0. So what if you ask, nothing has changed, if we write in pseudocode: <br><pre><code class="java">If (оракул(N)==0){
+While (true){
+}
+} </code></pre><br>
+То противоречие останется, но если мы добавим брата оракула, то всё становится интересней:<br>
+Пусть у нас есть два оракула, входные параметры одинаковы у обоих оракулов, но выводы различаются:<br>
+<br>
+S1 возвращает 0 или 1 но что значат эти 0 или 1 неизвестно, об этом знает только второй оракул.<br>
+<br>
+S2 возвращает 0 или 1 для обозначения данных первого оракула, но не даёт информации о работе алгоритма. 1 означает что у первого оракула 1 будет означать бесконечное выполнение алгоритма, 0 остановка. А вот ноль на оборот у первого оракула 0 будет означать бесконечное выполнение алгоритма, 1 остановка.<br>
+<br>
+Оракулы ВСЕГДА выполняют анализ за конечное время, но с оговоркой. Описание оговорки будет чуть ниже.<br>
+<br>
+Два оракула нужны для того, чтобы алгоритм получив данные от одного оракула не смог узнать о своём будущем, до полного выполнения всей программы. Так как узнав результат своей работы, алгоритм может изменить своё поведение, тем самым опровергнув утверждение оракула.<br>
+<br>
+Оракулы запускаются на двух параллельных машинах Тьюринга, синхронизированных такт в такт. Оракулы соединены очень быстрой связью, настолько быстрой что решения они принимают одновременно.<br>
+<br>
+Теперь как это будет выглядеть на псевдокоде:<br>
+<br>
+Запрос к первому оракулу<br>
+<br>
+<pre><code class="java">If (оракул(N)==0){
+While(true){
+}
+}</code></pre><br>
+<br>
+Запрос к второму оракулу<br>
+<br>
+<pre><code class="java">If (оракул(N)==0){
+While(true){
+}
+}</code></pre><br>
+<br>
+Оба оракула вернут ноль что будет означать что алгоритм зависнет.<br>
+<br>
+В конце выполненных алгоритмов мы можем взять и соотнести данные тем самым получив ответ.<br>
+Но есть еще один нюанс, все входные данные должны быть конечными. Ресурсы машины, также должны быть конечными. Если хоть что-то будет бесконечным, то гарантировать анализ оракулами за конечное время нельзя.<br>
+<br>
+<h2>Заключение</h2><br>
+Так как Алан Тьюринг доказал, что общего алгоритма быть не может, значит с большой долей вероятности в нашей теории кроется ошибка. Поэтому всех неравнодушных прошу в комментарии помочь найти такую ситуацию, которая бы смогла помочь решить текущую задачку.</div><p>Source: <a href="https://habr.com/ru/post/436090/">https://habr.com/ru/post/436090/</a></p>
+<section class="navigation-panel">
+<h4>More articles:</h4>
+<nav class="list-of-articles-container js-list-of-articles-container">Waiting for the list from <a href="../../index.html">here</a>...</nav>
+</section>
+<script src="../../js/main.js"></script>
+
+<!-- Yandex.Metrika counter -->
+<script type="text/javascript" >
+  (function (d, w, c) {
+      (w[c] = w[c] || []).push(function() {
+          try {
+              w.yaCounter52319614 = new Ya.Metrika({
+                  id:52319614,
+                  clickmap:true,
+                  trackLinks:true,
+                  accurateTrackBounce:true,
+                  webvisor:true
+              });
+          } catch(e) { }
+      });
+
+      var n = d.getElementsByTagName("script")[0],
+          s = d.createElement("script"),
+          f = function () { n.parentNode.insertBefore(s, n); };
+      s.type = "text/javascript";
+      s.async = true;
+      s.src = "https://mc.yandex.ru/metrika/watch.js";
+
+      if (w.opera == "[object Opera]") {
+          d.addEventListener("DOMContentLoaded", f, false);
+      } else { f(); }
+  })(document, window, "yandex_metrika_callbacks");
+</script>
+<noscript><div><img src="https://mc.yandex.ru/watch/52319614" style="position:absolute; left:-9999px;" alt="" /></div></noscript>
+
+<!-- Google Analytics -->
+  <script>
+    window.ga = function () { ga.q.push(arguments) }; ga.q = []; ga.l = +new Date;
+    ga('create', 'UA-134228602-1', 'auto'); ga('send', 'pageview')
+  </script>
+  <script src="https://www.google-analytics.com/analytics.js" async defer></script>
+
+</section>
+</body>
+
+</html>

@@ -1,0 +1,92 @@
+<!doctype html>
+<html class="no-js" lang="en">
+
+<head>
+  <!-- Global site tag (gtag.js) - Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=UA-134228602-1"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'UA-134228602-1');
+  </script>
+
+  <meta charset="utf-8">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  <title>Can the researchers of artificial intelligence trust him to check their work?</title>
+  <meta name="description" content="A machine learning researcher at Virginia Institute of Technology proposed a way to review scientific work using AI, which evaluates the appearance of...">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+  <link rel="stylesheet" href="../../css/main.css">
+
+  <script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+  <script>
+    (adsbygoogle = window.adsbygoogle || []).push({
+      google_ad_client: "ca-pub-6974184241884155",
+      enable_page_level_ads: true
+    });
+  </script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+  <script>window.jQuery || document.write('<script src="../../js/vendors/jquery-3.3.1.min.js"><\/script>')</script>
+</head>
+
+<body>
+  <!--[if lte IE 9]>
+    <p class="browserupgrade">You are using an <strong>outdated</strong> browser. Please <a href="https://browsehappy.com/">upgrade your browser</a> to improve your experience and security.</p>
+  <![endif]-->
+  <nav class="page-headings-container js-page-headings-container"></nav>
+  <div class="tools-bar js-tools-bar">
+    <!-- <a href="https://quick-geek.github.io/search.html" title="Search">🔎</a> -->
+    <a class="js-list-of-headings-button" data-state="closed" href="#" title="Headings">📜</a>
+    <a class="js-go-to-top-button" href="#" title="Go to Top">⬆️</a>
+    <a class="js-go-to-bottom-button" href="#" title="Go to Bottom">⬇️</a>
+  </div>
+  <section class="page js-page"><h1>Can the researchers of artificial intelligence trust him to check their work?</h1><div class="post__text post__text-html js-mediator-article">  A machine learning researcher at Virginia Institute of Technology proposed a way to review scientific work using AI, which evaluates the appearance of text and graphics in a document.  Will its methods of evaluating the “completeness” of scientific work suffice to speed up the process of independent review? <br><br>  In the field of machine learning, there is a whole avalanche of research.  Cliff Young, an engineer from Google, compared this situation with <a href="https://www.zdnet.com/article/google-says-exponential-growth-of-ai-is-changing-nature-of-compute/">Moore's law</a> , adapted for publications on the topic of AI - the number of academic papers on this topic appearing on the arXiv website doubles every 18 months. <br><br>  And this situation creates problems when reviewing works - experienced researchers in the field of AI are simply not enough to carefully read every new work.  Can scientists trust AI to work on accepting or rejecting work? <br><a name="habracut"></a><br>  This interesting question brings up a <a href="https://arxiv.org/pdf/1812.08775.pdf">report</a> recently published on the arXiv website;  Jia-Bin Huang [Jia-Bin Huang], the author of the work, a machine learning researcher, called it "Deep Gestalt of Work." <br><br>  Juan used a convolutional neural network — a common machine learning tool used for image recognition — to sift 5,000 papers published since 2013.  Juan writes that only on one appearance of the work - a mixture of text and images - his neural network can distinguish "good" work, worthy of inclusion in scientific archives, with an accuracy of 92%. <br><br>  For researchers, this means that a couple of things play the most important role in the appearance of their document: vivid pictures on the title page of the research work and filling all pages with text, so that at the end of the last page there is no empty space. <br><br><img src="https://habrastorage.org/getpro/habr/post_images/ce2/cd2/a7f/ce2cd2a7f98b808e0a8af4634d769328.png"><br>  Juan's convolutional neural network digests thousands of approved and unapproved scientific papers, creating a “heat map” of strengths and weaknesses.  The biggest mistakes of the works that did not pass the selection: the absence of color pictures and an empty space at the end of the last page. <br><br>  Juan bases his work on another work from 2010, authored by Carven von Bearnensquash of the University of Phoenix.  We used non-depth learning, traditional computer vision technology, to find a way to “at a glance assess the overall appearance” of the work and to conclude whether or not to approve the work. <br><br>  Using this idea, Juan fed the computer 5,618 papers adopted at the two most important conferences on computer vision, CVPR and ICCV over the past five years.  Huang also collected works presented at the workshops of conferences that played the role of rejected works - because there is no access to works rejected at conferences. <br><br>  Juan trained the network to associate past and non-completed works with the binary outcome “good” and “bad”, in order to isolate from them signs of “completion” or gestalt.  Gestalt is something whole, exceeding in size the sum of its parts.  This is what machine learning pioneer Terry Seinovsky called “general organized perception”, something more meaningful than the hills and ravines of the area in your immediate vicinity. <br><br>  The trained network was then checked on a subset of the work that she had not seen before.  The training balanced false positives - accepted jobs that were worth rejecting - with false failures, rejected jobs that were worth accepting. <br><br>  By limiting the number of “good”, but rejected works, 0.4% - that is, only 4 works - the network was able to correctly reject half of the “bad” works, which had to be rejected. <br><br>  The author even thought of feeding his own work of his own neural network.  As a result, the neural network rejected it: “We applied a trained classifier to this work.  Our network ruthlessly predicted that with a 97% probability this work should be rejected without independent review. ” <br><br>  As for these cosmetic requirements - beautiful pictures in the article - Juan does not simply describe the results of the work.  He also offers code that allows you to create good-looking works.  He feeds "good" work into the training database of the generative-adversary network, which can create a new plan, learning from examples. <br><br>  Juan also offers a third component, “reworking” the rejected work into acceptable, “automatically giving advice on what needs to be changed in the incoming work,” for example, “add a picture to attract attention and pictures on the last page.” <br><br>  Huang suggests that such a work approval process can become a “pre-filter” that lightens the workload on reviewers, since it can see thousands of papers in a few seconds.  And yet "it is unlikely that such a classifier will be used at a real conference," the author concludes. <br><br>  One of the limitations of work that can affect its use is that even if the appearance of the work, its visual gestalt, coincides with historical results, this does not guarantee the presence of real value in the work. <br><br>  As Juan writes, “ignoring the content of the works, we may reject works with good material, and poor visual design, or accept fucking works that look good.” </div><p>Source: <a href="https://habr.com/ru/post/436036/">https://habr.com/ru/post/436036/</a></p>
+<section class="navigation-panel">
+<h4>More articles:</h4>
+<nav class="list-of-articles-container js-list-of-articles-container">Waiting for the list from <a href="../../index.html">here</a>...</nav>
+</section>
+<script src="../../js/main.js"></script>
+
+<!-- Yandex.Metrika counter -->
+<script type="text/javascript" >
+  (function (d, w, c) {
+      (w[c] = w[c] || []).push(function() {
+          try {
+              w.yaCounter52319614 = new Ya.Metrika({
+                  id:52319614,
+                  clickmap:true,
+                  trackLinks:true,
+                  accurateTrackBounce:true,
+                  webvisor:true
+              });
+          } catch(e) { }
+      });
+
+      var n = d.getElementsByTagName("script")[0],
+          s = d.createElement("script"),
+          f = function () { n.parentNode.insertBefore(s, n); };
+      s.type = "text/javascript";
+      s.async = true;
+      s.src = "https://mc.yandex.ru/metrika/watch.js";
+
+      if (w.opera == "[object Opera]") {
+          d.addEventListener("DOMContentLoaded", f, false);
+      } else { f(); }
+  })(document, window, "yandex_metrika_callbacks");
+</script>
+<noscript><div><img src="https://mc.yandex.ru/watch/52319614" style="position:absolute; left:-9999px;" alt="" /></div></noscript>
+
+<!-- Google Analytics -->
+  <script>
+    window.ga = function () { ga.q.push(arguments) }; ga.q = []; ga.l = +new Date;
+    ga('create', 'UA-134228602-1', 'auto'); ga('send', 'pageview')
+  </script>
+  <script src="https://www.google-analytics.com/analytics.js" async defer></script>
+
+</section>
+</body>
+
+</html>

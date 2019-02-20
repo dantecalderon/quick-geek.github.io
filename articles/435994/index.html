@@ -1,0 +1,92 @@
+<!doctype html>
+<html class="no-js" lang="en">
+
+<head>
+  <!-- Global site tag (gtag.js) - Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=UA-134228602-1"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'UA-134228602-1');
+  </script>
+
+  <meta charset="utf-8">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  <title>This is Karma, baby, or why the attack on wireless networks, which was supposed to sink into oblivion, is still alive</title>
+  <meta name="description" content="Today, wireless access points surround us everywhere: in cafes, restaurants, in shopping centers and in transport. This has ceased to be something unu...">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+  <link rel="stylesheet" href="../../css/main.css">
+
+  <script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+  <script>
+    (adsbygoogle = window.adsbygoogle || []).push({
+      google_ad_client: "ca-pub-6974184241884155",
+      enable_page_level_ads: true
+    });
+  </script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+  <script>window.jQuery || document.write('<script src="../../js/vendors/jquery-3.3.1.min.js"><\/script>')</script>
+</head>
+
+<body>
+  <!--[if lte IE 9]>
+    <p class="browserupgrade">You are using an <strong>outdated</strong> browser. Please <a href="https://browsehappy.com/">upgrade your browser</a> to improve your experience and security.</p>
+  <![endif]-->
+  <nav class="page-headings-container js-page-headings-container"></nav>
+  <div class="tools-bar js-tools-bar">
+    <!-- <a href="https://quick-geek.github.io/search.html" title="Search">🔎</a> -->
+    <a class="js-list-of-headings-button" data-state="closed" href="#" title="Headings">📜</a>
+    <a class="js-go-to-top-button" href="#" title="Go to Top">⬆️</a>
+    <a class="js-go-to-bottom-button" href="#" title="Go to Bottom">⬇️</a>
+  </div>
+  <section class="page js-page"><h1>This is Karma, baby, or why the attack on wireless networks, which was supposed to sink into oblivion, is still alive</h1><div class="post__text post__text-html js-mediator-article"><p><img src="https://ic.pics.livejournal.com/ibigdan/8161099/9174404/9174404_original.jpg"></p><br><p>  Today, wireless access points surround us everywhere: in cafes, restaurants, in shopping centers and in transport.  This has ceased to be something unusual, and we calmly connect to an unprotected network or keep the search mode for familiar points around constantly on.  That is why in recent years the number of attacks aimed at this segment has been steadily increasing.  It is not surprising, because getting access to user traffic opens up a huge field of action for an attacker.  Today I would like to consider one of these attacks under the prosaic name Karma, invented back in 2005, but at the moment is still relevant. <a name="habracut"></a></p><br><p>  At one time, conversations about Karma (hereinafter - Karma) were very popular among security circles, and many heard about it at least with the edge of their ears.  Those whom this topic has bypassed at that time may be familiar with it in absentia thanks to the well-known device called Pineapple.  It was created specifically to conduct Karma and other similar attacks on wireless networks quickly and effortlessly. </p><br><p>  A cursory examination of Karma itself makes it clear that in reality it is an evil twin “on steroids”, because, in essence, its main part is to pick up a copy of a certain access point.  However, the devil is in the details, and the details allow the attack, created 13 years ago, not to lose its relevance and be used to conduct pentests to this day. </p><br><h3 id="poperechnyy-razrez-ili-otkuda-nogi-rastut">  Cross-section, or where the legs grow from </h3><br><p>  What is this dinosaur different from all the others, and thus survived?  Karma stands out because it is not based on software vulnerabilities of access points or clients, but on the features of the widely used 802.11 standard, or rather, on the features of its authentication protocol.  For a complete understanding of the Karma device, the authentication process itself will be considered in detail below.  Readers familiar with this process can easily skip this part. </p><br><p><img src="https://i.pinimg.com/originals/73/7c/9b/737c9bd48cbd7f70080750429eb0610d.png" alt="737c9bd48cbd7f70080750429eb0610d.png"></p><br><p>  To announce its presence, the Access Point (access point, hereafter - AP) transmits the so-called Beacon frames — packets containing the SSID of the access point (i.e. its identifier, network name), supported data rates and encryption type that uses this wireless network. </p><br><p>  The user finds wireless networks by listening to packets in search of Beacon frames from APs around him or by sending to access points from his list of preferred networks Probe request frames — packets consisting of the SSID that the user is looking for, as well as data rates that are supported user device.  The SSID can be an empty string indicating that this is a Null probe request (a request addressed to all access points regardless of the SSID). </p><br><p>  APs respond to Probe requests, their SSIDs, as well as Null probe requests using Probe Response packets.  Probe Response contains data identical to the data in the Beacon frames: SSID, supported data transfer rates, and the presence of encryption. </p><br><p>  If the wireless network uses encryption, the user's device must be authenticated before connecting.  This process occurs through Authentication frames.  If the user's device has already been authenticated or the network does not require it, the device will send an Association Request to the access point, to which the AP responds with an Association Response frame.  After that, the user can work in this wireless network. </p><br><p>  <strong>It is important to note</strong> that although the standard defines how a user joins an access point, the method for selecting this point is not defined, there is no mention of whether the base station should be authenticated or trusted by default.  The solution to this problem was left to the suppliers of hardware and software of the operating system. </p><br><p>  Now it became clear how Karma works.  An attacker within the signal range (which can be potentially helped by high gain antennas and signal amplifiers) can passively monitor one wireless channel and observe connection requests from users to all access points.  He can use this information to recreate the victim’s preferred networks list.  User requests to connect reveal only the names of the networks, but their type of encryption is not.  However, possessing only the SSID of the access point, the attacker can create a copy of it with the same name, increasing the likelihood of the victim connecting to it: for example, by amplifying the signal from the access point (the client usually automatically connects to the most powerful point), or perform an attack like denial of service "in relation to the selected AP.  If the client expects the network to be encrypted, the connection will not be established, and the attacker can try the next network in his recreated copy of the victim's preferred network list.  When he stumbles upon a network that does not support encryption, a wireless network will be created, to which the victim will immediately join. </p><br><p>  <strong>A little bit about the attack from the creators of Wi-Fi Pineapple:</strong> </p><br><p> <a href="https://youtu.be/vsOuOlKbjH4"><img src="http://img.youtube.com/vi/vsOuOlKbjH4/0.jpg" alt="IMAGE ALT TEXT HERE"></a> </p><br><h3 id="old-but-not-obsolete">  "Old, but not obsolete" </h3><br><p>  To date, the key problem in the standard has not been resolved, and Karma continues to be a real threat to users.  For example, to test wireless networks now often use the above-mentioned WiFi Pineapple, which can be purchased freely.  The creators of this project are actively supporting it and, with some frequency, release updates.  A relatively new version of Pineapple was released recently: Tetra - a full-fledged router with everything you need, 4 SMA antennas and built-in 2 GB flash memory and Nano - a simplified version that has a USB adapter format with 2 SMA antennas, 16 MB ROM and a connector under micro SD. </p><br><p><img src="https://i0.wp.com/d2cpnw0u24fjm4.cloudfront.net/wp-content/uploads/WF-Pineapple-Tetra.jpg?fit=1920%2C1440&amp;ssl=1"></p><br><p>  For those who would like to try Karma on this wonderful device, I would immediately like to say that there is no point in buying from the hands early versions like Mark V, since  the manufacturer has stopped supporting them, and the likelihood that you can simply download the necessary software through the device’s built-in store or update the device (the latest firmware for Mark V was released in August 2015) tends to zero, and to launch it and turn attack, even speech does not go. </p><br><p><img src="https://i.pinimg.com/originals/48/bf/f8/48bff8c04155e312cfbbe38d90a06987.jpg" alt="48bff8c04155e312cfbbe38d90a06987.jpg"></p><br><p>  Having a little rummaged on github, it is possible to find several implementations of Karma with open source code of different levels of execution: </p><br><ul><li>  <a href="https://github.com/P0cL4bs/WiFi-Pumpkin">WiFi-pumpkin</a> ; </li><li>  <a href="https://github.com/wifiphisher/wifiphisher">Wifiphisher</a> ; </li><li>  <a href="https://github.com/sensepost/hostapd-mana">Mana toolkit</a> ; </li><li>  <a href="http://fruitywifi.com/index_eng.html">FruityWifi</a> . </li></ul><br><p> Although the last two of these implementations have already been given are not supported, but WiFi-Pumpkin and Wifiphisher are currently alive and continue to evolve.  My Karma research did not start with them, but with Mana and FruityWiFi, which spent a tremendous amount of time analyzing.  It was not possible to make them work, and the attempts were abandoned.  However, in the near future I plan to return to this topic again and try WiFi-Pumpkin and Wifiphisher, these projects have their own small community and the probability of success in this case is much higher. </p><br><p>  Also, the cherry on the cake and the interesting implementation of Karma can be called <a href="https://github.com/CreateRemoteThread/esp8266-karma">this small project</a> that implements the attack using a cheap and popular ESP8266 microcontroller.  The project is not completely independent Karma, the user must create a Rogue AP (fake access point), there are no functions for creating a preferred list of networks.  However, both of these problems are not so difficult to solve - ESP is quite generous in terms of resources for this, and, with due desire, you can get a good utility. </p><br><h3 id="borba-s-plohoy-karmoy">  Fighting bad karma </h3><br><p><img src="https://habrastorage.org/webt/8s/5y/5d/8s5y5d-ynwofhqbm6fhnx39ks7k.jpeg"></p><br><p>  And now what to do with this information, how to protect yourself?  There is absolutely no magic here, the rules for protecting against Karma are simple: </p><br><ol><li>  Disable Wi-Fi search mode on all your devices until you need it. </li><li>  Do not trust familiar access points, always check whether this point can be here at all (yes, MT_FREE, I'm talking about you). </li><li>  Use VPN wherever possible and impossible. <br>  (Everything here works the same way as with an attacker who can listen to traffic on the network under control - using the VPN, he simply cannot decipher anything). </li><li>  Create access points with encryption and give preference to them. </li><li>  Do not re-log in to familiar networks (most likely, this is a fake access point of the attacker). </li></ol><br><p>  Despite the fact that the target OS has been updated hundreds of times since the advent of Karma and the systems have become more secure, this attack is still alive and threatening users.  Expect that in the near future the standard will be corrected or added is not necessary, so we can only adhere to these simple rules and keep our ears open. </p></div><p>Source: <a href="https://habr.com/ru/post/435994/">https://habr.com/ru/post/435994/</a></p>
+<section class="navigation-panel">
+<h4>More articles:</h4>
+<nav class="list-of-articles-container js-list-of-articles-container">Waiting for the list from <a href="../../index.html">here</a>...</nav>
+</section>
+<script src="../../js/main.js"></script>
+
+<!-- Yandex.Metrika counter -->
+<script type="text/javascript" >
+  (function (d, w, c) {
+      (w[c] = w[c] || []).push(function() {
+          try {
+              w.yaCounter52319614 = new Ya.Metrika({
+                  id:52319614,
+                  clickmap:true,
+                  trackLinks:true,
+                  accurateTrackBounce:true,
+                  webvisor:true
+              });
+          } catch(e) { }
+      });
+
+      var n = d.getElementsByTagName("script")[0],
+          s = d.createElement("script"),
+          f = function () { n.parentNode.insertBefore(s, n); };
+      s.type = "text/javascript";
+      s.async = true;
+      s.src = "https://mc.yandex.ru/metrika/watch.js";
+
+      if (w.opera == "[object Opera]") {
+          d.addEventListener("DOMContentLoaded", f, false);
+      } else { f(); }
+  })(document, window, "yandex_metrika_callbacks");
+</script>
+<noscript><div><img src="https://mc.yandex.ru/watch/52319614" style="position:absolute; left:-9999px;" alt="" /></div></noscript>
+
+<!-- Google Analytics -->
+  <script>
+    window.ga = function () { ga.q.push(arguments) }; ga.q = []; ga.l = +new Date;
+    ga('create', 'UA-134228602-1', 'auto'); ga('send', 'pageview')
+  </script>
+  <script src="https://www.google-analytics.com/analytics.js" async defer></script>
+
+</section>
+</body>
+
+</html>

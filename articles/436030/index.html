@@ -1,0 +1,94 @@
+<!doctype html>
+<html class="no-js" lang="en">
+
+<head>
+  <!-- Global site tag (gtag.js) - Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=UA-134228602-1"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'UA-134228602-1');
+  </script>
+
+  <meta charset="utf-8">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  <title>GoDaddy customers are unhappy with JS injections from the hoster</title>
+  <meta name="description" content="One GoDaddy client noticed that the hoster injects extraneous JavaScript into its users' HTML pages. 
+
+ There were no scripts on the admin side, and o...">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+  <link rel="stylesheet" href="../../css/main.css">
+
+  <script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+  <script>
+    (adsbygoogle = window.adsbygoogle || []).push({
+      google_ad_client: "ca-pub-6974184241884155",
+      enable_page_level_ads: true
+    });
+  </script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+  <script>window.jQuery || document.write('<script src="../../js/vendors/jquery-3.3.1.min.js"><\/script>')</script>
+</head>
+
+<body>
+  <!--[if lte IE 9]>
+    <p class="browserupgrade">You are using an <strong>outdated</strong> browser. Please <a href="https://browsehappy.com/">upgrade your browser</a> to improve your experience and security.</p>
+  <![endif]-->
+  <nav class="page-headings-container js-page-headings-container"></nav>
+  <div class="tools-bar js-tools-bar">
+    <!-- <a href="https://quick-geek.github.io/search.html" title="Search">🔎</a> -->
+    <a class="js-list-of-headings-button" data-state="closed" href="#" title="Headings">📜</a>
+    <a class="js-go-to-top-button" href="#" title="Go to Top">⬆️</a>
+    <a class="js-go-to-bottom-button" href="#" title="Go to Bottom">⬇️</a>
+  </div>
+  <section class="page js-page"><h1>GoDaddy customers are unhappy with JS injections from the hoster</h1><div class="post__text post__text-html js-mediator-article"><img src="https://habrastorage.org/getpro/habr/post_images/ea2/f1f/8e1/ea2f1f8e18eb24e011221091e899df1f.png"><br><br>  One GoDaddy client <a href="https://www.igorkromin.net/index.php/2019/01/13/godaddy-is-sneakily-injecting-javascript-into-your-website-and-how-to-stop-it/">noticed</a> that the hoster injects extraneous JavaScript into its users' HTML pages. <br><br>  There were no scripts on the admin side, and on the client side, &lt;script&gt; &lt;/ script&gt; appeared in the code with a comment from the hoster. <br><a name="habracut"></a><br><pre><code class="xml hljs"><span class="hljs-tag"><span class="hljs-tag">&lt;</span><span class="hljs-name"><span class="hljs-tag"><span class="hljs-name">script</span></span></span><span class="hljs-tag">&gt;</span></span><span class="javascript"><span class="hljs-string"><span class="javascript"><span class="hljs-string">'undefined'</span></span></span><span class="javascript">=== </span><span class="hljs-keyword"><span class="javascript"><span class="hljs-keyword">typeof</span></span></span><span class="javascript"> _trfq || (</span><span class="hljs-built_in"><span class="javascript"><span class="hljs-built_in">window</span></span></span><span class="javascript">._trfq = []);</span><span class="hljs-string"><span class="javascript"><span class="hljs-string">'undefined'</span></span></span><span class="javascript">=== </span><span class="hljs-keyword"><span class="javascript"><span class="hljs-keyword">typeof</span></span></span><span class="javascript"> _trfd &amp;&amp; (</span><span class="hljs-built_in"><span class="javascript"><span class="hljs-built_in">window</span></span></span><span class="javascript">._trfd=[]),_trfd.push({</span><span class="hljs-string"><span class="javascript"><span class="hljs-string">'tccl.baseHost'</span></span></span><span class="javascript">:</span><span class="hljs-string"><span class="javascript"><span class="hljs-string">'secureserver.net'</span></span></span><span class="javascript">}),_trfd.push({</span><span class="hljs-string"><span class="javascript"><span class="hljs-string">'ap'</span></span></span><span class="javascript">:</span><span class="hljs-string"><span class="javascript"><span class="hljs-string">'cpsh'</span></span></span><span class="javascript">},{</span><span class="hljs-string"><span class="javascript"><span class="hljs-string">'server'</span></span></span><span class="javascript">:</span><span class="hljs-string"><span class="javascript"><span class="hljs-string">'xxxxxxxx0000'</span></span></span><span class="javascript">}) </span><span class="hljs-comment"><span class="javascript"><span class="hljs-comment">// Monitoring performance to make your website faster. If you want to opt-out, please contact web hosting support.</span></span></span></span><span class="hljs-tag"><span class="hljs-tag">&lt;/</span><span class="hljs-name"><span class="hljs-tag"><span class="hljs-name">script</span></span></span><span class="hljs-tag">&gt;</span></span><span class="hljs-tag"><span class="hljs-tag">&lt;</span><span class="hljs-name"><span class="hljs-tag"><span class="hljs-name">script</span></span></span><span class="hljs-tag"> </span><span class="hljs-attr"><span class="hljs-tag"><span class="hljs-attr">src</span></span></span><span class="hljs-tag">=</span><span class="hljs-string"><span class="hljs-tag"><span class="hljs-string">'https://img1.wsimg.com/tcc/tcc_l.combined.1.0.6.min.js'</span></span></span><span class="hljs-tag">&gt;</span></span><span class="undefined"></span><span class="hljs-tag"><span class="undefined"></span><span class="hljs-tag">&lt;/</span><span class="hljs-name"><span class="hljs-tag"><span class="hljs-name">script</span></span></span><span class="hljs-tag">&gt;</span></span></code> </pre> <br>  Of course, the comment explains the behavior of the script, which is designed to monitor performance.  But the user still could not believe that the hoster injects javascript without his consent. <br><br>  But GoDaddy really does that.  The technology is called Real User Metrics.  In the rules for using the service it is written that all customers from the United States automatically subscribe to this service.  This refers to customers whose sites are located in the US data center.  The pages of these sites stranger JavaScript is embedded by default. <br><br>  Most interestingly, even in the help section, GoDaddy <a href="https://au.godaddy.com/help/why-am-i-signed-up-for-real-user-metrics-31969">recognizes</a> that these scripts "can slow down or break your site." <br><br><img src="https://habrastorage.org/webt/r-/j4/87/r-j4871pcal5f8r0ruskklvjie4.png"><br><br>  To disable the imposed service, click on the button with ellipsis in the upper right corner of the admin interface, select the item <i>Help us</i> , and then <i>Opt Out</i> . <br><br><img src="https://habrastorage.org/getpro/habr/post_images/80b/9e7/8a8/80b9e78a8b5ec67cacc7e1368eb95d23.png"><br><br><img src="https://habrastorage.org/getpro/habr/post_images/6ce/3c1/319/6ce3c131962af6f8f9c303253963a95b.png"><br><br>  After this, extraneous scripts will disappear from the pages of the site. </div><p>Source: <a href="https://habr.com/ru/post/436030/">https://habr.com/ru/post/436030/</a></p>
+<section class="navigation-panel">
+<h4>More articles:</h4>
+<nav class="list-of-articles-container js-list-of-articles-container">Waiting for the list from <a href="../../index.html">here</a>...</nav>
+</section>
+<script src="../../js/main.js"></script>
+
+<!-- Yandex.Metrika counter -->
+<script type="text/javascript" >
+  (function (d, w, c) {
+      (w[c] = w[c] || []).push(function() {
+          try {
+              w.yaCounter52319614 = new Ya.Metrika({
+                  id:52319614,
+                  clickmap:true,
+                  trackLinks:true,
+                  accurateTrackBounce:true,
+                  webvisor:true
+              });
+          } catch(e) { }
+      });
+
+      var n = d.getElementsByTagName("script")[0],
+          s = d.createElement("script"),
+          f = function () { n.parentNode.insertBefore(s, n); };
+      s.type = "text/javascript";
+      s.async = true;
+      s.src = "https://mc.yandex.ru/metrika/watch.js";
+
+      if (w.opera == "[object Opera]") {
+          d.addEventListener("DOMContentLoaded", f, false);
+      } else { f(); }
+  })(document, window, "yandex_metrika_callbacks");
+</script>
+<noscript><div><img src="https://mc.yandex.ru/watch/52319614" style="position:absolute; left:-9999px;" alt="" /></div></noscript>
+
+<!-- Google Analytics -->
+  <script>
+    window.ga = function () { ga.q.push(arguments) }; ga.q = []; ga.l = +new Date;
+    ga('create', 'UA-134228602-1', 'auto'); ga('send', 'pageview')
+  </script>
+  <script src="https://www.google-analytics.com/analytics.js" async defer></script>
+
+</section>
+</body>
+
+</html>

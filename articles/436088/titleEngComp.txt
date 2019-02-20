@@ -1,0 +1,1 @@
+Graphic editor GANpaint draws objects and demonstrates the capabilities of GAN.

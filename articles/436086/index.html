@@ -1,0 +1,92 @@
+<!doctype html>
+<html class="no-js" lang="en">
+
+<head>
+  <!-- Global site tag (gtag.js) - Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=UA-134228602-1"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'UA-134228602-1');
+  </script>
+
+  <meta charset="utf-8">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  <title>Update Update 4 for Veeam Cloud Connect</title>
+  <meta name="description" content="The new year began with new products from Veeam. Last week, Service Providers became available Update 4 for Veeam Cloud Connect. Let me remind you tha...">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+  <link rel="stylesheet" href="../../css/main.css">
+
+  <script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+  <script>
+    (adsbygoogle = window.adsbygoogle || []).push({
+      google_ad_client: "ca-pub-6974184241884155",
+      enable_page_level_ads: true
+    });
+  </script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+  <script>window.jQuery || document.write('<script src="../../js/vendors/jquery-3.3.1.min.js"><\/script>')</script>
+</head>
+
+<body>
+  <!--[if lte IE 9]>
+    <p class="browserupgrade">You are using an <strong>outdated</strong> browser. Please <a href="https://browsehappy.com/">upgrade your browser</a> to improve your experience and security.</p>
+  <![endif]-->
+  <nav class="page-headings-container js-page-headings-container"></nav>
+  <div class="tools-bar js-tools-bar">
+    <!-- <a href="https://quick-geek.github.io/search.html" title="Search">🔎</a> -->
+    <a class="js-list-of-headings-button" data-state="closed" href="#" title="Headings">📜</a>
+    <a class="js-go-to-top-button" href="#" title="Go to Top">⬆️</a>
+    <a class="js-go-to-bottom-button" href="#" title="Go to Bottom">⬇️</a>
+  </div>
+  <section class="page js-page"><h1>Update Update 4 for Veeam Cloud Connect</h1><div class="post__text post__text-html js-mediator-article">  The new year began with new products from Veeam.  Last week, Service Providers became available Update 4 for Veeam Cloud Connect.  Let me remind you that Veeam Cloud Connect helps to set up virtual machine replication, launch replicas in the service provider cloud, and organize a remote repository for backups on the provider's site.  I already wrote about this tool <a href="https://habr.com/company/dataline/blog/308984/">here</a> .  Today I will show that a new one has appeared in it. <br><br>  Here are the main changes: <br><br><ul><li>  Cloud Gateway binding to specific customers; </li><li>  replication to the VMware vCloud Director organization.  Previously, you could only make replicas at the vCenter level.  Clients did not have the ability to connect to the replica of the virtual machine through the console, without failover. </li><li>  backup to tape with client binding to a specific tape. </li></ul><br>  Details under the cut. <br><br><img src="https://habrastorage.org/webt/av/uw/n-/avuwn-om-68sj8t98hgnicss3wo.png"><br><br><img src="https://habrastorage.org/webt/iv/2k/-p/iv2k-psgfstvuyakfjun_ky44fi.jpeg"><a name="habracut"></a><br><br><h3>  Cloud Gateway Pool </h3><br>  Now the client can be assigned separate cloud gateway pools (Cloud Gateway Pool).  If the client has specific channel requirements for replication tasks (for example, channel encryption according to GOST or guaranteed speed), this can be arranged in the new Veeam Cloud Connect.  To do this, create a client-specific Cloud Gateway Pool.  There may be several of them - for fault tolerance or load balancing.  I will show the example of one. <br><br><img src="https://habrastorage.org/webt/qa/6v/yn/qa6vyni1df2wjrauio3fikz-0gy.jpeg"><br><br>  Next, create the Gateway Pool and add the required Cloud Gateway to it. <br><br><img src="https://habrastorage.org/webt/lg/ss/zr/lgsszrsx7ic3-hmydxl9ksd3e_e.jpeg"><br><br><img src="https://habrastorage.org/webt/pc/m1/hw/pcm1hwbttldot8mkfjbe9uvi3ko.jpeg"><br><br><img src="https://habrastorage.org/webt/xv/sh/jl/xvshjleukvajrzw1r7wdj3ban60.jpeg"><br><br><img src="https://habrastorage.org/webt/rw/gs/d3/rwgsd3w5f6glknpsezmyfetdemq.jpeg"><br><br>  When the gateway pool is created, assign it to the appropriate client.  There is a failover option to other Cloud Gateways if something happens to the allocated pool. <br><br><img src="https://habrastorage.org/webt/zd/bp/4y/zdbp4ybym-av9fj224dtzkiupke.jpeg"><br><br><h3>  Replication in vCloud Director </h3><br>  Now you can configure virtual machine replication not just to the VMware infrastructure of the cloud provider, but to the selected vCloud Director organization.  Versions 8.10, 8.20, 9.0, 9.0.0.1, 9.0.0.2 and 9.1 are supported.  Remember that the Hardware Version of the replicated virtual machine should be no higher than that of the provider.  Here is how it will look in practice. <br><br>  In Cloud Connect we create a client profile based on the account in vCloud Director. <br><br><img src="https://habrastorage.org/webt/i6/wl/m5/i6wlm59pcb5uu3eaiixo2vnjhwm.jpeg"><br><br>  Select the organization where the replicas will be added. <br><br><img src="https://habrastorage.org/webt/3l/7h/2s/3l7h2sv44e129sfhicv1nokoxzk.jpeg"><br><br>  We select Gateway Pool for this client. <br><br><img src="https://habrastorage.org/webt/ff/q-/l1/ffq-l1e9gbz-cgeft26n7ssdcg8.jpeg"><br><br>  In the Replica Resources tab, we see the selected organization in the cloud.  Click Apply, and the client can connect to Cloud Connect. <br><br><img src="https://habrastorage.org/webt/w4/iv/ut/w4ivutmfsfw_fjzrsinb2u9h63y.jpeg"><br><br>  For network connectivity between resources in the service provider's cloud and its infrastructure, it is proposed to use Veeam Network Extension.  With it, you can do partial (restore individual machines from replicas) and complete failover (restore the entire site).  You can use NSX Edge functionality for this purpose.  It is much more convenient. <br><br>  Now let's see how client replication setup looks like. <br><br>  To connect to Cloud Connect in the console, Veeam Backup and Replication, the client selects a service provider. <br><br><img src="https://habrastorage.org/webt/1-/3d/v8/1-3dv8diitv3qufhvafpn2ujthc.jpeg"><br><br><img src="https://habrastorage.org/webt/ba/7-/2w/ba7-2wiqaugog3jnbuqxlulsuom.jpeg"><br><br>  The client is authorized in Cloud Connect using the vCloud Director account, into which replicas will be added later. <br><br><img src="https://habrastorage.org/webt/q4/5l/5f/q45l5fmsflya4ll4spdwtscq2ke.jpeg"><br><br>  After authorization, the client sees the resources allocated for the replica: the name of the organization, CPU, Memory, Storage, etc.). <br><br><img src="https://habrastorage.org/webt/rf/-0/ng/rf-0ngooznt6r3avhgev4c0mzmk.jpeg"><br><br>  Then you can start creating tasks for replication.  Here everything is as in previous versions, up to the Destination tab. <br><br><img src="https://habrastorage.org/webt/5g/vx/q0/5gvxq0rsmrxyu2jbzsihorvb8rq.jpeg"><br><br><img src="https://habrastorage.org/webt/6y/57/nz/6y57nz8nvemy11mebjsjj2wgc4g.jpeg"><br><br>  On the Destination tab, the client selects the vApp to which the virtual machine is going to replicate, and the Storage policy. <br><br><img src="https://habrastorage.org/webt/g8/w7/vt/g8w7vt2c4inxorcft5ypx-aulni.jpeg"><br><br>  Further the task is configured, as in the previous version.  This is the finished task for replication. <br><br><img src="https://habrastorage.org/webt/rp/ok/oz/rpokozng6atpfig3nkzji1bnyjs.jpeg"><br><br>  And these are ready-made replicas in the service provider cloud. <br><br><img src="https://habrastorage.org/webt/z_/1f/g0/z_1fg077qduvbmbk0cse2uc2b7c.jpeg"><br><br>  All replicas can be accessed through the vCloud Director control panel.  Any virtual machine can be turned on / off, potestit, clone, and everything that can be done with normal virtual machines.  If the topic is interesting, in the next post I can tell you more about setting up this whole thing. <br><br><img src="https://habrastorage.org/webt/1q/ll/mf/1qllmfa8d5dep8xjfsisxo_0bks.jpeg"><br><br><img src="https://habrastorage.org/webt/tc/md/ay/tcmdayzb_nxhaq8oedkhka-sg9k.jpeg"><br><br><h3>  Record backup to tape </h3><br>  With Update 4, the ability to assign specific tapes to a specific client has been added.  Previously, you had to poke around in the repository to understand what and where it lies. This is more of a convenience store for the provider. <br><br><img src="https://habrastorage.org/webt/93/mg/hj/93mghjllbvxxh1n6ort3xxf9gum.jpeg"><br><br><img src="https://habrastorage.org/webt/eg/ko/u9/egkou9iijpqev9j4kmpmnhlr368.jpeg"><br><br>  Update 4 will be open to the public on January 22.  In the <a href="https://www.dtln.ru/uslugi/iaas/cloudline">CloudLine</a> cloud, <a href="https://www.dtln.ru/uslugi/iaas/cloudline">you</a> can take a test pool of resources to try out the new features of Veeam Cloud Connect. </div><p>Source: <a href="https://habr.com/ru/post/436086/">https://habr.com/ru/post/436086/</a></p>
+<section class="navigation-panel">
+<h4>More articles:</h4>
+<nav class="list-of-articles-container js-list-of-articles-container">Waiting for the list from <a href="../../index.html">here</a>...</nav>
+</section>
+<script src="../../js/main.js"></script>
+
+<!-- Yandex.Metrika counter -->
+<script type="text/javascript" >
+  (function (d, w, c) {
+      (w[c] = w[c] || []).push(function() {
+          try {
+              w.yaCounter52319614 = new Ya.Metrika({
+                  id:52319614,
+                  clickmap:true,
+                  trackLinks:true,
+                  accurateTrackBounce:true,
+                  webvisor:true
+              });
+          } catch(e) { }
+      });
+
+      var n = d.getElementsByTagName("script")[0],
+          s = d.createElement("script"),
+          f = function () { n.parentNode.insertBefore(s, n); };
+      s.type = "text/javascript";
+      s.async = true;
+      s.src = "https://mc.yandex.ru/metrika/watch.js";
+
+      if (w.opera == "[object Opera]") {
+          d.addEventListener("DOMContentLoaded", f, false);
+      } else { f(); }
+  })(document, window, "yandex_metrika_callbacks");
+</script>
+<noscript><div><img src="https://mc.yandex.ru/watch/52319614" style="position:absolute; left:-9999px;" alt="" /></div></noscript>
+
+<!-- Google Analytics -->
+  <script>
+    window.ga = function () { ga.q.push(arguments) }; ga.q = []; ga.l = +new Date;
+    ga('create', 'UA-134228602-1', 'auto'); ga('send', 'pageview')
+  </script>
+  <script src="https://www.google-analytics.com/analytics.js" async defer></script>
+
+</section>
+</body>
+
+</html>

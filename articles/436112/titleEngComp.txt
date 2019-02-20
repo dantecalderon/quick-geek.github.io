@@ -1,0 +1,1 @@
+The kubectl-debug plugin for debugging in Kubernetes pods

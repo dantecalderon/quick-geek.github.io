@@ -1,0 +1,94 @@
+<!doctype html>
+<html class="no-js" lang="en">
+
+<head>
+  <!-- Global site tag (gtag.js) - Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=UA-134228602-1"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'UA-134228602-1');
+  </script>
+
+  <meta charset="utf-8">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  <title>How to connect Raspberry PI to Azure IoT: step-by-step instructions</title>
+  <meta name="description" content="Hi, Habr! I present to you the translation of the article Connecting Raspberry PI via Azure IoT: Step-By-Step Tutorial . 
+
+ In this post, we will expl...">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+  <link rel="stylesheet" href="../../css/main.css">
+
+  <script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+  <script>
+    (adsbygoogle = window.adsbygoogle || []).push({
+      google_ad_client: "ca-pub-6974184241884155",
+      enable_page_level_ads: true
+    });
+  </script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+  <script>window.jQuery || document.write('<script src="../../js/vendors/jquery-3.3.1.min.js"><\/script>')</script>
+</head>
+
+<body>
+  <!--[if lte IE 9]>
+    <p class="browserupgrade">You are using an <strong>outdated</strong> browser. Please <a href="https://browsehappy.com/">upgrade your browser</a> to improve your experience and security.</p>
+  <![endif]-->
+  <nav class="page-headings-container js-page-headings-container"></nav>
+  <div class="tools-bar js-tools-bar">
+    <!-- <a href="https://quick-geek.github.io/search.html" title="Search">🔎</a> -->
+    <a class="js-list-of-headings-button" data-state="closed" href="#" title="Headings">📜</a>
+    <a class="js-go-to-top-button" href="#" title="Go to Top">⬆️</a>
+    <a class="js-go-to-bottom-button" href="#" title="Go to Bottom">⬇️</a>
+  </div>
+  <section class="page js-page"><h1>How to connect Raspberry PI to Azure IoT: step-by-step instructions</h1><div class="post__text post__text-html js-mediator-article">  Hi, Habr!  I present to you the translation of the article <a href="https://indeema.com/blog/connecting-raspberry-pi-via-azure-iot--step-by-step-tutorial">Connecting Raspberry PI via Azure IoT: Step-By-Step Tutorial</a> . <br><br>  In this post, we will explain how to connect the Raspberry Pi as a peripheral device to transmit signals to the LED panel using the Azure IoT Edge module. <br><br>  In most steps, we will use the Azure CLI, as well as the Azure Portal, to launch Azure IoT Edge. <a name="habracut"></a><br><br>  <b>For this we will need:</b> <br><br><ul><li>  Raspberry Pi 3 Model B + (LED panel) </li><li>  Microsoft Azure Account </li><li>  Latest version of Azure CLI </li><li>  Extension (component) of Azure IoT CLI </li></ul><br><h3>  Install and configure Azure IoT </h3><br>  Now we will install the Azure CLI, create the IoT Hub and connect our devices.  We will also create an identifier for the Raspberry Pi and use its access parameters for recognition in the IoT Hub.  In addition, we use add-edge-enabled to connect the Raspberry Pi to the Azure IoT Edge. <br><br>  To install and configure Azure IoT for the first time, you need: <br><br><ol><li>  Install the latest version of the Azure CLI on your computer with <a href="https://docs.microsoft.com/en-us/cli/azure/install-azure-cli%3Fview%3Dazure-cli-latest">docs.microsoft.com/en-us/cli/azure/install-azure-cli?view=azure-cli-latest</a> </li><li>  Configure the Azure CLI using: <br><br><pre><code class="plaintext hljs">$ az extension add --name azure-cli-iot-ext&lt;/li&gt;</code> </pre> </li><li>  Build a resource group for our project: <br><br><pre> <code class="plaintext hljs">$ az group create --name rasp-IoT --location westus</code> </pre> </li><li>  Create a gateway to connect peripherals to Azure IoT: <br><br><pre> <code class="plaintext hljs">$ az iot hub create --resource-group rasp-IoT --name rasp-IoT-Hub --sku S1</code> </pre> </li><li>  Create ids for the Raspberry Pi and device: <br><br><pre> <code class="plaintext hljs">$ az iot hub device-identity create --hub-name rasp-IoT-Hub --device-id myPi001 --edge-enabled</code> </pre> <br>  This command will produce a specific string that will be needed to connect the device. </li><li>  Copy output line to file or clipboard.  We use it later to connect the device to the IoT Hub. </li></ol><br><h3>  We connect Raspberry Pi </h3><br>  Azure IoT Edge Modules work like containers.  To connect the Raspberry Pi to the Azure IoT Hub and the Azure IoT Edge we need: <br><br><ol><li>  Install Docker on Raspberry Pi: <br><br><pre> <code class="plaintext hljs">$ curl -fsSL get.docker.com -o get-docker.sh &amp;&amp; sh get-docker.sh</code> </pre> <br>  You can also check its version using the command: $ sudo docker version </li><li>  Install Azure IoT Edge Runtime, which will act as a background daemon: <br><br><pre> <code class="plaintext hljs">$ curl -L https://aka.ms/libiothsm-std-linux-armhf-latest -o libiothsm-std.deb &amp;&amp; sudo dpkg -i ./libiothsm-std.deb</code> </pre> <br><pre> <code class="plaintext hljs">$ curl -L https://aka.ms/iotedged-linux-armhf-latest -o iotedge.deb &amp;&amp; sudo dpkg -i ./iotedge.deb</code> </pre> <br><pre> <code class="plaintext hljs">$sudo apt-get install -f</code> </pre> <br><pre> <code class="plaintext hljs">$ curl -L https://aka.ms/iotedged-linux-armhf-latest -o iotedge.deb &amp;&amp; sudo dpkg -i ./iotedge.deb</code> </pre> <br><pre> <code class="plaintext hljs">$sudo apt-get install -f</code> </pre> </li><li>  Connect our device to Azure IoT Hub using: <br><br><pre> <code class="plaintext hljs">$ az iot hub device-identity create --hub-name rasp-IoT-Hub --device-id myPi001 --edge-enabled</code> </pre> <br>  We have already used this command to create an identifier for the Raspberry Pi. </li><li>  Open the <code>/etc/iotedge/config.yaml</code> file in any editor and replace the “ADD DEVICE CONNECTION STRING HERE” with a specific line to connect the device, which we previously copied to the file / buffer. <br><br><img src="https://habrastorage.org/webt/1y/jq/nk/1yjqnk_ja5-bd1axs3hsgqqgdwc.png" alt="image"></li><li>  Restart the IoT Edge background process and check its status: </li></ol><br><pre> <code class="plaintext hljs">$ sudo systemctl restart iotedge</code> </pre> <br><pre> <code class="plaintext hljs">$ sudo systemctl status iotedge</code> </pre> <br><img src="https://habrastorage.org/webt/y9/df/7b/y9df7b6lu150ze59dyirjqjilqk.png" alt="image"><br><br>  Now we can install the LED panel control module. <br><br><h3>  Expand Azure IoT Edge Modules </h3><br>  Below is a simple example that clearly shows the concept, deployment, and management of Azure IoT Edge modules: <br><br><ol><li>  Launch Azure Portal in a browser. </li><li>  Go to the IoT Hub and from the Automation Device Management select the IoT Edge. <br><br><img src="https://habrastorage.org/webt/_s/_t/ux/_s_tux8o81c-t4vy7syiezvcflu.png" alt="image"></li><li>  In IoT Edge Devices, select the device PI1 and click Set Modules. <br><br><img src="https://habrastorage.org/webt/nb/2k/q5/nb2kq5_twmu1g1b9dxssvzmsjbo.png" alt="image"></li><li>  Expand the Add list and select the IoT Edge Module to deploy a custom module. <br><br><img src="https://habrastorage.org/webt/ua/oe/ul/uaoeul3ioqhrufnzodaclbynflu.png" alt="image"></li></ol><br>  Now we will use Azure Portal to deploy the container as a module.  Before that, we need to create a docker image and save it in the Docker Hub as an example. <br><br>  Go to IoT Edge Custom Modules and follow these steps: <br><br><ol><li>  In the Name field, enter Matrix.  This will be the name of our module. </li><li>  In the Image URI field, enter janakiramm / matrix: v1. </li><li>  Since you do not need access to the local I2C bus on the Raspberry Pi, you need to run the container in Privileged mode.  To enable it, insert the following JSON line into the Container Create Options: <br><br><pre> <code class="plaintext hljs">{ “HostConfig”: { “Privileged”: true } }</code> </pre> </li><li>  Leave the following Poles in the default settings. </li><li>  Click Save to confirm the deployment. <br><img src="https://habrastorage.org/webt/it/1j/6-/it1j6-2oqyggr5qh7kikuw9z5sq.png"></li></ol><br>  This will launch the deployment of custom modules on the peripheral device. <br><br>  You can also check the connection of the module to the device using the iotedge CLI on the Raspberry Pi: <br><br><pre> <code class="plaintext hljs">$ sudo iotedge list</code> </pre> <br><img src="https://habrastorage.org/webt/xs/o5/wt/xso5wtdv0uqs06nmhyphrot4eoa.png"><br><br>  As soon as the module is successfully deployed, the diodes on the panel connected to the Raspberry Pi will flash. <br><br><img src="https://habrastorage.org/webt/x1/3j/pj/x13jpjty0gpc0bk7yq8mcslw3q8.png"><br><br>  Using the Azure IoT cloud service, you can create much more complex and feature-rich IoT solutions.  For example, instantly scale custom development on peripheral devices and send only current data to the cloud, while the main functions are used locally. <br><br>  We think this sounds very promising. <br><br><h3>  Chips for decentralization in Azure </h3><br>  There is a new cool feature that distinguishes Microsoft from other cloud service providers and, we believe, implements the concept of full decentralization of WEB 3.0 most fully.  Of course, we mean distributed registry technology. <br><br>  At Azure Blockchain Workbench, you can implement innovative blockchain solutions on a globally accessible platform.  Honestly, there is little that can compete with the “wow effect” that professional decentralized applications (DApps) cause to users. <br><br>  And yet, I mean not only the blatant popularity of crypto and HYIP around the ICO.  Using the Azure Blockchain Workbench, developers can incorporate the unique capabilities of a distributed registry into their projects, including IoT solutions.  And it is this that brings the added value of the results that customers receive. <br><br>  The technology of the distributed registry promises to bring the delivery of value to a completely new level, so even a superficial examination of the corresponding cloud service (like the same Azure Blockchain Workbench) will require a separate post.  Of course, we are absolutely not against “diving” in particular the Azure Blockchain if you are also interested in this topic. <br><br>  Stay in touch, stay tuned and tell what else you are interested in reading. </div><p>Source: <a href="https://habr.com/ru/post/436050/">https://habr.com/ru/post/436050/</a></p>
+<section class="navigation-panel">
+<h4>More articles:</h4>
+<nav class="list-of-articles-container js-list-of-articles-container">Waiting for the list from <a href="../../index.html">here</a>...</nav>
+</section>
+<script src="../../js/main.js"></script>
+
+<!-- Yandex.Metrika counter -->
+<script type="text/javascript" >
+  (function (d, w, c) {
+      (w[c] = w[c] || []).push(function() {
+          try {
+              w.yaCounter52319614 = new Ya.Metrika({
+                  id:52319614,
+                  clickmap:true,
+                  trackLinks:true,
+                  accurateTrackBounce:true,
+                  webvisor:true
+              });
+          } catch(e) { }
+      });
+
+      var n = d.getElementsByTagName("script")[0],
+          s = d.createElement("script"),
+          f = function () { n.parentNode.insertBefore(s, n); };
+      s.type = "text/javascript";
+      s.async = true;
+      s.src = "https://mc.yandex.ru/metrika/watch.js";
+
+      if (w.opera == "[object Opera]") {
+          d.addEventListener("DOMContentLoaded", f, false);
+      } else { f(); }
+  })(document, window, "yandex_metrika_callbacks");
+</script>
+<noscript><div><img src="https://mc.yandex.ru/watch/52319614" style="position:absolute; left:-9999px;" alt="" /></div></noscript>
+
+<!-- Google Analytics -->
+  <script>
+    window.ga = function () { ga.q.push(arguments) }; ga.q = []; ga.l = +new Date;
+    ga('create', 'UA-134228602-1', 'auto'); ga('send', 'pageview')
+  </script>
+  <script src="https://www.google-analytics.com/analytics.js" async defer></script>
+
+</section>
+</body>
+
+</html>

@@ -1,0 +1,1 @@
+Windows will reserve 7 GB for system upgrades to avoid running out of hard disk space.

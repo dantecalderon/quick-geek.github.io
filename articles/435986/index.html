@@ -1,0 +1,92 @@
+<!doctype html>
+<html class="no-js" lang="en">
+
+<head>
+  <!-- Global site tag (gtag.js) - Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=UA-134228602-1"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'UA-134228602-1');
+  </script>
+
+  <meta charset="utf-8">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  <title>Windows will reserve 7 GB for system upgrades to avoid running out of hard disk space.</title>
+  <meta name="description" content="Microsoft has found a way out when Windows Update makes a mistake in estimating free space on the hard disk of a computer and as a result errors occur...">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+  <link rel="stylesheet" href="../../css/main.css">
+
+  <script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+  <script>
+    (adsbygoogle = window.adsbygoogle || []).push({
+      google_ad_client: "ca-pub-6974184241884155",
+      enable_page_level_ads: true
+    });
+  </script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+  <script>window.jQuery || document.write('<script src="../../js/vendors/jquery-3.3.1.min.js"><\/script>')</script>
+</head>
+
+<body>
+  <!--[if lte IE 9]>
+    <p class="browserupgrade">You are using an <strong>outdated</strong> browser. Please <a href="https://browsehappy.com/">upgrade your browser</a> to improve your experience and security.</p>
+  <![endif]-->
+  <nav class="page-headings-container js-page-headings-container"></nav>
+  <div class="tools-bar js-tools-bar">
+    <!-- <a href="https://quick-geek.github.io/search.html" title="Search">🔎</a> -->
+    <a class="js-list-of-headings-button" data-state="closed" href="#" title="Headings">📜</a>
+    <a class="js-go-to-top-button" href="#" title="Go to Top">⬆️</a>
+    <a class="js-go-to-bottom-button" href="#" title="Go to Bottom">⬇️</a>
+  </div>
+  <section class="page js-page"><h1>Windows will reserve 7 GB for system upgrades to avoid running out of hard disk space.</h1><div class="post__text post__text-html js-mediator-article"><img src="https://habrastorage.org/getpro/habr/post_images/4a2/58f/fd6/4a258ffd63796d95b42d9029ecc5dd7a.jpg"><br><br>  Microsoft has <a href="https://www.extremetech.com/computing/283376-windows-will-grab-7gb-of-your-storage-to-fix-its-own-update-failures">found a way</a> out when Windows Update makes a mistake in estimating free space on the hard disk of a computer and as a result errors occur when installing the operating system.  Now, Windows will reserve 7 gigabytes for the needs of the update, so the problem with the shortage simply disappears. <br><br>  Beginning with Windows 1803, Microsoft has warned users that if they do not free up a certain amount of file space, errors may occur during the OS upgrade.  The reason - Windows Update does not check the system for sufficient free space on the hard disk before initialization.  Therefore, the solution that can be used by the owner of a Windows OS computer is to clean the disk from temporary files.  But, of course, not all users can or want to monitor the availability of free space on the HDD. <br><a name="habracut"></a><br>  For 32-bit Windows 10, 16 GB is needed, for 64-bit, 32 GB.  This is the file space you need to install the OS itself.  It requires a little less to upgrade.  Starting with the release of Windows 19H1 / 1903, the OS will begin to independently reserve hard disk space for the needs of the update.  The minimum will be reserved 7 GB, perhaps the system will allocate and more, it all depends on the characteristics of the computer.  And this is “an offer that cannot be refused” - there is no possibility of blocking the backup function.  True, you can reduce the amount of HDD, reserved by the system. <br><br><img src="https://habrastorage.org/getpro/habr/post_images/e9a/f68/bc9/e9af68bc9c104086d5f56543af34045a.png"><br><br>  “A certain part of the hard disk will be reserved for updates, applications, temporary files and the system cache.  Our goal is to improve the daily use of your PC, ensuring the functioning of the critical functions of the operating system.  If there is no disk space, the work of some services and applications becomes unreliable.  Windows and programs may not work as expected if there is no free space.  Reserving a place, we minimize the danger of failure.  Disk space will be allocated automatically when new versions are installed, ”a Microsoft statement said. <br><br>  In principle, there is nothing awful in the actions of Microsoft.  An ordinary user with a fairly powerful PC, where a capacious storage medium is installed, will not notice anything.  But Windows is often installed on entry-level systems with a minimum of free file space.  And here problems may arise.  It is possible that such a move by the company will force equipment manufacturers to install larger capacity disks in their devices, which, of course, will affect their final price. <br><br>  Earlier, the corporation <a href="https://techcommunity.microsoft.com/t5/Windows-Kernel-Internals/Windows-Sandbox/ba-p/301849">spoke</a> about another novelty - the function of Windows 10, which allows to run executable files safely.  This is a Windows Sandbox, a sandbox, which will enable you to check any application or document before opening it.  Virtualization is used for sandboxing.  When you try to launch an unfamiliar file, Windows 10 automatically launches a “lightweight” virtual machine, in the environment of which the application is launched or the document is opened. <br><br><img src="https://habrastorage.org/getpro/habr/post_images/3b1/ac9/5f9/3b1ac95f92c25e3be744787b9b2cca28.jpg"><br><br>  The virtual machine is a proprietary company, this is Hyper-V.  It creates a new kernel that works autonomously, regardless of the core.  As soon as the file being checked stops working, the virtual environment is destroyed.  All this is intended mainly for corporate users.  The feature will appear in Windows 10 Pro and Windows 10 Enterprise. <br><br>  Another new feature is automatic troubleshooting.  It works in the background, regularly conducting diagnostics of equipment and software.  One example is the localization of a problem when a PC is disconnected from the Internet.  According to the company, the function (which cannot be disabled) is able to restore the default settings of critical important services, as well as adjust the operating system parameters in accordance with the hardware configuration and make other changes that are necessary for normal Windows operation. <br><br>  Part of the updated OS will be the malware recognition log and the Tamper Protection feature - it provides additional protection against external interference in the operation of critical system security functions. </div><p>Source: <a href="https://habr.com/ru/post/435986/">https://habr.com/ru/post/435986/</a></p>
+<section class="navigation-panel">
+<h4>More articles:</h4>
+<nav class="list-of-articles-container js-list-of-articles-container">Waiting for the list from <a href="../../index.html">here</a>...</nav>
+</section>
+<script src="../../js/main.js"></script>
+
+<!-- Yandex.Metrika counter -->
+<script type="text/javascript" >
+  (function (d, w, c) {
+      (w[c] = w[c] || []).push(function() {
+          try {
+              w.yaCounter52319614 = new Ya.Metrika({
+                  id:52319614,
+                  clickmap:true,
+                  trackLinks:true,
+                  accurateTrackBounce:true,
+                  webvisor:true
+              });
+          } catch(e) { }
+      });
+
+      var n = d.getElementsByTagName("script")[0],
+          s = d.createElement("script"),
+          f = function () { n.parentNode.insertBefore(s, n); };
+      s.type = "text/javascript";
+      s.async = true;
+      s.src = "https://mc.yandex.ru/metrika/watch.js";
+
+      if (w.opera == "[object Opera]") {
+          d.addEventListener("DOMContentLoaded", f, false);
+      } else { f(); }
+  })(document, window, "yandex_metrika_callbacks");
+</script>
+<noscript><div><img src="https://mc.yandex.ru/watch/52319614" style="position:absolute; left:-9999px;" alt="" /></div></noscript>
+
+<!-- Google Analytics -->
+  <script>
+    window.ga = function () { ga.q.push(arguments) }; ga.q = []; ga.l = +new Date;
+    ga('create', 'UA-134228602-1', 'auto'); ga('send', 'pageview')
+  </script>
+  <script src="https://www.google-analytics.com/analytics.js" async defer></script>
+
+</section>
+</body>
+
+</html>

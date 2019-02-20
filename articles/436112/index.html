@@ -1,0 +1,92 @@
+<!doctype html>
+<html class="no-js" lang="en">
+
+<head>
+  <!-- Global site tag (gtag.js) - Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=UA-134228602-1"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'UA-134228602-1');
+  </script>
+
+  <meta charset="utf-8">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  <title>The kubectl-debug plugin for debugging in Kubernetes pods</title>
+  <meta name="description" content="At the end of last year, a plug-in for kubectl was introduced on Reddit to help debug Kubernetes cluster pods - kubectl-debug . This idea immediately ...">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+  <link rel="stylesheet" href="../../css/main.css">
+
+  <script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+  <script>
+    (adsbygoogle = window.adsbygoogle || []).push({
+      google_ad_client: "ca-pub-6974184241884155",
+      enable_page_level_ads: true
+    });
+  </script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+  <script>window.jQuery || document.write('<script src="../../js/vendors/jquery-3.3.1.min.js"><\/script>')</script>
+</head>
+
+<body>
+  <!--[if lte IE 9]>
+    <p class="browserupgrade">You are using an <strong>outdated</strong> browser. Please <a href="https://browsehappy.com/">upgrade your browser</a> to improve your experience and security.</p>
+  <![endif]-->
+  <nav class="page-headings-container js-page-headings-container"></nav>
+  <div class="tools-bar js-tools-bar">
+    <!-- <a href="https://quick-geek.github.io/search.html" title="Search">🔎</a> -->
+    <a class="js-list-of-headings-button" data-state="closed" href="#" title="Headings">📜</a>
+    <a class="js-go-to-top-button" href="#" title="Go to Top">⬆️</a>
+    <a class="js-go-to-bottom-button" href="#" title="Go to Bottom">⬇️</a>
+  </div>
+  <section class="page js-page"><h1>The kubectl-debug plugin for debugging in Kubernetes pods</h1><div class="post__text post__text-html js-mediator-article"><img src="https://habrastorage.org/webt/t4/le/ko/t4lekoyyijply0zcuwy84_3mhay.jpeg"><br><br>  At the end of last year, a plug-in for kubectl was <a href="https://www.reddit.com/r/devops/comments/a8vnt5/i_wrote_a_tool_to_debug_kubernetes_pods_more/">introduced</a> on Reddit to help debug Kubernetes cluster pods - <a href="https://github.com/aylei/kubectl-debug">kubectl-debug</a> .  This idea immediately seemed interesting and useful to our engineers, so we decided to look at its implementation and are happy to share our results with Habra readers. <a name="habracut"></a><br><br><h2>  Why is it even needed? </h2><br>  At the moment there is a serious inconvenience in the process of debugging something within the framework of the pods.  The main goal when assembling an image of a container is to <b>minimize</b> it, i.e.  make as small as possible in size and containing as little as possible of the "extra" inside.  However, when it comes to problems in the work of the final software in containers or debugging its communication with other services in the cluster / outside ... minimalism plays a cruel joke with us - after all, <b>there is nothing</b> in the containers for the actual process of finding problems.  Utilities such as netstat / ip / ping / curl / wget, etc. are usually not available. <br><br>  And often it all ends with the fact that the engineer in haste puts the necessary software right in the running container in order to “see the light” and see the problem.  It is for such cases that the kubectl-debug plugin seemed to be a very useful tool, because it saves from the immediate pain. <br><br>  With it, you can <b>run a container with all the necessary tools</b> on board in the context of the problem pod and study all the processes “from the side” while inside.  If you’ve ever encountered troubleshooting at Kubernetes, it sounds good, doesn't it? <br><br><h2>  What is this plugin? </h2><br>  In general terms, the architecture of this solution looks like a bundle of a <b>plug-in</b> for kubectl and an <b>agent</b> , launched using the DaemonSet controller.  The plugin serves commands starting with the <code>kubectl debug …</code> and interacts with agents on the cluster nodes.  The agent, in turn, runs on the host network, and the host docker.sock is also mounted in the agent pod for full access to the containers on this server. <br><br>  Accordingly, when prompted to run a debug container in the specified pod: <br>  There is a process to identify the <code>hostIP</code> , and also sends a request to the agent (running on a suitable host) to start the debug container in the namespaces (namespaces) corresponding to the target pod. <br><br>  A more detailed understanding of these stages is available in the <a href="https://github.com/aylei/kubectl-debug">project documentation</a> . <br><br><h2>  What is required for work? </h2><br>  The author of kubectl-debug claims compatibility with <b>Kubernetes 1.12.0+</b> client / cluster <b>versions</b> , but I had K8s 1.10.8 on hand, on which everything worked without visible problems ... with a single note: for the <code>kubectl debug</code> team to work It is in this form that the version of <b>kubectl is</b> exactly <b>1.12+</b> .  Otherwise, all the commands are similar, but are only called via <code>kubectl-debug …</code> <br><br>  When you start the DaemonSet template described in <code>README</code> you should not forget about the taint'es you use on the nodes: without the appropriate tolerations of the agent’s pods, they don’t live there and, as a result, the pods that live on these nodes do not will be able to connect a debugger. <br><br>  Help at the debugger is quite complete and seems to describe all the current capabilities for launching / configuring the plugin.  In general, the utility pleases with a large number of start-up directives: you can enclose certificates, specify the kubectl context, specify a separate kubectl config or the address of the cluster API server and more. <br><br><h2>  Work with debugger </h2><br>  Installation before the “everything works” is reduced to two stages: <br><br><ol><li>  execute <code>kubectl apply -f agent_daemonset.yml</code> ; </li><li>  directly install the plugin itself - in general, everything as described <a href="https://github.com/aylei/kubectl-debug">here</a> . </li></ol><br>  How to use it?  Suppose we have the following problem: the metrics of one of the services in the cluster are not collected - and we want to check if there are any network problems between Prometheus and the target service.  As you can guess, the Prometheus image lacks the required tools. <br><br>  Let's try to connect to the container with Prometheus (if there are several containers in the pod, you will need to specify which one to connect to, otherwise the debugger will choose the first one by default): <br><br><pre> <code class="plaintext hljs">kubectl-debug --namespace kube-prometheus prometheus-main-0 Defaulting container name to prometheus. pulling image nicolaka/netshoot:latest... latest: Pulling from nicolaka/netshoot 4fe2ade4980c: Already exists ad6ddc9cd13b: Pull complete cc720038bf2b: Pull complete ff17a2bb9965: Pull complete 6fe9f5dade08: Pull complete d11fc7653a2e: Pull complete 4bd8b4917a85: Pull complete 2bd767dcee18: Pull complete Digest: sha256:897c19b0b79192ee5de9d7fb40d186aae3c42b6e284e71b93d0b8f1c472c54d3 Status: Downloaded newer image for nicolaka/netshoot:latest starting debug container... container created, open tty... [1] → root @ /</code> </pre> <br>  Previously, we found out that the problem service lives on the address 10.244.1.214 and listens to port 8080. Of course, we can check availability from the hosts, however, for a reliable debugging process, these operations must be reproduced in identical (or as close as possible) conditions.  Therefore, checking out pod / container with Prometheus is the best option.  Let's start with the simple: <br><br><pre> <code class="plaintext hljs"> [1] → ping 10.244.1.214 PING 10.244.1.214 (10.244.1.214) 56(84) bytes of data. 64 bytes from 10.244.1.214: icmp_seq=1 ttl=64 time=0.056 ms 64 bytes from 10.244.1.214: icmp_seq=2 ttl=64 time=0.061 ms 64 bytes from 10.244.1.214: icmp_seq=3 ttl=64 time=0.047 ms 64 bytes from 10.244.1.214: icmp_seq=4 ttl=64 time=0.049 ms ^C --- 10.244.1.214 ping statistics --- 4 packets transmitted, 4 received, 0% packet loss, time 61ms rtt min/avg/max/mdev = 0.047/0.053/0.061/0.007 ms</code> </pre> <br>  All is well.  Maybe the port is unavailable? <br><br><pre> <code class="plaintext hljs"> [1] → curl -I 10.244.1.214:8080 HTTP/1.1 200 OK Date: Sat, 12 Jan 2019 14:01:29 GMT Content-Length: 143 Content-Type: text/html; charset=utf-8</code> </pre> <br>  And there are no problems.  Then check if the actual communication between Prometheus and the endpoint with metrics occurs: <br><br><pre> <code class="plaintext hljs"> [2] → tcpdump host 10.244.1.214 tcpdump: verbose output suppressed, use -v or -vv for full protocol decode listening on eth0, link-type EN10MB (Ethernet), capture size 262144 bytes 14:04:19.234101 IP prometheus-main-0.prometheus-operated.kube-prometheus.svc.cluster.local.36278 &gt; 10.244.1.214.8080: Flags [P.], seq 4181259750:4181259995, ack 2078193552, win 1444, options [nop,nop,TS val 3350532304 ecr 1334757657], length 245: HTTP: GET /metrics HTTP/1.1 14:04:19.234158 IP 10.244.1.214.8080 &gt; prometheus-main-0.prometheus-operated.kube-prometheus.svc.cluster.local.36278: Flags [.], ack 245, win 1452, options [nop,nop,TS val 1334787600 ecr 3350532304], length 0 14:04:19.290904 IP 10.244.1.214.8080 &gt; prometheus-main-0.prometheus-operated.kube-prometheus.svc.cluster.local.36278: Flags [P.], seq 1:636, ack 245, win 1452, options [nop,nop,TS val 1334787657 ecr 3350532304], length 635: HTTP: HTTP/1.1 200 OK 14:04:19.290923 IP prometheus-main-0.prometheus-operated.kube-prometheus.svc.cluster.local.36278 &gt; 10.244.1.214.8080: Flags [.], ack 636, win 1444, options [nop,nop,TS val 3350532361 ecr 1334787657], length 0 ^C 4 packets captured 4 packets received by filter 0 packets dropped by kernel</code> </pre> <br>  Requests, answers come.  As a result of these operations, we can conclude that there are no problems at the level of network interaction, which means (most likely) - we need to look at the application side.  We connect to the container with exporter (also, of course, using the debugger in question, because exporters always have extremely minimalistic images) and ... we are surprised to find that there is a problem in the service configuration - for example, they forgot to send the exporter to the correct address of the final application.  <b>The case is solved!</b> <br><br>  Of course, in the situation described here, other ways of debugging are possible, but we leave them outside the article.  The result is that kubectl-debug has plenty of opportunities to use: after all, you can run absolutely any image in the work, and if you want, you can even collect some of your specific (with the necessary set of tools). <br><br>  What other application options immediately come to mind? <br><br><ul><li>  "Silent" application that <s>harmful</s> developers have not implemented normal logging.  But he has the ability to connect to the service port and debug with a specific tool, which, of course, is not worth putting into the final image. </li><li>  The launch next to the combat application is identical in the “manual” mode, but with debug enabled - to check the interaction with neighboring services. </li></ul><br>  In general, it is obvious that there are much more situations in which such a tool can be useful.  Engineers who encounter them at work every day will be able to assess the potential of the utility in terms of “live” debugging. <br><br><h2>  findings </h2><br>  Kubectl-debug is a useful and promising tool.  Of course, there are Kubernetes clusters and applications for which it does not make much sense, but it is more likely that it will provide invaluable help in debugging - especially if it comes to the combat environment and the need to quickly find the reasons the problem occurred. <br><br>  The first experience of use revealed an acute need for connectivity to the pod / container, which does not start up completely (for example, “hangs” in <code>CrashLoopbackOff</code> ), just with the aim to check the causes of the “non-launch” of the application on the go.  On this occasion, I created a <a href="https://github.com/aylei/kubectl-debug/issues/8">corresponding issue</a> in the project repository, to which the developer responded positively and promised implementation in the near future.  Very pleased with the fast and adequate feedback.  So we will look forward to new features of the utility and its further development! <br><br><h2>  PS </h2><br>  Read also in our blog: <br><br><ul><li>  “ <a href="https://habrahabr.ru/company/flant/blog/427745/">Kubernetes tips &amp; tricks: access to dev sites</a> ”; </li><li>  " <a href="https://habrahabr.ru/company/flant/blog/426985/">Kubebox and other console shells for Kubernetes</a> "; </li><li>  “ <a href="https://habr.com/company/flant/blog/341386/">Introducing loghouse - an open source system for working with logs in Kubernetes</a> ”; </li><li>  “ <a href="https://habr.com/company/flant/blog/412901/">Monitoring and Kubernetes (review and video of the report)</a> ”. </li></ul></div><p>Source: <a href="https://habr.com/ru/post/436112/">https://habr.com/ru/post/436112/</a></p>
+<section class="navigation-panel">
+<h4>More articles:</h4>
+<nav class="list-of-articles-container js-list-of-articles-container">Waiting for the list from <a href="../../index.html">here</a>...</nav>
+</section>
+<script src="../../js/main.js"></script>
+
+<!-- Yandex.Metrika counter -->
+<script type="text/javascript" >
+  (function (d, w, c) {
+      (w[c] = w[c] || []).push(function() {
+          try {
+              w.yaCounter52319614 = new Ya.Metrika({
+                  id:52319614,
+                  clickmap:true,
+                  trackLinks:true,
+                  accurateTrackBounce:true,
+                  webvisor:true
+              });
+          } catch(e) { }
+      });
+
+      var n = d.getElementsByTagName("script")[0],
+          s = d.createElement("script"),
+          f = function () { n.parentNode.insertBefore(s, n); };
+      s.type = "text/javascript";
+      s.async = true;
+      s.src = "https://mc.yandex.ru/metrika/watch.js";
+
+      if (w.opera == "[object Opera]") {
+          d.addEventListener("DOMContentLoaded", f, false);
+      } else { f(); }
+  })(document, window, "yandex_metrika_callbacks");
+</script>
+<noscript><div><img src="https://mc.yandex.ru/watch/52319614" style="position:absolute; left:-9999px;" alt="" /></div></noscript>
+
+<!-- Google Analytics -->
+  <script>
+    window.ga = function () { ga.q.push(arguments) }; ga.q = []; ga.l = +new Date;
+    ga('create', 'UA-134228602-1', 'auto'); ga('send', 'pageview')
+  </script>
+  <script src="https://www.google-analytics.com/analytics.js" async defer></script>
+
+</section>
+</body>
+
+</html>

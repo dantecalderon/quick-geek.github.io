@@ -1,0 +1,1 @@
+Плагин kubectl-debug для отладки в pod'ах Kubernetes
