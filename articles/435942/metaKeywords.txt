@@ -1,0 +1,1 @@
+n-queens, one Billion Queens Solution, regularities in n-queens solutions, non deterministic problem

@@ -1,0 +1,1 @@
+Кластерное хранилище Pacemaker + DRBD (Dual primary) + ctdb

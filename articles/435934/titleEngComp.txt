@@ -1,0 +1,1 @@
+No more than 80 TLS certificates have been extended due to the US government's shutdown.

@@ -1,0 +1,1 @@
+ruby, clean architecture, screaming architecture, domain-driven design, архитектура приложений, проектирование систем, проектирование сайтов, эрик эванс, роберт мартин, ddd, value object, entity, patterns

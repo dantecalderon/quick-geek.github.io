@@ -1,0 +1,1 @@
+Разработка модулей для puppet при помощи puppet development kit

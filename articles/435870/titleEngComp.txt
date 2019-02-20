@@ -1,0 +1,1 @@
+Cybernetic orchestra. Orchestration of Docker containers with .NET Core applications in the cloud

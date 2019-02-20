@@ -1,0 +1,128 @@
+<div class="post__text post__text-html js-mediator-article"><img src="https://habrastorage.org/webt/ei/lx/7g/eilx7ge_qfo9qu0xnwi1wvhjajs.jpeg" alt="image"><br><br>  Hello! <br><br>  Winter has come, and with it the task of checking the heat-insulating properties of the <s>buildings of the country residence of the</s> villa.  And then it turned out that quite accessible thermal imaging modules appeared on the famous Chinese website.  Do not collect yourself an exotic and perhaps even useful thing - a homemade thermal imager?  Why not, it seems like Raspberry was somewhere lying around ... I will tell you what came of it under the cut. <br><a name="habracut"></a><br><h2>  MLX90640.  What is it? </h2><br>  And this is, in fact, a thermal imaging matrix with a microcontroller on board.  Production of a previously unknown company Melexis.  Thermal imaging matrix has a dimension of 32 by 24 pixels.  This is a bit, but when interpolating an image, it seems like enough to see at least something. <br><br><img src="https://habrastorage.org/webt/vg/dz/aj/vgdzajxguwnre-4onijasyukl8o.jpeg" alt="image"><br><br>  The sensor is available in two versions, the body of which differ in the viewing angle of the matrix.  A more low-profile design A surveys the world at an angle of 110 (horizontal) by 75 (vertical) degrees.  B - under 55 to 37.5 degrees, respectively.  The device case has only four outputs - two for power, two for communication with the control device via the I2C interface.  Datasheet for those interested can be downloaded <a href="https://www.melexis.com/en/documents/documentation/datasheets/datasheet-mlx90640">here</a> . <br><br><h2>  What then is the GY-MCU90640? </h2><br>  The Chinese comrades put the MLX90640 on the board with another microcontroller on board (STM32F103).  Apparently, for easier management of the matrix.  All this farm is called GY-MCU90640.  And it is worth at the time of purchase (end of December 2018) in the region of 5 thousand rubles.  As follows: <br><br><img src="https://habrastorage.org/webt/jd/h9/w4/jdh9w4phuzdtcccd8gsgcd5_gjk.jpeg" alt="image"><br><br>  As you can see, there are two types of boards, with a narrow or wide-angle version of the sensor on board. <br><br>  Which version is best for you?  A good question, unfortunately, it came to me only after the module was already ordered and received.  For some reason, at the time of the order, I did not pay attention to these nuances.  And in vain. <br><br>  A wider version will be good on self-propelled robots or in security systems (the field of view will be larger).  According to the datasheet, it also has less noise and greater measurement accuracy. <br><br><img src="https://habrastorage.org/webt/_r/f1/vw/_rf1vwk_urgqftzfjdsy9lucsxo.jpeg" alt="image"><br><br>  But for visualization tasks, I would recommend a more “long-range” version B. For one very significant reason.  In the future, when shooting, you can expand it (manually or on a platform with a drive) and make composite “photos”, thereby increasing the more than modest resolution of 32 by 24 pixels.  To collect thermal images 64 by 96 pixels, for example ... Well, okay, in the future, the text will be photos from my wide-angle version A. <br><br><h2>  Connect to Raspberry PI </h2><br>  You can control the thermal imaging module in two ways: <br><br><ol><li>  Short-circuit the “SET” jumper on the board and, using I2C, contact the internal microcontroller MLX90640 directly. </li><li>  Leave the jumper alone and communicate with the module through a similar interface installed on the STM32F103 board via RS-232. </li></ol><br>  If you are writing in C ++, it will probably be more convenient to ignore the extra microcontroller, short the jumper and use the API from the manufacturer, which lies <a href="https://github.com/melexis/mlx90640-library">here</a> . <br><br>  Modest pytonists, too, can go the first way.  It seems like there are a couple of libraries in Python ( <a href="https://github.com/RevKarl/MLX90640-python">here</a> and <a href="https://github.com/bsdz/mlx90640-library">here</a> ).  But unfortunately, none of them earned me one go. <br><br>  Advanced pythonists can, in principle, write a module control driver on Python.  The procedure for obtaining the frame is described in detail in the datasheet.  But then you have to prescribe all calibration procedures, which seems a bit cumbersome.  So I had to go the second way.  He was moderately thorny, but quite passable. <br><br>  Thanks to the foresight of Chinese engineers or just a happy coincidence, the handkerchief turned out to be a very good arrangement of conclusions: <br><br><img src="https://habrastorage.org/webt/wr/t1/iu/wrt1iuw0xxqw0cze8sb0wg4bl54.jpeg" alt="image"><br><br>  It remains only to put the block and insert the scarf into the raspberry plug.  The board uses a 5 to 3 Volt converter, so the delicate Rx and Tx outputs of the Raspberry don't seem to threaten anything. <br><br>  It should be added that the connection according to the first variant is also possible, but it requires more labor and soldering skills.  The board must be placed on the other side of the Raspberry connector (shown in the title photo of this post). <br><br><h2>  Soft </h2><br>  On the well-known Chinese website, this miracle is offered to access the GY-MCU90640: <br><br><img src="https://habrastorage.org/webt/ri/fo/pq/rifopqyhbfzldcrxujqgobydntm.jpeg" alt="image"><br><br>  Apparently, there should be some description of the interaction protocol with the on-board microcontroller, according to which this software product works!  After a brief conversation with the vendor’s handkerchief (respect to these distinguished gentlemen), this protocol was sent to me.  He was in pdf and in pure Chinese. <br><br>  Thanks to Google’s translator and active copy-pasting in about an hour and a half, the protocol was decrypted, anyone can get acquainted with it on <a href="https://github.com/vvkuryshev/GY-MCU90640-RPI-Python">Github</a> .  It turned out that the shawl understands six basic commands, among which there is a frame request on the COM port. <br><br>  Each pixel of the matrix is, in fact, the temperature value of the object on which this pixel is looking.  Temperature value in degrees Celsius multiplied by 100 (two-byte number).  Actually, there is even a special mode in which the shawl will send frames from the matrix to Raspberry 4 times per second. <br><br><div class="spoiler">  <b class="spoiler_title">The script for thermal imaging is here:</b> <div class="spoiler_text"><pre><code class="python">"""MIT License
+
+Copyright (c) 2019 
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE."""
+
+import serial, time
+import datetime as dt
+import numpy as np
+import cv2
+
+# function to get Emissivity from MCU
+def get_emissivity():
+	ser.write(serial.to_bytes([0xA5,0x55,0x01,0xFB]))
+	read = ser.read(4)
+	return read[2]/100
+
+# function to get temperatures from MCU (Celsius degrees x 100)
+def get_temp_array(d):
+
+	# getting ambient temperature
+	T_a = (int(d[1540]) + int(d[1541])*256)/100
+
+	# getting raw array of pixels temperature
+	raw_data = d[4:1540]
+	T_array = np.frombuffer(raw_data, dtype=np.int16)
+	
+	return T_a, T_array
+
+# function to convert temperatures to pixels on image
+def td_to_image(f):
+	norm = np.uint8((f/100 - Tmin)*255/(Tmax-Tmin))
+	norm.shape = (24,32)
+	return norm
+
+########################### Main cycle #################################
+# Color map range
+Tmax = 40
+Tmin = 20
+
+print ('Configuring Serial port')
+ser = serial.Serial ('/dev/serial0')
+ser.baudrate = 115200
+
+# set frequency of module to 4 Hz
+ser.write(serial.to_bytes([0xA5,0x25,0x01,0xCB]))
+time.sleep(0.1)
+
+# Starting automatic data colection
+ser.write(serial.to_bytes([0xA5,0x35,0x02,0xDC]))
+t0 = time.time()
+
+try:
+	while True:
+		# waiting for data frame
+		data = ser.read(1544)
+		
+		# The data is ready, let's handle it!
+		Ta, temp_array = get_temp_array(data)
+		ta_img = td_to_image(temp_array)
+		
+		# Image processing
+		img = cv2.applyColorMap(ta_img, cv2.COLORMAP_JET)
+		img = cv2.resize(img, (320,240), interpolation = cv2.INTER_CUBIC)
+		img = cv2.flip(img, 1)
+		
+		text = 'Tmin = {:+.1f} Tmax = {:+.1f} FPS = {:.2f}'.format(temp_array.min()/100, temp_array.max()/100, 1/(time.time() - t0))
+		cv2.putText(img, text, (5, 15), cv2.FONT_HERSHEY_SIMPLEX, 0.45, (0, 0, 0), 1)
+		cv2.imshow('Output', img)
+		
+		# if 's' is pressed - saving of picture
+		key = cv2.waitKey(1) &amp; 0xFF
+		if key == ord("s"):
+			fname = 'pic_' + dt.datetime.now().strftime('%Y-%m-%d_%H-%M-%S') + '.jpg'
+			cv2.imwrite(fname, img)
+			print('Saving image ', fname)
+		
+		t0 = time.time()
+
+except KeyboardInterrupt:
+	# to terminate the cycle
+	ser.write(serial.to_bytes([0xA5,0x35,0x01,0xDB]))
+	ser.close()
+	cv2.destroyAllWindows()
+	print(' Stopped')
+
+# just in case 
+ser.close()
+cv2.destroyAllWindows()</code></pre><br>
+</div></div><br>
+<h2>Результаты</h2><br>
+Скрипт опрашивает тепловизионную матрицу и выводит кадры на консоль монитора, на который подключен Raspberry PI, 4 раза в секунду. Этого достаточно для того, чтобы не испытывать большого дискомфорта при съемке объектов. Для визуализации кадра используется пакет OpenCV. При нажатии на кнопку «s» в папку со скриптом сохраняются тепловизионные «тепловые карты» в формате jpg. <br>
+<br>
+<img src="https://habrastorage.org/webt/6n/9o/gw/6n9ogwhkr1klkw_qvcaej45vqnw.jpeg" alt="image"><br>
+<br>
+Для большей информативности я вывел минимальную и максимальную температуры на кадре. То есть глядя на окраску, можно видеть какая примерно температура у наиболее разогретых или охлажденных предметов. Погрешность измерения — примерно градус с бОльшую сторону. Тепловой диапазон задан от 20 до 40 градусов. Выход из скрипта по нажатию Ctrl + C.<br>
+<br>
+<img src="https://habrastorage.org/webt/ik/e9/cy/ike9cyyu4h3wbdde2tfubq6yhwu.jpeg" alt="image"><br>
+<br>
+Скрипт работает примерно одинаково и на Raspberry Pi Zero W и на Pi 3 B+. Я установил VNC сервер на смартфон. Таким образом, взяв в руки малину, подключенную к powerbank'у и смарфтон с запущенным VNC можно получить переносной тепловизор с возможностью сохранения тепловых снимков. Возможно, это не совсем удобно, но вполне функционально.<br>
+<br>
+После первого запуска возможно некорректное измерение максимальной температуры. В этом случае нужно выйти из скрипта и запустить повторно.<br>
+<br>
+Вот, собственно, и всё на сегодня. Эксперимент с самодельным тепловизором получился удачным. С помощью данного девайса вполне можно провести тепловизионное обследование дома своими силами, например. Если у кого-то возникнут дополнительные мысли насчет областей применения подобных штук, добро пожаловать в комментарии.<br>
+<br>
+Всем удачной трудовой недели и до новых встреч!<br>
+<br>
+UPD: В комментариях меня просили сделать снимок дома с улицы. Выкладываю здесь. Из-за меньшего контраста температур, чем в помещении, снимки получились не особо информативными. На фото сверху дом целиком с двух сторон. На нижних — фото разных окон.<br>
+<br>
+<img src="https://habrastorage.org/webt/-y/ww/kd/-ywwkdovoeqvolceev0zu--0bi4.jpeg" alt="image"><br>
+<br>
+В коде изменил только температурный диапазон. Вместо +20...+40 поставил -10...+5.</div>

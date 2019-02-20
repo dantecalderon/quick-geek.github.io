@@ -1,0 +1,1 @@
+Changing the schema of PostgreSQL tables without long locks. Yandex lecture

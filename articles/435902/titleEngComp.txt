@@ -1,0 +1,1 @@
+It is not so easy to take and write SELECT, if the vendor does not allow ... but we still write
