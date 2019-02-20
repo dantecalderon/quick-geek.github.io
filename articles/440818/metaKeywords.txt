@@ -1,0 +1,1 @@
+go, golang, error handling, обработка ошибок

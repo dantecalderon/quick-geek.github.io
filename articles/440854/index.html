@@ -1,0 +1,92 @@
+<!doctype html>
+<html class="no-js" lang="en">
+
+<head>
+  <!-- Global site tag (gtag.js) - Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=UA-134228602-1"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'UA-134228602-1');
+  </script>
+
+  <meta charset="utf-8">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  <title>Crypto miners penetrated Microsoft Store</title>
+  <meta name="description" content="It turns out that even in the Microsoft Store directory you can publish a malicious program, and no one will notice. This is very convenient for intru...">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+  <link rel="stylesheet" href="../../css/main.css">
+
+  <script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+  <script>
+    (adsbygoogle = window.adsbygoogle || []).push({
+      google_ad_client: "ca-pub-6974184241884155",
+      enable_page_level_ads: true
+    });
+  </script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+  <script>window.jQuery || document.write('<script src="../../js/vendors/jquery-3.3.1.min.js"><\/script>')</script>
+</head>
+
+<body>
+  <!--[if lte IE 9]>
+    <p class="browserupgrade">You are using an <strong>outdated</strong> browser. Please <a href="https://browsehappy.com/">upgrade your browser</a> to improve your experience and security.</p>
+  <![endif]-->
+  <nav class="page-headings-container js-page-headings-container"></nav>
+  <div class="tools-bar js-tools-bar">
+    <!-- <a href="https://quick-geek.github.io/search.html" title="Search">🔎</a> -->
+    <a class="js-list-of-headings-button" data-state="closed" href="#" title="Headings">📜</a>
+    <a class="js-go-to-top-button" href="#" title="Go to Top">⬆️</a>
+    <a class="js-go-to-bottom-button" href="#" title="Go to Bottom">⬇️</a>
+  </div>
+  <section class="page js-page"><h1>Crypto miners penetrated Microsoft Store</h1><div class="post__text post__text-html js-mediator-article"><img src="https://habrastorage.org/getpro/habr/post_images/22f/0ed/ed3/22f0eded342011e8e00c032953a04f27.png"><br><br>  It turns out that even in the Microsoft Store directory you can publish a malicious program, and no one will notice.  This is very convenient for intruders, because most users see directories like Microsoft Store, App Store and Google Play as a safe haven where they are protected from viruses (of course, this is not so).  Accordingly, thousands of users carelessly download the application, not knowing anything bad.  Unfortunately for fraudsters, now this shop is partially covered. <br><br>  On January 17, 2019, Symantec <a href="https://www.symantec.com/blogs/threat-intelligence/cryptojacking-apps-microsoft-store">found</a> eight applications with built-in crypto-engineers in the Microsoft Store.  All applications belong to the PWA (Progressive Web Applications) class, they are installed in Windows 10 and work in a separate window (WWAHost.exe), which is not similar to a browser, but in fact they are browser applications. <br><a name="habracut"></a><br>  Such programs do nothing wrong with the victim's computer.  Just quietly and peacefully mine Monero on the CPU, not too increasing the load on the processor. <br><br>  Symantec immediately reported the find to Microsoft, and they were soon removed from the catalog.  February 15 report <a href="https://www.symantec.com/blogs/threat-intelligence/cryptojacking-apps-microsoft-store">published in the public domain</a> . <br><br>  The list of applications covers several thematic categories: here are tutorials on optimizing a computer and a battery (there is some irony here), an application for searching the Internet, web browsers, and programs for downloading videos from YouTube. <br><br>  Although the developers are listed as three companies (DigiDream, 1clean and Findoo), but Symantec experts believe that they are actually created by one person or group. <br><br>  On the one hand, if the developer had written about mining in small letters in the user agreement, then with a 99% probability no one would have noticed this phrase, but his actions would be completely legal.  On the other hand, in any case, mining probably violates the rules for Microsoft Store applications, so they simply would not be allowed into the catalog. <br><br>  These annexes were posted between April and December 2018, most of which were published at the end of the year. <br><br>  It is not known how many users downloaded and installed programs.  But they were easy to find in the tops of free apps in the tops of the Microsoft Store.  The company Symantec said that in mid-January for these applications published 1900 estimates, that is, the number of users in the thousands, and maybe tens of thousands.  On the other hand, ratings can be stranded, so it is not possible to make an accurate assessment. <br><br>  Once the applications are loaded and run, they immediately download the mining JavaScript library from the developer’s server.  How it is done: the official domains of each program are registered in the manifest file.  For example, the domain <i>Fast-search.tk</i> for the Fast-search Lite application in the screenshot below. <br><br><img src="https://habrastorage.org/getpro/habr/post_images/fcb/685/7f0/fcb6857f0ed3b83c1fb8591e6080f79c.png"><br><br>  After installation, the application accesses this domain and activates the Google Tag Manager (GTM) script, and all eight applications do this with the same GTM-PRFLJPX key.  Google Tag Manager is a common marketer tool.  The link looks like <code>https://www.googletagmanager.com/gtm.js?id={GTM ID}</code> , which theoretically allows you to access an arbitrary function, which the attackers used. <br><br>  Under the guise of GTM runs the following script: <br><br><img src="https://habrastorage.org/getpro/habr/post_images/eaf/cca/196/eafcca1963d1eb9a8b1910144815fcf0.png"><br><br>  By listening to network traffic, Symantec experts noticed that this script is accessing a remote server and trying to download the <code>http://statdynamic.com/lib/crypta.js</code> library. <br><br>  Well, then it is clear.  Crypta.js is an encrypted mining library that uses the CPU and mine the popular Monero coin.  Why popular?  Because it is specially optimized for mining on the central processor, so there is still a little profitable mining there. <br><br>  In reality, Crypta.js is a version of the well-known library Coinhive - legal service, which opened in September 2017 and is still working, allowing monetize the user base to program developers and website owners. <br><br>  Symantec deciphered Crypta.js and found a Coinhive account where money is transferred from mining: <i>da8c1ffb984d0c24acc5f8b966d6f218fc3ca6bda661</i> .  Maybe sometime in the future, in such situations, the attacker’s account will be arrested and the coins from him distributed among all the victims. </div><p>Source: <a href="https://habr.com/ru/post/440854/">https://habr.com/ru/post/440854/</a></p>
+<section class="navigation-panel">
+<h4>More articles:</h4>
+<nav class="list-of-articles-container js-list-of-articles-container">Waiting for the list from <a href="../../index.html">here</a>...</nav>
+</section>
+<script src="../../js/main.js"></script>
+
+<!-- Yandex.Metrika counter -->
+<script type="text/javascript" >
+  (function (d, w, c) {
+      (w[c] = w[c] || []).push(function() {
+          try {
+              w.yaCounter52319614 = new Ya.Metrika({
+                  id:52319614,
+                  clickmap:true,
+                  trackLinks:true,
+                  accurateTrackBounce:true,
+                  webvisor:true
+              });
+          } catch(e) { }
+      });
+
+      var n = d.getElementsByTagName("script")[0],
+          s = d.createElement("script"),
+          f = function () { n.parentNode.insertBefore(s, n); };
+      s.type = "text/javascript";
+      s.async = true;
+      s.src = "https://mc.yandex.ru/metrika/watch.js";
+
+      if (w.opera == "[object Opera]") {
+          d.addEventListener("DOMContentLoaded", f, false);
+      } else { f(); }
+  })(document, window, "yandex_metrika_callbacks");
+</script>
+<noscript><div><img src="https://mc.yandex.ru/watch/52319614" style="position:absolute; left:-9999px;" alt="" /></div></noscript>
+
+<!-- Google Analytics -->
+  <script>
+    window.ga = function () { ga.q.push(arguments) }; ga.q = []; ga.l = +new Date;
+    ga('create', 'UA-134228602-1', 'auto'); ga('send', 'pageview')
+  </script>
+  <script src="https://www.google-analytics.com/analytics.js" async defer></script>
+
+</section>
+</body>
+
+</html>

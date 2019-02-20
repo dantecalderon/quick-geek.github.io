@@ -1,0 +1,1 @@
+Patterns and anti-patterns CI / CD. Part 1

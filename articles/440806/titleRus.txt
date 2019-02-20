@@ -1,0 +1,1 @@
+Тёмный Mobile на CodeFest: функциональный Swift, заблуждения Clean Architecture и #КонечноЖеKotlin

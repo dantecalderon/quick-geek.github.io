@@ -1,0 +1,92 @@
+<!doctype html>
+<html class="no-js" lang="en">
+
+<head>
+  <!-- Global site tag (gtag.js) - Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=UA-134228602-1"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'UA-134228602-1');
+  </script>
+
+  <meta charset="utf-8">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  <title>Redux - revision logic reducer'a and actions</title>
+  <meta name="description" content="The other day, picking on the set of files redux'a, where, according to logic, the files are made in reducers, actions, constants of the types of acti...">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+  <link rel="stylesheet" href="../../css/main.css">
+
+  <script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+  <script>
+    (adsbygoogle = window.adsbygoogle || []).push({
+      google_ad_client: "ca-pub-6974184241884155",
+      enable_page_level_ads: true
+    });
+  </script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+  <script>window.jQuery || document.write('<script src="../../js/vendors/jquery-3.3.1.min.js"><\/script>')</script>
+</head>
+
+<body>
+  <!--[if lte IE 9]>
+    <p class="browserupgrade">You are using an <strong>outdated</strong> browser. Please <a href="https://browsehappy.com/">upgrade your browser</a> to improve your experience and security.</p>
+  <![endif]-->
+  <nav class="page-headings-container js-page-headings-container"></nav>
+  <div class="tools-bar js-tools-bar">
+    <!-- <a href="https://quick-geek.github.io/search.html" title="Search">🔎</a> -->
+    <a class="js-list-of-headings-button" data-state="closed" href="#" title="Headings">📜</a>
+    <a class="js-go-to-top-button" href="#" title="Go to Top">⬆️</a>
+    <a class="js-go-to-bottom-button" href="#" title="Go to Bottom">⬇️</a>
+  </div>
+  <section class="page js-page"><h1>Redux - revision logic reducer'a and actions</h1><div class="post__text post__text-html js-mediator-article"><p><img src="https://habrastorage.org/webt/if/nt/hs/ifnthsnauaas05bj_gbpaugiatm.gif"><br>  The other day, picking on the set of files redux'a, where, according to logic, the files are made in reducers, actions, constants of the types of actions.  All this turned out to be quite a not an easy task keeping all these types of files in my head and follow the logic.  And ... eureka, the idea of ​​simplifying the writing of redux logic.  Maybe creating your bike, but who didn't try to write your bikes?  But the main thing is not writing, but <strong>written</strong> support <strong>when</strong> .  Let me try to show you a bit of my vision of my redux logic. </p><a name="habracut"></a><br><h3 id="nachalo">  Start </h3><br><p>  And so we have reduce: </p><br><pre><code class="javascript hljs"><span class="hljs-comment"><span class="hljs-comment">// импортируем константы import { TODO } from './actions/const'; ..... // может быть ооочень много импортов .... // и наконец наш reducer function todoApp(state = initialState, action) { switch (action.type) { case TODO.SET_VISIBILITY_FILTER: return Object.assign({}, state, { visibilityFilter: action.filter }) case TODO.ADD_</span><span class="hljs-doctag"><span class="hljs-comment"><span class="hljs-doctag">TODO:</span></span></span><span class="hljs-comment"> return Object.assign({}, state, { todos: [ ...state.todos, { text: action.text, completed: false } ] }) case TODO.TOGGLE_</span><span class="hljs-doctag"><span class="hljs-comment"><span class="hljs-doctag">TODO:</span></span></span><span class="hljs-comment"> return Object.assign({}, state, { todos: state.todos.map((todo, index) =&gt; { if (index === action.index) { return Object.assign({}, todo, { completed: !todo.completed }) } return todo }) }) ... тут тоже может быть ооч много букв и вырастает до... ну в общем только поиск тебе поможет в этом лапшевидном файле ... default: return state } }</span></span></code> </pre> <br><p>  <em>taken from of the docks by redux</em> . </p><br><p>  action has a type like: </p><br><pre> <code class="javascript hljs"><span class="hljs-comment"><span class="hljs-comment">// импортируем константы import { TODO } from './const'; export const addTodo = (value) =&gt; ({ type: TODO.ADD_TODO, payload: value })</span></span></code> </pre> <br><p>  I think there is no need to show constants. </p><br><h3 id="bool">  Bool </h3><br><p>  I will try to describe the frenzy that I feel while reading the code, especially when debugging or expanding the functionality. </p><br><ul><li>  search - you need to press <code>Ctrl + F</code> all the time and globally <code>Ctrl + Shift + F</code> </li><li>  not immediately visible from where the legs grow.  It follows from the paragraph above. </li><li>  No, it's just a little, so I still have the whole project permeated with constants.  No, I am not against constants, but why?  Especially if you use them together with nesting as in the example, but if you also concatenate them from several then this is generally a navigation hell. </li><li>  logic is spread.  In one place of action in another, the processing of these actions in the third (optional) constants that only those two need. </li><li>  I need to keep many files open when developing or debugging.  It follows from the paragraph above. <br>  well and so on. </li></ul><br><h3 id="vstuplenie-v-logiku">  Entry into logic </h3><br><p>  Perhaps it will seem strange at first and shocking, but it still seems to me that this is the place to be.  I'll try to bring my template. </p><br><h4 id="reducer">  reducer </h4><br><p>  <em>peeped into google</em> </p><br><blockquote>  Gearbox - a mechanism that changes torque and power.  This is one or more gears that interact with each other and reduce the number of engine revolutions to an acceptable speed of rotation of the performing node. </blockquote><p>  That is, the shaft on it is a gear, this gear sends the other gear a rotation which in turn to its shaft.  We remove the shaft and gear is removed together with it.  Not discontinuous so to speak module. </p><br><p>  If you hold the allegory further then the shaft is an action and the gear is logic.  From this it follows that the gearbox acts as such a link in ensuring the transmission of torque, that is, data in the application.  It must support the perfect working environment of the mechanisms. </p><br><h4 id="action">  action </h4><br><p>  As mentioned above, this is the action itself, and the logic of how much energy to transmit (in our case, data). </p><br><h3 id="i-tak-poehali-moy-velosiped">  And so it went.  My bike </h3><br><p>  reducer: </p><br><pre> <code class="javascript hljs"><span class="hljs-keyword"><span class="hljs-keyword">export</span></span> <span class="hljs-function"><span class="hljs-keyword"><span class="hljs-function"><span class="hljs-keyword">function</span></span></span><span class="hljs-function"> </span><span class="hljs-title"><span class="hljs-function"><span class="hljs-title">todoApp</span></span></span><span class="hljs-function">(</span><span class="hljs-params"><span class="hljs-function"><span class="hljs-params">state = initialState, action</span></span></span><span class="hljs-function">) </span></span>{ <span class="hljs-keyword"><span class="hljs-keyword">if</span></span> (<span class="hljs-keyword"><span class="hljs-keyword">typeof</span></span> action.func === <span class="hljs-string"><span class="hljs-string">'function'</span></span>) { <span class="hljs-keyword"><span class="hljs-keyword">return</span></span> action.func(state); } }</code> </pre> <br><p>  yes this is my entire reducer.  Maybe there will be a small gap patterns, how?  we took the logic out of reducer'a ..?  Yes.  I tell you, we got the logic out of the reducer'a !!! </p><br><p>  Let's look at the action: </p><br><pre> <code class="javascript hljs"><span class="hljs-keyword"><span class="hljs-keyword">export</span></span> <span class="hljs-function"><span class="hljs-keyword"><span class="hljs-function"><span class="hljs-keyword">function</span></span></span><span class="hljs-function"> </span><span class="hljs-title"><span class="hljs-function"><span class="hljs-title">addTodo</span></span></span><span class="hljs-function"> = (</span><span class="hljs-params"><span class="hljs-function"><span class="hljs-params">value</span></span></span><span class="hljs-function">) =&gt; (</span><span class="hljs-params"><span class="hljs-function"><span class="hljs-params">{ type: </span></span><span class="hljs-string"><span class="hljs-function"><span class="hljs-params"><span class="hljs-string">'ADD_TODO'</span></span></span></span><span class="hljs-function"><span class="hljs-params"> , payload: value, func: (state</span></span></span><span class="hljs-function">) =&gt;(</span><span class="hljs-params"><span class="hljs-function"><span class="hljs-params">{...state, value}</span></span></span><span class="hljs-function">) }) }</span></span></code> </pre> <br><p>  For the sake of this, we have taken out the logic responsible for the transfer of data to the site.  Reducer remained to ensure the operation of the entire mechanism.  And he should do it well without being distracted by things that do not concern him.  And we can only observe the order in which from where the legs grow and if you need to quickly find and fix or supplement. </p><br><p>  Worth noting We removed constants.  Yes, and switch too.  This has reduced the complexity of O (1) execution in the reducer. </p><br><p>  This is just an example sketch that you can expand and remove combineReducers.  It’s so great to expand, supplement, change to fit your needs, take a tool and make it ideal for your tasks. </p></div><p>Source: <a href="https://habr.com/ru/post/440940/">https://habr.com/ru/post/440940/</a></p>
+<section class="navigation-panel">
+<h4>More articles:</h4>
+<nav class="list-of-articles-container js-list-of-articles-container">Waiting for the list from <a href="../../index.html">here</a>...</nav>
+</section>
+<script src="../../js/main.js"></script>
+
+<!-- Yandex.Metrika counter -->
+<script type="text/javascript" >
+  (function (d, w, c) {
+      (w[c] = w[c] || []).push(function() {
+          try {
+              w.yaCounter52319614 = new Ya.Metrika({
+                  id:52319614,
+                  clickmap:true,
+                  trackLinks:true,
+                  accurateTrackBounce:true,
+                  webvisor:true
+              });
+          } catch(e) { }
+      });
+
+      var n = d.getElementsByTagName("script")[0],
+          s = d.createElement("script"),
+          f = function () { n.parentNode.insertBefore(s, n); };
+      s.type = "text/javascript";
+      s.async = true;
+      s.src = "https://mc.yandex.ru/metrika/watch.js";
+
+      if (w.opera == "[object Opera]") {
+          d.addEventListener("DOMContentLoaded", f, false);
+      } else { f(); }
+  })(document, window, "yandex_metrika_callbacks");
+</script>
+<noscript><div><img src="https://mc.yandex.ru/watch/52319614" style="position:absolute; left:-9999px;" alt="" /></div></noscript>
+
+<!-- Google Analytics -->
+  <script>
+    window.ga = function () { ga.q.push(arguments) }; ga.q = []; ga.l = +new Date;
+    ga('create', 'UA-134228602-1', 'auto'); ga('send', 'pageview')
+  </script>
+  <script src="https://www.google-analytics.com/analytics.js" async defer></script>
+
+</section>
+</body>
+
+</html>

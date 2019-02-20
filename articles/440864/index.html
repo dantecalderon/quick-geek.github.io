@@ -1,0 +1,94 @@
+<!doctype html>
+<html class="no-js" lang="en">
+
+<head>
+  <!-- Global site tag (gtag.js) - Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=UA-134228602-1"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'UA-134228602-1');
+  </script>
+
+  <meta charset="utf-8">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  <title>The tragic story of dating with poppler</title>
+  <meta name="description" content="... Or as we wrote a pilot application for OS Sailfish using poppler. 
+
+ The year began with an amusing task - our team needed to assemble a pilot of ...">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+  <link rel="stylesheet" href="../../css/main.css">
+
+  <script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+  <script>
+    (adsbygoogle = window.adsbygoogle || []).push({
+      google_ad_client: "ca-pub-6974184241884155",
+      enable_page_level_ads: true
+    });
+  </script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+  <script>window.jQuery || document.write('<script src="../../js/vendors/jquery-3.3.1.min.js"><\/script>')</script>
+</head>
+
+<body>
+  <!--[if lte IE 9]>
+    <p class="browserupgrade">You are using an <strong>outdated</strong> browser. Please <a href="https://browsehappy.com/">upgrade your browser</a> to improve your experience and security.</p>
+  <![endif]-->
+  <nav class="page-headings-container js-page-headings-container"></nav>
+  <div class="tools-bar js-tools-bar">
+    <!-- <a href="https://quick-geek.github.io/search.html" title="Search">🔎</a> -->
+    <a class="js-list-of-headings-button" data-state="closed" href="#" title="Headings">📜</a>
+    <a class="js-go-to-top-button" href="#" title="Go to Top">⬆️</a>
+    <a class="js-go-to-bottom-button" href="#" title="Go to Bottom">⬇️</a>
+  </div>
+  <section class="page js-page"><h1>The tragic story of dating with poppler</h1><div class="post__text post__text-html js-mediator-article">  ... Or as we wrote a pilot application for OS Sailfish using poppler. <br><br>  The year began with an amusing task - our team needed to assemble a pilot of the application “Mobile manager’s workplace” on the Sailfish OS in a short time.  In fact, this is a mobile client, EDS, i.e.  It is designed to work with documents.  And of course, a pdf-reader is needed to work with documents.  But it turned out that making it work smoothly is not so easy.  But we can say we did it (for the prototype, of course).  How?  Read under the cut. <br><br><div style="text-align:center;"><img src="https://habrastorage.org/webt/gf/f7/nq/gff7nqytdtylqssn9kt4r1ec-ww.jpeg" alt="image"></div><a name="habracut"></a><br>  From the good, I can say that the pdf-reader built into the operating system is simply wonderful, no need to separately assemble.  And "Aurora" (it seems like this is the future "Russian" name for the hard-to-pronounce "Sailfish Mobile OS Rus") can boast of this, for which she thanks a lot.  But still writing a quick solution was not so easy. <br><br>  Poppler is a <a href="https://poppler.freedesktop.org/">pdf rendering library</a> built into Sailfish, which is why it was chosen for our dark purposes.  But only for writing a prototype, because the GPL license will not allow in the future to release on it a commercial product.  And, having touched it a little, I come to the conclusion that there must be more convenient solutions, but more on that later. <br><br>  I would like to tell you about the two main problems that I faced, trying to squeeze at least something from the poppler in a short time.  I propose to watch a video demonstrating the work of the application, which turned out before reading my nagging. <br><br><iframe width="560" height="315" src="https://www.youtube.com/embed/angNsth2tno" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen=""></iframe><br><h3>  Problem number one </h3><br>  See the beautiful carousel?  This is a way to display documents by folders - intuitive and easy for the user, allows you to quickly view documents, details on it, before going directly to reading the document and approval.  It is necessary so that important ministers, signing their very important documents, can look at their eyes to delight PathView. <br><br>  PathView is a great tool, you can make a bunch of all kinds of beauty.  But our problem is delegate. <br><br>  To draw the first page of the document (document preview on the main screen) online using poppler is an idea so-so, because the folders are not cached and the transition between them starts to hang incredibly, the poppler draws slowly.  More precisely renders, draws, of course, QPainter. <br><br>  The problem is solved simply, but not at all elegantly: we render the preview when the application starts, save the image to the device, and finally draw through the QImage in the delegate.  And, frankly, how to rewrite it in a more elegant form, I have not yet invented. <br><br><h3>  Problem number two </h3><br>  If you try to draw a large document all at once (the page that displays the content of the document), it is not enough that it does this for a very long time, it also blurs the picture.  I thought, I messed up with the dimensions, that the document is rendered into a small-sized image, and then stretches it by a specified amount, but no, I checked everything 100 times.  I tried to make a bigger picture - everything is the same.  Yes, and smears not as a loss of quality, but rather, as if we had a hand in fresh ink. <br><br>  This, of course, is solved in one fell swoop; you need to draw not the entire document, but only the current page and the neighboring pages, but you have not had time to do it yet. <br><br><h4>  Total </h4><br>  Poppler is slow and strange, but thanks for being there.  Now we want to implement the pdf graphic and text annotations as part of the pilot, so I’m going to rewrite the whole thing <a href="https://github.com/galkahana/PDF-Writer">to another library</a> , this is something incredibly powerful at first glance, I hope that the declared functionality actually corresponds. <br><br>  If anyone has tried or knows the solution is more appropriate, I will be most grateful for the advice. </div><p>Source: <a href="https://habr.com/ru/post/440864/">https://habr.com/ru/post/440864/</a></p>
+<section class="navigation-panel">
+<h4>More articles:</h4>
+<nav class="list-of-articles-container js-list-of-articles-container">Waiting for the list from <a href="../../index.html">here</a>...</nav>
+</section>
+<script src="../../js/main.js"></script>
+
+<!-- Yandex.Metrika counter -->
+<script type="text/javascript" >
+  (function (d, w, c) {
+      (w[c] = w[c] || []).push(function() {
+          try {
+              w.yaCounter52319614 = new Ya.Metrika({
+                  id:52319614,
+                  clickmap:true,
+                  trackLinks:true,
+                  accurateTrackBounce:true,
+                  webvisor:true
+              });
+          } catch(e) { }
+      });
+
+      var n = d.getElementsByTagName("script")[0],
+          s = d.createElement("script"),
+          f = function () { n.parentNode.insertBefore(s, n); };
+      s.type = "text/javascript";
+      s.async = true;
+      s.src = "https://mc.yandex.ru/metrika/watch.js";
+
+      if (w.opera == "[object Opera]") {
+          d.addEventListener("DOMContentLoaded", f, false);
+      } else { f(); }
+  })(document, window, "yandex_metrika_callbacks");
+</script>
+<noscript><div><img src="https://mc.yandex.ru/watch/52319614" style="position:absolute; left:-9999px;" alt="" /></div></noscript>
+
+<!-- Google Analytics -->
+  <script>
+    window.ga = function () { ga.q.push(arguments) }; ga.q = []; ga.l = +new Date;
+    ga('create', 'UA-134228602-1', 'auto'); ga('send', 'pageview')
+  </script>
+  <script src="https://www.google-analytics.com/analytics.js" async defer></script>
+
+</section>
+</body>
+
+</html>

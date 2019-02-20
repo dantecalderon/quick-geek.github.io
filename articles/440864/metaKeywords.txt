@@ -1,0 +1,1 @@
+qt, qml, c++, sailfish os, poppler, pdf

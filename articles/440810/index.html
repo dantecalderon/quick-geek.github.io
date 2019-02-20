@@ -1,0 +1,92 @@
+<!doctype html>
+<html class="no-js" lang="en">
+
+<head>
+  <!-- Global site tag (gtag.js) - Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=UA-134228602-1"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'UA-134228602-1');
+  </script>
+
+  <meta charset="utf-8">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  <title>Presented by Talos - “a modern Linux distribution for Kubernetes”</title>
+  <meta name="description" content="A few days ago, American engineer Andrew Rynhard presented an interesting project: a compact Linux distribution kit, designed specifically for launchi...">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+  <link rel="stylesheet" href="../../css/main.css">
+
+  <script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+  <script>
+    (adsbygoogle = window.adsbygoogle || []).push({
+      google_ad_client: "ca-pub-6974184241884155",
+      enable_page_level_ads: true
+    });
+  </script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+  <script>window.jQuery || document.write('<script src="../../js/vendors/jquery-3.3.1.min.js"><\/script>')</script>
+</head>
+
+<body>
+  <!--[if lte IE 9]>
+    <p class="browserupgrade">You are using an <strong>outdated</strong> browser. Please <a href="https://browsehappy.com/">upgrade your browser</a> to improve your experience and security.</p>
+  <![endif]-->
+  <nav class="page-headings-container js-page-headings-container"></nav>
+  <div class="tools-bar js-tools-bar">
+    <!-- <a href="https://quick-geek.github.io/search.html" title="Search">🔎</a> -->
+    <a class="js-list-of-headings-button" data-state="closed" href="#" title="Headings">📜</a>
+    <a class="js-go-to-top-button" href="#" title="Go to Top">⬆️</a>
+    <a class="js-go-to-bottom-button" href="#" title="Go to Bottom">⬇️</a>
+  </div>
+  <section class="page js-page"><h1>Presented by Talos - “a modern Linux distribution for Kubernetes”</h1><div class="post__text post__text-html js-mediator-article"><img src="https://habrastorage.org/webt/t-/z1/j4/t-z1j4yey3nifrww_gvguiuw1kk.png"><br><br>  A few days ago, American engineer Andrew Rynhard <a href="https://www.reddit.com/r/kubernetes/comments/aqt0u9/talos_a_modern_linux_distribution_for_kubernetes/">presented an</a> interesting project: a compact Linux distribution kit, designed specifically for launching Kubernetes clusters.  It got its name from ancient Greek mythology - <a href="https://github.com/autonomy/talos">Talos</a> . <a name="habracut"></a><br><br>  The project appeared under the inspiration from <a href="https://twitter.com/kelseyhightower/status/650468942410989568">Kelsey Hightower's tweet as far</a> back as 2015, in which he said that we had only to wait for the appearance of a conditional KubeOS (after which the life of cloud environments would become absolutely wonderful): <br><br><img src="https://habrastorage.org/webt/ct/ve/hu/ctvehuwa-3w4mimsjrdkig-ick4.png"><br><br>  <i>By the way, with the advent of Talos, this story <a href="https://twitter.com/autonomyio/status/1096562962557394945">continued</a> : someone answered the historical tweet that such a system had already appeared, and the author Talos said that he would be happy if Kelsey looked at the project.</i>  <i>The reaction of the latter, however, (yet) was not followed.</i> <br><br>  Apparently, the development of Talos involved one person <i>(representing himself in the framework of the whole company - <a href="https://www.autonomy.io/">Autonomy</a> )</i> - it took him more than a year.  And now, when the status of minimum readiness is reached, the author expects that other representatives of Kubernetes / cloud native-community will join him.  So what is the essence of the project? <br><br><h2>  Talos principles and features </h2><br>  Talos is positioned as a modern Linux distribution, specially created (and exclusively!) For Kubernetes.  To achieve this goal in its implementation follow the following approaches: <br><br><h3>  Minimalism </h3><br>  Ubiquitous minimalism is one of the cornerstones of Talos architecture.  One of the clearest examples here is <a href="https://talos.autonomy.io/components/init/">the initialization service</a> used, which (contrary to current trends in this area) follows the UNIX philosophy that “every program does one thing but well”: <br><br><blockquote>  We wanted to make init focused on a single task — launch Kubernetes.  It simply has no mechanisms for any other actions. </blockquote><br>  The developers went further and deprived their operating system of the usual system administrators of user access to the host: <b>in Talos there are no command shells, no SSH daemon, or even the ability to run their own processes</b> on the host.  And really: why all this if you need to run Kubernetes and only?  Virtually all processes in Talos operate within containers. <br><br>  However, since the world is not so perfect (for the OS to fully function "itself"), there are still tools for operating the OS: <br><br><ul><li>  The <a href="https://talos.autonomy.io/components/osd/">osd</a> daemon, implemented according to the principle of providing the minimum necessary privileges (Principle of Least Privilege) and offering an API (based on gRPC) for managing nodes; </li><li>  An <a href="https://talos.autonomy.io/components/osctl/">osctl</a> CLI utility that allows you to communicate with the osd service that runs on each node. </li></ul><br>  This is how a set of basic operating capabilities is implemented: rebooting services and cluster nodes, getting kernel logs (dmesg) from containers, inserting data into node configuration files, etc. <br><br>  All the listed components (init, osd, osctl ...), like <a href="https://github.com/autonomy/talos/tree/master/internal/app">some others</a> in the distribution, <b>are written in the Go language</b> .  By the way, all the source code is distributed under the terms of the Open Source-license Mozilla Public License 2.0. <br><br><h3>  Security </h3><br>  The minimalist approach described above (all necessary <b>only</b> for launching Kubernetes) + the principle of issuing only minimal privileges by themselves reduces the potential attack surface.  In addition, in Talos: <br><br><ul><li>  The included kernel is configured in accordance with the recommendations of the <a href="http://kernsec.org/wiki/index.php/Kernel_Self_Protection_Project">KSSP</a> (Kernel Self Protection Project) project, which focuses on the ability of the kernel to protect itself against potential bugs and vulnerabilities (instead of using userspace utilities for the same purposes); </li><li>  the root file system is mounted in read-only, which - combined with the absence of shells / SSH - makes the system immutable; </li><li>  uses two-way TLS (mTLS) to interact with the API; </li><li>  Kubernetes settings and configurations are applied in accordance with <a href="https://www.cisecurity.org/benchmark/kubernetes/">CIS guidelines</a> (Center for Internet Security). </li></ul><br>  An additional plus, resulting from minimalism and focusing on immutable, is the <b>predictability of the</b> system in its behavior (since the number of factors affecting the environment is reduced). <br><br><h3>  Relevance </h3><br>  The authors promise to base Talos on the penultimate upstream release of Kubernetes (however, K8s 1.13.3 is <a href="https://github.com/andrewrynhard/talos/commit/1219ae7">supported</a> right now) and the latest available LTS release of the Linux kernel (4.19.10 is currently used). <br><br><h3>  System components </h3><br>  The main components of the distribution (in addition to the kernel and "proprietary" utilities) are: <br><br><ul><li>  musl-libc - as standard C library; </li><li>  golang - for <code>init</code> and its other tools; </li><li>  gRPC - for API; </li><li>  containerd - to run system services in containers (used with the <a href="https://github.com/containerd/cri">CRI</a> plugin for Kubernetes); </li><li>  kubeadm - for deploying clusters. </li></ul><br><h2>  Work with Talos </h2><br>  Examples of Talos deployments for AWS, KVM and Xen use cases are provided in the <a href="https://talos.autonomy.io/examples/">project documentation</a> .  To quickly illustrate how this looks, here is an installation algorithm with Linux KVM virtual machines: <br><br>  1. Installing the master node on the host: <br><br><pre> <code class="bash hljs">docker run --rm --privileged --volume /dev:/dev \ autonomy/talos:latest image -b /dev/sdb -f -p bare-metal \ -u http://<span class="hljs-variable"><span class="hljs-variable">${IP}</span></span>:8080/master.yaml</code> </pre> <br>  2. Create VM: <br><br><pre> <code class="bash hljs">virt-install -n master --description <span class="hljs-string"><span class="hljs-string">"Kubernetes master node."</span></span> \ --os-type=Linux --os-variant=generic --virt-type=kvm --cpu=host \ --vcpus=2 --ram=4096 --disk path=/dev/sdb \ --network bridge=br0,model=e1000,mac=52:54:00:A8:4C:E1 \ --graphics none --boot hd --rng /dev/random</code> </pre> <br>  3. Similar steps to create a work node: <br><br><pre> <code class="bash hljs">docker run --rm --privileged --volume /dev:/dev \ autonomy/talos:latest image -b /dev/sdc -f -p bare-metal \ -u http://<span class="hljs-variable"><span class="hljs-variable">${IP}</span></span>:8080/worker.yaml virt-install -n master --description <span class="hljs-string"><span class="hljs-string">"Kubernetes worker node."</span></span> \ --os-type=Linux --os-variant=generic --virt-type=kvm --cpu=host \ --vcpus=2 --ram=4096 --disk path=/dev/sdc \ --network bridge=br0,model=e1000,mac=52:54:00:B9:5D:F2 \ --graphics none --boot hd --rng /dev/random</code> </pre> <br>  Configuring the interaction between osd and osctl by and large comes down to generating keys for their authentication (already mentioned mTLS) and is described <a href="https://talos.autonomy.io/configuration/osd/">here</a> . <br><br>  Further work with them comes down to commands like <code>osctl reboot</code> , <code>osctl stats</code> and <code>osctl logs</code> .  Demonstration of container output in the <code>k8s.io</code> namespace: <br><br><pre> <code class="bash hljs">$ osctl ps -k NAMESPACE ID IMAGE PID STATUS k8s.io 0ca1… sha256:da86… 2341 RUNNING k8s.io 356f… sha256:da86… 2342 RUNNING … k8s.io e42e… sha256:4ff8… 2508 RUNNING k8s.io kubelet k8s.gcr.io/… 2068 RUNNING</code> </pre> <br>  The process of configuring a Kubernetes cluster with Talos is available <a href="https://talos.autonomy.io/configuration/masters/">here</a> (mater nodes) and <a href="https://talos.autonomy.io/configuration/workers/">here</a> (workers). <br><br><h2>  Status and prospects </h2><br>  The project is in the alpha version stage (the latest release is <a href="">v0.1.0-alpha.18</a> ) and, of course, at this stage it looks more like an amusing experiment than anything really close to production. <br><br>  However, a surge of interest in Talos after its recent announcement (already 600+ stars on GitHub) and the call of the only author to work together can serve as an excellent incentive for its development. <br><br><img src="https://habrastorage.org/webt/gw/tz/l2/gwtzl2ri3yoyt-1rculmaeloxxe.png"><br>  <i>Activity on <a href="https://github.com/autonomy/talos/issues">issues</a> of the Talos project in recent days</i> <br><br>  At least, the distribution kit contains ideas relevant for the world of cloud native, the qualitative implementation of which is a matter of time. <br><br><h2>  PS </h2><br>  Read also in our blog: <br><br><ul><li>  “ <a href="https://habr.com/ru/company/flant/blog/431192/">Firecracker introduced microvirtualization for Linux at AWS</a> ”; </li><li>  “The <a href="https://habr.com/ru/company/flant/blog/429952/">Past, Present, and Future of Docker and Other Container Executables in Kubernetes</a> ”; </li><li>  " <a href="https://habr.com/company/flant/blog/426141/">Red Hat replaces Docker with Podman</a> "; </li><li>  “The <a href="https://habr.com/company/flant/blog/352432/">Linux distribution from scratch for building Docker images is our experience with dappdeps</a> .” </li></ul></div><p>Source: <a href="https://habr.com/ru/post/440810/">https://habr.com/ru/post/440810/</a></p>
+<section class="navigation-panel">
+<h4>More articles:</h4>
+<nav class="list-of-articles-container js-list-of-articles-container">Waiting for the list from <a href="../../index.html">here</a>...</nav>
+</section>
+<script src="../../js/main.js"></script>
+
+<!-- Yandex.Metrika counter -->
+<script type="text/javascript" >
+  (function (d, w, c) {
+      (w[c] = w[c] || []).push(function() {
+          try {
+              w.yaCounter52319614 = new Ya.Metrika({
+                  id:52319614,
+                  clickmap:true,
+                  trackLinks:true,
+                  accurateTrackBounce:true,
+                  webvisor:true
+              });
+          } catch(e) { }
+      });
+
+      var n = d.getElementsByTagName("script")[0],
+          s = d.createElement("script"),
+          f = function () { n.parentNode.insertBefore(s, n); };
+      s.type = "text/javascript";
+      s.async = true;
+      s.src = "https://mc.yandex.ru/metrika/watch.js";
+
+      if (w.opera == "[object Opera]") {
+          d.addEventListener("DOMContentLoaded", f, false);
+      } else { f(); }
+  })(document, window, "yandex_metrika_callbacks");
+</script>
+<noscript><div><img src="https://mc.yandex.ru/watch/52319614" style="position:absolute; left:-9999px;" alt="" /></div></noscript>
+
+<!-- Google Analytics -->
+  <script>
+    window.ga = function () { ga.q.push(arguments) }; ga.q = []; ga.l = +new Date;
+    ga('create', 'UA-134228602-1', 'auto'); ga('send', 'pageview')
+  </script>
+  <script src="https://www.google-analytics.com/analytics.js" async defer></script>
+
+</section>
+</body>
+
+</html>
