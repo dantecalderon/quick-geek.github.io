@@ -1,0 +1,92 @@
+<!doctype html>
+<html class="no-js" lang="en">
+
+<head>
+  <!-- Global site tag (gtag.js) - Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=UA-134228602-1"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'UA-134228602-1');
+  </script>
+
+  <meta charset="utf-8">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  <title>How scoring works in the car sharing industry. Part 2. Determine the aggressive driver in 5 seconds</title>
+  <meta name="description" content="In the last article, we reviewed the scoring algorithm based on sharp accelerations and decelerations. The results of scoring according to this algori...">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+  <link rel="stylesheet" href="../../css/main.css">
+
+  <script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+  <script>
+    (adsbygoogle = window.adsbygoogle || []).push({
+      google_ad_client: "ca-pub-6974184241884155",
+      enable_page_level_ads: true
+    });
+  </script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+  <script>window.jQuery || document.write('<script src="../../js/vendors/jquery-3.3.1.min.js"><\/script>')</script>
+</head>
+
+<body>
+  <!--[if lte IE 9]>
+    <p class="browserupgrade">You are using an <strong>outdated</strong> browser. Please <a href="https://browsehappy.com/">upgrade your browser</a> to improve your experience and security.</p>
+  <![endif]-->
+  <nav class="page-headings-container js-page-headings-container"></nav>
+  <div class="tools-bar js-tools-bar">
+    <!-- <a href="https://quick-geek.github.io/search.html" title="Search">🔎</a> -->
+    <a class="js-list-of-headings-button" data-state="closed" href="#" title="Headings">📜</a>
+    <a class="js-go-to-top-button" href="#" title="Go to Top">⬆️</a>
+    <a class="js-go-to-bottom-button" href="#" title="Go to Bottom">⬇️</a>
+  </div>
+  <section class="page js-page"><h1>How scoring works in the car sharing industry. Part 2. Determine the aggressive driver in 5 seconds</h1><div class="post__text post__text-html js-mediator-article">  In the <a href="https://habr.com/ru/company/bright-box/blog/430558/">last article,</a> we reviewed the scoring algorithm based on sharp accelerations and decelerations.  The results of scoring according to this algorithm weakly correlate with the probability of an accident.  In this article, we turn to the more advanced driving style analysis algorithms based on the values ​​of speed, engine speed and accelerometer indicators. <br><br><img src="https://habrastorage.org/webt/lr/eh/8r/lreh8r3u7dhm4wl7_daix_lcpsu.jpeg"><br><a name="habracut"></a><br>  For the analysis, we will use the data of 250,000 trips of 43,000 car-sharing users, of whom 250 were accidents.  Teletomatic devices Remoto are installed on the analyzed cars.  In the article we will consider two groups of drivers - aggressive and neat.  Aggressive drivers are defined as drivers who repeatedly commit violations of traffic rules. <br><br>  To begin, let us analyze the average speed of movement and average turnovers of users who were not involved in an accident or those responsible for an accident. <br><br><img src="https://habrastorage.org/webt/ac/r1/am/acr1amx5otc94lstswqdn7jb8b0.png"><br>  <i>Figure 1. Average speed</i> <br><img src="https://habrastorage.org/webt/c2/p-/qx/c2p-qxwg0ifcw9mk_0c2kxrxvck.png"><br>  <i>Figure 2. Average engine speed</i> <br><br>  On histograms 1 and 2, blue and orange indicate the indicators of users without an accident and the perpetrators of an accident, respectively, where the dotted lines are the medians.  It is seen that the average users with accidents and without - slightly different.  This suggests that most of the route drivers drive the same way. <br><br>  Then we selected 10 drivers: 5 with an aggressive driving style and 5 with a calm one.  Analysis of the data from the routes of these user groups showed an interesting feature - the first 5 seconds of the trip are aggressive users quickly pick up speed and keep the engine running higher.  Also, aggressive users slow down with great acceleration when the car is completely stopped (at a traffic light or at the end of a trip).  For speed, engine speed and acceleration, we used the following values ​​for the analysis: <br><br><ul><li>  Maximum value; </li><li>  Maximum change value; </li><li>  Mean statistical deviation; </li><li>  Average value; </li><li>  Median value. </li></ul><br>  On our test sample it was clearly visible that the maximum turnovers of aggressive drivers at the beginning of the route are much higher than those of the others, like the maximum acceleration.  As a result, we decided to calculate these values ​​for all 250,000 routes, dividing the data into two groups: the perpetrators of road accidents and ordinary users. <br><br><img src="https://habrastorage.org/webt/at/vp/-a/atvp-aphdkf2fkpgmpwptwmhmos.png"><br>  <i>Figure 3. The maximum speed at the start of the trip</i> <br><br>  Histogram 3 shows the distribution of the maximum engine speed, orange - the trips of users guilty of accidents, blue - all users.  Dotted lines are medians.  One can see a bright shift of the drivers responsible for the accident to the right, i.e.  In the first 5 seconds of the trip, these drivers keep their pace higher than the others.  36% of drivers from the same group have a turn above 4800 at the start of the route, and only 9% of all the drivers in question have such turns. <br><br>  Similarly, with maximum acceleration.  Histogram 4 depicts the distribution of maximum accelerations.  Those responsible for the accident maximum acceleration is higher than the rest. <br><br><img src="https://habrastorage.org/webt/u9/7x/6o/u97x6otpirkciq1xatshnyjommq.png"><br>  <i>Figure 4. Maximum acceleration at the start of the trip</i> <br><br>  Now we will consider not only the beginning of the trip, but all five-second intervals from the moments of a full stop and five-second intervals to a full stop.  For every 5 seconds of the start of the movement we calculate the maximum value of the engine speed and maximum acceleration.  Then for each user we find the maximum values. <br><br>  The largest deviations for the beginning of the movement show the maximum speed, and for stops - the maximum acceleration. <br><br><img src="https://habrastorage.org/webt/0x/jb/xz/0xjbxz0hmpekfp00vfbccksepmm.png"><br>  <i>Figure 5. Maximum engine speed when driving</i> <br><br><img src="https://habrastorage.org/webt/g1/dv/ne/g1dvneruy2wpoy7r9i_l3g1xtss.png"><br>  <i>Figure 6. Maximum Acceleration at Stop</i> <br><br>  As a result, it turns out that 80% of drivers who are guilty of accidents have a turnover of more than 5000, when only 20% of all drivers have such speed, in other words 80% of the drivers responsible for accidents are in the group of 20% of all users.  Also, 52% of the drivers of the perpetrators of road accidents, have a turnover above 5800, despite the fact that 10% of all users had such speed.  With acceleration when stopping a similar situation, although visually the shift is less, 60% of drivers with accidents showed an acceleration of more than 120, when only 20% of all drivers have such accelerations when stopping. <br><br>  We consider the maximum values ​​due to the strong variation of indicators of aggressive drivers, the deviation of data from one aggressive driver is always higher than that of a quiet driver.  In other words, quiet drivers usually drive in the same way, when aggressive drivers can drive as calmly and extremely aggressively, it's hard to say why and what affects it (there can be both mood and haste, etc.). <br><br>  We reviewed the starts and stops within the trip and got a good deviation for drivers with an accident relative to the entire mass of drivers.  Drivers with an aggressive driving style are most often responsible for road accidents, 80% of the perpetrators of road accidents fall into the group of aggressive in terms of maximum speed at the start of the movement.  This group of drivers should pay attention to car sharing operators, since  for them, an accident is always a loss. <br><br>  Other important elements of the trip are turns, I will tell about them in the next article. <br><br>  Author: Kirill Kulchenkov, <a href="https://habr.com/ru/users/kulchenkov32/" class="user_link">kulchenkov32</a> , business consultant, Bright Box. </div><p>Source: <a href="https://habr.com/ru/post/436220/">https://habr.com/ru/post/436220/</a></p>
+<section class="navigation-panel">
+<h4>More articles:</h4>
+<nav class="list-of-articles-container js-list-of-articles-container">Waiting for the list from <a href="../../index.html">here</a>...</nav>
+</section>
+<script src="../../js/main.js"></script>
+
+<!-- Yandex.Metrika counter -->
+<script type="text/javascript" >
+  (function (d, w, c) {
+      (w[c] = w[c] || []).push(function() {
+          try {
+              w.yaCounter52319614 = new Ya.Metrika({
+                  id:52319614,
+                  clickmap:true,
+                  trackLinks:true,
+                  accurateTrackBounce:true,
+                  webvisor:true
+              });
+          } catch(e) { }
+      });
+
+      var n = d.getElementsByTagName("script")[0],
+          s = d.createElement("script"),
+          f = function () { n.parentNode.insertBefore(s, n); };
+      s.type = "text/javascript";
+      s.async = true;
+      s.src = "https://mc.yandex.ru/metrika/watch.js";
+
+      if (w.opera == "[object Opera]") {
+          d.addEventListener("DOMContentLoaded", f, false);
+      } else { f(); }
+  })(document, window, "yandex_metrika_callbacks");
+</script>
+<noscript><div><img src="https://mc.yandex.ru/watch/52319614" style="position:absolute; left:-9999px;" alt="" /></div></noscript>
+
+<!-- Google Analytics -->
+  <script>
+    window.ga = function () { ga.q.push(arguments) }; ga.q = []; ga.l = +new Date;
+    ga('create', 'UA-134228602-1', 'auto'); ga('send', 'pageview')
+  </script>
+  <script src="https://www.google-analytics.com/analytics.js" async defer></script>
+
+</section>
+</body>
+
+</html>

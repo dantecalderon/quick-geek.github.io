@@ -1,0 +1,1 @@
+12 weird things that can happen after installing the npm package

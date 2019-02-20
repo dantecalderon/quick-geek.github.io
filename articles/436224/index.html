@@ -1,0 +1,96 @@
+<!doctype html>
+<html class="no-js" lang="en">
+
+<head>
+  <!-- Global site tag (gtag.js) - Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=UA-134228602-1"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'UA-134228602-1');
+  </script>
+
+  <meta charset="utf-8">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  <title>We write our programming language, part 4: Representation of structures and classes, generation of allocators</title>
+  <meta name="description" content="Good day to those who decided to read my next article. 
+
+ First of all I post links to the previous parts: 
+ Part 1: we write language VM 
+ Part 2: in...">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+  <link rel="stylesheet" href="../../css/main.css">
+
+  <script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+  <script>
+    (adsbygoogle = window.adsbygoogle || []).push({
+      google_ad_client: "ca-pub-6974184241884155",
+      enable_page_level_ads: true
+    });
+  </script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+  <script>window.jQuery || document.write('<script src="../../js/vendors/jquery-3.3.1.min.js"><\/script>')</script>
+</head>
+
+<body>
+  <!--[if lte IE 9]>
+    <p class="browserupgrade">You are using an <strong>outdated</strong> browser. Please <a href="https://browsehappy.com/">upgrade your browser</a> to improve your experience and security.</p>
+  <![endif]-->
+  <nav class="page-headings-container js-page-headings-container"></nav>
+  <div class="tools-bar js-tools-bar">
+    <!-- <a href="https://quick-geek.github.io/search.html" title="Search">🔎</a> -->
+    <a class="js-list-of-headings-button" data-state="closed" href="#" title="Headings">📜</a>
+    <a class="js-go-to-top-button" href="#" title="Go to Top">⬆️</a>
+    <a class="js-go-to-bottom-button" href="#" title="Go to Bottom">⬇️</a>
+  </div>
+  <section class="page js-page"><h1>We write our programming language, part 4: Representation of structures and classes, generation of allocators</h1><div class="post__text post__text-html js-mediator-article"><img src="https://habrastorage.org/getpro/habr/post_images/926/35c/060/92635c060bc7b3bdbcad911834e06806.png" alt="image"><br><br>  Good day to those who decided to read my next article. <br><br>  First of all I post links to the previous parts: <br>  <a href="https://habr.com/ru/post/435202/">Part 1: we write language VM</a> <br>  <a href="https://habr.com/ru/post/435258/">Part 2: intermediate presentation of programs</a> <br>  <a href="https://habr.com/ru/post/435520/">Part 3: Translator Architecture.</a>  <a href="https://habr.com/ru/post/435520/">Parsing language structures and mathematical expressions</a> <br><br>  Also worth putting links to the <a href="https://github.com/RoPi0n/mash-lang">repository</a> and a <a href="https://habr.com/ru/post/434966/">small overview article</a> , in which I briefly described the work done in its entirety. <br><br>  So, in the last article I described the creation of a translator from a more or less high-level programming language into an intermediate representation and further assembly of the application. <br><br>  Now we are faced with the task of adding structures and classes to the language in order for it to have the functionality of modern analogues.  This article will not show the code described <br>  functionality because  there is a lot of it, it is rather boring and not everyone will be interested in digging into it.  Only theory.  And some pictures. <br><br>  Let's start creating ... <br><a name="habracut"></a><br><br><h3>  Class representation </h3><br>  It should start with the fact that any structure can be represented as an array.  The index of an array element can be associated with a particular class variable or with its method. <br><br>  Consider a simple code example (of course on Mash): <br><img src="https://habrastorage.org/getpro/habr/post_images/246/620/611/246620611496a1412229548fddfd936c.png" alt="image"><br><br>  Before us is a simple example of a class that stores copies of the values ​​a and b, which are passed to it in the constructor.  It also has a destructor and a summ function, which returns the sum of a and b. <br>  But in the intermediate representation there is no OOP, and even more so at the VM level. <br>  If we look a little deeper to see what MyClass really is, we will see something like the following picture: <br><img src="https://habrastorage.org/getpro/habr/post_images/629/582/da1/629582da16e94838f7e3adeca41fc530.png" alt="image"><br><br>  Fine.  Translator, through simple manipulations and spells, turns our structure into a simple array. <br><br><h3>  Dynamic typing for classes </h3><br>  It is also worth thinking about the rapid dynamic establishment of types for classes and the corresponding work with them, because in languages ​​with dynamic typing this is a very important point. <br><br>  The most simple and effective solution is a virtual table of class components.  Those.  in the translator, you can implement the processing of all class definitions and make a list of the names of class variables and methods.  Accordingly, since  our classes are represented as arrays - each name from the list is comparable to an index.  As you fill the list of names - you can specify the size of the array for each class, for more economical allocation of memory. <br><br><h3>  Base class allocators </h3><br>  In order to be able to use a class with a virtual table of methods, in addition to simple memory allocation, you need to fill this table with pointers to the entry points to the class methods. <br><br>  A simple and working way is to generate an allocator for each class.  This is a simple method that allocates memory for an array of class structure, partially fills it, and returns a pointer to the class. <br><br>  Allocators are called when creating an instance of a class, i.e.  in the example above, the call will be made on the 24th line - “new MyClass (10, 20)”.  After the allocator, you can call the class constructor.  In Mash, the constructor is invoked if there are parentheses (...) after the class name in the new construct. <br><br><h3>  Introspection </h3><br>  It is possible that not everyone is familiar with this definition, but many have come across it. <br><blockquote>  Introspection is the definition of the type of object with which the work is performed during the execution of the code.  An example is typeof () in the same javascript. <br></blockquote><br><br>  Mash has complete introspection, i.e.  for simple data types and for classes. <br>  Without further ado, here are some code examples: <br><img src="https://habrastorage.org/getpro/habr/post_images/81f/61b/f68/81f61bf68859481bea940a78b1d436ea.png" alt="image"><br><br>  And for the class: <br><img src="https://habrastorage.org/getpro/habr/post_images/522/3d6/565/5223d6565ba77ebb32495e96c77016ed.png" alt="image"><br><br>  Introspection for classes is implemented by adding a type to the field of each class - a pointer to its type. <br><br><h3>  Completion </h3><br>  I tried in simple language to tell how the work with classes was organized in my translator of the Mash language.  This technology is also inherent in many other languages ​​with dynamic typing. <br><br>  I hope this article was interesting to you.  Thank you for reading it to the end, if you did it.  At the moment it was probably my last article on the creation of the Mash language (As long as I did not master the JIT compilation).  My subsequent articles will cover other aspects of the project, or they will relate to other topics altogether. </div><p>Source: <a href="https://habr.com/ru/post/436224/">https://habr.com/ru/post/436224/</a></p>
+<section class="navigation-panel">
+<h4>More articles:</h4>
+<nav class="list-of-articles-container js-list-of-articles-container">Waiting for the list from <a href="../../index.html">here</a>...</nav>
+</section>
+<script src="../../js/main.js"></script>
+
+<!-- Yandex.Metrika counter -->
+<script type="text/javascript" >
+  (function (d, w, c) {
+      (w[c] = w[c] || []).push(function() {
+          try {
+              w.yaCounter52319614 = new Ya.Metrika({
+                  id:52319614,
+                  clickmap:true,
+                  trackLinks:true,
+                  accurateTrackBounce:true,
+                  webvisor:true
+              });
+          } catch(e) { }
+      });
+
+      var n = d.getElementsByTagName("script")[0],
+          s = d.createElement("script"),
+          f = function () { n.parentNode.insertBefore(s, n); };
+      s.type = "text/javascript";
+      s.async = true;
+      s.src = "https://mc.yandex.ru/metrika/watch.js";
+
+      if (w.opera == "[object Opera]") {
+          d.addEventListener("DOMContentLoaded", f, false);
+      } else { f(); }
+  })(document, window, "yandex_metrika_callbacks");
+</script>
+<noscript><div><img src="https://mc.yandex.ru/watch/52319614" style="position:absolute; left:-9999px;" alt="" /></div></noscript>
+
+<!-- Google Analytics -->
+  <script>
+    window.ga = function () { ga.q.push(arguments) }; ga.q = []; ga.l = +new Date;
+    ga('create', 'UA-134228602-1', 'auto'); ga('send', 'pageview')
+  </script>
+  <script src="https://www.google-analytics.com/analytics.js" async defer></script>
+
+</section>
+</body>
+
+</html>

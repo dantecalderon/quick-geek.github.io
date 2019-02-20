@@ -1,0 +1,1 @@
+We use data science to determine the life cycle of the client

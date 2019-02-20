@@ -1,0 +1,92 @@
+<!doctype html>
+<html class="no-js" lang="en">
+
+<head>
+  <!-- Global site tag (gtag.js) - Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=UA-134228602-1"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'UA-134228602-1');
+  </script>
+
+  <meta charset="utf-8">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  <title>How to connect Yandex Cashier and succeed in conversion</title>
+  <meta name="description" content="In this article I will share the experience of using the payment system in the context of how this may affect the conversion. A part of theses will be...">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+  <link rel="stylesheet" href="../../css/main.css">
+
+  <script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+  <script>
+    (adsbygoogle = window.adsbygoogle || []).push({
+      google_ad_client: "ca-pub-6974184241884155",
+      enable_page_level_ads: true
+    });
+  </script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+  <script>window.jQuery || document.write('<script src="../../js/vendors/jquery-3.3.1.min.js"><\/script>')</script>
+</head>
+
+<body>
+  <!--[if lte IE 9]>
+    <p class="browserupgrade">You are using an <strong>outdated</strong> browser. Please <a href="https://browsehappy.com/">upgrade your browser</a> to improve your experience and security.</p>
+  <![endif]-->
+  <nav class="page-headings-container js-page-headings-container"></nav>
+  <div class="tools-bar js-tools-bar">
+    <!-- <a href="https://quick-geek.github.io/search.html" title="Search">🔎</a> -->
+    <a class="js-list-of-headings-button" data-state="closed" href="#" title="Headings">📜</a>
+    <a class="js-go-to-top-button" href="#" title="Go to Top">⬆️</a>
+    <a class="js-go-to-bottom-button" href="#" title="Go to Bottom">⬇️</a>
+  </div>
+  <section class="page js-page"><h1>How to connect Yandex Cashier and succeed in conversion</h1><div class="post__text post__text-html js-mediator-article"><p>  In this article I will share the experience of using the payment system in the context of how this may affect the conversion.  A part of theses will be relevant for almost any system, but basically it will be a question of Yandex Cashier with the aim of introducing more specifics.  The article will be useful to those who are now choosing a payment system or simply considering connecting Yandex Cashier in the foreseeable future. </p><br><a name="habracut"></a><h3>  Analytics and high expectations </h3><br><p>  It is obvious that the lead may well change his mind to convert to sale at any stage.  Even going to the payment page.  From the experience of working with Metric and Direct in a pair, I expected to see a solution for end-to-end analytics out of the box in the Cashier’s case.  Unfortunately, it is not.  If you need to understand exactly which users bring the purchase to the end, you will have to do something different. </p><br><p>  Since it is not possible to fully analyze the user case with standard tools, in most cases it remains to consider the individual steps: </p><br><h3>  Payment Error </h3><br><p>  In case of an error in payment (for example, the CVC code is incorrectly entered when paying by credit card) Yandex Cashier will show the user a page with the actual error message and a button to go back to the store.  There are no buttons to retry paying on this page.  This button will have to do on its side.  The user can use it if she still returns by the link provided to the store website.  Not perfect, but better than losing a customer, forcing him to go through the checkout procedure again. </p><br><p>  Technically, just requesting repetition by order number will fail.  This process is not described in the official documentation, but the support recommends that you pass the request through your server before the primary payment to Cashier and then save the payment form data, and then redirect to their server.  So if necessary, you will immediately be available all the data for a retry. </p><br><h3>  54-ФЗ </h3><br><p>  Since July 2017, under the new law, when paying online, online stores are required to provide the buyer with an electronic check.  It must be sent by email or SMS.  Get these contact information from the user - the task of the store.  Fortunately, usually the order form and so contains the appropriate field to communicate with the buyer. </p><br><p>  In most cases, if you use Yandex Cashier, it is more convenient for you to initiate the sending of checks through them, passing the information for the check along with the rest of the payment data.  They can do this in two ways to choose a store: </p><br><ul><li>  Attempt to send data to the online checkout for 5 minutes and in case of failure (no response from the online checkout) cancel the payment </li><li>  Do the same for 7 days and in case of failure, notify the store, without canceling the payment.  Support claims that in fact the online ticket office responds at worst during the day. </li></ul><br><p>  The second scenario definitely wins, not allowing losing a client due to a temporary failure of the online cash register.  How exactly this option correlates with the requirements of the law, support of Yandex Cash does not comment.  From myself I recommend to pay attention to the concept of "moment of calculation" and specify it in a public offer. </p><br><h3>  The trust </h3><br><p>  The obvious advantage of Yandex Cash Desk, which is worth using is a strong brand.  If you have a small, little-known online store, the Yandex logo in the description of payment methods can positively affect conversion, transferring some of your credibility to your site and increasing the level of user confidence.  By the way, not all payment methods specified on the Cashier landing page will be available immediately after connection.  Therefore, not looking to copy the list to yourself is a bad idea.  You can enable inactive payment methods by writing to support. </p><br><p>  I didn’t specifically compare Cashier here with other payment systems, as I didn’t use them myself.  I did not want to draw conclusions on the descriptions on the landings.  It would be interesting to see in the comments comparisons from those who worked with something else in practice. </p></div><p>Source: <a href="https://habr.com/ru/post/436252/">https://habr.com/ru/post/436252/</a></p>
+<section class="navigation-panel">
+<h4>More articles:</h4>
+<nav class="list-of-articles-container js-list-of-articles-container">Waiting for the list from <a href="../../index.html">here</a>...</nav>
+</section>
+<script src="../../js/main.js"></script>
+
+<!-- Yandex.Metrika counter -->
+<script type="text/javascript" >
+  (function (d, w, c) {
+      (w[c] = w[c] || []).push(function() {
+          try {
+              w.yaCounter52319614 = new Ya.Metrika({
+                  id:52319614,
+                  clickmap:true,
+                  trackLinks:true,
+                  accurateTrackBounce:true,
+                  webvisor:true
+              });
+          } catch(e) { }
+      });
+
+      var n = d.getElementsByTagName("script")[0],
+          s = d.createElement("script"),
+          f = function () { n.parentNode.insertBefore(s, n); };
+      s.type = "text/javascript";
+      s.async = true;
+      s.src = "https://mc.yandex.ru/metrika/watch.js";
+
+      if (w.opera == "[object Opera]") {
+          d.addEventListener("DOMContentLoaded", f, false);
+      } else { f(); }
+  })(document, window, "yandex_metrika_callbacks");
+</script>
+<noscript><div><img src="https://mc.yandex.ru/watch/52319614" style="position:absolute; left:-9999px;" alt="" /></div></noscript>
+
+<!-- Google Analytics -->
+  <script>
+    window.ga = function () { ga.q.push(arguments) }; ga.q = []; ga.l = +new Date;
+    ga('create', 'UA-134228602-1', 'auto'); ga('send', 'pageview')
+  </script>
+  <script src="https://www.google-analytics.com/analytics.js" async defer></script>
+
+</section>
+</body>
+
+</html>

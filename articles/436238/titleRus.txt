@@ -1,0 +1,1 @@
+Аутентификация в Kubernetes с помощью GitHub OAuth и Dex

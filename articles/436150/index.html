@@ -1,0 +1,94 @@
+<!doctype html>
+<html class="no-js" lang="en">
+
+<head>
+  <!-- Global site tag (gtag.js) - Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=UA-134228602-1"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'UA-134228602-1');
+  </script>
+
+  <meta charset="utf-8">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  <title>Configuring data transfer from the device to AWS IoT Core</title>
+  <meta name="description" content="I present to your attention the translation of a part of the article: The non-primitive approach of amazon - how AWS IoT meets IoT challenges 
+
+ AWS I...">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+  <link rel="stylesheet" href="../../css/main.css">
+
+  <script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+  <script>
+    (adsbygoogle = window.adsbygoogle || []).push({
+      google_ad_client: "ca-pub-6974184241884155",
+      enable_page_level_ads: true
+    });
+  </script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+  <script>window.jQuery || document.write('<script src="../../js/vendors/jquery-3.3.1.min.js"><\/script>')</script>
+</head>
+
+<body>
+  <!--[if lte IE 9]>
+    <p class="browserupgrade">You are using an <strong>outdated</strong> browser. Please <a href="https://browsehappy.com/">upgrade your browser</a> to improve your experience and security.</p>
+  <![endif]-->
+  <nav class="page-headings-container js-page-headings-container"></nav>
+  <div class="tools-bar js-tools-bar">
+    <!-- <a href="https://quick-geek.github.io/search.html" title="Search">🔎</a> -->
+    <a class="js-list-of-headings-button" data-state="closed" href="#" title="Headings">📜</a>
+    <a class="js-go-to-top-button" href="#" title="Go to Top">⬆️</a>
+    <a class="js-go-to-bottom-button" href="#" title="Go to Bottom">⬇️</a>
+  </div>
+  <section class="page js-page"><h1>Configuring data transfer from the device to AWS IoT Core</h1><div class="post__text post__text-html js-mediator-article">  I present to your attention the translation of a part of the article: <a href="https://indeema.com/blog/the-non-primitive-approach-of-amazon--how-aws-iot-meets-iot-challenges">The non-primitive approach of amazon - how AWS IoT meets IoT challenges</a> <br><br>  <i>AWS IoT Core is perhaps the most significant service among the basic Amazon services dedicated to IoT.</i>  <i>It allows you to easily and securely connect physical devices to the cloud, scale them securely, and provides full interoperability between IoT devices with their peripheral software and the AWS IoT cloud services mentioned above.</i> <i><br></i> <br>  To get started with AWS IoT, let's organize a test connection of a test device containing a microcontroller, as well as the following sensors HDC1080 - (temperature, humidity), BME280 - (pressure), MH-Z19 - (CO2), CCS811 - (eCO2, tVOC) in AWS IoT Core for test data transfer. <br><a name="habracut"></a><br><img src="https://habrastorage.org/webt/ef/t-/7w/eft-7wtfefcmotlpe500lrjz8-w.png"><br><br>  A secure device connection is essential in our case.  One of the most popular methods for ensuring secure data transfer is the use of end-to-end encryption via TLS 1.2.  protocol.  Only a few microcontroller-based solutions can comply with TLS 1.2.  due to lack of resources.  This time we use ESP32, since the microcontroller is one of the most affordable solutions. <br><br>  First, we need to create an AWS user, and our ESP32 microcontroller must be connected to the Internet. <br><br>  After logging in, open the IoT AWS console at <a href="https://aws.amazon.com/iot">aws.amazon.com/iot</a> .  On the welcome page, select “Start”. <br><br>  If you are using the IoT AWS console for the first time, you will see the “Welcome to the IoT AWS console” page.  In the left navigation pane, select Manage to expand the options, and then select Things. <br><br>  On the page that says “You still have nothing”, select “Register item”.  (If you have already created a thing, select Create.) <br><br><img src="https://habrastorage.org/webt/d_/f9/ms/d_f9mskdnuhd6dursoujte7qrt8.png"><br><br>  An object is a device whose state or data is stored in the AWS cloud.  This saved status or data is called device shadow.  The Device Shadow service maintains a shadow for each device connected to AWS IoT. <br><br>  Enter a name for the item and then click “Next”. <br><br><img src="https://habrastorage.org/webt/ol/r7/oq/olr7oqe50ohkd24yuhpk8z1dvj0.png"><br><br>  After that we have to create certificates for a secure connection. <br><br><img src="https://habrastorage.org/webt/xc/_y/ll/xc_yllqmxus4nilpi6y0uyilgk0.png"><br><br>  Then we have to upload the certificates, click Finish and get the authorized item. <br><br><img src="https://habrastorage.org/webt/ow/zj/hz/owzjhzepergjwa6jb0pbbxee2wu.png"><br><img src="https://habrastorage.org/webt/ef/4n/ys/ef4nyswph6ickzu9uavy1f0yzfa.png"><br><br>  Then we have to go to “security” and choose “policy”. <br><br><img src="https://habrastorage.org/webt/55/_l/lr/55_llrkrmz723zxqfrzzcmrwcaq.png"><br><br>  On the New Policy page, in the Name field, enter a name for the policy. <br>  In the “Action” field, enter “iot”: *.  In the resource ARN field, enter *. <br>  Check the “Allow” box.  This allows your Raspberry Pi to post messages to AWS IoT. <br>  iot: * - subscription and publication policy using this certificate <br>  * - all clients can post / subscribe to this item using this certificate. <br><br><img src="https://habrastorage.org/webt/dk/ps/lu/dkpslu50deidkz2o8vpm6x-ayie.png"><br><img src="https://habrastorage.org/webt/hd/z_/jx/hdz_jxzb_n6sczqpugcyc05cpik.png"><br><br>  In the left navigation pane, in the “Security” section, select “Certificates”. <br><br>  In the field for the certificate you created, select ... to open the drop-down menu, and then select “Attach policy”. <br><br><img src="https://habrastorage.org/webt/hd/yh/-p/hdyh-psnra1as0vpsaiedwmmfoa.png"><br><img src="https://habrastorage.org/webt/u3/ui/_e/u3ui_e1jpx1jazwfgi6ops2jl6u.png"><br><br>  In the field for the certificate you created, select ... to open the drop-down menu, and then select “Attach the item”. <br><br><img src="https://habrastorage.org/webt/sj/mm/xn/sjmmxnt5pj58qbyagehjvb19mwy.png"><br><br>  The last step is to activate the certificate: <br><br>  In the field for the certificate you created, select ... to open the drop-down menu, and then select “Activate”. <br><br><img src="https://habrastorage.org/webt/s2/ie/2x/s2ie2xnjujc_kslsr1umsvaihc4.png"><br><br>  We assume that our microcontroller ESP32, already configured to work with IoT AWS.  He knows the Rest API Endpoint broker, the port and the protocol, and all the necessary certificates are available. <br><br>  Now we need to test the ability to transfer data between ESP32 and the AWS IoT cloud.  Go to “Management”, select our test-ESP32 item, in the left menu, go to “Interact” and copy the address of the topic under the “Update to this thing shadow” line. <br><br><img src="https://habrastorage.org/webt/z_/cn/kb/z_cnkb4wfzhwhm6gihb56u2pmsc.png"><br><br>  After that, subscribe to the selected topic and wait for the data. <br><br><img src="https://habrastorage.org/webt/hm/3c/nf/hm3cnf_1urigi1wwxubdesivhwg.png"><br><img src="https://habrastorage.org/webt/hv/uj/-h/hvuj-hxsye2jocefqyf8gtrx6b8.png"><br><br>  In a few seconds we will see the data successfully obtained by the MQTT broker. <br><br><img src="https://habrastorage.org/webt/jn/jt/de/jnjtdeaqrl7g8ihrmm7peplz1c4.png"><br><br>  Finally, we can collect, analyze, and visualize our data using AWS IoT, as well as using our own solutions and architecture. </div><p>Source: <a href="https://habr.com/ru/post/436150/">https://habr.com/ru/post/436150/</a></p>
+<section class="navigation-panel">
+<h4>More articles:</h4>
+<nav class="list-of-articles-container js-list-of-articles-container">Waiting for the list from <a href="../../index.html">here</a>...</nav>
+</section>
+<script src="../../js/main.js"></script>
+
+<!-- Yandex.Metrika counter -->
+<script type="text/javascript" >
+  (function (d, w, c) {
+      (w[c] = w[c] || []).push(function() {
+          try {
+              w.yaCounter52319614 = new Ya.Metrika({
+                  id:52319614,
+                  clickmap:true,
+                  trackLinks:true,
+                  accurateTrackBounce:true,
+                  webvisor:true
+              });
+          } catch(e) { }
+      });
+
+      var n = d.getElementsByTagName("script")[0],
+          s = d.createElement("script"),
+          f = function () { n.parentNode.insertBefore(s, n); };
+      s.type = "text/javascript";
+      s.async = true;
+      s.src = "https://mc.yandex.ru/metrika/watch.js";
+
+      if (w.opera == "[object Opera]") {
+          d.addEventListener("DOMContentLoaded", f, false);
+      } else { f(); }
+  })(document, window, "yandex_metrika_callbacks");
+</script>
+<noscript><div><img src="https://mc.yandex.ru/watch/52319614" style="position:absolute; left:-9999px;" alt="" /></div></noscript>
+
+<!-- Google Analytics -->
+  <script>
+    window.ga = function () { ga.q.push(arguments) }; ga.q = []; ga.l = +new Date;
+    ga('create', 'UA-134228602-1', 'auto'); ga('send', 'pageview')
+  </script>
+  <script src="https://www.google-analytics.com/analytics.js" async defer></script>
+
+</section>
+</body>
+
+</html>
