@@ -1,0 +1,1 @@
+Keras, CNN, вокал, разделение источников звука, разделение сигнала, audio source separation, обработка сигналов, звук как изображение, Feature Engineering

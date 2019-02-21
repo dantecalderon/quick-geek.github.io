@@ -1,1 +1,0 @@
-postgresql, django, таблицы данных, блокировки sql, concurrency, constraints, даунтайм

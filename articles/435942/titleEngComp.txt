@@ -1,1 +1,0 @@
-One Billion Queens Problem Solution or, “Investigation of the laws in the list of solutions of the n-Queens distribution problem”

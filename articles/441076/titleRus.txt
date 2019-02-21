@@ -1,0 +1,1 @@
+Оптимизация скриптов с Webpack SplitChunksPlugin

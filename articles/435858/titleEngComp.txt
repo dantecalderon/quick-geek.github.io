@@ -1,1 +1,0 @@
-Programmable hardware TOTP keys with the ability to synchronize time

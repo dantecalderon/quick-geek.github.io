@@ -1,1 +1,0 @@
-ASP.NET, Docker, Microsoft, nginx, Виртуализация

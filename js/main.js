@@ -79,5 +79,5 @@ $(function() {
 
 
 	//Get the list of all articles
-	$('.js-list-of-articles-container').load('../../index.html .js-all-articles-list');
+	//$('.js-list-of-articles-container').load('../../index.html .js-all-articles-list');
 });

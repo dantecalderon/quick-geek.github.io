@@ -1,1 +1,0 @@
-Spring, Java, Reactive programming, распределенные системы, программирование

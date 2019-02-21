@@ -1,1 +1,0 @@
-нейросеть, ИНС, neural network, ANN, Go, металлодетектор, импульсный металлодетектор, metal detector, pulse induction, дискриминация, discrimination

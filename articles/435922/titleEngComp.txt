@@ -1,1 +1,0 @@
-Java, Spring, Kurento and media services. Part 2

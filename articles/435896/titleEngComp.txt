@@ -1,1 +1,0 @@
-Using the DiagnosticSource in .NET Core: Theory

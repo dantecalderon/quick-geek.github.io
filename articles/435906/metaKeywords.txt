@@ -1,1 +1,0 @@
-drbd, pacemaker, CTDB, samba, clvm, gfs2

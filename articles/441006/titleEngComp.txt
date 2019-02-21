@@ -1,0 +1,1 @@
+An overview of image segmentation methods in the scikit-image library

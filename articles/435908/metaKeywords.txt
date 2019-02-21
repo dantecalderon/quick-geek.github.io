@@ -1,1 +1,0 @@
-go, js, echo, svelte, buntdb, spa, pwa, rest api

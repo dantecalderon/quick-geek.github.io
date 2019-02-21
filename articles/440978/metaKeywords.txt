@@ -1,0 +1,1 @@
+термостат, esp8266, arduino, dht22, mh-z19, rf-модули, blynk, email оповещения

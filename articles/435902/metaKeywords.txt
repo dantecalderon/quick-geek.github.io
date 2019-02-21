@@ -1,1 +1,0 @@
-aql, aerospike, nosql, java, antlr, antlr4, select, sql, грамматика, велосипедостроение, предикаты, сортировочная станция, shunting yard

@@ -1,0 +1,1 @@
+CAD, KeeBee, USB, OpenSCAD, STM32F042K6T6, Nucleo, KiCAD, клавиатура
