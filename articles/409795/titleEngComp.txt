@@ -1,0 +1,1 @@
+Another neural network was taught to diagnose the problem by X-ray

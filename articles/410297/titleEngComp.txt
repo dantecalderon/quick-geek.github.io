@@ -1,0 +1,1 @@
+BlackBox is a source code generator (JAVA, C #, C) processing the binary protocol of your distributed application

@@ -1,0 +1,1 @@
+A new form of qubit control can increase the time of steady operation of a quantum computer.

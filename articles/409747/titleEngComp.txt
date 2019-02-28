@@ -1,0 +1,1 @@
+AttnGAN neural network draws objects in parts, using the vector space of not only sentences, but also words

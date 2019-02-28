@@ -1,0 +1,1 @@
+New revisions of modules based on ESP8266 do not know how to write in SPI Flash

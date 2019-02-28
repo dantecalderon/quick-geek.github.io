@@ -1,0 +1,1 @@
+The history of creating a home cloud. Part 2. Creating a server - setting LAMP in Debian

@@ -1,0 +1,1 @@
+SamsPcbGuide Part 1: Evaluation of the inductance of elements of the printed circuit board topology

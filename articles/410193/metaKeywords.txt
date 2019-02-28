@@ -1,0 +1,1 @@
+Intel, Intel Joule, Intel RealSense, ResNet, Face_recognition

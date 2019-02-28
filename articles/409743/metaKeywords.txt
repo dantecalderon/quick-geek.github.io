@@ -1,0 +1,1 @@
+cpld, verilog, arduino, stm32, led-экраны

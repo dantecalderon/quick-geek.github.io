@@ -1,0 +1,1 @@
+Управление интернет-реле из RouterOS Mikrotik через API
